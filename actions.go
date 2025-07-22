@@ -1599,7 +1599,7 @@ func tipsHelpText() string {
 	return strings.TrimSpace(`
 @YGENERAL TIPS@N
 
-Shamogu is a @Mturn-based@N game: take your time when in perilious situations!
+Shamogu is a @Mturn-based@N game: take your time when in perilous situations!
 
 Always check your inventory to see if some spirit ability or comestible can help in your situation. The sooner is often the better!
 
