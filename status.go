@@ -1,0 +1,148 @@
+package main
+
+import (
+	"fmt"
+
+	"codeberg.org/anaseto/gruid"
+	"codeberg.org/anaseto/gruid/ui"
+)
+
+// gameStatus represents the game's status bar and relevant data.
+type gameStatus struct {
+	menu  *ui.Menu
+	desc  *ui.Label
+	focus bool
+}
+
+// statusEntry represents the various kinds of entries in the status bar.
+type statusEntry int
+
+const (
+	statusLevel statusEntry = iota
+	statusTurns
+	statusMenu
+	statusDirection
+	statusHP
+	statusAttack
+	statusDefense
+)
+
+func (md *model) updateStatus() {
+	g := md.g
+	var entries []ui.MenuEntry
+
+	stt := ui.StyledText{}.WithMarkups(Markups)
+
+	// Map level.
+	level := fmt.Sprintf(" L:%d ", g.Map.Level)
+	if md.g.win {
+		level = " L:@GOut!@N "
+	}
+	entries = append(entries, ui.MenuEntry{Text: stt.WithText(level), Disabled: true})
+
+	// Turns.
+	entries = append(entries, ui.MenuEntry{Text: stt.WithTextf("T:%d ", g.Turn), Disabled: true})
+
+	// Menu button.
+	if md.mode == modeMenu && md.menu.mode == modeGameMenu {
+		entries = append(entries, ui.MenuEntry{Text: stt.WithTextf("@Y[M]@N")})
+	} else {
+		entries = append(entries, ui.MenuEntry{Text: stt.WithTextf("[M]")})
+	}
+
+	// Direction
+	dirs := " @B.@N "
+	switch md.g.Dir {
+	case gruid.Point{1, 0}:
+		dirs = " @B→@N "
+	case gruid.Point{-1, 0}:
+		dirs = " @B←@N "
+	case gruid.Point{0, 1}:
+		dirs = " @B↓@N "
+	case gruid.Point{0, -1}:
+		dirs = " @B↑@N "
+	}
+	entries = append(entries, ui.MenuEntry{
+		Text:     stt.WithText(dirs),
+		Disabled: true})
+
+	// HP
+	pa := g.PlayerActor()
+	hps := fmtHP(pa.HP, pa.GetMaxHP())
+	entries = append(entries, ui.MenuEntry{
+		Text:     stt.WithTextf("HP:%s ", hps),
+		Disabled: true})
+
+	// attack
+	entries = append(entries, ui.MenuEntry{
+		Text:     stt.WithTextf("A:%s ", fmtAD(pa.GetAttack(), pa.Attack)),
+		Disabled: true})
+
+	// defense
+	entries = append(entries, ui.MenuEntry{
+		Text:     stt.WithTextf("D:%s ", fmtAD(pa.GetDefense(), pa.Defense)),
+		Disabled: true})
+
+	// statuses
+	for i, turns := range pa.Statuses {
+		if turns <= 0 {
+			continue
+		}
+		st := Status(i)
+		entries = append(entries, ui.MenuEntry{
+			Text:     stt.WithTextf("@%c%s(%d)@N ", statusColor(st, turns), st.Abbr(), turns),
+			Disabled: true})
+	}
+	if pa.IsDead() {
+		entries = append(entries, ui.MenuEntry{
+			Text:     stt.WithText("@RDead@N "),
+			Disabled: true})
+	}
+	if md.targ.kb {
+		entries = append(entries, ui.MenuEntry{
+			Text:     stt.WithText("@C[Examine]@N "),
+			Disabled: true})
+	}
+
+	md.status.menu.SetEntries(entries)
+}
+
+func statusColor(st Status, turns int) rune {
+	if st.Bad() {
+		return 'O'
+	}
+	if turns <= 1 {
+		return 'C'
+	}
+	return 'B'
+}
+
+func statusHPColor(hp, hpmax int) rune {
+	switch {
+	case hp <= 1 || hp <= hpmax/3:
+		return 'O'
+	case hp <= (3*hpmax)/4:
+		return 'Y'
+	default:
+		return 'G'
+	}
+}
+
+func fmtHP(hp, hpmax int) string {
+	hpColor := statusHPColor(hp, hpmax)
+	if hp < 0 {
+		hp = 0
+	}
+	return fmt.Sprintf("@%c%d/%d@N", hpColor, hp, hpmax)
+}
+
+func fmtAD(val, def int) string {
+	color := 'N'
+	switch {
+	case val < def:
+		color = 'O'
+	case val > def:
+		color = 'B'
+	}
+	return fmt.Sprintf("@%c%d@N", color, val)
+}

@@ -1,0 +1,675 @@
+package main
+
+import (
+	"fmt"
+
+	"codeberg.org/anaseto/gruid"
+	"codeberg.org/anaseto/gruid/paths"
+)
+
+// AttackKind represents different kinds of attack kinds.
+type AttackKind int
+
+const (
+	AttackPlain  AttackKind = iota // Attack against adjacent foe without moving
+	AttackCharge                   // Attack against adjacent foe after moving
+	AttackRanged                   // Attack against non-adjacent foe without moving (swapping occurs after the attack)
+
+	AttackGale      // pushing gale damage
+	AttackLightning // lightning damage
+	AttackFire      // fire damage
+	AttackPoison    // poison damage
+	AttackOther     // other damage sources (not logged by InflictDamage)
+)
+
+const (
+	// HPCritical represents the critical HP threshold.
+	HPCritical = 3
+
+	// MaxAttackDamage represents the maximum damage that can be inflicted
+	// in one attack.
+	MaxAttackDamage = 3
+
+	BerserkAttackBonus            = 2
+	FoggySkinDefenseBonus         = 1
+	ConfusedImbalanceDefenseBonus = 2
+	LignificationDefenseBonus     = 4
+)
+
+// GetAttack returns the actor's current attack with modifiers.
+func (a *Actor) GetAttack() int {
+	attack := a.Attack
+	if a.Has(StatusBerserk) {
+		attack += BerserkAttackBonus
+	}
+	if a.Has(StatusImbalance) {
+		attack /= 2
+	}
+	return attack
+}
+
+// GetDefense returns the actor's current defense with modifiers.
+func (a *Actor) GetDefense() int {
+	defense := a.Defense
+	if a.Has(StatusLignification) {
+		defense += LignificationDefenseBonus
+	}
+	if a.Has(StatusFoggySkin) {
+		defense += FoggySkinDefenseBonus
+	}
+	if a.Has(StatusImbalance) && a.Has(StatusConfusion) {
+		defense += ConfusedImbalanceDefenseBonus
+	}
+	return defense
+}
+
+// GetMaxHP returns the actor's current max HP with modifiers.
+func (a *Actor) GetMaxHP() int {
+	hp := a.MaxHP
+	if a.Has(StatusBerserk) || a.Has(StatusLignification) {
+		hp += a.HPBonus()
+	}
+	return hp
+}
+
+// InflictDamage deals the given amount of non-bump damage to the actor, after
+// applying maximum restrictions. It handles critical mode and extra effects.
+func (g *Game) InflictDamage(i ID, ai *Actor, dmg int, ap AttackKind) int {
+	return g.InflictDamageGeneric(-1, i, nil, ai, dmg, ap)
+}
+
+// InflictDamageGeneric deals the given amount of damage to the actor, after
+// applying maximum restrictions. It handles critical mode and extra effects.
+func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKind) int {
+	if dmg <= 0 || aj.IsDead() {
+		return 0
+	}
+	dmg = min(dmg, aj.HP)
+	aj.Statuses[StatusDaze] = 0
+	aj.HP -= dmg
+	// Logging.
+	ej := g.Entity(j)
+	switch {
+	case i >= 0 && ai != nil:
+		g.logBumpDamage(i, j, ai, aj, dmg, ap)
+		if g.IntN(dmg) > 0 {
+			g.MakeNoise(ej.P, NoiseCombat)
+		}
+	case !g.InFOV(ej.P):
+		break
+	case ap == AttackGale:
+		if aj.IsDead() {
+			g.LogfStyled("The gale kills the %s (%d dmg).", logHurtMons, ej.Name, dmg)
+		} else {
+			g.LogfStyled("The gale hurts the %s (%d dmg).", logHurtMons, ej.Name, dmg)
+		}
+	case ap == AttackLightning:
+		if aj.IsDead() {
+			g.LogfStyled("The lightning kills the %s (%d dmg).", logHurtMons, ej.Name, dmg)
+		} else {
+			g.LogfStyled("The lightning hurts the %s (%d dmg).", logHurtMons, ej.Name, dmg)
+		}
+	case ap == AttackFire:
+		if j == PlayerID {
+			g.LogfStyled("The fire burns you (%d dmg).", logHurtPlayer, FireDamage)
+			g.StoryLogf("Burnt by fire (HP: %d/%d)", aj.HP, aj.GetMaxHP())
+			break
+		}
+		if aj.IsDead() {
+			g.LogfStyled("The fire kills the %s.", logHurtMons, ej.Name)
+		}
+	case ap == AttackPoison:
+		if j == PlayerID {
+			g.LogfStyled("Moving while poisoned hurts you (%d dmg).", logHurtPlayer, dmg)
+			g.StoryLogf("Moved while poisoned (HP: %d/%d)", aj.HP, aj.GetMaxHP())
+			break
+		}
+		if aj.IsDead() {
+			g.LogfStyled("The %s dies from poison.", logHurtMons, ej.Name)
+		}
+	case j != PlayerID && aj.IsDead() && !aj.DoesAny(MonsExplodingDeath):
+		g.Logf("The %s dies.", ej.Name)
+	}
+	// Extra effects (gathering stats & monster death/explosion).
+	switch {
+	case j == PlayerID:
+		g.Stats.Hurt++
+		g.Stats.Damage += dmg
+		g.Stats.MapDamage[g.Map.Level-1] += dmg
+		g.md.WoundedAnimation()
+		if g.Wizard != WizardNone && aj.IsDead() {
+			aj.HP = aj.MaxHP
+			g.LogStyled("*** Wizard mode resurrected you! ***", logSpecial)
+		}
+		if aj.HP+dmg > HPCritical && aj.HP <= HPCritical {
+			g.md.mode = modeCritical
+		}
+		g.md.auto.mode = noAuto
+	case aj.IsDead():
+		g.monsterDeath(j, aj)
+	}
+	return dmg
+}
+
+func (g *Game) logBumpDamage(i, j ID, _, aj *Actor, dmg int, ap AttackKind) {
+	ei, ej := g.Entity(i), g.Entity(j)
+	switch {
+	case i == PlayerID:
+		switch {
+		case aj.IsDead():
+			if ap == AttackCharge {
+				g.LogfStyled("Your charge kills the %v (%d dmg).", logHurtMons, ej.Name, dmg)
+			} else {
+				g.LogfStyled("You kill the %v (%d dmg).", logHurtMons, ej.Name, dmg)
+			}
+			g.Stats.Hits++
+		default:
+			if ap == AttackCharge {
+				g.LogfStyled("You charge the %v (%d dmg).", logHurtMons, g.Entity(j).Name, dmg)
+			} else {
+				g.LogfStyled("You hit the %v (%d dmg).", logHurtMons, g.Entity(j).Name, dmg)
+			}
+			g.Stats.Hits++
+		}
+	case j == PlayerID:
+		hpstr := fmt.Sprintf("HP: %d/%d", aj.HP, aj.GetMaxHP())
+		if ap == AttackCharge {
+			g.LogfStyled("The %s charges you (%d dmg).", logHurtPlayer, ei.Name, dmg)
+			g.StoryLogf("Charged at by %s for %d dmg (%s)", ei.Name, dmg, hpstr)
+		} else {
+			g.LogfStyled("The %v hits you (%d dmg).", logHurtPlayer, ei.Name, dmg)
+			g.StoryLogf("Hit by %s for %d dmg (%s)", ei.Name, dmg, hpstr)
+		}
+	default:
+		if !g.InFOV(ej.P) {
+			return
+		}
+		switch {
+		case aj.IsDead():
+			g.LogfStyled("The %s kills the %s (%d dmg).", logHurtMons, ei.Name, ej.Name, dmg)
+		default:
+			g.LogfStyled("The %s hits the %s (%d dmg).", logHurtMons, ei.Name, ej.Name, dmg)
+		}
+	}
+}
+
+// monsterDeath handles extra effects on monster death (like for exploding
+// nadres).
+func (g *Game) monsterDeath(i ID, ai *Actor) {
+	ei := g.Entity(i)
+	g.Stats.Death(ei.Name)
+	if !ai.DoesAny(MonsExplodingDeath) {
+		return
+	}
+	if g.InFOV(ei.P) {
+		g.Logf("The %s explodes.", ei.Name)
+	}
+	g.MakeNoise(ei.P, NoiseExplosion)
+	var nbs paths.Neighbors
+	ps := append(nbs.Cardinal(ei.P, g.Map.Passable), ei.P)
+	g.md.ExplosionAnimation(ps)
+	for _, q := range ps {
+		if g.Map.Burnable(q) {
+			g.FireCloudAt(q)
+		} else {
+			g.dig(q)
+		}
+		if j, aj := g.ActorAt(q); j >= 0 {
+			g.PutStatus(j, aj, StatusFire, DurationFire)
+		}
+	}
+}
+
+// RangedTargetInDir returns the first visible actor target in the given
+// direction.
+func (g *Game) RangedTargetInDir(from, dir gruid.Point) (ID, *Actor) {
+	for p := from.Add(dir); g.Map.Passable(p) && g.InFOV(p); p = p.Add(dir) {
+		if i, ai := g.ActorAt(p); i >= 0 {
+			return i, ai
+		}
+	}
+	return -1, nil
+}
+
+// ActorInRange returns an actor at a given position reachable from a given one
+// (for a ranged or attraction attack).
+func (g *Game) ActorInRange(from, at gruid.Point) ID {
+	if at.X != from.X && at.Y != from.Y {
+		return -1
+	}
+	dir := toDir(at.Sub(from))
+	j, _ := g.RangedTargetInDir(from, dir)
+	return j
+}
+
+// FourDirectionalAttack handles extra swapping effects for actors with
+// PatternFourDirs trait.
+func (g *Game) FourDirectionalAttack(i ID, ai *Actor, ap AttackKind) bool {
+	ei := g.Entity(i)
+	var actors []*Actor
+	var ids []ID
+	for j, aj := range g.AdjacentActors(ei.P) {
+		if i == PlayerID || j == PlayerID {
+			actors = append(actors, aj)
+			ids = append(ids, j)
+		}
+	}
+	g.rand.Shuffle(len(actors), func(i, j int) {
+		actors[i], actors[j] = actors[j], actors[i]
+		ids[i], ids[j] = ids[j], ids[i]
+	})
+	bonus := len(actors) - 1
+	if bonus < 0 {
+		bonus = 0
+	}
+	for k, j := range ids {
+		g.BumpAttackActor(i, j, ai, actors[k], ap, bonus)
+	}
+	return len(actors) > 0
+}
+
+// BumpAttackActor does an attack against an actor at a given position.
+// It returns the damage done.
+func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) {
+	dazed := aj.Has(StatusDaze)
+	ei, ej := g.Entity(i), g.Entity(j)
+	dmg := g.AttackDamage(i, j, ai, aj, ap, bonus)
+	if dmg <= 0 {
+		if ai.DoesAny(PatternSwap|PatternSwapDaze) && ai.CanMove() {
+			pi, pj := ei.P, ej.P
+			if !AdjacentPoints(pi, pj) {
+				g.BumpMoveActor(i, ai, pi.Add(toDir(pj.Sub(pi))))
+			}
+		}
+		return
+	}
+	// Extra effects by attack pattern.
+	switch {
+	case ai.DoesAny(Pushing|PushingUnbalance) && ai.CanMove() && !ai.Has(StatusPoison) && !aj.ResistsMove() && g.IntN(5-dmg) < 2:
+		g.push(i, j, ai, aj, dmg, ap, bonus)
+	case ai.DoesAny(PatternSwap|PatternSwapDaze) && ap != AttackCharge && ai.CanMove() && !aj.ResistsMove():
+		g.swapSpaceDistortion(i, j, ai, aj, dmg, dazed)
+	case ai.DoesAny(PatternCatch|PatternCatchUnbalance) && ap == AttackRanged && !aj.ResistsMove():
+		g.catch(i, j, ai, aj, dmg)
+	case ai.DoesAny(PatternRangedRecoil) && ap != AttackCharge && ai.CanMove() && g.IntN(5-dmg) < 2:
+		if g.recoil(i, j, ai) && i != PlayerID &&
+			ai.Has(StatusConfusion) && g.PutStatus(i, ai, StatusImbalance, 1+dmg) {
+			g.Logf("The confused %s lost balance due to recoil!", ei.Name)
+		}
+	}
+	// NOTE: There's only at most one extra attack or defense effect in the
+	// switch per actor currently, otherwise some would need to be tested
+	// for separately (like burning because of crazy druid that does
+	// berserking attacks too).
+	//
+	// Extra attack effects.
+	switch {
+	case ai.DoesAll(MonsSpitFire) && ap == AttackRanged:
+		if g.PutStatus(j, aj, StatusFire, DurationFire) {
+			if p := ej.P; g.Map.Burnable(p) {
+				g.FireCloudAt(p)
+			}
+			if ai.Has(StatusConfusion) && i != PlayerID && g.PutStatus(i, ai, StatusFire, DurationFire) {
+				g.Logf("The confused %s burned itself too!", ei.Name)
+			}
+		}
+	case ai.DoesAny(VenomousMelee) && (ap != AttackRanged || g.AdjacentEntities(i, j)) && g.IntN(6-dmg) < 2:
+		if g.PutStatus(j, aj, StatusPoison, DurationPoison) && i != PlayerID {
+			g.LogfStyled("The confused %s bit itself too!", logHurtMons, ei.Name)
+			g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
+		}
+	case ai.DoesAll(MonsFear) && g.IntN(5-dmg) < 2:
+		if g.PutStatus(j, aj, StatusFear, DurationMonsFear) {
+			if ai.Has(StatusConfusion) && g.PutStatus(i, ai, StatusFear, DurationMonsFear) {
+				g.Logf("The confused %s frightened itself too!", ei.Name)
+			}
+		}
+	case ai.DoesAny(MonsConfusion) && g.IntN(6-dmg) < 2:
+		if g.PutStatus(j, aj, StatusConfusion, DurationConfusion) {
+			// Should not happen currently (only confusing eyes do
+			// this and they're immune to confusion).
+			g.monsConfusionPenalty(i, ai)
+		}
+	case ai.DoesAny(MonsLignify) && g.IntN(6-dmg) < 2:
+		if g.PutStatus(j, aj, StatusLignification, DurationLignification/2) {
+			g.monsConfusionPenalty(i, ai)
+		}
+	case ai.DoesAny(MonsBerserking) && g.IntN(6-dmg) < 2:
+		if g.PutStatus(j, aj, StatusBerserk, DurationBerserk/2) {
+			g.monsConfusionPenalty(i, ai)
+		}
+	case ai.DoesAny(MonsBlink) && aj.IsAlive():
+		g.blinkOther(i, j, ai, aj)
+	}
+	if ai.DoesAll(MonsBurn) && g.IntN(5-dmg) < 2 {
+		if g.PutStatus(j, aj, StatusFire, DurationFire) {
+			if p := ej.P; g.Map.Burnable(p) {
+				g.FireCloudAt(p)
+			}
+		}
+	}
+	// Extra defense effects.
+	switch {
+	case aj.DoesAny(DazingSpines) && (ap != AttackRanged || g.AdjacentEntities(i, j)) && g.IntN(5-dmg) == 0:
+		g.PutStatus(i, ai, StatusDaze, DurationDazeSpines)
+	case aj.DoesAny(MonsNausea) && aj.IsDead() && (ap != AttackRanged || g.AdjacentEntities(i, j)):
+		g.PutStatus(i, ai, StatusNausea, DurationNauseaRat)
+	}
+}
+
+// computeDamage computes a damage roll with given attack and defense values.
+func (g *Game) computeDamage(a, d int) int {
+	var dmg int
+	if g.IntN(100) < 5 {
+		// Ensure at least 5% miss chance.
+		return 0
+	}
+	if g.IntN(max(2, d)) == 0 {
+		dmg++
+	}
+	for range 2 {
+		if g.IntN(1+a)*g.IntN(1+a) > 0 {
+			dmg++
+		}
+	}
+	if g.IntN(1+d) > 0 {
+		dmg--
+	}
+	return max(0, min(a, dmg))
+}
+
+// AttackDamage inflicts bump attack damage by an actor on another, and
+// returns the damage done (zero for a miss).
+func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) int {
+	switch {
+	case ap == AttackCharge && ai.DoesAny(PatternRampage) && !aj.ResistsMove():
+		// Rampage has an attack bonus when charging, except against
+		// walking trees and lignified oponents.
+		bonus++
+	case ap == AttackRanged && ai.DoesAny(PatternCatch|PatternCatchUnbalance):
+		// Catching ranged attacks get an attack bonus.
+		bonus++
+	}
+	attack, defense := ai.GetAttack()+bonus, aj.GetDefense()
+	if attack <= 0 {
+		// Ensure at least 1 offense.
+		attack = 1
+	}
+	if ai.DoesAny(MonsIgnoreDefense) && !aj.Has(StatusFoggySkin) {
+		defense = 0
+	}
+	n := 1 // default number of attacks
+	if ai.Has(StatusFocus) || ai.DoesAny(MonsFourHeaded) {
+		n += 3 // extra attacks for each extra head
+	}
+	var dmg int
+	for range n {
+		// Damage per attack.
+		dmg += g.computeDamage(attack, defense)
+	}
+	if ap == AttackCharge && ai.Has(StatusDig) {
+		// Dig status gives extra *effective* damage on charge.
+		dmg++
+	}
+	if ai.Has(StatusBerserk) {
+		// Berserk status gives extra *effective* damage.
+		dmg++
+	}
+	dmg = min(dmg, aj.HP)
+	if j == PlayerID {
+		if dmg == aj.HP && (dmg >= 2 && g.IntN(2+dmg) > 0 || dmg == 1 && g.IntN(2) == 0) {
+			// Lucky roll adjustment for increased game tension and
+			// more newbie-friendliness.
+			dmg--
+		}
+		if attack*n >= aj.HP && dmg < aj.HP {
+			// We avoided death with a lucky roll.
+			g.Stats.Lucky++
+		}
+	}
+	if dmg <= 0 {
+		g.logBumpMiss(i, j, ap)
+		return 0
+	}
+	pj := g.Entity(j).P
+	if i == PlayerID {
+		g.md.HitAnimation(pj, dmg == aj.HP)
+	}
+	dmg = g.InflictDamageGeneric(i, j, ai, aj, dmg, ap) // dmg actually remains the same
+	if aj.Behavior != nil && aj.Behavior.State != Hunting && ai.IsPlayer() {
+		// Surprise charging attacks make monsters hunt immediately.
+		aj.Behavior.State = Hunting
+		aj.Behavior.Target = g.PP()
+	}
+	return dmg
+}
+
+func (g *Game) logBumpMiss(i, j ID, ap AttackKind) {
+	ei, ej := g.Entity(i), g.Entity(j)
+	switch {
+	case i == PlayerID:
+		if ap == AttackCharge {
+			g.Logf("Your charge misses the %v.", ej.Name)
+		} else {
+			g.Logf("You miss the %v.", ej.Name)
+		}
+		g.Stats.Misses++
+	case j == PlayerID:
+		if ap == AttackCharge {
+			g.Logf("The %s’s charge misses you.", ei.Name)
+		} else {
+			g.Logf("The %v misses you.", ei.Name)
+		}
+	}
+	// NOTE: we don't log misses between monsters, as that's not very
+	// interesting information.
+}
+
+func (g *Game) monsConfusionPenalty(i ID, ai *Actor) {
+	if ai.Has(StatusConfusion) {
+		g.LogfStyled("The confused %s hurt itself too!", logHurtMons, g.Entity(i))
+		g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
+	}
+}
+
+// push handles extra penetrating and pushing effects for actors with
+// Pushing trait.  It should be called only on pairs of adjacent actors.
+func (g *Game) push(i, j ID, ai, aj *Actor, dmg int, ap AttackKind, bonus int) {
+	ei, ej := g.Entity(i), g.Entity(j)
+	pi, pj := ei.P, ej.P
+	delta := pj.Sub(pi)
+	npj := pj.Add(delta)
+	if ai.DoesAny(PushingUnbalance) {
+		if g.PutStatus(j, aj, StatusImbalance, 2+dmg/3) && i != PlayerID &&
+			ai.Has(StatusConfusion) && g.PutStatus(i, ai, StatusImbalance, dmg) {
+			g.Logf("The confused %s lost balance while pushing too!", ei.Name)
+		}
+	}
+	if k, ak := g.ActorAt(npj); ak != nil {
+		// There's another actor behind: extra piercing attack.
+		g.AttackDamage(i, k, ai, ak, ap, bonus)
+		return
+	}
+	// No actor behind: try pushing.
+	if !g.Map.Passable(npj) {
+		if aj.IsDead() {
+			g.BumpMoveActor(i, ai, pj)
+		}
+		return
+	}
+	if aj.IsAlive() {
+		if j != PlayerID {
+			g.Logf("The %v is pushed away.", ej.Name)
+		} else {
+			g.Log("You’re pushed away.")
+			g.StoryLogf("Pushed away by %s", ei.Name)
+		}
+		g.MoveActor(j, aj, npj)
+		g.md.MoveAnimation(pj, npj)
+	}
+	g.BumpMoveActor(i, ai, pj)
+}
+
+// catch handles extra catching effects for actors with PatternCatch trait.  It
+// should be called only on pairs of adjacent actors.
+func (g *Game) catch(i, j ID, ai, aj *Actor, dmg int) {
+	ei, ej := g.Entity(i), g.Entity(j)
+	dir := toDir(ej.P.Sub(ei.P))
+	to := ei.P.Add(dir)
+	from := ej.P
+	g.BumpMoveActor(j, aj, to)
+	g.md.MoveAnimation(from, to)
+	if ai.DoesAny(PatternCatchUnbalance) && g.IntN(8-dmg) < 5 {
+		if g.PutStatus(j, aj, StatusImbalance, 1+dmg) && i != PlayerID &&
+			ai.Has(StatusConfusion) && g.PutStatus(i, ai, StatusImbalance, 1+dmg) {
+			g.Logf("The confused %s lost balance too!", ei.Name)
+		}
+	}
+}
+
+// swapSpaceDistortion handles extra swapping effects for actors with
+// PatternSwap trait, after inflicting damage on target.  It should be called
+// only on pairs of adjacent actors.
+func (g *Game) swapSpaceDistortion(i, j ID, ai, aj *Actor, dmg int, dazed bool) {
+	pj := g.Entity(j).P
+	g.MoveActor(i, ai, pj) // swaps positions
+	if !dazed && ai.DoesAny(PatternSwapDaze) && g.IntN(6-dmg) < 2 {
+		duration := 2 + dmg/2
+		if g.PutStatus(j, aj, StatusDaze, duration) && i != PlayerID &&
+			ai.Has(StatusConfusion) && g.PutStatus(i, ai, StatusDaze, duration) {
+			g.LogfStyled("The confused %s dazed itself too!",
+				logHurtMons, g.Entity(i).Name)
+		}
+	}
+	for p := range g.Map.PassableNeighbors(pj) {
+		if k, ak := g.ActorAt(p); k >= 0 && k != j && !ak.ResistsMove() {
+			ek := g.Entity(k)
+			if to, ok := g.BlinkPos(ek.P); ok {
+				g.md.TeleportAnimation(ek.P, to, true)
+				g.MoveActor(k, ak, to)
+				g.Logf("The temporal distortion blinked the %s away.", ek.Name)
+			}
+		}
+	}
+	if i == PlayerID || j == PlayerID {
+		// Reverse direction too, because it makes sense that after
+		// swapping positions both actors are still facing each other.
+		g.Dir = g.Dir.Mul(-1)
+	}
+}
+
+// recoil handles extra recoil effects for actors with the PatternRangedRecoil
+// trait.
+func (g *Game) recoil(i, j ID, ai *Actor) bool {
+	ei, ej := g.Entity(i), g.Entity(j)
+	dir := toDir(ei.P.Sub(ej.P))
+	npi := ei.P.Add(dir)
+	if !g.Map.Passable(npi) {
+		return false
+	}
+	if i, _ := g.ActorAt(npi); i >= 0 {
+		return false
+	}
+	if paths.DistanceManhattan(ei.P, ej.P) == 1 {
+		p := npi.Add(dir)
+		if g.Map.Passable(p) {
+			if i, _ := g.ActorAt(p); i < 0 {
+				npi = p
+			}
+		}
+	}
+	pi := ei.P
+	g.MoveActor(i, ai, npi)
+	g.md.MoveAnimation(pi, npi)
+	return true
+}
+
+// AdjacentPoints reports whether positions p and q are adjacent.
+func AdjacentPoints(p, q gruid.Point) bool {
+	return paths.DistanceManhattan(p, q) == 1
+}
+
+// AdjacentEntities reports whether two entities are adjacent.
+func (g *Game) AdjacentEntities(i, j ID) bool {
+	return paths.DistanceManhattan(g.Entity(i).P, g.Entity(j).P) == 1
+}
+
+// Dig attempts to make an actor dig at a given position. It reports true on
+// success.
+func (g *Game) Dig(i ID, a *Actor, at gruid.Point, log bool) bool {
+	if !a.Has(StatusDig) {
+		if log {
+			g.Logf("You cannot walk into the %s.", TerrainName(g.Map.Terrain.At(at)))
+		}
+		return false
+	}
+	if !inMap(at) {
+		if log {
+			g.Log("You cannot walk out of the map.")
+		}
+		return false
+	}
+	g.dig(at)
+	return true
+}
+
+func (g *Game) dig(at gruid.Point) {
+	if g.Map.Passable(at) {
+		return
+	}
+	g.Stats.Digs++
+	g.Map.Terrain.Set(at, Rubble)
+	g.MakeNoise(at, NoiseDig)
+	pp := g.PP()
+	if paths.DistanceManhattan(pp, at) <= MaxFOVRange {
+		g.UpdateFOV()
+		g.UpdateKnowledge()
+		if pp != at {
+			g.md.AnimationFrame()
+		}
+	}
+}
+
+// blinkOther implements the blinking bump effect.
+func (g *Game) blinkOther(i, j ID, ai, aj *Actor) {
+	if aj.IsDead() || aj.ResistsMove() {
+		return
+	}
+	ej := g.Entity(j)
+	if to, ok := g.BlinkPos(ej.P); ok {
+		g.md.TeleportAnimation(ej.P, to, true)
+		g.MoveActor(j, aj, to)
+		ei := g.Entity(i)
+		if j == PlayerID {
+			g.Logf("The %s’s attack made you blink away.", ei.Name)
+			g.StoryLogf("Blinked away by %s", ei.Name)
+		}
+		if ai.Has(StatusConfusion) {
+			if to, ok := g.BlinkPos(ei.P); ok {
+				g.md.TeleportAnimation(ei.P, to, g.InFOV(to))
+			}
+			g.MoveActor(i, ai, to)
+			g.LogfStyled("The confused %s hurt and blinked itself too!", logHurtMons, ei.Name)
+			g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
+		}
+	}
+}
+
+// BlinkPos returns a suitable blinking position in FOV from the given
+// position.
+func (g *Game) BlinkPos(from gruid.Point) (gruid.Point, bool) {
+	pp := g.PP()
+	ps := []gruid.Point{}
+	for _, p := range g.Map.FOVPts {
+		if paths.DistanceManhattan(p, pp) > MaxFOVRange || p == from {
+			continue
+		}
+		if cost, ok := g.Map.FOV.At(p); ok && cost <= MaxFOVRange && g.IsFree(p) {
+			ps = append(ps, p)
+		}
+	}
+	if len(ps) == 0 {
+		return InvalidPos, false
+	}
+	return ps[g.IntN(len(ps))], true
+}

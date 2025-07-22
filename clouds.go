@@ -1,0 +1,237 @@
+package main
+
+import (
+	"codeberg.org/anaseto/gruid"
+)
+
+// Cloud represents a cloud, which can be of some specific kind (like fog), and
+// has a duration.
+type Cloud struct {
+	Kind     CloudKind
+	P        gruid.Point
+	Duration int
+}
+
+// CloudKind represents the possible kinds of clouds.
+type CloudKind int
+
+// These constants represent the possible kind of clouds.
+const (
+	NoCloud CloudKind = iota
+	CloudFog
+	CloudFire
+	CloudPoison
+)
+
+func (ck CloudKind) String() string {
+	switch ck {
+	case CloudFog:
+		return "fog"
+	case CloudFire:
+		return "fire"
+	case CloudPoison:
+		return "poisonous cloud"
+	default:
+		return "cloud"
+	}
+}
+
+func (ck CloudKind) Desc() string {
+	switch ck {
+	case CloudFog:
+		return "The fog obstructs vision."
+	case CloudFire:
+		return "The fire cloud obstructs vision and may burn foliage and creatures."
+	case CloudPoison:
+		return "The poisonous cloud obstructs vision and poisons creatures."
+	default:
+		// should not happen.
+		return "No description."
+	}
+}
+
+const FireDamage = 1
+const PoisonDamage = 1
+
+// CloudGrid is a representation of the clouds in the map that allows both for
+// linear processing of current clouds, as well as constant-time checks of a
+// particular position in the map looking for any clouds.
+type CloudGrid struct {
+	Clouds []Cloud
+	Grid   []int // index in Clouds for a map position, or -1
+}
+
+// NewCloudGrid returns a new CloudGrid properly initialized.
+func NewCloudGrid() *CloudGrid {
+	cg := &CloudGrid{}
+	cg.Grid = make([]int, MapWidth*MapHeight)
+	cg.Clouds = []Cloud{}
+	for i := range cg.Grid {
+		cg.Grid[i] = -1 // no cloud
+	}
+	return cg
+}
+
+func point2idx(p gruid.Point) int {
+	return p.Y*MapWidth + p.X
+}
+
+// func idx2point(i int) gruid.Point {
+// 	return gruid.Point{X: i % MapWidth, Y: i / MapWidth}
+// }
+
+// Reset removes all the clouds
+func (cg *CloudGrid) Reset() {
+	for _, cl := range cg.Clouds {
+		p := cl.P
+		i := point2idx(p)
+		if i < 0 || i >= MapWidth*MapHeight {
+			// invalid cloud pos (should not happen)
+			continue
+		}
+		cg.Grid[i] = -1 // no cloud
+	}
+	cg.Clouds = cg.Clouds[:0]
+}
+
+// At returns a cloud at a given position, if any.
+func (cg *CloudGrid) At(p gruid.Point) (Cloud, bool) {
+	i := point2idx(p)
+	if i < 0 || i >= MapWidth*MapHeight {
+		return Cloud{}, false
+	}
+	if j := cg.Grid[i]; j >= 0 {
+		return cg.Clouds[j], true
+	}
+	return Cloud{}, false
+}
+
+// AddCloud adds a cloud at a given position. If there's already a could it
+// does nothing, unless they're of same type and the new one has a longer
+// duration.
+func (g *Game) AddCloud(cl Cloud) {
+	cg := g.Map.Clouds
+	p := cl.P
+	if !g.Map.Passable(p) {
+		return
+	}
+	i := point2idx(p)
+	if j := cg.Grid[i]; j >= 0 {
+		cj := cg.Clouds[j]
+		if cl.Kind == cj.Kind && cl.Duration > cj.Duration {
+			cg.Clouds[j] = cl
+		}
+		return
+	}
+	switch cl.Kind {
+	case CloudFire:
+		g.Stats.FireClouds++
+	case CloudPoison:
+		g.Stats.PoisonClouds++
+	}
+	j := len(cg.Clouds)
+	cg.Clouds = append(cg.Clouds, cl)
+	cg.Grid[i] = j
+}
+
+func (cg *CloudGrid) removeCloud(j int) {
+	nl := len(cg.Clouds) - 1 // new length
+	cj, cnj := cg.Clouds[j], cg.Clouds[nl]
+	i, ni := point2idx(cj.P), point2idx(cnj.P)
+	// We update values in Grid so that the last cloud in Clouds is now at
+	// index j.
+	cg.Grid[ni] = j
+	cg.Grid[i] = -1
+	cg.Clouds[j], cg.Clouds[nl] = cg.Clouds[nl], cg.Clouds[j]
+	cg.Clouds = cg.Clouds[:nl]
+}
+
+// RemoveCloud removes a cloud at a given index.
+func (g *Game) RemoveCloud(j int) {
+	cg := g.Map.Clouds
+	if j < 0 || j >= len(cg.Clouds) {
+		// Should not happen.
+		return
+	}
+	cj := cg.Clouds[j]
+	if cj.Kind == CloudFire {
+		// RemoveCloud is used for cloud expiration, so when we have a
+		// could of fire, we replace it with a new cloud of fog
+		// instead.
+		t := g.Map.Terrain.At(cj.P)
+		if t == Foliage {
+			g.Map.Terrain.Set(cj.P, Floor)
+		}
+		cj.Kind = CloudFog
+		cj.Duration = g.fireCloudDuration()
+		cg.Clouds[j] = cj
+		return
+	}
+	cg.removeCloud(j)
+}
+
+// fireCloudDuration returns the typical duration of a fire cloud.
+func (g *Game) fireCloudDuration() int {
+	return 6 + g.IntN(9)
+}
+
+// poisonCloudDuration returns the typical duration of a poisonous cloud.
+func (g *Game) poisonCloudDuration() int {
+	return 6 + g.IntN(5)
+}
+
+// UpdateClouds reduces the duration of all clouds by one, and removes any
+// cloud whose new duration is zero or negative.
+func (g *Game) UpdateClouds() {
+	cg := g.Map.Clouds
+	for i := 0; i < len(cg.Clouds); {
+		cl := &cg.Clouds[i]
+		cl.Duration--
+		if cl.Duration <= 0 {
+			g.RemoveCloud(i)
+		} else {
+			i++
+		}
+	}
+	for _, cl := range cg.Clouds {
+		switch cl.Kind {
+		case CloudFire:
+			if j, aj := g.ActorAt(cl.P); j >= 0 {
+				g.PutStatus(j, aj, StatusFire, DurationFire)
+			}
+			for p := range NeighborsFunc(cl.P, g.Map.Burnable) {
+				if _, ok := cg.At(p); ok || g.IntN(3) > 0 {
+					continue
+				}
+				g.FireCloudAt(p)
+			}
+		case CloudPoison:
+			if j, aj := g.ActorAt(cl.P); j >= 0 {
+				g.PutStatus(j, aj, StatusPoison, DurationPoison)
+			}
+		}
+	}
+}
+
+// FireCloudAt adds a fire cloud at the given position.
+func (g *Game) FireCloudAt(p gruid.Point) {
+	g.AddCloud(Cloud{Kind: CloudFire, P: p, Duration: g.fireCloudDuration()})
+}
+
+// PoisonCloudAt adds a poisonous cloud at the given position.
+func (g *Game) PoisonCloudAt(p gruid.Point) {
+	g.AddCloud(Cloud{Kind: CloudPoison, P: p, Duration: g.poisonCloudDuration()})
+}
+
+// FireAt reports whether there's a fire at the given position.
+func (g *Game) FireAt(p gruid.Point) bool {
+	if cl, ok := g.Map.Clouds.At(p); ok {
+		return cl.Kind == CloudFire
+	}
+	return false
+}
+
+// InflictFireDamage inflicts fire damage to an actor.
+func (g *Game) InflictFireDamage(i ID, ai *Actor) {
+	g.InflictDamage(i, ai, FireDamage, AttackFire)
+}
