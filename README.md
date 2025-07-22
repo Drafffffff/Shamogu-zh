@@ -12,6 +12,15 @@ dungeon portal suddenly appeared at the top of the mountain. As the guardian,
 you decide to explore that dungeon in order to find and destroy the source of
 corruption… You hope luck will be on your side!”*
 
+Website
+-------
+
+![Shamogu introduction screen](https://anaseto.codeberg.page/games/shamogu/intro-screen-tiles.png)
+
+You can visit the [game's
+website](https://anaseto.codeberg.page/games/shamogu)
+for more information and tips about the game.
+
 Install from Sources
 --------------------
 
