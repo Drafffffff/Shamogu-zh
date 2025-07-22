@@ -1,10 +1,10 @@
 Shamanic Mountain Guardian
 ==========================
 
-Shamogu is a coffee-break roguelike game. The game has a focus on tactical
-positioning and careful timing of consumable usage. Visibility and noise
-stealth mechanics play an important role. The game features streamlined
-inventory management and varied character builds.
+Shamogu is a coffee-break roguelike game with a focus on tactical positioning
+and careful timing of consumable usage. Visibility and noise stealth mechanics
+play an important role. The game features streamlined inventory management and
+varied character builds.
 
 *“All life in your mountain is being corrupted. Beasts are losing their mind
 and becoming aggressive. These disturbing events started to happen after a
