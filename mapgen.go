@@ -316,10 +316,6 @@ func (mg *MapGen) genVaults(templates []string, n int, pl Placement) (ps []gruid
 			}
 		}
 		if vi != nil {
-			switch pl {
-			case PlacementCenter, PlacementEdge:
-				vi.special = true
-			}
 			mg.vaults = append(mg.vaults, vi)
 			ps = append(ps, p)
 		} else {
@@ -460,8 +456,7 @@ func (rs vaultSlice) Less(i, j int) bool {
 	jpos := rs[j].p
 	jpos.X += rs[j].w / 2
 	jpos.Y += rs[j].h / 2
-	return rs[i].special || !rs[j].special && paths.DistanceManhattan(ipos, center) <= paths.DistanceManhattan(jpos, center)
-	// return paths.DistanceManhattan(ipos, center) <= paths.DistanceManhattan(jpos, center)
+	return paths.DistanceManhattan(ipos, center) <= paths.DistanceManhattan(jpos, center)
 }
 
 // connectAllVaults connects all the vaults using tunnels as necessary.

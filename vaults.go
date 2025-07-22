@@ -40,7 +40,6 @@ type vault struct {
 	places  []place     // special places in the vault (like for items)
 	vault   *rl.Vault   // parsed vault string representation
 	tunnels int         // number of tunnels
-	special bool        // whether the room is considered special (not very useful now)
 }
 
 // ventry represents a vault entry.
