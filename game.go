@@ -176,7 +176,7 @@ func (g *Game) ComputeNoise() {
 		}
 		if ai.DoesAny(MonsHeavyFootsteps) && (goodhearing || g.IntN(dist) <= MaxFOVRange) {
 			ei.Noise = true
-			g.Log("You hear heavy foosteps.")
+			g.Log("You hear heavy footsteps.")
 			continue
 		}
 		if ai.DoesAny(MonsLightFootsteps | MonsCreep) {
