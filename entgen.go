@@ -370,64 +370,52 @@ func (g *Game) genMonsters() {
 	if g.ProcInfo.GuardianEarly == g.Map.Level {
 		g.genMonsterGuardian(CrazyDruid, g.Map.Totem)
 	}
-	if g.Map.Level == g.ProcInfo.MonsEarly {
+	// number of early, mid, late monsters.
+	nE, nM, nL := nMonsE[g.Map.Level-1], nMonsM[g.Map.Level-1], nMonsL[g.Map.Level-1]
+	switch g.Map.Level {
+	case g.ProcInfo.MonsEarly:
+		// Special level with many early monsters of same kind.
+		nE += 2
+		nM--
 		mk := monsEarly[g.IntN(len(monsEarly))]
-		for range g.Map.Level * 2 {
+		for range nE - 2 {
 			g.genMonster(mk)
 		}
-		for range 2 {
-			g.genMonster(monsEarly[g.IntN(len(monsEarly))])
-		}
-		for range 1 + g.Map.Level {
-			g.genMonster(monsMid[g.IntN(len(monsMid))])
-		}
-		for range (g.Map.Level - 1) / 2 {
-			g.genMonster(monsLate[g.IntN(len(monsLate))])
-		}
-		return
-	}
-	if g.Map.Level == g.ProcInfo.MonsMid {
-		for range 2 + g.Map.Level/4 {
-			g.genMonster(monsEarly[g.IntN(len(monsEarly))])
-		}
+		nE = 2 // two remaining
+	case g.ProcInfo.MonsMid:
+		// Special level with many mid monsters of same kind.
+		nE -= 2
+		nM += 2
 		mk := monsMid[g.IntN(len(monsMid))]
-		for range g.Map.Level * 2 {
+		for range nM - 2 {
 			g.genMonster(mk)
 		}
-		for range 2 {
-			g.genMonster(monsMid[g.IntN(len(monsMid))])
-		}
-		for range (g.Map.Level - 1) / 2 {
-			g.genMonster(monsLate[g.IntN(len(monsLate))])
-		}
-		return
-	}
-	if g.Map.Level == g.ProcInfo.MonsLate {
-		for range g.Map.Level / 3 {
-			g.genMonster(monsEarly[g.IntN(len(monsEarly))])
-		}
-		for range (2 * g.Map.Level) / 3 {
-			g.genMonster(monsMid[g.IntN(len(monsMid))])
-		}
+		nM = 2 // two remaining
+	case g.ProcInfo.MonsLate:
+		// Special level with many late monsters of same kind.
+		nE -= 2
+		nM -= 2
+		nL += 3
 		mk := monsLate[g.IntN(len(monsLate))]
-		for range g.Map.Level - 2 {
+		for range nL - 2 {
 			g.genMonster(mk)
 		}
-		for range 2 {
-			g.genMonster(monsLate[g.IntN(len(monsLate))])
-		}
-		return
+		nL = 2 // two remaining
 	}
-	for range 3 + g.Map.Level/2 {
+	for range nE {
 		g.genMonster(monsEarly[g.IntN(len(monsEarly))])
 	}
-	for range 1 + (g.Map.Level*4)/3 {
+	for range nM {
 		g.genMonster(monsMid[g.IntN(len(monsMid))])
 	}
-	for range (g.Map.Level - 1) / 2 {
+	for range nL {
 		g.genMonster(monsLate[g.IntN(len(monsLate))])
 	}
 }
+
+var nMonsE = [MapLevels]int{3, 5, 6, 6, 5, 5, 5, 4, 4}
+var nMonsM = [MapLevels]int{2, 3, 4, 6, 8, 10, 10, 10, 10}
+var nMonsL = [MapLevels]int{0, 0, 1, 1, 2, 2, 3, 4, 5}
 
 // genMonster spawns a monster of the given kind on a random free floor.
 func (g *Game) genMonster(mk monsterKind) {
