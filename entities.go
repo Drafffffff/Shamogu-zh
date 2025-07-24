@@ -18,6 +18,7 @@ type Entity struct {
 	P         gruid.Point // map position (invalidPos if none)
 	KnownP    gruid.Point // last known position
 	KnownDead bool        // whether it's a monster known to be dead
+	Seen      bool        // whether we already saw it once
 	Noise     bool        // whether it made noise reaching player (monsters only currently)
 	Role      any         // non-common role(s) for the entity
 }
