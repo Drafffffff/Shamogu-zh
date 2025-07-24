@@ -389,11 +389,9 @@ func (g *Game) pushingGale(from, dir gruid.Point) {
 			n++
 		}
 		if g.IsFree(to) {
+			from := ei.P
 			g.MoveActor(i, ai, to)
-			g.md.MoveAnimation(ei.P, to)
-			// XXX: gale animation: we could collect positions
-			// instead first, so that we can do all directions at
-			// once in the animation.
+			g.md.MoveAnimation(from, to)
 		}
 	}
 }

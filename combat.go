@@ -198,6 +198,7 @@ func (g *Game) logBumpDamage(i, j ID, _, aj *Actor, dmg int, ap AttackKind) {
 func (g *Game) monsterDeath(i ID, ai *Actor) {
 	ei := g.Entity(i)
 	g.Stats.Death(ei.Name)
+	g.md.DeathAnimation(ei.P)
 	if !ai.DoesAny(MonsExplodingDeath) {
 		return
 	}
@@ -432,8 +433,8 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 		return 0
 	}
 	pj := g.Entity(j).P
-	if j != PlayerID {
-		g.md.HitAnimation(pj, dmg == aj.HP)
+	if j != PlayerID && dmg < aj.HP {
+		g.md.HitAnimation(pj)
 	}
 	dmg = g.InflictDamageGeneric(i, j, ai, aj, dmg, ap) // dmg actually remains the same
 	if aj.Behavior != nil && aj.Behavior.State != Hunting && ai.IsPlayer() {

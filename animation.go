@@ -160,17 +160,23 @@ func (md *model) AnimationFrame() {
 	md.anims.Frame(AnimDurShort)
 }
 
-// HitAnimation animates a player's hit at a given position.
-func (md *model) HitAnimation(p gruid.Point, fatal bool) {
+// HitAnimation animates a player's non-killing hit at a given position.
+func (md *model) HitAnimation(p gruid.Point) {
 	if DisableAnimations || !md.g.InFOV(p) {
 		return
 	}
 	md.startAnimSeq()
-	r := '√'
-	if fatal {
-		r = '∞'
+	md.anims.Draw(p, '√', ColorMagenta)
+	md.anims.Frame(AnimDurMedium)
+}
+
+// DeathAnimation animates a monster's death at a given position.
+func (md *model) DeathAnimation(p gruid.Point) {
+	if DisableAnimations || !md.g.InFOV(p) {
+		return
 	}
-	md.anims.Draw(p, r, ColorMagenta)
+	md.startAnimSeq()
+	md.anims.Draw(p, '∞', ColorMagenta)
 	md.anims.Frame(AnimDurMedium)
 }
 
