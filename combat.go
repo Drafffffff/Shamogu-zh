@@ -432,7 +432,7 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 		return 0
 	}
 	pj := g.Entity(j).P
-	if i == PlayerID {
+	if j != PlayerID {
 		g.md.HitAnimation(pj, dmg == aj.HP)
 	}
 	dmg = g.InflictDamageGeneric(i, j, ai, aj, dmg, ap) // dmg actually remains the same
