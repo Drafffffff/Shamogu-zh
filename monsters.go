@@ -173,7 +173,7 @@ func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point) bool {
 			g.MakeNoise(ei.P, NoiseBark)
 			g.PutStatus(PlayerID, g.PlayerActor(), StatusFear, DurationFearBark)
 			if ai.Has(StatusConfusion) {
-				g.LogfStyled("The confused %s bit its tongue while barking!", logHurtMons, g.Entity(i))
+				g.LogfStyled("The confused %s bit its tongue while barking!", logHurtMons, g.Entity(i).Name)
 				g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
 			}
 		}

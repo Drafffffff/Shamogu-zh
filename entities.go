@@ -23,6 +23,11 @@ type Entity struct {
 	Role      any         // non-common role(s) for the entity
 }
 
+// String returns the name of the entity.
+func (e *Entity) String() string {
+	return e.Name
+}
+
 // Color returns the color of an entity
 func (e *Entity) Color() (fg gruid.Color) {
 	switch r := e.Role.(type) {

@@ -468,7 +468,7 @@ func (g *Game) logBumpMiss(i, j ID, ap AttackKind) {
 
 func (g *Game) monsConfusionPenalty(i ID, ai *Actor) {
 	if ai.Has(StatusConfusion) {
-		g.LogfStyled("The confused %s hurt itself too!", logHurtMons, g.Entity(i))
+		g.LogfStyled("The confused %s hurt itself too!", logHurtMons, g.Entity(i).Name)
 		g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
 	}
 }
