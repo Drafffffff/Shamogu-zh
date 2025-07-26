@@ -10,7 +10,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 	pl := g.PlayerEntity()
 	pa := pl.Actor()
 	if pa.Has(StatusDaze) {
-		g.Log("You’re too dazed for that: you need to wait.")
+		g.logDaze()
 		return false
 	}
 	if pa.Has(StatusSprint) && !pa.Has(StatusLignification) {
@@ -80,6 +80,15 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 		g.BumpAttackActor(PlayerID, j, pa, aj, AttackCharge, 0)
 	}
 	return true
+}
+
+func (g *Game) logDaze() {
+	pa := g.PlayerActor()
+	if pa.Has(StatusNausea) {
+		g.Log("You’re dazed and nauseous: you need to wait (ENTER).")
+	} else {
+		g.Log("You’re dazed: you need to wait (ENTER) or eat.")
+	}
 }
 
 // Sprint performs a sprinting bump-movement in the given direction.

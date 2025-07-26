@@ -476,7 +476,7 @@ func (a ActionInteract) Handle(md *model) (gruid.Effect, bool) {
 	md.mode = modeNormal
 	pa := g.PlayerActor()
 	if pa.Has(StatusDaze) {
-		g.Log("You’re too dazed for that. You need to wait.")
+		g.logDaze()
 		return nil, false
 	}
 	pp := g.PP()
@@ -1413,7 +1413,7 @@ func (md *model) KeysHelp() {
 	entries := []string{
 		"Basic Game Actions", "",
 		"Move or Attack", "arrows or hjkl or mouse left",
-		"Wait a turn", "“.” or enter or mouse left on @",
+		"Wait a turn", "“.” or ENTER or mouse left on @",
 		"Interact (Equip/Activate/…)", "e",
 		"Use inventory item", "i",
 		"Toggle keyboard examine mode", "x",
@@ -1424,7 +1424,7 @@ func (md *model) KeysHelp() {
 		"Examine next portal/menhir/food", "> & %",
 		"Examine previous/next monster", "+ -",
 		"Run", runKeys,
-		"Travel", "“.” or enter in keyboard examine mode",
+		"Travel", "“.” or ENTER in keyboard examine mode",
 		"Autoexplore (use with caution)", "o",
 		"Other Common Actions", "",
 		"Save and Quit", "S",
