@@ -20,7 +20,7 @@ func (g *Game) InitPlayer() {
 }
 
 func emptySlot() *Entity {
-	return &Entity{Name: "(empty slot)"}
+	return &Entity{Name: "(empty slot)", P: InvalidPos, Seen: true}
 }
 
 // GenEntities generates the entities for a new level, placing them on the map.
@@ -140,7 +140,8 @@ var secondarySpirits = []spiritInfo{
 // spiritEntity generates a new spirit entity using the given data.
 func spiritEntity(si spiritInfo) *Entity {
 	return &Entity{
-		Name: si.Name,
+		Name:   si.Name,
+		KnownP: InvalidPos,
 		Role: &Spirit{
 			Charges:      si.MaxCharges[0],
 			MaxCharges:   si.MaxCharges,
@@ -172,9 +173,10 @@ var ComestibleData = []itemInfo{
 // data.
 func comestibleEntity(ci itemInfo) *Entity {
 	return &Entity{
-		Name: ci.Name,
-		Rune: '%',
-		Role: &Comestible{Effect: ci.Effect}}
+		Name:   ci.Name,
+		Rune:   '%',
+		KnownP: InvalidPos,
+		Role:   &Comestible{Effect: ci.Effect}}
 }
 
 // MenhirData provides information about the various kinds of menhirs.
@@ -188,9 +190,10 @@ var MenhirData = []itemInfo{
 // menhirEntity generates a new menhir Entity entity using the given data.
 func menhirEntity(ci itemInfo) *Entity {
 	return &Entity{
-		Name: ci.Name,
-		Rune: '&',
-		Role: &Menhir{Effect: ci.Effect}}
+		Name:   ci.Name,
+		Rune:   '&',
+		KnownP: InvalidPos,
+		Role:   &Menhir{Effect: ci.Effect}}
 }
 
 // genItems generates items for the new level.
@@ -448,9 +451,10 @@ func (g *Game) genMonsterGuardian(mk monsterKind, at gruid.Point) {
 // monster generates a new monster entity using the given data.
 func monster(mi monsterInfo) *Entity {
 	return &Entity{
-		Name: mi.Name,
-		Rune: mi.R,
-		Role: NewActor(mi.Attack, mi.Defense, mi.HP, mi.Traits),
+		Name:   mi.Name,
+		Rune:   mi.R,
+		KnownP: InvalidPos,
+		Role:   NewActor(mi.Attack, mi.Defense, mi.HP, mi.Traits),
 	}
 }
 

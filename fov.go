@@ -65,6 +65,9 @@ func (g *Game) SeeEntities() {
 // SenseEntity updates known position of an entity to its real one. The given
 // verb is used in the log message (one of "see", "sense").
 func (g *Game) SenseEntity(e *Entity, verb string) {
+	if e.Role == nil {
+		return
+	}
 	if !e.Seen {
 		e.Seen = true
 		g.md.auto.mode = noAuto
