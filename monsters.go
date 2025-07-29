@@ -32,7 +32,7 @@ func (g *Game) HandleMonsterTurn(i ID, ai *Actor) {
 			maxdist = MaxFOVRange - 2
 			from = beh.Guard
 		} else if beh.State == Hunting {
-			maxdist = 2 * MaxFOVRange
+			maxdist = (3 * MaxFOVRange) / 2
 		}
 		beh.Target = g.RandomPassableNearby(from, maxdist)
 		beh.State = Wandering
@@ -199,17 +199,13 @@ func (g *Game) RandomPassableNearby(from gruid.Point, maxdist int) gruid.Point {
 }
 
 // RandomPassableClosePath returns a random free passable point at a maximal
-// passable path distance maxdist from the given point. The first half of
-// points by distance gets a higher chance if the area is large enough.
+// passable path distance maxdist from the given point.
 func (g *Game) RandomPassableClosePath(from gruid.Point, maxdist int) gruid.Point {
 	dij := &MapPath{passable: g.Map.Passable}
 	nodes := g.PR.BreadthFirstMap(dij, []gruid.Point{from}, maxdist)
 	if len(nodes) == 0 {
 		// Should not happen.
 		return from
-	}
-	if len(nodes) >= 16 && g.IntN(2) == 0 {
-		return nodes[g.IntN(max(16, len(nodes)/2))].P
 	}
 	return nodes[g.IntN(len(nodes))].P
 }
