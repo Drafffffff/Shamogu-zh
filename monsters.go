@@ -199,7 +199,8 @@ func (g *Game) RandomPassableNearby(from gruid.Point, maxdist int) gruid.Point {
 }
 
 // RandomPassableClosePath returns a random free passable point at a maximal
-// passable path distance maxdist from the given point.
+// passable path distance maxdist from the given point. The first half of
+// points by distance gets a higher chance if the area is large enough.
 func (g *Game) RandomPassableClosePath(from gruid.Point, maxdist int) gruid.Point {
 	dij := &MapPath{passable: g.Map.Passable}
 	nodes := g.PR.BreadthFirstMap(dij, []gruid.Point{from}, maxdist)
@@ -207,7 +208,10 @@ func (g *Game) RandomPassableClosePath(from gruid.Point, maxdist int) gruid.Poin
 		// Should not happen.
 		return from
 	}
-	return nodes[g.rand.IntN(len(nodes))].P
+	if len(nodes) >= 16 && g.IntN(2) == 0 {
+		return nodes[g.IntN(max(16, len(nodes)/2))].P
+	}
+	return nodes[g.IntN(len(nodes))].P
 }
 
 // CallToCommonTarget makes various nearby monsters chose the same target.  The
