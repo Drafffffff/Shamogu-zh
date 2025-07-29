@@ -4,7 +4,6 @@ package main
 
 import (
 	"fmt"
-	"hash/maphash"
 	"log"
 	"math/rand/v2"
 	"runtime"
@@ -89,7 +88,7 @@ func (md *model) init() gruid.Effect {
 	g := md.g
 	load, err := g.Load()
 	md.g.md = md // handy cycle
-	g.rand = rand.New(rand.NewPCG((&maphash.Hash{}).Sum64(), (&maphash.Hash{}).Sum64()))
+	g.rand = rand.New(rand.NewPCG(rand.Uint64(), rand.Uint64()))
 	if !load {
 		g.Init()
 		md.openSpiritSelectionMenu()

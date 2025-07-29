@@ -1,7 +1,6 @@
 package main
 
 import (
-	"hash/maphash"
 	"math/rand/v2"
 	"strings"
 	"testing"
@@ -75,7 +74,7 @@ func testGame(t *testing.T) {
 	md.initKeys()
 	g := md.g
 	g.md = md
-	g.rand = rand.New(rand.NewPCG((&maphash.Hash{}).Sum64(), (&maphash.Hash{}).Sum64()))
+	g.rand = rand.New(rand.NewPCG(rand.Uint64(), rand.Uint64()))
 	g.Init()
 	g.Entities[PrimarySpiritID] = spiritEntity(primarySpirits[g.rand.IntN(len(primarySpirits))])
 	g.ComputePlayerStats()
