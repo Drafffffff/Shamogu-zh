@@ -113,7 +113,7 @@ func (g *Game) RandomPassable() gruid.Point {
 	size := m.Size()
 	for {
 		p := gruid.Point{g.rand.IntN(size.X), g.rand.IntN(size.Y)}
-		if t := m.At(p); t == Floor || t == Foliage || t == Rubble {
+		if t := m.At(p); Passable(t) {
 			return p
 		}
 	}

@@ -27,7 +27,7 @@ func (g *Game) HandleMonsterTurn(i ID, ai *Actor) {
 	if beh.Target == ei.P || beh.Target == InvalidPos {
 		// The monster's target has either been reached or is invalid:
 		// we spend a turn chosing a new target.
-		from, maxdist := ei.P, 50
+		from, maxdist := ei.P, unreachable
 		if beh.Guard != InvalidPos {
 			maxdist = MaxFOVRange - 2
 			from = beh.Guard
@@ -183,19 +183,20 @@ func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point) bool {
 }
 
 // RandomPassableNearby returns a random free passable point at a maximal distance
-// maxdist from the given point. For small distances it uses passable path
-// distance.
+// maxdist from the given point (for small distances). Long distances are
+// ignored and simply produce a random point somewhat biased toward origin.
 func (g *Game) RandomPassableNearby(from gruid.Point, maxdist int) gruid.Point {
 	if maxdist <= 2*MaxFOVRange {
 		return g.RandomPassableClosePath(from, maxdist)
 	}
-	for {
-		p := g.RandomPassable()
-		if paths.DistanceManhattan(from, p) > maxdist {
-			continue
-		}
-		return p
+	// For longer distances, maxdist is ignored. We simply generate a
+	// random target, with some bias toward targets that are close.
+	p := g.RandomPassable()
+	q := g.RandomPassable()
+	if paths.DistanceManhattan(from, p) > paths.DistanceManhattan(from, q) {
+		return q
 	}
+	return p
 }
 
 // RandomPassableClosePath returns a random free passable point at a maximal
