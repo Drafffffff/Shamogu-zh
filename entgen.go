@@ -38,7 +38,7 @@ func (g *Game) GenEntities(mg *MapGen) {
 // genPlayerOnNewLevel places the player in the map with replenished charges and HP.
 func (g *Game) genPlayerOnNewLevel(mg *MapGen) {
 	p := g.PlayerEntity()
-	p.P = mg.RandomVaultsPlace(mg.vaults[:len(mg.vaults)/3], PlaceActor)
+	p.P = mg.RandomVaultsPlace(mg.vaults[:len(mg.vaults)/3], PlaceWaypoint)
 	if p.P == InvalidPos {
 		panic("invalid player position")
 	}

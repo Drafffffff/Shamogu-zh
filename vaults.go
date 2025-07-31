@@ -62,7 +62,7 @@ const (
 	PlaceEntry placeKind = iota
 	PlaceItem
 	PlaceStatic
-	PlaceActor
+	PlaceWaypoint
 )
 
 func vaultDistance(v1, v2 *vault) int {
@@ -77,7 +77,7 @@ func (mg *MapGen) DigVault(v *vault) {
 			mg.vault.SetU(q, true)
 		}
 		switch c {
-		case '.', '!', '-', '>', 'P':
+		case '.', '!', '-', '>', 'W':
 			if inMap(q) {
 				mg.terrain.Set(q, Floor)
 			}
@@ -137,8 +137,8 @@ func (mg *MapGen) DigVault(v *vault) {
 			log.Printf("mapgen: invalid terrain: %c for room w:%d h:%d pos:%+v\n%s", c, v.w, v.h, v.p, v.vault.Content())
 		}
 		switch c {
-		case 'P':
-			v.places = append(v.places, place{p: q, kind: PlaceActor})
+		case 'W':
+			v.places = append(v.places, place{p: q, kind: PlaceWaypoint})
 		case '!':
 			v.places = append(v.places, place{p: q, kind: PlaceItem})
 		case '>':

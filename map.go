@@ -71,7 +71,7 @@ type Map struct {
 	Clouds       *CloudGrid                // cloud map
 	Level        int                       // current map level
 	Noise        map[gruid.Point]NoiseType // non-movement noise sources
-	PatrolPoints []gruid.Point             // vault patrol points
+	WayPoints    []gruid.Point             // vault waypoints
 
 	BoolCache  CacheGrid[bool] // for boolean caching in algorithms
 	ActorCache CacheGrid[ID]   // for caching actor positions

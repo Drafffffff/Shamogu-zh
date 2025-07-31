@@ -234,10 +234,10 @@ func (g *Game) RandomPassableNearbyTarget(from gruid.Point) gruid.Point {
 }
 
 // RandomPassableTarget provides a suitable next target position for wandering
-// monsters, somewhat biased toward vault patrol points.
+// monsters, somewhat biased toward vault waypoints.
 func (g *Game) RandomPassableTarget() gruid.Point {
-	if g.rand.IntN(2) == 0 && len(g.Map.PatrolPoints) > 0 {
-		p := g.Map.PatrolPoints[g.IntN(len(g.Map.PatrolPoints))]
+	if g.rand.IntN(2) == 0 && len(g.Map.WayPoints) > 0 {
+		p := g.Map.WayPoints[g.IntN(len(g.Map.WayPoints))]
 		return g.RandomPassableWithin(p, 5)
 	}
 	return g.RandomPassable()
