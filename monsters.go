@@ -243,20 +243,28 @@ func (g *Game) RandomPassableTarget() gruid.Point {
 	return g.RandomPassable()
 }
 
-// CallToCommonTarget makes various nearby monsters chose the same target.  The
+// CallToCommonTarget makes a few nearby monsters chose the same target.  The
 // idea is to make monsters occasionally naturally form small groups in a
 // simple way (without requiring more complex herd mechanics).
 func (g *Game) CallToCommonTarget(i ID, ai *Actor) {
-	const maxdist = 6
-	n := 0
-	p := g.Entity(i).P
-	for j, aj := range g.Monsters() {
-		if j == i || aj.Behavior.State == Hunting || n >= 2 ||
-			paths.DistanceManhattan(p, g.Entity(j).P) > maxdist ||
-			aj.Behavior.Guard != InvalidPos {
+	const maxdist = MaxFOVRange - 1
+	maxcalls := 2
+	if g.IntN(5) < 2 {
+		maxcalls = 1
+	}
+	k := 0
+	from := g.Entity(i).P
+	dij := &MapPath{passable: g.Map.Passable}
+	nodes := g.PR.BreadthFirstMap(dij, []gruid.Point{from}, maxdist)
+	for _, n := range nodes {
+		j, aj := g.ActorAt(n.P)
+		if j < 0 || j == i || j == PlayerID || aj.Behavior.State == Hunting || aj.Behavior.Guard != InvalidPos {
 			continue
 		}
 		aj.Behavior.Target = ai.Behavior.Target
-		n++
+		k++
+		if k >= maxcalls {
+			break
+		}
 	}
 }
