@@ -34,7 +34,11 @@ func (g *Game) HandleMonsterTurn(i ID, ai *Actor) {
 		} else if beh.State == Hunting {
 			maxdist = (3 * MaxFOVRange) / 2
 		}
-		beh.Target = g.RandomPassableNearby(from, maxdist)
+		if maxdist < unreachable {
+			beh.Target = g.RandomPassableWithin(from, maxdist)
+		} else {
+			beh.Target = g.RandomPassableNearbyTarget(from)
+		}
 		beh.State = Wandering
 		if maxdist > MaxFOVRange && g.IntN(3) == 0 || maxdist <= MaxFOVRange && g.IntN(10) == 0 {
 			g.CallToCommonTarget(i, ai)
@@ -44,7 +48,7 @@ func (g *Game) HandleMonsterTurn(i ID, ai *Actor) {
 	if beh.State == Wandering && len(beh.Path) >= 2 && beh.Path[0] == ei.P && beh.Path[len(beh.Path)-1] == ai.Behavior.Target {
 		// The monster is wandering and is still on the previously
 		// computed path, so we try to continue on the cached path.
-		g.MonsterBumpTo(i, ai, beh.Path[1])
+		g.monsterBumpTo(i, ai, beh.Path[1])
 		return
 	}
 	// Monster is hunting or was moved from its old path position,
@@ -55,7 +59,7 @@ func (g *Game) HandleMonsterTurn(i ID, ai *Actor) {
 		return
 	}
 	if len(beh.Path) >= 2 {
-		g.MonsterBumpTo(i, ai, beh.Path[1])
+		g.monsterBumpTo(i, ai, beh.Path[1])
 	}
 }
 
@@ -83,11 +87,41 @@ func (g *Game) monsterDiscord(i ID, ai *Actor) bool {
 	return true
 }
 
-// MonsterBumpTo handles movement or attack for a monster actor. The position
+// MonsterUpdateTarget makes an ai entity aware about a new target position.
+// It returns true if the monster's mind state changed.
+func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point) bool {
+	ei, beh := g.Entity(i), ai.Behavior
+	if beh.State == Hunting {
+		if g.InFOV(ei.P) {
+			// If player's in FOV, then PP gets priority.
+			beh.Target = g.PP()
+		} else {
+			beh.Target = at
+		}
+		return false
+	}
+	if g.InFOV(ei.P) && at == g.PP() {
+		g.Logf("The %s notices you.", ei.Name)
+		beh.State = Hunting
+		if ai.DoesAny(MonsBarking) {
+			g.Logf("The %s barks.", ei.Name)
+			g.MakeNoise(ei.P, NoiseBark)
+			g.PutStatus(PlayerID, g.PlayerActor(), StatusFear, DurationFearBark)
+			if ai.Has(StatusConfusion) {
+				g.LogfStyled("The confused %s bit its tongue while barking!", logHurtMons, g.Entity(i).Name)
+				g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
+			}
+		}
+	}
+	beh.Target = at
+	return beh.State == Hunting
+}
+
+// monsterBumpTo handles movement or attack for a monster actor. The position
 // should be adjacent to the monster's (the next position in the movement
 // path).
-func (g *Game) MonsterBumpTo(i ID, ai *Actor, to gruid.Point) {
-	if ai.Has(StatusFear) && g.MonsterFlee(i, ai) {
+func (g *Game) monsterBumpTo(i ID, ai *Actor, to gruid.Point) {
+	if ai.Has(StatusFear) && g.monsterFlee(i, ai) {
 		return
 	}
 	ei := g.Entity(i)
@@ -152,87 +186,10 @@ func (g *Game) MonsterBumpTo(i ID, ai *Actor, to gruid.Point) {
 	}
 }
 
-// MonsterUpdateTarget makes an ai entity aware about a new target position.
-// It returns true if the monster's mind state changed.
-func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point) bool {
-	ei, beh := g.Entity(i), ai.Behavior
-	if beh.State == Hunting {
-		if g.InFOV(ei.P) {
-			// If player's in FOV, then PP gets priority.
-			beh.Target = g.PP()
-		} else {
-			beh.Target = at
-		}
-		return false
-	}
-	if g.InFOV(ei.P) && at == g.PP() {
-		g.Logf("The %s notices you.", ei.Name)
-		beh.State = Hunting
-		if ai.DoesAny(MonsBarking) {
-			g.Logf("The %s barks.", ei.Name)
-			g.MakeNoise(ei.P, NoiseBark)
-			g.PutStatus(PlayerID, g.PlayerActor(), StatusFear, DurationFearBark)
-			if ai.Has(StatusConfusion) {
-				g.LogfStyled("The confused %s bit its tongue while barking!", logHurtMons, g.Entity(i).Name)
-				g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
-			}
-		}
-	}
-	beh.Target = at
-	return beh.State == Hunting
-}
-
-// RandomPassableNearby returns a random free passable point at a maximal distance
-// maxdist from the given point (for small distances). Long distances are
-// ignored and simply produce a random point somewhat biased toward origin.
-func (g *Game) RandomPassableNearby(from gruid.Point, maxdist int) gruid.Point {
-	if maxdist <= 2*MaxFOVRange {
-		return g.RandomPassableClosePath(from, maxdist)
-	}
-	// For longer distances, maxdist is ignored. We simply generate a
-	// random target, with some bias toward targets that are close.
-	p := g.RandomPassable()
-	q := g.RandomPassable()
-	if paths.DistanceManhattan(from, p) > paths.DistanceManhattan(from, q) {
-		return q
-	}
-	return p
-}
-
-// RandomPassableClosePath returns a random free passable point at a maximal
-// passable path distance maxdist from the given point.
-func (g *Game) RandomPassableClosePath(from gruid.Point, maxdist int) gruid.Point {
-	dij := &MapPath{passable: g.Map.Passable}
-	nodes := g.PR.BreadthFirstMap(dij, []gruid.Point{from}, maxdist)
-	if len(nodes) == 0 {
-		// Should not happen.
-		return from
-	}
-	return nodes[g.IntN(len(nodes))].P
-}
-
-// CallToCommonTarget makes various nearby monsters chose the same target.  The
-// idea is to make monsters occasionally naturally form small groups in a
-// simple way (without requiring more complex herd mechanics).
-func (g *Game) CallToCommonTarget(i ID, ai *Actor) {
-	const maxdist = 6
-	n := 0
-	p := g.Entity(i).P
-	for j, aj := range g.Monsters() {
-		if j == i || aj.Behavior.State == Hunting || n >= 2 ||
-			paths.DistanceManhattan(p, g.Entity(j).P) > maxdist ||
-			aj.Behavior.Guard != InvalidPos {
-			continue
-		}
-		aj.Behavior.Target = ai.Behavior.Target
-		n++
-	}
-}
-
-// MonsterFlee handles movement for an afraid hunting monster. When they're in
+// monsterFlee handles movement for an afraid hunting monster. When they're in
 // a straight direction from the player, they'll flee randomly in a direction
 // that avoids them (if any is free).
-func (g *Game) MonsterFlee(i ID, ai *Actor) bool {
+func (g *Game) monsterFlee(i ID, ai *Actor) bool {
 	ei, pl := g.Entity(i), g.PlayerEntity()
 	if !g.InFOV(ei.P) || g.ActorInRange(ei.P, pl.P) != PlayerID {
 		return false
@@ -251,4 +208,55 @@ func (g *Game) MonsterFlee(i ID, ai *Actor) bool {
 	to := ps[g.IntN(len(ps))]
 	g.BumpMoveActor(i, ai, to)
 	return true
+}
+
+// RandomPassableWithin returns a random free passable point within a maximal
+// path distance maxdist from the given point.
+func (g *Game) RandomPassableWithin(from gruid.Point, maxdist int) gruid.Point {
+	dij := &MapPath{passable: g.Map.Passable}
+	nodes := g.PR.BreadthFirstMap(dij, []gruid.Point{from}, maxdist)
+	if len(nodes) == 0 {
+		// Should not happen.
+		return from
+	}
+	return nodes[g.IntN(len(nodes))].P
+}
+
+// RandomPassableNearbyTarget returns a random free passable point somewhat
+// biased toward the given origin point.
+func (g *Game) RandomPassableNearbyTarget(from gruid.Point) gruid.Point {
+	p := g.RandomPassableTarget()
+	q := g.RandomPassableTarget()
+	if paths.DistanceManhattan(from, p) > paths.DistanceManhattan(from, q) {
+		return q
+	}
+	return p
+}
+
+// RandomPassableTarget provides a suitable next target position for wandering
+// monsters, somewhat biased toward vault patrol points.
+func (g *Game) RandomPassableTarget() gruid.Point {
+	if g.rand.IntN(2) == 0 && len(g.Map.PatrolPoints) > 0 {
+		p := g.Map.PatrolPoints[g.IntN(len(g.Map.PatrolPoints))]
+		return g.RandomPassableWithin(p, 5)
+	}
+	return g.RandomPassable()
+}
+
+// CallToCommonTarget makes various nearby monsters chose the same target.  The
+// idea is to make monsters occasionally naturally form small groups in a
+// simple way (without requiring more complex herd mechanics).
+func (g *Game) CallToCommonTarget(i ID, ai *Actor) {
+	const maxdist = 6
+	n := 0
+	p := g.Entity(i).P
+	for j, aj := range g.Monsters() {
+		if j == i || aj.Behavior.State == Hunting || n >= 2 ||
+			paths.DistanceManhattan(p, g.Entity(j).P) > maxdist ||
+			aj.Behavior.Guard != InvalidPos {
+			continue
+		}
+		aj.Behavior.Target = ai.Behavior.Target
+		n++
+	}
 }

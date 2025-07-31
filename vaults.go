@@ -62,7 +62,7 @@ const (
 	PlaceEntry placeKind = iota
 	PlaceItem
 	PlaceStatic
-	PlacePlayer
+	PlaceActor
 )
 
 func vaultDistance(v1, v2 *vault) int {
@@ -138,7 +138,7 @@ func (mg *MapGen) DigVault(v *vault) {
 		}
 		switch c {
 		case 'P':
-			v.places = append(v.places, place{p: q, kind: PlacePlayer})
+			v.places = append(v.places, place{p: q, kind: PlaceActor})
 		case '!':
 			v.places = append(v.places, place{p: q, kind: PlaceItem})
 		case '>':

@@ -44,6 +44,7 @@ func (g *Game) GenerateMap(ml MapLayout) {
 	if g.ProcInfo.Earthquake == g.Map.Level {
 		g.earthquake()
 	}
+	g.computePatrolPoints(mg)
 	g.GenEntities(mg)
 	g.Map.Clouds.Reset()
 }
@@ -560,6 +561,18 @@ func (g *Game) earthquake() {
 			}
 			if g.IntN(5) == 0 {
 				it.SetCell(Rubble)
+			}
+		}
+	}
+}
+
+// computePatrolPoints computes the list of vault patrol points.
+func (g *Game) computePatrolPoints(mg *MapGen) {
+	g.Map.PatrolPoints = g.Map.PatrolPoints[:0]
+	for _, vi := range mg.vaults {
+		for _, pl := range vi.places {
+			if pl.kind == PlaceActor && g.Map.Passable(pl.p) {
+				g.Map.PatrolPoints = append(g.Map.PatrolPoints, pl.p)
 			}
 		}
 	}
