@@ -316,7 +316,11 @@ func (eff EffectJump) Apply(g *Game) bool {
 	for p := from.Add(dir); p != to; p = p.Add(dir) {
 		if i, ai := g.ActorAt(p); i >= 0 {
 			if !pa.Has(StatusFear) && !pa.Has(StatusDaze) {
-				g.BumpAttackActor(PlayerID, i, pa, ai, AttackPlain, 1)
+				if pa.Has(StatusSprint) {
+					g.PutStatus(i, ai, StatusImbalance, DurationImbalanceSprint)
+				} else {
+					g.BumpAttackActor(PlayerID, i, pa, ai, AttackPlain, 1)
+				}
 			}
 			g.PutStatus(i, ai, StatusDaze, DurationDazeJump)
 		}
