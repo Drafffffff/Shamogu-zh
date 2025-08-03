@@ -489,6 +489,10 @@ func (g *Game) PutStatus(i ID, ai *Actor, st Status, turns int) bool {
 	case StatusFoggySkin:
 		g.RemoveStatus(i, ai, StatusLignification)
 		g.RemoveStatus(i, ai, StatusFire)
+	case StatusSprint:
+		g.RemoveStatus(i, ai, StatusFocus)
+	case StatusFocus:
+		g.RemoveStatus(i, ai, StatusSprint)
 	}
 	return true
 }
