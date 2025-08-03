@@ -207,7 +207,7 @@ func (g *Game) monsterDeath(i ID, ai *Actor) {
 	}
 	g.MakeNoise(ei.P, NoiseExplosion)
 	var nbs paths.Neighbors
-	ps := append(nbs.Cardinal(ei.P, g.Map.Passable), ei.P)
+	ps := append(nbs.Cardinal(ei.P, inMap), ei.P)
 	g.md.ExplosionAnimation(ps)
 	for _, q := range ps {
 		if g.Map.Burnable(q) {
