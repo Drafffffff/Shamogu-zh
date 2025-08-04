@@ -26,7 +26,6 @@ const (
 	modeKeysChange
 	modeGameMenu
 	modeSelection
-	modeWizard
 )
 
 func (md *model) updateMenu(msg gruid.Msg) {
