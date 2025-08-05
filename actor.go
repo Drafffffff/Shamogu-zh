@@ -123,6 +123,7 @@ const (
 	PatternSwapDaze       // temporal cat dazing swapping-attack
 
 	BadHearing       // worse hearing of noise (footsteps)
+	BurningHits      // hits may burn
 	DazingSpines     // body covered in dazing spines (porcupine)
 	GoodHearing      // better hearing of noise (footsteps)
 	GoodSmell        // smell food from a distance
@@ -137,6 +138,7 @@ const (
 	ResistanceConfusion // halves duration of confusion status
 	ResistanceDaze      // halves duration of daze status
 	ResistanceFear      // halves duration of fear status
+	ResistanceFire      // halves duration of fire status
 	ResistanceImbalance // halves duration of imbalance status
 	ResistancePoison    // halves duration of poison status
 
@@ -147,7 +149,6 @@ const (
 	MonsBarking        // bark with a fear inducing chance on noticing the player
 	MonsBerserking     // berserking spiders may make you berserk
 	MonsBlink          // attack makes you blink
-	MonsBurn           // attack may burn you
 	MonsConfusion      // confusing attack (like floating eyes)
 	MonsDig            // dig walls when hunting
 	MonsExplodingDeath // explode on death
@@ -188,6 +189,10 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, PatternSwap, "ranged space-distorting attack")
 	desc = traitDesc(desc, t, PatternSwapDaze, "ranged space-distorting attack that may @Odaze@N foes")
 
+	desc = traitDesc(desc, t, Pushing, "hits may push foes")
+	desc = traitDesc(desc, t, PushingUnbalance, "hits may push and @Ounbalance@N foes")
+	desc = traitDesc(desc, t, BurningHits, "hits may @Oburn@N foes")
+	desc = traitDesc(desc, t, VenomousMelee, "@Ovenomous@N melee attack")
 	desc = traitDesc(desc, t, DazingSpines, "spines may @Odaze@N foes in melee")
 	switch {
 	case t.All(GoodHearing) && !t.All(BadHearing):
@@ -196,10 +201,7 @@ func (t Traits) String() string {
 		desc = append(desc, "bad hearing")
 	}
 	desc = traitDesc(desc, t, GoodSmell, "smells food from afar")
-	desc = traitDesc(desc, t, Pushing, "hits may push foes")
-	desc = traitDesc(desc, t, PushingUnbalance, "hits may push and @Ounbalance@N foes")
 	desc = traitDesc(desc, t, TrailingCloud, "movement leaves fog behind")
-	desc = traitDesc(desc, t, VenomousMelee, "@Ovenomous@N melee attack")
 	desc = traitDesc(desc, t, WoodyLegs, "can move while lignified (with reduced duration)")
 
 	desc = traitDesc(desc, t, VulnerabilityFire, "double @OFire@N duration")
@@ -207,13 +209,13 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, ResistanceConfusion, "half @OConfusion@N duration")
 	desc = traitDesc(desc, t, ResistanceDaze, "half @ODaze@N duration")
 	desc = traitDesc(desc, t, ResistanceFear, "half @OFear@N duration")
+	desc = traitDesc(desc, t, ResistanceFire, "half @OFire@N duration")
 	desc = traitDesc(desc, t, ResistanceImbalance, "half @OImbalance@N duration")
 	desc = traitDesc(desc, t, ResistancePoison, "half @OPoison@N duration")
 
 	desc = traitDesc(desc, t, MonsBarking, "barks on sight and @Ofrightens@N you")
 	desc = traitDesc(desc, t, MonsBerserking, "hits may @Bberserk@N you briefly")
 	desc = traitDesc(desc, t, MonsBlink, "hits makes you blink")
-	desc = traitDesc(desc, t, MonsBurn, "hits may @Oburn@N you")
 	desc = traitDesc(desc, t, MonsConfusion, "@Oconfusing@N hits")
 	desc = traitDesc(desc, t, MonsDig, "digs walls when hunting")
 	desc = traitDesc(desc, t, MonsExplodingDeath, "explodes on death")
@@ -407,6 +409,9 @@ func (g *Game) PutStatus(i ID, ai *Actor, st Status, turns int) bool {
 			if ai.IsDead() {
 				return false
 			}
+		}
+		if ai.DoesAny(ResistanceFire) {
+			turns = (turns + 1) / 2
 		}
 		if ai.DoesAny(VulnerabilityFire) || ai.Has(StatusLignification) {
 			turns *= 2

@@ -15,7 +15,7 @@ func (g *Game) InitPlayer() {
 	for i := PrimarySpiritID; i < FirstMapID; i++ {
 		g.Entities[i] = emptySlot()
 	}
-	// g.Entities[PrimarySpiritID+1] = spiritEntity(secondarySpirits[0])
+	// g.Entities[PrimarySpiritID+1] = spiritEntity(secondarySpirits[6])
 	g.ComputePlayerStats()
 }
 
@@ -135,6 +135,12 @@ var secondarySpirits = []spiritInfo{
 		Ability:      [2]Ability{EffectSprint{}, EffectSprint{}},
 		BonusDefense: [2]int{1, 1},
 		BonusTraits:  [2]Traits{TrailingCloud, TrailingCloud | ResistanceImbalance}},
+	{
+		Name:        "Fire Salamander",
+		MaxCharges:  [2]int{2, 3},
+		Ability:     [2]Ability{EffectFireRetreat{}, EffectFireRetreat{}},
+		BonusAttack: [2]int{1, 1},
+		BonusTraits: [2]Traits{BadHearing | BurningHits, BadHearing | BurningHits | ResistanceFire}},
 }
 
 // spiritEntity generates a new spirit entity using the given data.
@@ -309,9 +315,9 @@ var MonsData = []monsterInfo{
 	BarkingHound:     {"barking hound", 'h', 3, 0, 4, MonsBarking | GoodHearing | MonsImmunityFear},
 	BerserkingSpider: {"berserking spider", 's', 2, 1, 3, MonsBerserking | MonsSilent},
 	BlinkButterfly:   {"blinking butterfly", 'b', 2, 3, 2, MonsBlink | MonsImmunityImbalance | MonsImmunityLignification | MonsWingFlap},
-	BurningPhoenix:   {"burning phoenix", 'P', 3, 1, 5, PatternRampage | MonsBurn | MonsImmunityFire | MonsImmunityLignification | MonsWingFlap | MonsNotable},
+	BurningPhoenix:   {"burning phoenix", 'P', 3, 1, 5, PatternRampage | BurningHits | MonsImmunityFire | MonsImmunityLignification | MonsWingFlap | MonsNotable},
 	ConfusingEye:     {"confusing eye", 'e', 2, 0, 2, PatternRanged | MonsConfusion | MonsImmunityConfusion | MonsLightFootsteps},
-	CrazyDruid:       {"crazy druid", 'C', 3, 1, 4, PatternSwap | MonsBurn | MonsBerserking | MonsNotable},
+	CrazyDruid:       {"crazy druid", 'C', 3, 1, 4, PatternSwap | BurningHits | MonsBerserking | MonsNotable},
 	DisgustingRat:    {"disgusting rat", 'r', 2, 0, 3, MonsNausea | MonsLightFootsteps},
 	EarthDragon:      {"earth dragon", 'D', 4, 2, 6, PushingUnbalance | MonsDig | MonsImmunityFear | MonsHeavyFootsteps | MonsNotable},
 	ExplodingNadre:   {"exploding nadre", 'n', 2, 2, 1, MonsExplodingDeath},

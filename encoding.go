@@ -29,6 +29,7 @@ func init() {
 	gob.Register(EffectLignify{})
 	gob.Register(EffectPoisonCloud{})
 	gob.Register(EffectSprint{})
+	gob.Register(EffectFireRetreat{})
 
 	gob.Register(EffectMappingMenhir{})
 	gob.Register(EffectTeleportMenhir{})

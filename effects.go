@@ -82,13 +82,13 @@ func (eff EffectAmbrosiaBerries) Desc() string {
 type EffectBerserkingFlower struct{}
 
 func (eff EffectBerserkingFlower) Apply(g *Game) bool {
-	a := g.PlayerActor()
-	if a.Has(StatusBerserk) {
+	pa := g.PlayerActor()
+	if pa.Has(StatusBerserk) {
 		g.Log("You’re already berserk.")
 		return false
 	}
 	g.eatMsg("berserking flower", 0)
-	g.PutStatus(PlayerID, a, StatusBerserk, DurationBerserk)
+	g.PutStatus(PlayerID, pa, StatusBerserk, DurationBerserk)
 	return true
 }
 
@@ -100,17 +100,17 @@ func (eff EffectBerserkingFlower) Desc() string {
 type EffectLignificationFruit struct{}
 
 func (eff EffectLignificationFruit) Apply(g *Game) bool {
-	a := g.PlayerActor()
-	if a.Has(StatusLignification) {
+	pa := g.PlayerActor()
+	if pa.Has(StatusLignification) {
 		g.Log("You’re already lignified.")
 		return false
 	}
-	if a.Has(StatusFoggySkin) {
+	if pa.Has(StatusFoggySkin) {
 		g.Log("You cannot lignify yourself while smoky.")
 		return false
 	}
 	g.eatMsg("lignification fruit", 0)
-	g.PutStatus(PlayerID, a, StatusLignification, DurationLignification)
+	g.PutStatus(PlayerID, pa, StatusLignification, DurationLignification)
 	return true
 }
 
@@ -244,12 +244,12 @@ func (eff EffectTeleportMushroom) Desc() string {
 type EffectFocus struct{}
 
 func (eff EffectFocus) Apply(g *Game) bool {
-	a := g.PlayerActor()
-	if a.Has(StatusFocus) {
+	pa := g.PlayerActor()
+	if pa.Has(StatusFocus) {
 		g.Log("You’re already focusing your heads.")
 		return false
 	}
-	g.PutStatus(PlayerID, a, StatusFocus, DurationFocus)
+	g.PutStatus(PlayerID, pa, StatusFocus, DurationFocus)
 	g.instant = true
 	return true
 }
@@ -265,12 +265,12 @@ func (eff EffectFocus) Desc() string {
 type EffectDig struct{}
 
 func (eff EffectDig) Apply(g *Game) bool {
-	a := g.PlayerActor()
-	if a.Has(StatusDig) {
+	pa := g.PlayerActor()
+	if pa.Has(StatusDig) {
 		g.Log("You’re already on a destructive charge.")
 		return false
 	}
-	g.PutStatus(PlayerID, a, StatusDig, DurationDig)
+	g.PutStatus(PlayerID, pa, StatusDig, DurationDig)
 	g.instant = true
 	return true
 }
@@ -403,12 +403,12 @@ func (g *Game) pushingGale(from, dir gruid.Point) {
 type EffectTimeStop struct{}
 
 func (eff EffectTimeStop) Apply(g *Game) bool {
-	a := g.PlayerActor()
-	if a.Has(StatusTimeStop) {
+	pa := g.PlayerActor()
+	if pa.Has(StatusTimeStop) {
 		g.Log("You already froze time.")
 		return false
 	}
-	g.PutStatus(PlayerID, a, StatusTimeStop, DurationTimeStop)
+	g.PutStatus(PlayerID, pa, StatusTimeStop, DurationTimeStop)
 	g.instant = true
 	return true
 }
@@ -595,16 +595,16 @@ func (eff EffectPoisonCloud) Desc() string {
 type EffectSprint struct{}
 
 func (eff EffectSprint) Apply(g *Game) bool {
-	a := g.PlayerActor()
-	if a.Has(StatusSprint) {
+	pa := g.PlayerActor()
+	if pa.Has(StatusSprint) {
 		g.Log("You’re already sprinting.")
 		return false
 	}
-	if !a.CanMove() {
+	if !pa.CanMove() {
 		g.Log("You cannot sprint while lignified.")
 		return false
 	}
-	g.PutStatus(PlayerID, a, StatusSprint, DurationSprint)
+	g.PutStatus(PlayerID, pa, StatusSprint, DurationSprint)
 	g.instant = true
 	return true
 }
@@ -616,6 +616,51 @@ func (eff EffectSprint) Name() string {
 func (eff EffectSprint) Desc() string {
 	return fmt.Sprintf("@BSprint@N for %d turns. %s @GInstant@N. Canceled by waiting.",
 		DurationSprint, statusDesc[StatusSprint])
+}
+
+type EffectFireRetreat struct{}
+
+func (eff EffectFireRetreat) Apply(g *Game) bool {
+	pl, pa := g.Player()
+	if !pa.CanMove() {
+		g.Log("You cannot retreat while lignified.")
+		return false
+	}
+	if pa.HP == 1 && pa.Has(StatusPoison) {
+		g.Log("You cannot retreat while poisoned and almost dead.")
+		return false
+	}
+	from := pl.P
+	p, to := from, from
+	for range 2 {
+		p = p.Sub(g.Dir)
+		if !g.InFOV(p) {
+			break
+		}
+		if !g.Map.Passable(p) && !g.Dig(PlayerID, pa, p, false) {
+			break
+		}
+		if i, _ := g.ActorAt(p); i >= 0 {
+			break
+		}
+		to = p
+	}
+	if from == to {
+		g.Log("There’s no room to retreat.")
+		return false
+	}
+	g.BumpMoveActor(PlayerID, pa, to)
+	g.md.MoveAnimation(from, to)
+	g.FireCloudAt(from)
+	return true
+}
+
+func (eff EffectFireRetreat) Name() string {
+	return "fire retreat"
+}
+
+func (eff EffectFireRetreat) Desc() string {
+	return "Walk backwards up to two tiles while leaving a fire cloud lasting 4-12 turns."
 }
 
 func (g *Game) menhirMsg(name string) {

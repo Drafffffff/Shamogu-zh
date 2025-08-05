@@ -1,5 +1,16 @@
 # v? ?
 
+* New secondary spirit: Fire Salamander. It features a *fire retreat* ability
+  that makes the player retreat up to two tiles while leaving a fire cloud on
+  the previous position, as long as there's room for the retreat. The new
+  spirit also confers +1 attack and a chance of burning foes on hit (like
+  phoenixes do) and the upgraded version confers fire resistance (half duration
+  of Fire effects).  As a drawback, it inflicts bad hearing on the player,
+  making it harder to hear footsteps and impossible to hear creeping and
+  wing-flapping noises. If the Fire Salamander is combined with the Barking
+  Hound spirit, hearing becomes normal again (neither good nor bad). Fire
+  Salamander is hence a spirit that offers very good offense capabilities and
+  some mobility, but it can significantly impair stealth tactics.
 * Space-distorting attacks now swap clouds too. While getting swapped into a
   cloud of fire or poison by foes was (very occasionally) fun, Temporal Cat
   players not being able to safely attack monsters on dangerous clouds was

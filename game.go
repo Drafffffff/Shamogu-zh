@@ -107,7 +107,7 @@ func (g *Game) EndTurn() {
 		}
 		p := g.PP()
 		g.HandleActorTurn(i, ai)
-		if p != g.PP() {
+		if p != g.PP() || i == PlayerID {
 			g.UpdateFOV()
 			g.UpdateKnowledge()
 			if i != PlayerID {
@@ -181,7 +181,7 @@ func (g *Game) ComputeNoise() {
 		if badhearing {
 			// Bad hearing reduces the chance of hearing normal and
 			// heavy footsteps.
-			dist += (1 + dist) / 2
+			dist *= 2
 		}
 		if ai.DoesAny(MonsHeavyFootsteps) && (goodhearing || g.IntN(dist) <= MaxFOVRange) {
 			// Good hearing allows to always hear heavy footsteps.

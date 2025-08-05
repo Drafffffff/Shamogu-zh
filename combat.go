@@ -298,12 +298,21 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int)
 			g.Logf("The confused %s lost balance due to recoil!", ei.Name)
 		}
 	}
-	// NOTE: There's only at most one extra attack or defense effect in the
-	// switch per actor currently, otherwise some would need to be tested
-	// for separately (like burning because of crazy druid that does
-	// berserking attacks too).
-	//
-	// Extra attack effects.
+	// Extra attack effects (shared by both player and monsters).
+	if ai.DoesAny(VenomousMelee) && (ap != AttackRanged || g.AdjacentEntities(i, j)) && g.IntN(6-dmg) < 2 {
+		if g.PutStatus(j, aj, StatusPoison, DurationPoison) && i != PlayerID {
+			g.LogfStyled("The confused %s bit itself too!", logHurtMons, ei.Name)
+			g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
+		}
+	}
+	if ai.DoesAll(BurningHits) && g.IntN(5-dmg) < 2 {
+		if g.PutStatus(j, aj, StatusFire, DurationFire) {
+			if p := ej.P; g.Map.Burnable(p) {
+				g.FireCloudAt(p)
+			}
+		}
+	}
+	// Monster-specific extra attack effects (at most one per monster).
 	switch {
 	case ai.DoesAll(MonsSpitFire) && ap == AttackRanged:
 		if g.PutStatus(j, aj, StatusFire, DurationFire) {
@@ -313,11 +322,6 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int)
 			if ai.Has(StatusConfusion) && i != PlayerID && g.PutStatus(i, ai, StatusFire, DurationFire) {
 				g.Logf("The confused %s burned itself too!", ei.Name)
 			}
-		}
-	case ai.DoesAny(VenomousMelee) && (ap != AttackRanged || g.AdjacentEntities(i, j)) && g.IntN(6-dmg) < 2:
-		if g.PutStatus(j, aj, StatusPoison, DurationPoison) && i != PlayerID {
-			g.LogfStyled("The confused %s bit itself too!", logHurtMons, ei.Name)
-			g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
 		}
 	case ai.DoesAll(MonsFear) && g.IntN(5-dmg) < 2:
 		if g.PutStatus(j, aj, StatusFear, DurationMonsFear) {
@@ -341,13 +345,6 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int)
 		}
 	case ai.DoesAny(MonsBlink) && aj.IsAlive():
 		g.blinkOther(i, j, ai, aj)
-	}
-	if ai.DoesAll(MonsBurn) && g.IntN(5-dmg) < 2 {
-		if g.PutStatus(j, aj, StatusFire, DurationFire) {
-			if p := ej.P; g.Map.Burnable(p) {
-				g.FireCloudAt(p)
-			}
-		}
 	}
 	// Extra defense effects.
 	switch {

@@ -88,7 +88,8 @@ func (g *Game) spiritProcGen() {
 		// level.
 		mapSpirits[i] = -1
 	}
-	copy(mapSpirits, spirits)
+	// Games generate at most 6 totems among possible ones.
+	copy(mapSpirits, spirits[:min(6, len(spirits))])
 	// We shuffle over more levels to possibly leave early ones without
 	// spirit.
 	s := mapSpirits[1:8]
