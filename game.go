@@ -117,12 +117,18 @@ func (g *Game) EndTurn() {
 			}
 		}
 	}
-	// We update FOV again after all monsters moved.
-	g.UpdateClouds()
 	if pa.IsDead() {
 		// The player died before turn ended.
 		return
 	}
+	// Clouds are updated after all actors acted.
+	g.UpdateClouds()
+	if pa.IsDead() {
+		// The player died due to a fire cloud.
+		return
+	}
+	// We update FOV again after all monsters moved and clouds were
+	// updated.
 	g.UpdateFOV()
 	g.UpdateKnowledge()
 	g.ComputeNoise()
