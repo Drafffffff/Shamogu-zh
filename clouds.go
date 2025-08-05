@@ -134,6 +134,20 @@ func (g *Game) AddCloud(cl Cloud) {
 	cg.Grid[i] = j
 }
 
+// SwapClouds swaps any clouds at valid positions p and q.
+func (g *Game) SwapClouds(p, q gruid.Point) {
+	cg := g.Map.Clouds
+	pidx, qidx := point2idx(p), point2idx(q)
+	i, j := cg.Grid[pidx], cg.Grid[qidx]
+	cg.Grid[pidx], cg.Grid[qidx] = cg.Grid[qidx], cg.Grid[pidx]
+	if i >= 0 {
+		cg.Clouds[i].P = q
+	}
+	if j >= 0 {
+		cg.Clouds[j].P = p
+	}
+}
+
 func (cg *CloudGrid) removeCloud(j int) {
 	nl := len(cg.Clouds) - 1 // new length
 	cj, cnj := cg.Clouds[j], cg.Clouds[nl]

@@ -1,5 +1,25 @@
 # v? ?
 
+* Space-distorting attacks now swap clouds too. While getting swapped into a
+  cloud of fire or poison by foes was (very occasionally) fun, Temporal Cat
+  players not being able to safely attack monsters on dangerous clouds was
+  more annoying than fun. And in both cases, it could result in unexpected
+  dangerous situations that would've required explicit examination to be
+  avoided: when a monster is on a tile with a cloud, only the monster is drawn,
+  and while that limitation could be solved for the tiles version with image
+  layers, introducing that kind of visual clutter doesn't fit the simplicity of
+  the game.
+* Players with the Rampaging Boar spirit don't move into poison or fire clouds
+  after pushing anymore. While sometimes funny, it had similar issues as
+  swapping into unexpected clouds. Monster boars and dragons still move into
+  dangerous clouds after pushing, because they're enraged and corrupted, so not
+  as smart!
+* The “sprint” and “focus” abilities now cancel each other. It's never really
+  useful nor thematic to have both at the same time, so hydra players have now
+  an instant sprint cancellation option (at the cost of a spirit charge).
+* While sprinting, the frog's “jump” ability now unbalances foes without
+  hurting them, but still dazes them, effectively combining the effects of the
+  two kinds of jumps in a sensible way.
 * Improve a bit monster distribution. Mostly, bias toward early-mid-late
   monsters depending on map level has been increased, making the various phases
   more distinct. Early and Mid game difficulty remains similar. Late game has
@@ -12,12 +32,6 @@
 * Improvements in monster group formation. In particular, less groups of three
   monsters than before and more groups of two, so somewhat better coverage of
   the map in mid and late game, but smaller likeliness of large monster groups.
-* The “sprint” and “focus” abilities now cancel each other. It's never really
-  useful nor thematic to have both at the same time, so hydra players have now
-  an instant sprint cancellation option (at the cost of a spirit charge).
-* While sprinting, the frog's “jump” ability now unbalances foes without
-  hurting them, but still dazes them, effectively combining the effects of the
-  two kinds of jumps in a sensible way.
 * Add a few new special vaults.
 * Nadre explosions now properly blow up nearby walls too, like in Boohu and
   Harmonist.
@@ -26,7 +40,7 @@
 * Animation improvements. Monster deaths are now always animated when in view,
   independently of the cause. Hits between confused monsters are now animated
   too, making it clearer what's happening.
-* Improve a few tiles (footsteps, translucid walls, food).
+* Improve a few tiles (footsteps, translucent walls, food).
 
 # v1.0.0-beta.1 2025-07-22
 
