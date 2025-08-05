@@ -155,7 +155,9 @@ func (g *Game) endTurnEarly() bool {
 // ComputeNoise generates footstep noise information.
 func (g *Game) ComputeNoise() {
 	dij := &MapPath{passable: g.Map.Passable}
-	goodhearing := g.PlayerActor().DoesAny(GoodHearing)
+	pa := g.PlayerActor()
+	goodhearing := pa.DoesAny(GoodHearing) && !pa.DoesAny(BadHearing)
+	badhearing := !pa.DoesAny(GoodHearing) && pa.DoesAny(BadHearing)
 	maxdist := (3 * MaxFOVRange) / 2
 	g.PRnoise.BreadthFirstMap(dij, []gruid.Point{g.PP()}, maxdist)
 	for i, ai := range g.Monsters() {
@@ -169,20 +171,33 @@ func (g *Game) ComputeNoise() {
 		}
 		if ai.DoesAny(MonsSilent) {
 			if goodhearing && g.IntN(dist) < MaxFOVRange/2 {
+				// Good hearing allows to occasionally hear
+				// almost silent monsters like spiders.
 				ei.Noise = true
 				g.Log("You hear an imperceptible air movement.")
 			}
 			continue
 		}
+		if badhearing {
+			// Bad hearing reduces the chance of hearing normal and
+			// heavy footsteps.
+			dist += (1 + dist) / 2
+		}
 		if ai.DoesAny(MonsHeavyFootsteps) && (goodhearing || g.IntN(dist) <= MaxFOVRange) {
+			// Good hearing allows to always hear heavy footsteps.
 			ei.Noise = true
 			g.Log("You hear heavy footsteps.")
+			continue
+		}
+		if badhearing && ai.DoesAny(MonsCreep|MonsWingFlap) {
+			// Wing flapping and creeping can't be heared with
+			// bad (mostly ground vibration-based) hearing.
 			continue
 		}
 		if ai.DoesAny(MonsLightFootsteps | MonsCreep) {
 			dist += 3
 		}
-		if ei.Noise = goodhearing && g.IntN(dist) <= MaxFOVRange || g.IntN(dist) <= 2*MaxFOVRange/3; !ei.Noise {
+		if ei.Noise = goodhearing && g.IntN(dist) <= MaxFOVRange || g.IntN(dist) <= (2*MaxFOVRange)/3; !ei.Noise {
 			continue
 		}
 		g.Logf("You hear %s.", monsterNoiseString(ai))
@@ -226,12 +241,13 @@ func noiseColor(e *Entity) gruid.Color {
 func (g *Game) MakeNoise(at gruid.Point, nt NoiseType) {
 	noise := nt.Noise()
 	dij := &MapPath{passable: g.Map.Passable}
-	maxdist := 3 * noise / 2
+	maxdist := (3 * noise) / 2
 	g.PRnoise.BreadthFirstMap(dij, []gruid.Point{at}, maxdist)
 	pp := g.PP()
 	pa := g.PlayerActor()
+	goodhearing := pa.DoesAny(GoodHearing) && !pa.DoesAny(BadHearing)
 	d := g.PRnoise.BreadthFirstMapAt(pp)
-	if d <= maxdist && (pa.DoesAny(GoodHearing) || d <= noise) {
+	if d <= maxdist && (goodhearing || d <= noise) {
 		if at != pp && g.Map.Noise != nil {
 			g.Map.Noise[at] = nt
 		}

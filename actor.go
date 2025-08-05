@@ -122,6 +122,7 @@ const (
 	PatternSwap           // temporal cat swapping-attack
 	PatternSwapDaze       // temporal cat dazing swapping-attack
 
+	BadHearing       // worse hearing of noise (footsteps)
 	DazingSpines     // body covered in dazing spines (porcupine)
 	GoodHearing      // better hearing of noise (footsteps)
 	GoodSmell        // smell food from a distance
@@ -188,7 +189,12 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, PatternSwapDaze, "ranged space-distorting attack that may @Odaze@N foes")
 
 	desc = traitDesc(desc, t, DazingSpines, "spines may @Odaze@N foes in melee")
-	desc = traitDesc(desc, t, GoodHearing, "good hearing")
+	switch {
+	case t.All(GoodHearing) && !t.All(BadHearing):
+		desc = append(desc, "good hearing")
+	case !t.All(GoodHearing) && t.All(BadHearing):
+		desc = append(desc, "bad hearing")
+	}
 	desc = traitDesc(desc, t, GoodSmell, "smells food from afar")
 	desc = traitDesc(desc, t, Pushing, "hits may push foes")
 	desc = traitDesc(desc, t, PushingUnbalance, "hits may push and @Ounbalance@N foes")
