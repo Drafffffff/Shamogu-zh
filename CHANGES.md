@@ -48,6 +48,9 @@
   Harmonist.
 * Fix spelling and formatting issues in a few log messages. Avoid case of
   duplicated "Saw *monster*" entries in timeline.
+* Fix field of view sometimes not being updated just after cloud creation but
+  later at the end of a turn, which could allow monsters to attack once from a
+  distance before the update.
 * Animation improvements. Monster deaths are now always animated when in view,
   independently of the cause. Hits between confused monsters are now animated
   too, making it clearer what's happening.
