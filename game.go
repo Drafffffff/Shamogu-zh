@@ -188,6 +188,7 @@ func (g *Game) ComputeNoise() {
 			// Bad hearing reduces the chance of hearing normal and
 			// heavy footsteps.
 			dist *= 2
+			dist += 2
 		}
 		if ai.DoesAny(MonsHeavyFootsteps) && (goodhearing || g.IntN(dist) <= MaxFOVRange) {
 			// Good hearing allows to always hear heavy footsteps.
@@ -201,9 +202,9 @@ func (g *Game) ComputeNoise() {
 			continue
 		}
 		if ai.DoesAny(MonsLightFootsteps | MonsCreep) {
-			dist += 3
+			dist += 4
 		}
-		if ei.Noise = goodhearing && g.IntN(dist) <= MaxFOVRange || g.IntN(dist) <= (2*MaxFOVRange)/3; !ei.Noise {
+		if ei.Noise = goodhearing && g.IntN(dist) <= MaxFOVRange || g.IntN(dist) <= MaxFOVRange/2; !ei.Noise {
 			continue
 		}
 		g.Logf("You hear %s.", monsterNoiseString(ai))
