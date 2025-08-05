@@ -498,6 +498,15 @@ func (g *Game) push(i, j ID, ai, aj *Actor, dmg int, ap AttackKind, bonus int) {
 		}
 		return
 	}
+	if i == PlayerID {
+		switch g.Map.Clouds.At(pj).Kind {
+		case NoCloud, CloudFog:
+		default:
+			// Player is smarter than corrupted monsters: we don't
+			// push and move when foe is on a dangerous cloud.
+			return
+		}
+	}
 	if aj.IsAlive() {
 		if j != PlayerID {
 			g.Logf("The %v is pushed away.", ej.Name)

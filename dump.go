@@ -176,7 +176,7 @@ func (g *Game) dumpDungeon(sb *strings.Builder) {
 			sb.WriteRune(r)
 			continue
 		}
-		if _, ok := g.Map.Clouds.At(p); ok && (r == '.' || r == '"' || r == '^') {
+		if g.Map.Clouds.At(p).Kind != NoCloud && (r == '.' || r == '"' || r == '^') {
 			r = '§'
 		}
 		if i := ids.At(p); i > 0 {

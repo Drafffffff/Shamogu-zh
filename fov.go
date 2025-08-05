@@ -177,7 +177,7 @@ func (lt *lighter) Cost(src, from, to gruid.Point) int {
 	if t == Wall || t == Rubble {
 		return wallcost
 	}
-	if _, ok := g.Map.Clouds.At(from); ok {
+	if g.Map.Clouds.At(from).Kind != NoCloud {
 		return wallcost
 	}
 	// specific diagonal costs
@@ -224,7 +224,7 @@ func (g *Game) opaqueDiagonal(from, to gruid.Point) (opaque, hard bool) {
 	opaque = true
 	hard = true
 	for _, p := range ps {
-		if _, ok := g.Map.Clouds.At(p); ok {
+		if g.Map.Clouds.At(p).Kind != NoCloud {
 			continue
 		}
 		switch g.Map.Terrain.AtU(p) {

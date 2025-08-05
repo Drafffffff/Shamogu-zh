@@ -39,7 +39,8 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 			g.md.RangedAttackAnimation(pa, pl.P, ej.P)
 			g.BumpAttackActor(PlayerID, j, pa, aj, AttackRanged, 0)
 			return true
-		case pa.DoesAny(PatternSwap|PatternSwapDaze) && pa.CanMove() && !aj.ResistsMove():
+		case pa.DoesAny(PatternSwap|PatternSwapDaze) && pa.CanMove() && !aj.ResistsMove() &&
+			g.Map.Clouds.At(ej.P).Kind == NoCloud:
 			g.Dir = dir
 			g.md.RangedAttackAnimation(pa, pl.P, ej.P)
 			g.BumpAttackActor(PlayerID, j, pa, aj, AttackRanged, 0)

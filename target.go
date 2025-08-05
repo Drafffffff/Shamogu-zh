@@ -84,8 +84,6 @@ func (md *model) updateTargInfo() {
 	if g.InFOV(p) {
 		pi.sees = true
 	}
-	if cl, ok := g.Map.Clouds.At(p); ok {
-		pi.cloud = cl.Kind
-	}
+	pi.cloud = g.Map.Clouds.At(p).Kind
 	md.targ.info = pi
 }

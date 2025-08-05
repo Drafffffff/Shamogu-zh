@@ -95,15 +95,15 @@ func (cg *CloudGrid) Reset() {
 }
 
 // At returns a cloud at a given position, if any.
-func (cg *CloudGrid) At(p gruid.Point) (Cloud, bool) {
+func (cg *CloudGrid) At(p gruid.Point) Cloud {
 	i := point2idx(p)
 	if i < 0 || i >= MapWidth*MapHeight {
-		return Cloud{}, false
+		return Cloud{}
 	}
 	if j := cg.Grid[i]; j >= 0 {
-		return cg.Clouds[j], true
+		return cg.Clouds[j]
 	}
-	return Cloud{}, false
+	return Cloud{}
 }
 
 // AddCloud adds a cloud at a given position. If there's already a could it
@@ -200,7 +200,7 @@ func (g *Game) UpdateClouds() {
 				g.PutStatus(j, aj, StatusFire, DurationFire)
 			}
 			for p := range NeighborsFunc(cl.P, g.Map.Burnable) {
-				if _, ok := cg.At(p); ok || g.IntN(3) > 0 {
+				if cg.At(p).Kind != NoCloud || g.IntN(3) > 0 {
 					continue
 				}
 				g.FireCloudAt(p)
@@ -225,10 +225,7 @@ func (g *Game) PoisonCloudAt(p gruid.Point) {
 
 // FireAt reports whether there's a fire at the given position.
 func (g *Game) FireAt(p gruid.Point) bool {
-	if cl, ok := g.Map.Clouds.At(p); ok {
-		return cl.Kind == CloudFire
-	}
-	return false
+	return g.Map.Clouds.At(p).Kind == CloudFire
 }
 
 // InflictFireDamage inflicts fire damage to an actor.
