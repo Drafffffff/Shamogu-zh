@@ -305,7 +305,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int)
 			g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
 		}
 	}
-	if ai.DoesAll(BurningHits) && g.IntN(5-dmg) < 2 {
+	if ai.DoesAll(BurningHits) && g.IntN(6-dmg) < 2 {
 		if g.PutStatus(j, aj, StatusFire, DurationFire) {
 			if p := ej.P; g.Map.Burnable(p) {
 				g.FireCloudAt(p)
