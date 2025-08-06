@@ -214,10 +214,9 @@ func (g *Game) UpdateClouds() {
 				g.PutStatus(j, aj, StatusFire, DurationFire)
 			}
 			for p := range NeighborsFunc(cl.P, g.Map.Burnable) {
-				if cg.At(p).Kind != NoCloud || g.IntN(3) > 0 {
-					continue
+				if cg.At(p).Kind == NoCloud && g.IntN(3) == 0 {
+					g.FireCloudAt(p)
 				}
-				g.FireCloudAt(p)
 			}
 		case CloudPoison:
 			if j, aj := g.ActorAt(cl.P); j >= 0 {
