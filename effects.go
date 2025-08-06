@@ -568,10 +568,15 @@ type EffectPoisonCloud struct{}
 
 func (eff EffectPoisonCloud) Apply(g *Game) bool {
 	p := g.PP()
+	behind := p.Sub(g.Dir)
 	done := false
 	for q := range g.Map.PassableNeighbors(p) {
-		if q == p.Sub(g.Dir) {
+		if q == behind {
 			continue
+		}
+		nq := q.Add(q.Sub(p))
+		if g.IsFree(q) && g.IsFree(nq) {
+			q = nq
 		}
 		done = true
 		g.PoisonCloudAt(q)
@@ -589,7 +594,7 @@ func (eff EffectPoisonCloud) Name() string {
 }
 
 func (eff EffectPoisonCloud) Desc() string {
-	return "Spit poisonous clouds on the sides and in front of you, lasting 6-10 turns."
+	return "Spit poisonous clouds on the sides and in front of you up to two free tiles away, lasting 6-10 turns."
 }
 
 type EffectSprint struct{}

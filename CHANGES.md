@@ -11,6 +11,11 @@
   Hound spirit, hearing becomes normal again (neither good nor bad). Fire
   Salamander is hence a spirit that offers very good offense capabilities and
   some mobility, but it can significantly impair stealth tactics.
+* Improve “poison cloud” ability of the Venomous Viper spirit so that the
+  poison clouds are created up to two free tiles away (before a monster or
+  obstacle). This creates more varied possibilities for tactical movement,
+  while still restricting safe movements in a similar but less extreme way, and
+  providing similar defense from ranged monsters.
 * Space-distorting attacks now swap clouds too. While getting swapped into a
   cloud of fire or poison by foes was (very occasionally) fun, Temporal Cat
   players not being able to safely attack monsters on dangerous clouds was

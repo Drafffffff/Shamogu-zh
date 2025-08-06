@@ -15,7 +15,7 @@ func (g *Game) InitPlayer() {
 	for i := PrimarySpiritID; i < FirstMapID; i++ {
 		g.Entities[i] = emptySlot()
 	}
-	// g.Entities[PrimarySpiritID+1] = spiritEntity(secondarySpirits[6])
+	// g.Entities[PrimarySpiritID+1] = spiritEntity(secondarySpirits[4])
 	g.ComputePlayerStats()
 }
 
