@@ -200,7 +200,7 @@ func (md *model) drawMapWizard(gd gruid.Grid) {
 	g := md.g
 	// Terrain drawing.
 	for p, t := range g.Map.Terrain.All() {
-		r := g.Map.Rune(t)
+		r := MapRune(t)
 		if (r == '#' || r == '◊') && !g.Map.PassableNeighbor(p) {
 			r = ' '
 		}
@@ -296,8 +296,16 @@ var Markups = map[rune]gruid.Style{
 	'M': {Fg: ColorMagenta},
 	'O': {Fg: ColorOrange},
 	'R': {Fg: ColorRed},
-	'V': {Fg: ColorViolet},
+	'V': {Fg: ColorViolet}, // unused
 	'Y': {Fg: ColorYellow},
+	'b': {Fg: ColorBlue, Attrs: AttrInMap},
+	'c': {Fg: ColorCyan, Attrs: AttrInMap},
+	'g': {Fg: ColorGreen, Attrs: AttrInMap},
+	'm': {Fg: ColorMagenta, Attrs: AttrInMap},
+	'o': {Fg: ColorOrange, Attrs: AttrInMap},
+	'r': {Fg: ColorRed, Attrs: AttrInMap},
+	'v': {Fg: ColorViolet, Attrs: AttrInMap}, // unused
+	'y': {Fg: ColorYellow, Attrs: AttrInMap},
 }
 
 func (md *model) drawTargInfo() {

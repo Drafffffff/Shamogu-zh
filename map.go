@@ -118,8 +118,8 @@ func (m *Map) Burnable(p gruid.Point) bool {
 	return m.Terrain.At(p) == Foliage
 }
 
-// Rune returns the character rune representing a given terrain.
-func (m *Map) Rune(t rl.Cell) (r rune) {
+// MapRune returns the character rune representing a given terrain.
+func MapRune(t rl.Cell) (r rune) {
 	switch t {
 	case Wall:
 		r = '#'
@@ -141,7 +141,7 @@ func (m *Map) Rune(t rl.Cell) (r rune) {
 func (m *Map) RuneAt(p gruid.Point) rune {
 	t := m.KnownTerrain.At(p)
 	if t != Unknown {
-		return m.Rune(t)
+		return MapRune(t)
 	}
 	for q := range m.PassableNeighbors(p) {
 		if tq := m.KnownTerrain.At(q); tq != Unknown && tq != Wall && tq != TranslucentWall {

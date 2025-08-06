@@ -51,6 +51,8 @@
 * Fix field of view sometimes not being updated just after cloud creation but
   later at the end of a turn, which could allow monsters to attack once from a
   distance before the update.
+* Add concise information about current tile in the status bar which tells
+  whether there's fog, an item, or a special kind of terrain under the player.
 * Animation improvements. Monster deaths are now always animated when in view,
   independently of the cause. Hits between confused monsters are now animated
   too, making it clearer what's happening.

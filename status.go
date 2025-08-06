@@ -93,10 +93,39 @@ func (md *model) updateStatus() {
 			Text:     stt.WithTextf("@%c%s(%d)@N ", statusColor(st, turns), st.Abbr(), turns),
 			Disabled: true})
 	}
-	if pa.IsDead() {
+	switch {
+	case pa.IsDead():
 		entries = append(entries, ui.MenuEntry{
 			Text:     stt.WithText("@RDead@N "),
 			Disabled: true})
+	default:
+		pp := g.PP()
+		if i, _ := g.ItemAt(pp); i >= 0 {
+			ei := g.Entity(i)
+			entries = append(entries, ui.MenuEntry{
+				Text:     stt.WithTextf("%c ", ei.Rune).WithStyle(gruid.Style{Fg: ei.Color(), Attrs: AttrInMap}),
+				Disabled: true})
+		} else if t := g.Map.Terrain.At(pp); t != Floor {
+			entries = append(entries, ui.MenuEntry{
+				Text:     stt.WithTextf("%c ", MapRune(t)).WithStyle(gruid.Style{Fg: ColorForeground, Attrs: AttrInMap}),
+				Disabled: true})
+		}
+		clk := g.Map.Clouds.At(pp).Kind
+		switch clk {
+		case NoCloud:
+		case CloudPoison:
+			entries = append(entries, ui.MenuEntry{
+				Text:     stt.WithText("@g§@N "),
+				Disabled: true})
+		case CloudFire:
+			entries = append(entries, ui.MenuEntry{
+				Text:     stt.WithText("@r§@N "),
+				Disabled: true})
+		case CloudFog:
+			entries = append(entries, ui.MenuEntry{
+				Text:     stt.WithText("§ "),
+				Disabled: true})
+		}
 	}
 	if md.targ.kb {
 		entries = append(entries, ui.MenuEntry{
