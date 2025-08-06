@@ -76,7 +76,8 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 		return true
 	}
 	if j, aj := g.ActorAt(nto); j >= 0 {
-		// Charge against actor at nto, which may be outside FOV.
+		// Charge against actor at nto. An ambushing charge outside FOV
+		// can happend and is allowed even while afraid.
 		g.BumpAttackActor(PlayerID, j, pa, aj, AttackCharge, 0)
 	}
 	return true

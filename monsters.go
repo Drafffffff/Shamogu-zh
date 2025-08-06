@@ -158,7 +158,8 @@ func (g *Game) monsterBumpTo(i ID, ai *Actor, to gruid.Point) {
 	}
 	j, aj := g.ActorAt(to)
 	if j < 0 {
-		// Move and then try charge.
+		// Move and then try charge. An ambushing charge outside FOV
+		// can happend and is allowed even while afraid.
 		delta := to.Sub(ei.P)
 		nto := to.Add(delta)
 		g.BumpMoveActor(i, ai, to)
@@ -188,11 +189,17 @@ func (g *Game) monsterBumpTo(i ID, ai *Actor, to gruid.Point) {
 
 // monsterFlee handles movement for an afraid hunting monster. When they're in
 // a straight direction from the player, they'll flee randomly in a direction
-// that avoids them (if any is free).
+// that avoids them (if any is free). Reports whether turn is finished.
 func (g *Game) monsterFlee(i ID, ai *Actor) bool {
 	ei, pl := g.Entity(i), g.PlayerEntity()
-	if !g.InFOV(ei.P) || g.ActorInRange(ei.P, pl.P) != PlayerID {
+	if !g.InFOV(ei.P) {
 		return false
+	}
+	if g.ActorInRange(ei.P, pl.P) != PlayerID {
+		// If the monster is almost adjacent to the player, they'll
+		// just wait and lose a turn (true), otherwise they'll try to
+		// approach (false).
+		return paths.DistanceManhattan(ei.P, pl.P) == 2
 	}
 	var nbs paths.Neighbors
 	ps := nbs.Cardinal(ei.P, func(p gruid.Point) bool {
