@@ -615,6 +615,7 @@ func (g *Game) HandleActorTurn(i ID, ai *Actor) {
 	if ai.Has(StatusFoggySkin) {
 		g.exudeFog(i)
 	}
+	g.handleCornered(i, ai)
 }
 
 // exudeFog implements the FoggySkin status effect.
@@ -629,6 +630,48 @@ func (g *Game) exudeFog(i ID) {
 		}
 		g.AddCloud(Cloud{Kind: CloudFog, Duration: 2 + g.IntN(3), P: q})
 	}
+}
+
+// handleCornered makes cornered and afraid actors become berserk.
+func (g *Game) handleCornered(i ID, ai *Actor) {
+	if !ai.Has(StatusFear) {
+		return
+	}
+	ei := g.Entity(i)
+	from := ei.P
+	if !g.InFOV(from) {
+		return
+	}
+	for _, dir := range directions {
+		p := from.Add(dir)
+		if !inMap(p) {
+			continue
+		}
+		if !g.Map.Passable(p) && !ai.Has(StatusDig) && !ai.DoesAny(MonsDig) {
+			continue
+		}
+		if j, _ := g.ActorAt(p); j >= 0 {
+			continue
+		}
+		j, _ := g.RangedTargetInDir(from, dir)
+		if j < 0 {
+			// One direction is free of any actors: the afraid
+			// actor is not cornered yet.
+			return
+		}
+		if i != PlayerID && j != PlayerID {
+			// The afraid monster is not cornered yet: one of the
+			// directions has free space and no player.
+			return
+		}
+	}
+	// The actor is afraid and cornered: become berserk for a short while.
+	if i == PlayerID {
+		g.Log("You feel cornered.")
+	} else if g.InFOV(from) {
+		g.LogfStyled("The afraid %s feels cornered.", logSpecial, ei.Name)
+	}
+	g.PutStatus(i, ai, StatusBerserk, DurationBerserk/2)
 }
 
 // TeleportActor teleports the given actor.

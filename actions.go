@@ -1483,7 +1483,7 @@ indicates two or more negative statuses.`)
 		case StatusConfusion:
 			details = "Confused monsters will attack other monsters too when adjacent. Some monsters may even hurt or affect themselves when performing special actions like digging, spiting fire, barking, or pushing."
 		case StatusFear:
-			details = "Monsters cannot attack you and may flee when facing you. Ambushing charges against unseen foes can still happen."
+			details = "Monsters will flee when facing you. Ambushing charges against unseen foes can still happen. At the end of a turn, a cornered and afraid actor with no possible escape will become berserk. "
 		case StatusPoison:
 			details = "Watch out for confusion if any monsters survive poisoning!"
 		case StatusNausea:

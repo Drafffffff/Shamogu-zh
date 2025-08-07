@@ -16,6 +16,8 @@
   obstacle). This creates more varied possibilities for tactical movement,
   while still restricting safe movements in a similar but less extreme way, and
   providing similar defense from ranged monsters.
+* When the player or a monster is both afraid and cornered with no possible
+  escape, they now become berserk for a short while!
 * Space-distorting attacks now swap clouds too. While getting swapped into a
   cloud of fire or poison by foes was (very occasionally) fun, Temporal Cat
   players not being able to safely attack monsters on dangerous clouds was
