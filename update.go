@@ -309,6 +309,11 @@ func (md *model) updateStatusMouse(msg gruid.MsgMouse) {
 				n++
 			}
 			if st < 0 {
+				if !pa.IsDead() && !md.g.win {
+					md.status.desc.Box = &ui.Box{Title: ui.Text("Player’s Tile")}
+					md.status.desc.SetText("The tile where the player is.")
+					md.status.focus = true
+				}
 				break
 			}
 			turns := pa.Statuses[st]
