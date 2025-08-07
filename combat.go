@@ -250,6 +250,9 @@ func (g *Game) FourDirectionalAttack(i ID, ai *Actor, ap AttackKind) bool {
 	var actors []*Actor
 	var ids []ID
 	for j, aj := range g.AdjacentActors(ei.P) {
+		// Either attacker or defender should be the player. Confused
+		// monsters fighting each other in discord don't perform
+		// four-directional attacks.
 		if i == PlayerID || j == PlayerID {
 			actors = append(actors, aj)
 			ids = append(ids, j)
@@ -294,14 +297,16 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int)
 		g.catch(i, j, ai, aj, dmg)
 	case ai.DoesAny(PatternRangedRecoil) && ap != AttackCharge && ai.CanMove() && g.IntN(5-dmg) < 2:
 		if g.recoil(i, j, ai) && i != PlayerID &&
-			ai.Has(StatusConfusion) && g.PutStatus(i, ai, StatusImbalance, 1+dmg) {
+			ai.Has(StatusConfusion) && g.PutStatus(i, ai, StatusImbalance, 1+dmg) && g.InFOV(ei.P) {
 			g.Logf("The confused %s lost balance due to recoil!", ei.Name)
 		}
 	}
 	// Extra attack effects (shared by both player and monsters).
 	if ai.DoesAny(VenomousMelee) && (ap != AttackRanged || g.AdjacentEntities(i, j)) && g.IntN(6-dmg) < 2 {
 		if g.PutStatus(j, aj, StatusPoison, DurationPoison) && i != PlayerID {
-			g.LogfStyled("The confused %s bit itself too!", logHurtMons, ei.Name)
+			if g.InFOV(ei.P) {
+				g.LogfStyled("The confused %s bit itself too!", logHurtMons, ei.Name)
+			}
 			g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
 		}
 	}
@@ -325,7 +330,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int)
 		}
 	case ai.DoesAll(MonsFear) && g.IntN(5-dmg) < 2:
 		if g.PutStatus(j, aj, StatusFear, DurationMonsFear) {
-			if ai.Has(StatusConfusion) && g.PutStatus(i, ai, StatusFear, DurationMonsFear) {
+			if ai.Has(StatusConfusion) && g.PutStatus(i, ai, StatusFear, DurationMonsFear) && g.InFOV(ei.P) {
 				g.Logf("The confused %s frightened itself too!", ei.Name)
 			}
 		}
@@ -465,7 +470,9 @@ func (g *Game) logBumpMiss(i, j ID, ap AttackKind) {
 
 func (g *Game) monsConfusionPenalty(i ID, ai *Actor) {
 	if ai.Has(StatusConfusion) {
-		g.LogfStyled("The confused %s hurt itself too!", logHurtMons, g.Entity(i).Name)
+		if g.InFOV(g.Entity(i).P) {
+			g.LogfStyled("The confused %s hurt itself too!", logHurtMons, g.Entity(i).Name)
+		}
 		g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
 	}
 }
@@ -479,7 +486,7 @@ func (g *Game) push(i, j ID, ai, aj *Actor, dmg int, ap AttackKind, bonus int) {
 	npj := pj.Add(delta)
 	if ai.DoesAny(PushingUnbalance) {
 		if g.PutStatus(j, aj, StatusImbalance, 2+dmg/3) && i != PlayerID &&
-			ai.Has(StatusConfusion) && g.PutStatus(i, ai, StatusImbalance, dmg) {
+			ai.Has(StatusConfusion) && g.PutStatus(i, ai, StatusImbalance, dmg) && g.InFOV(ei.P) {
 			g.Logf("The confused %s lost balance while pushing too!", ei.Name)
 		}
 	}
@@ -496,7 +503,7 @@ func (g *Game) push(i, j ID, ai, aj *Actor, dmg int, ap AttackKind, bonus int) {
 		return
 	}
 	if aj.IsAlive() {
-		if j != PlayerID {
+		if j != PlayerID && (i == PlayerID || g.InFOV(pj)) {
 			g.Logf("The %v is pushed away.", ej.Name)
 		} else {
 			g.Log("You’re pushed away.")
@@ -543,7 +550,7 @@ func (g *Game) swapSpaceDistortion(i, j ID, ai, aj *Actor, dmg int, dazed bool) 
 	if !dazed && ai.DoesAny(PatternSwapDaze) && g.IntN(6-dmg) < 2 {
 		duration := 2 + dmg/2
 		if g.PutStatus(j, aj, StatusDaze, duration) && i != PlayerID &&
-			ai.Has(StatusConfusion) && g.PutStatus(i, ai, StatusDaze, duration) {
+			ai.Has(StatusConfusion) && g.PutStatus(i, ai, StatusDaze, duration) && g.InFOV(pj) {
 			g.LogfStyled("The confused %s dazed itself too!",
 				logHurtMons, g.Entity(i).Name)
 		}
@@ -665,6 +672,14 @@ func (g *Game) blinkOther(i, j ID, ai, aj *Actor) {
 // BlinkPos returns a suitable blinking position in FOV from the given
 // position.
 func (g *Game) BlinkPos(from gruid.Point) (gruid.Point, bool) {
+	if !g.InFOV(from) {
+		// Disable blinking when out of FOV, like it can happen when
+		// confused monsters fight among themselves. Computing a
+		// separate FOV for the monster would not be worth the
+		// complexity, and not even really consistent with how it works
+		// when in FOV.
+		return InvalidPos, false
+	}
 	pp := g.PP()
 	ps := []gruid.Point{}
 	for _, p := range g.Map.FOVPts {
