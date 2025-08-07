@@ -98,6 +98,7 @@ func (md *model) updateStatus() {
 		entries = append(entries, ui.MenuEntry{
 			Text:     stt.WithText("@RDead@N "),
 			Disabled: true})
+	case md.g.win:
 	default:
 		pp := g.PP()
 		if i, _ := g.ItemAt(pp); i >= 0 {
@@ -126,11 +127,11 @@ func (md *model) updateStatus() {
 				Text:     stt.WithText("§ "),
 				Disabled: true})
 		}
-	}
-	if md.targ.kb {
-		entries = append(entries, ui.MenuEntry{
-			Text:     stt.WithText("@C[Examine]@N "),
-			Disabled: true})
+		if md.targ.kb {
+			entries = append(entries, ui.MenuEntry{
+				Text:     stt.WithText("@C[Examine]@N "),
+				Disabled: true})
+		}
 	}
 
 	md.status.menu.SetEntries(entries)
