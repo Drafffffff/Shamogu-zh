@@ -21,6 +21,9 @@ const (
 	RandomWalkTreeCave
 )
 
+// NLayouts represents the number of different kinds of map layouts.
+const NLayouts = 3
+
 // MapGen gathers all terrain and vault information for generating a new map.
 type MapGen struct {
 	terrain rl.Grid         // map terrain
