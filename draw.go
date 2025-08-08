@@ -324,9 +324,9 @@ func (md *model) drawTargInfo() {
 	stt := ui.StyledText{}.WithMarkups(Markups)
 	formatBox := func(title, s string, fg gruid.Color) {
 		md.desc.Content = stt.WithText(s).Format(MapWidth/2 - 3)
-		if md.desc.Content.Size().Y+2 > 2+MapHeight {
+		if md.desc.Content.Size().Y+y > MapHeight {
 			md.desc.Box = &ui.Box{Title: ui.NewStyledText(title, gruid.Style{}.WithFg(fg)),
-				Footer: ui.Text("scroll/page down for more…")}
+				Footer: ui.NewStyledText("scroll/page down for more…", gruid.Style{}.WithFg(ColorMagenta))}
 		} else {
 			md.desc.Box = &ui.Box{Title: ui.NewStyledText(title, gruid.Style{}.WithFg(fg))}
 		}
@@ -364,7 +364,7 @@ func (md *model) drawTargInfo() {
 			desc += "\n" + info.cloud.Desc()
 		}
 	}
-	if noise, ok := g.Map.Noise[md.targ.p]; ok && !g.InFOV(md.targ.p) {
+	if noise, ok := g.Map.Noise[md.targ.p]; ok && !g.InFOV(md.targ.p) && !md.targ.scroll {
 		msg := "noise"
 		switch noise {
 		case NoiseBark:
@@ -387,7 +387,10 @@ func (md *model) drawTargInfo() {
 	if !md.targ.scroll {
 		formatBox(t, desc, fg)
 	}
-	for _, id := range info.entities {
+	for i, id := range info.entities {
+		if md.targ.scroll && i < len(info.entities)-1 {
+			continue
+		}
 		e := g.Entity(id)
 		if !info.sees && e.Noise && e.P == md.targ.p {
 			noise := "footsteps"
