@@ -2,7 +2,7 @@ Shamanic Mountain Guardian
 ==========================
 
 Shamogu is a coffee-break roguelike game with a focus on tactical movement and
-careful timing of totemic spirit ability usage and comestible consumption.
+careful timing of totemic spirit invocation and comestible consumption.
 Visibility and noise stealth mechanics also play an important role.
 
 *“All life in your mountain is being corrupted. Beasts are losing their mind
