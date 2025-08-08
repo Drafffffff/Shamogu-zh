@@ -149,7 +149,7 @@ func (g *Game) Sprint(dir gruid.Point) bool {
 		}
 	}
 	g.md.MoveAnimation(from, to)
-	if n > 1 && pa.Has(StatusImbalance) && g.IntN(5) == 0 {
+	if n > 1 && pa.Has(StatusImbalance) && g.IntN(DurationSprint) == 0 {
 		g.Log("You fall due to imbalance.")
 		g.PutStatus(PlayerID, pa, StatusDaze, DurationDazeFall)
 	}
