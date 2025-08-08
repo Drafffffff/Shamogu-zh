@@ -48,7 +48,7 @@ func (md *model) Draw() gruid.Grid {
 		return md.gd.Slice(gruid.Range{})
 	case modePager:
 		if md.pager.mode == modeDump {
-			md.gd.Copy(md.pager.big.Draw())
+			md.gd.Copy(md.pager.pg.Draw())
 			return md.gd
 		}
 	case modeNewGame:
@@ -78,12 +78,16 @@ func (md *model) Draw() gruid.Grid {
 			md.drawTargInfo()
 		}
 	case modePager:
-		// switch md.pager.mode {
-		// case modeLore:
-		// 	md.gd.Slice(gruid.NewRange(10, 2, UIWidth, UIHeight-1)).Copy(md.pager.small.Draw())
-		// default:
-		md.gd.Copy(md.pager.big.Draw())
-		// }
+		pgd := md.pager.pg.Draw()
+		rg := md.pager.pg.View()
+		sz := pgd.Size()
+		if rg.Min.Y > 0 {
+			pgd.Set(gruid.Point{sz.X - 1, 1}, gruid.Cell{Rune: '↑'})
+		}
+		if rg.Max.Y < md.pager.nlines {
+			pgd.Set(gruid.Point{sz.X - 1, sz.Y - 2}, gruid.Cell{Rune: '↓'})
+		}
+		md.gd.Copy(pgd)
 	case modeMenu:
 		switch md.menu.mode {
 		case modeInventory, modeEquip:

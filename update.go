@@ -381,6 +381,7 @@ func (md *model) dump(msg string, err error) {
 		details = msg
 	}
 	stts = append(stts, ui.Text(details))
-	md.pager.big.SetLines(stts)
-	md.pager.big.SetCursor(gruid.Point{0, 0})
+	md.pager.pg.SetLines(stts)
+	md.pager.nlines = len(stts)
+	md.pager.pg.SetCursor(gruid.Point{0, 0})
 }

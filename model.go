@@ -123,16 +123,11 @@ func (md *model) initWidgets() {
 	md.status = &gameStatus{}
 	md.status.desc = ui.NewLabel(ui.StyledText{}.WithMarkups(Markups))
 	md.pager = &pager{}
-	md.pager.big = ui.NewPager(ui.PagerConfig{
+	md.pager.pg = ui.NewPager(ui.PagerConfig{
 		Grid: gruid.NewGrid(UIWidth, UIHeight-1),
 		Box:  &ui.Box{},
 		Keys: ui.PagerKeys{Quit: []gruid.Key{gruid.KeySpace, "x", "X", gruid.KeyEscape}},
 	})
-	// md.pager.small = ui.NewPager(ui.PagerConfig{
-	// 	Grid: gruid.NewGrid(60, UIHeight-1),
-	// 	Box:  &ui.Box{},
-	// 	Keys: ui.PagerKeys{Quit: []gruid.Key{gruid.KeySpace, "x", "X", gruid.KeyEscape}},
-	// })
 	md.pager.markup = ui.StyledText{}.WithMarkups(Markups)
 	style := ui.MenuStyle{
 		Active: gruid.Style{}.WithFg(ColorYellow),

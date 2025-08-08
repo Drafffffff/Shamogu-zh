@@ -1091,9 +1091,10 @@ func (a ActionViewMessages) Handle(md *model) (gruid.Effect, bool) {
 	for _, e := range md.g.Logs.Entries[len(md.pager.lines):] {
 		md.pager.lines = append(md.pager.lines, md.pager.markup.WithText(e.MText))
 	}
-	md.pager.big.SetLines(md.pager.lines)
-	md.pager.big.SetCursor(gruid.Point{0, len(md.pager.lines)})
-	md.pager.big.SetBox(&ui.Box{Title: ui.Text("Messages").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
+	md.pager.pg.SetLines(md.pager.lines)
+	md.pager.nlines = len(md.pager.lines)
+	md.pager.pg.SetCursor(gruid.Point{0, len(md.pager.lines)})
+	md.pager.pg.SetBox(&ui.Box{Title: ui.Text("Messages").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
 	md.mode = modePager
 	md.pager.mode = modeLogs
 	return nil, false
@@ -1387,7 +1388,7 @@ func (md *model) updateKeysDescription(title string, actions []string) {
 	} else {
 		title = fmt.Sprintf(" %s ", title)
 	}
-	md.pager.big.SetBox(&ui.Box{Title: ui.Text(title).WithStyle(gruid.Style{}.WithFg(ColorYellow))})
+	md.pager.pg.SetBox(&ui.Box{Title: ui.Text(title).WithStyle(gruid.Style{}.WithFg(ColorYellow))})
 	lines := []ui.StyledText{}
 	for i := 0; i < len(actions)-1; i += 2 {
 		stt := ui.StyledText{}
@@ -1401,8 +1402,9 @@ func (md *model) updateKeysDescription(title string, actions []string) {
 		}
 		lines = append(lines, stt)
 	}
-	md.pager.big.SetLines(lines)
-	md.pager.big.SetCursor(gruid.Point{0, 0})
+	md.pager.pg.SetLines(lines)
+	md.pager.nlines = len(lines)
+	md.pager.pg.SetCursor(gruid.Point{0, 0})
 }
 
 func (md *model) KeysHelp() {
@@ -1437,11 +1439,12 @@ func (md *model) KeysHelp() {
 func (md *model) helpTopic(title, content string) {
 	text := ui.Text(content).WithMarkups(Markups).Format(78)
 	stts := text.Lines()
-	md.pager.big.SetLines(stts)
-	md.pager.big.SetCursor(gruid.Point{0, 0})
+	md.pager.pg.SetLines(stts)
+	md.pager.nlines = len(stts)
+	md.pager.pg.SetCursor(gruid.Point{0, 0})
 	md.mode = modePager
 	md.pager.mode = modeHelp
-	md.pager.big.SetBox(&ui.Box{Title: ui.Text(title).WithStyle(gruid.Style{}.WithFg(ColorYellow))})
+	md.pager.pg.SetBox(&ui.Box{Title: ui.Text(title).WithStyle(gruid.Style{}.WithFg(ColorYellow))})
 }
 
 // ActionHelpStatuses opens the log message viewer.

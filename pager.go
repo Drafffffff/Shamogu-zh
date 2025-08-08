@@ -7,11 +7,11 @@ import (
 
 // pager gathers the structures used in the various kinds of pagers.
 type pager struct {
-	big *ui.Pager
-	// small  *ui.Pager
-	mode   pagerMode
-	markup ui.StyledText
-	lines  []ui.StyledText
+	pg     *ui.Pager       // pager widget
+	nlines int             // number of lines
+	mode   pagerMode       // pager mode
+	markup ui.StyledText   // styled text with default markup for pager
+	lines  []ui.StyledText // log lines cache (unused in dump & help modes)
 }
 
 // pagerMode represents the available pager modes
@@ -21,25 +21,19 @@ const (
 	modeLogs pagerMode = iota
 	modeDump
 	modeHelp
-	// modeLore // unused
 )
 
 func (md *model) updatePager(msg gruid.Msg) gruid.Effect {
 	switch md.pager.mode {
-	// case modeLore:
-	// 	md.pager.small.Update(msg)
-	// 	if md.pager.small.Action() == ui.PagerQuit {
-	// 		md.mode = modeNormal
-	// 	}
 	case modeDump:
-		md.pager.big.Update(msg)
-		if md.pager.big.Action() == ui.PagerQuit {
+		md.pager.pg.Update(msg)
+		if md.pager.pg.Action() == ui.PagerQuit {
 			md.mode = modeQuitting
 			return gruid.End()
 		}
 	default:
-		md.pager.big.Update(msg)
-		if md.pager.big.Action() == ui.PagerQuit {
+		md.pager.pg.Update(msg)
+		if md.pager.pg.Action() == ui.PagerQuit {
 			md.mode = modeNormal
 		}
 	}
