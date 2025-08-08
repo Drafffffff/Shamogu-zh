@@ -18,6 +18,8 @@
   providing similar defense from ranged monsters.
 * When the player or a monster is both afraid and cornered with no possible
   escape, they now become berserk for a short while!
+* Using “sprint” or “jump” abilities while imbalanced may now sometimes lead to
+  a dazing fall.
 * Space-distorting attacks now swap clouds too. While getting swapped into a
   cloud of fire or poison by foes was (very occasionally) fun, Temporal Cat
   players not being able to safely attack monsters on dangerous clouds was

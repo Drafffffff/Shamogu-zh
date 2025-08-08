@@ -14,6 +14,7 @@ const (
 	DurationConfusion              = 7
 	DurationConfusionAmbrosia      = 7
 	DurationConfusionToxins        = 5
+	DurationDazeFall               = 2
 	DurationDazeJump               = 5
 	DurationDazeLightning          = 3
 	DurationDazePenalty            = 7
@@ -250,7 +251,7 @@ func (eff EffectFocus) Apply(g *Game) bool {
 		return false
 	}
 	if pa.Has(StatusFear) {
-		g.Log("You cannot focus while afraid")
+		g.Log("You cannot focus while afraid.")
 		return false
 	}
 	g.PutStatus(PlayerID, pa, StatusFocus, DurationFocus)
@@ -328,6 +329,10 @@ func (eff EffectJump) Apply(g *Game) bool {
 			}
 			g.PutStatus(i, ai, StatusDaze, DurationDazeJump)
 		}
+	}
+	if pa.Has(StatusImbalance) && g.IntN(2) == 0 {
+		g.Log("You fall due to imbalance.")
+		g.PutStatus(PlayerID, pa, StatusDaze, DurationDazeFall)
 	}
 	return true
 }
