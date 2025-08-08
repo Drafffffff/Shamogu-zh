@@ -249,6 +249,10 @@ func (eff EffectFocus) Apply(g *Game) bool {
 		g.Log("You’re already focusing your heads.")
 		return false
 	}
+	if pa.Has(StatusFear) {
+		g.Log("You cannot focus while afraid")
+		return false
+	}
 	g.PutStatus(PlayerID, pa, StatusFocus, DurationFocus)
 	g.instant = true
 	return true
