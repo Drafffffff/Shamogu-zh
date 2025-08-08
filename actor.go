@@ -156,6 +156,7 @@ const (
 	MonsFourHeaded     // perform 4 attacks per attack
 	MonsIgnoreDefense  // attack ignores defense
 	MonsLignify        // attack may lignify you (also makes unmovable by force)
+	MonsSpores         // lignifying spores
 	MonsNausea         // killing rats can make the player nauseous if adjacent
 	MonsSpitFire       // spit fire when ranged (requires PatternRanged)
 
@@ -225,6 +226,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, MonsLignify, "hits may @Blignify@N you briefly, resists forced movement")
 	desc = traitDesc(desc, t, MonsNausea, "causes @Onausea@N when killed in melee")
 	desc = traitDesc(desc, t, MonsSpitFire, "spites @OFire@N from afar")
+	desc = traitDesc(desc, t, MonsSpores, "releases @Blignifying@N spores on sight")
 
 	desc = traitDesc(desc, t, MonsImmunityConfusion, "immune to @OConfusion@N")
 	desc = traitDesc(desc, t, MonsImmunityDaze, "@ODaze@N immunity")

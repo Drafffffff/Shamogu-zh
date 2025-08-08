@@ -6,21 +6,22 @@ const MapLevels = 9
 // ProcInfo contains information for procedural generation, like which items
 // were already generated, and so on.
 type ProcInfo struct {
-	Layouts       []MapLayout // map layouts
-	Earthquake    int         // level with extra rubble
-	FakePortal    int         // level with fake portal
-	GuardianEarly int         // level with early totem guardian
-	GuardianMid   int         // level with mid portal guardian
-	MonsEarly     int         // special early level
-	MonsMid       int         // special mid level
-	MonsLate      int         // special late level
-	Spirits       []int       // spirit index for each dungeon level (-1 if no spirit)
-	Menhirs       []int       // menhir-generation data
-	MenhirIdx     int         // current index in Menhirs
-	Comestibles   []int       // comestible-generation data
-	ComestibleIdx int         // current index in Comestibles
-	NComestibles  []int       // number of comestibles per level
-	NMenhirs      []int       // number of menhirs per level
+	Layouts         []MapLayout // map layouts
+	Earthquake      int         // level with extra rubble
+	FakePortal      int         // level with fake portal
+	GuardianTotem   int         // level with early totem guardian
+	GuardianPortal  int         // level with mid portal guardian
+	WanderingUnique int         // level with wandering unique
+	MonsEarly       int         // special early level
+	MonsMid         int         // special mid level
+	MonsLate        int         // special late level
+	Spirits         []int       // spirit index for each dungeon level (-1 if no spirit)
+	Menhirs         []int       // menhir-generation data
+	MenhirIdx       int         // current index in Menhirs
+	Comestibles     []int       // comestible-generation data
+	ComestibleIdx   int         // current index in Comestibles
+	NComestibles    []int       // number of comestibles per level
+	NMenhirs        []int       // number of menhirs per level
 }
 
 // InitProcInfo initializes procedural generation starting information.
@@ -51,13 +52,14 @@ func (g *Game) flavoursProcGen() {
 	gpi.Earthquake = 2 + g.IntN(MapLevels-1)
 	gpi.FakePortal = 2 + g.IntN(MapLevels-2)
 	for {
-		gpi.GuardianEarly = 3 + g.IntN(3)
-		if gpi.Spirits[gpi.GuardianEarly-1] >= 0 {
+		gpi.GuardianTotem = 3 + g.IntN(3)
+		if gpi.Spirits[gpi.GuardianTotem-1] >= 0 {
 			// There's a totem to guard on that level.
 			break
 		}
 	}
-	gpi.GuardianMid = 6 + g.IntN(3)
+	gpi.GuardianPortal = 6 + g.IntN(3)
+	gpi.WanderingUnique = 4 + g.IntN(6)
 	gpi.MonsEarly = g.IntN(4)
 	gpi.MonsMid = 4 + g.IntN(3)
 	gpi.MonsLate = 7 + g.IntN(3)

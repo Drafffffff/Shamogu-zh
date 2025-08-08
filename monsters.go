@@ -103,7 +103,8 @@ func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point) bool {
 	if g.InFOV(ei.P) && at == g.PP() {
 		g.Logf("The %s notices you.", ei.Name)
 		beh.State = Hunting
-		if ai.DoesAny(MonsBarking) {
+		switch {
+		case ai.DoesAny(MonsBarking):
 			g.Logf("The %s barks.", ei.Name)
 			g.MakeNoise(ei.P, NoiseBark)
 			g.PutStatus(PlayerID, g.PlayerActor(), StatusFear, DurationFearBark)
@@ -111,10 +112,30 @@ func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point) bool {
 				g.LogfStyled("The confused %s bit its tongue while barking!", logHurtMons, g.Entity(i).Name)
 				g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
 			}
+		case ai.DoesAny(MonsSpores):
+			if pa := g.PlayerActor(); !pa.Has(StatusLignification) {
+				g.Logf("The %s releases lignifying spores.", ei.Name)
+				g.releaseSpores(i)
+			}
 		}
 	}
 	beh.Target = at
 	return beh.State == Hunting
+}
+
+// releaseSpores releases lignifying spores in sight (as done by the wandering
+// mushroom).
+func (g *Game) releaseSpores(i ID) {
+	for j, aj := range g.Actors() {
+		if i == j {
+			continue
+		}
+		ej := g.Entity(j)
+		if !g.InFOV(ej.P) {
+			continue
+		}
+		g.PutStatus(j, aj, StatusLignification, DurationLignification/2)
+	}
 }
 
 // monsterBumpTo handles movement or attack for a monster actor. The position

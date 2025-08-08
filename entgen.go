@@ -305,34 +305,36 @@ const (
 	UndeadKnight
 	VenomousViper
 	WalkingTree
+	WanderingMushroom
 	WindFox
 )
 
 // MonsData provides information about the various kinds of monsters.
 var MonsData = []monsterInfo{
 	// 		  {name, rune, attack, defense, hp, traits}
-	AcidMound:        {"acid mound", 'a', 2, 0, 5, MonsIgnoreDefense | MonsImmunityImbalance | MonsCreep},
-	BarkingHound:     {"barking hound", 'h', 3, 0, 4, MonsBarking | GoodHearing | MonsImmunityFear},
-	BerserkingSpider: {"berserking spider", 's', 2, 1, 3, MonsBerserking | MonsSilent},
-	BlinkButterfly:   {"blinking butterfly", 'b', 2, 3, 2, MonsBlink | MonsImmunityImbalance | MonsImmunityLignification | MonsWingFlap},
-	BurningPhoenix:   {"burning phoenix", 'P', 3, 1, 5, PatternRampage | BurningHits | MonsImmunityFire | MonsImmunityLignification | MonsWingFlap | MonsNotable},
-	ConfusingEye:     {"confusing eye", 'e', 2, 0, 2, PatternRanged | MonsConfusion | MonsImmunityConfusion | MonsLightFootsteps},
-	CrazyDruid:       {"crazy druid", 'C', 3, 1, 4, PatternSwap | BurningHits | MonsBerserking | MonsNotable},
-	DisgustingRat:    {"disgusting rat", 'r', 2, 0, 3, MonsNausea | MonsLightFootsteps},
-	EarthDragon:      {"earth dragon", 'D', 4, 2, 6, PushingUnbalance | MonsDig | MonsImmunityFear | MonsHeavyFootsteps | MonsNotable},
-	ExplodingNadre:   {"exploding nadre", 'n', 2, 2, 1, MonsExplodingDeath},
-	FearsomeLich:     {"fearsome lich", 'L', 2, 2, 5, PatternRanged | MonsFear | MonsIgnoreDefense | MonsImmunityPoison | MonsNotable},
-	FireLama:         {"fire lama", 'l', 2, 0, 4, PatternRanged | MonsSpitFire},
-	FourHeadedHydra:  {"four-headed hydra", 'H', 2, 0, 6, PatternFourDirs | MonsFourHeaded | MonsHeavyFootsteps | MonsNotable},
-	MadOctopode:      {"mad octopode", 'O', 3, 2, 5, PatternCatchUnbalance | MonsImmunityImbalance | VenomousMelee | MonsCreep | MonsNotable},
-	LashingFrog:      {"lashing frog", 'F', 2, 1, 4, PatternCatchUnbalance},
-	RampagingBoar:    {"rampaging boar", 'B', 3, 0, 4, PatternRampage | PushingUnbalance | MonsDig},
-	TemporalCat:      {"temporal cat", 'c', 2, 0, 4, PatternSwapDaze | MonsLightFootsteps},
-	ThunderPorcupine: {"thunder porcupine", 'p', 2, 0, 3, DazingSpines | MonsImmunityDaze | MonsLightFootsteps},
-	UndeadKnight:     {"undead knight", 'K', 3, 3, 4, PatternFourDirs | MonsFear | MonsImmunityPoison | MonsNotable},
-	VenomousViper:    {"venomous viper", 'v', 2, 1, 4, VenomousMelee | MonsImmunityPoison | MonsCreep},
-	WalkingTree:      {"walking tree", 'T', 2, 4, 5, MonsLignify | MonsImmunityImbalance | MonsImmunityPoison | MonsImmunityLignification | VulnerabilityFire | MonsHeavyFootsteps | MonsNotable},
-	WindFox:          {"wind fox", 'f', 2, 0, 4, PatternRangedRecoil | MonsLightFootsteps},
+	AcidMound:         {"acid mound", 'a', 2, 0, 5, MonsIgnoreDefense | MonsImmunityImbalance | MonsCreep},
+	BarkingHound:      {"barking hound", 'h', 3, 0, 4, MonsBarking | GoodHearing | MonsImmunityFear},
+	BerserkingSpider:  {"berserking spider", 's', 2, 1, 3, MonsBerserking | MonsSilent},
+	BlinkButterfly:    {"blinking butterfly", 'b', 2, 3, 2, MonsBlink | MonsImmunityImbalance | MonsImmunityLignification | MonsWingFlap},
+	BurningPhoenix:    {"burning phoenix", 'P', 3, 1, 5, PatternRampage | BurningHits | MonsImmunityFire | MonsImmunityLignification | MonsWingFlap | MonsNotable},
+	ConfusingEye:      {"confusing eye", 'e', 2, 0, 2, PatternRanged | MonsConfusion | MonsImmunityConfusion | MonsLightFootsteps},
+	CrazyDruid:        {"crazy druid", 'C', 3, 1, 4, PatternSwap | BurningHits | MonsBerserking | MonsNotable},
+	DisgustingRat:     {"disgusting rat", 'r', 2, 0, 3, MonsNausea | MonsLightFootsteps},
+	EarthDragon:       {"earth dragon", 'D', 4, 2, 6, PushingUnbalance | MonsDig | MonsImmunityFear | MonsHeavyFootsteps | MonsNotable},
+	ExplodingNadre:    {"exploding nadre", 'n', 2, 2, 1, MonsExplodingDeath},
+	FearsomeLich:      {"fearsome lich", 'L', 2, 2, 5, PatternRanged | MonsFear | MonsIgnoreDefense | MonsImmunityPoison | MonsNotable},
+	FireLama:          {"fire lama", 'l', 2, 0, 4, PatternRanged | MonsSpitFire},
+	FourHeadedHydra:   {"four-headed hydra", 'H', 2, 0, 6, PatternFourDirs | MonsFourHeaded | MonsHeavyFootsteps | MonsNotable},
+	MadOctopode:       {"mad octopode", 'O', 3, 2, 5, PatternCatchUnbalance | MonsImmunityImbalance | VenomousMelee | MonsCreep | MonsNotable},
+	LashingFrog:       {"lashing frog", 'F', 2, 1, 4, PatternCatchUnbalance},
+	RampagingBoar:     {"rampaging boar", 'B', 3, 0, 4, PatternRampage | PushingUnbalance | MonsDig},
+	TemporalCat:       {"temporal cat", 'c', 2, 0, 4, PatternSwapDaze | MonsLightFootsteps},
+	ThunderPorcupine:  {"thunder porcupine", 'p', 2, 0, 3, DazingSpines | MonsImmunityDaze | MonsLightFootsteps},
+	UndeadKnight:      {"undead knight", 'K', 3, 3, 4, PatternFourDirs | MonsFear | MonsImmunityPoison | MonsNotable},
+	VenomousViper:     {"venomous viper", 'v', 2, 1, 4, VenomousMelee | MonsImmunityPoison | MonsCreep},
+	WalkingTree:       {"walking tree", 'T', 2, 4, 5, MonsLignify | MonsImmunityImbalance | MonsImmunityPoison | MonsImmunityLignification | VulnerabilityFire | MonsHeavyFootsteps | MonsNotable},
+	WanderingMushroom: {"wandering mushroom", 'M', 2, 2, 5, MonsSpores | MonsImmunityImbalance | MonsImmunityLignification | MonsNotable},
+	WindFox:           {"wind fox", 'f', 2, 0, 4, PatternRangedRecoil | MonsLightFootsteps},
 }
 
 // monsEarly represents early level monsters.
@@ -373,14 +375,18 @@ func (g *Game) genMonsters() {
 		g.genMonsterGuardian(FearsomeLich, g.Map.Orb)
 		g.genMonsterGuardian(UndeadKnight, g.Map.Orb)
 	}
-	if g.ProcInfo.GuardianMid == g.Map.Level {
+	if g.ProcInfo.GuardianPortal == g.Map.Level {
 		g.genMonsterGuardian(MadOctopode, g.Map.Portal)
 	}
-	if g.ProcInfo.GuardianEarly == g.Map.Level {
+	if g.ProcInfo.GuardianTotem == g.Map.Level {
 		g.genMonsterGuardian(CrazyDruid, g.Map.Totem)
 	}
 	// number of early, mid, late monsters.
 	nE, nM, nL := nMonsE[g.Map.Level-1], nMonsM[g.Map.Level-1], nMonsL[g.Map.Level-1]
+	if g.ProcInfo.WanderingUnique == g.Map.Level {
+		nM--
+		g.genMonster(WanderingMushroom)
+	}
 	switch g.Map.Level {
 	case g.ProcInfo.MonsEarly:
 		// Special level with many early monsters of same kind.
