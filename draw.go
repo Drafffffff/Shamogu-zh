@@ -476,6 +476,8 @@ func drawGamePicture(gd gruid.Grid) {
 		markups[i] = st.WithAttrs(AttrInMap)
 	}
 	st := gruid.Style{}.WithAttrs(AttrInMap)
+	markups['w'] = st.WithFg(ColorForeground).WithBg(ColorBackgroundSecondary).WithAttrs(AttrBold | AttrInMap)
+	markups['W'] = st.WithFg(ColorForegroundSecondary).WithBg(ColorBackground).WithAttrs(AttrBold | AttrInMap)
 	markups['l'] = st.WithFg(ColorForeground).WithBg(ColorBackgroundSecondary)
 	markups['y'] = st.WithFg(ColorYellow).WithBg(ColorBackgroundSecondary)
 	markups['c'] = st.WithFg(ColorCyan).WithBg(ColorBackgroundSecondary)
@@ -485,14 +487,14 @@ func drawGamePicture(gd gruid.Grid) {
 	markups['t'] = gruid.Style{}.WithFg(ColorGreen)
 	stt := ui.StyledText{}.WithMarkups(markups)
 	text := `@t───────────────────────
-@l""@d...@l#@d##########...#^##
-@d"@l.◊@d.@l@rF@l#@t SHAMOGU @d#.....^#
-@d.@l^@c&@l#..#####@d####..##....
-@l^..@b@@@l.....@rC@l..@d....###..."
-@l..^#.@rc@l.◊@c>@l#@d^..#####.@Y%@d.""
-@d.@O♫@d"#@l#...◊@y!@d..""###..""""
-@d."""#@l#...@d..."""#..""""#
-@d"""""#@l#.@d.........."""##
+@l""@d...@w#@W##########@d...@W#@d^@W##
+@d"@l.@w◊@d.@l@rF@w#@t SHAMOGU @W#@d.....^@W#
+@d.@l^@c&@w#@l..@w#####@W####@d..@W##@d....
+@l^..@b@@@l.....@rC@l..@d....@W###@d..."
+@l..^@w#@l.@rc@l.@w◊@c>@w#@d^..@W#####@d.@Y%@d.""
+@d.@O♫@d"@W#@w#@l...@w◊@y!@d..""@W###@d..""""
+@d."""@W#@w#@l...@d..."""@W#@d..""""@W#
+@d"""""@W#@w#@l.@d.........."""@W##
 @t───────────────────────
 `
 	stt.WithText(text).Draw(gd)
