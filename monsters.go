@@ -114,7 +114,6 @@ func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point) bool {
 			}
 		case ai.DoesAny(MonsSpores):
 			if pa := g.PlayerActor(); !pa.Has(StatusLignification) {
-				g.Logf("The %s releases lignifying spores.", ei.Name)
 				g.releaseSpores(i)
 			}
 		}
@@ -126,12 +125,21 @@ func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point) bool {
 // releaseSpores releases lignifying spores in sight (as done by the wandering
 // mushroom).
 func (g *Game) releaseSpores(i ID) {
+	const maxdist = 2*MaxFOVRange - 1
+	mp := &MappingPath{passable: g.Map.Passable}
+	ei := g.Entity(i)
+	g.PR.BreadthFirstMap(mp, []gruid.Point{ei.P}, maxdist)
+	if g.PR.BreadthFirstMapAt(g.PP()) > maxdist {
+		return
+	}
+	g.Logf("The %s releases lignifying spores.", ei.Name)
+	// TODO: maybe animation for spores?
 	for j, aj := range g.Actors() {
 		if i == j {
 			continue
 		}
 		ej := g.Entity(j)
-		if !g.InFOV(ej.P) {
+		if g.PR.BreadthFirstMapAt(ej.P) > maxdist {
 			continue
 		}
 		g.PutStatus(j, aj, StatusLignification, DurationLignification/2)
