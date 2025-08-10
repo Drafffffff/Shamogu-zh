@@ -336,8 +336,6 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int)
 		}
 	case ai.DoesAny(MonsConfusion) && g.IntN(6-dmg) < 2:
 		if g.PutStatus(j, aj, StatusConfusion, DurationConfusion) {
-			// Should not happen currently (only confusing eyes do
-			// this and they're immune to confusion).
 			g.monsConfusionPenalty(i, ai)
 		}
 	case ai.DoesAny(MonsLignify) && g.IntN(6-dmg) < 2:

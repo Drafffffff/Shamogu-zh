@@ -13,7 +13,7 @@
   some mobility, but it can significantly impair stealth tactics.
 * New unique monster: walking mushroom. It's less sturdy than a walking tree
   but releases lignifying spores on sight from afar, affecting other monsters
-  too.
+  too. Also, its melee hits are confusing.
 * Improve “poison cloud” ability of the Venomous Viper spirit so that the
   poison clouds are created up to two free tiles away (before a monster or
   obstacle). This creates more varied possibilities for tactical movement,
