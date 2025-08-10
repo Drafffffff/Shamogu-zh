@@ -84,7 +84,7 @@ func (md *model) Draw() gruid.Grid {
 		if rg.Min.Y > 0 {
 			pgd.Set(gruid.Point{sz.X - 1, 1}, gruid.Cell{Rune: '↑'})
 		}
-		if rg.Max.Y < md.pager.nlines {
+		if rg.Max.Y < md.pager.pg.Lines() {
 			pgd.Set(gruid.Point{sz.X - 1, sz.Y - 2}, gruid.Cell{Rune: '↓'})
 		}
 		md.gd.Copy(pgd)

@@ -1092,7 +1092,6 @@ func (a ActionViewMessages) Handle(md *model) (gruid.Effect, bool) {
 		md.pager.lines = append(md.pager.lines, md.pager.markup.WithText(e.MText))
 	}
 	md.pager.pg.SetLines(md.pager.lines)
-	md.pager.nlines = len(md.pager.lines)
 	md.pager.pg.SetCursor(gruid.Point{0, len(md.pager.lines)})
 	md.pager.pg.SetBox(&ui.Box{Title: ui.Text("Messages").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
 	md.mode = modePager
@@ -1403,7 +1402,6 @@ func (md *model) updateKeysDescription(title string, actions []string) {
 		lines = append(lines, stt)
 	}
 	md.pager.pg.SetLines(lines)
-	md.pager.nlines = len(lines)
 	md.pager.pg.SetCursor(gruid.Point{0, 0})
 }
 
@@ -1440,7 +1438,6 @@ func (md *model) helpTopic(title, content string) {
 	text := ui.Text(content).WithMarkups(Markups).Format(78)
 	stts := text.Lines()
 	md.pager.pg.SetLines(stts)
-	md.pager.nlines = len(stts)
 	md.pager.pg.SetCursor(gruid.Point{0, 0})
 	md.mode = modePager
 	md.pager.mode = modeHelp

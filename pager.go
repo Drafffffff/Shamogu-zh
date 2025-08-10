@@ -8,7 +8,6 @@ import (
 // pager gathers the structures used in the various kinds of pagers.
 type pager struct {
 	pg     *ui.Pager       // pager widget
-	nlines int             // number of lines
 	mode   pagerMode       // pager mode
 	markup ui.StyledText   // styled text with default markup for pager
 	lines  []ui.StyledText // log lines cache (unused in dump & help modes)
