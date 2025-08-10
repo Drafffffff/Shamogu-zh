@@ -488,7 +488,7 @@ type EffectBark struct{}
 
 func (eff EffectBark) Apply(g *Game) bool {
 	const maxdist = MaxFOVRange
-	mp := &MappingPath{passable: g.Map.Passable}
+	mp := &MapPath{passable: g.Map.Passable}
 	g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, maxdist)
 	g.Log("You bark.")
 	g.MakeNoise(g.PP(), NoiseBark)
@@ -521,7 +521,7 @@ func (eff EffectNoxiousSmell) Apply(g *Game) bool {
 
 func (g *Game) confusingSmell(i ID, maxdist, duration int) {
 	p := g.Entity(i).P
-	mp := &MappingPath{passable: g.Map.Passable}
+	mp := &MapPath{passable: g.Map.Passable}
 	g.PR.BreadthFirstMap(mp, []gruid.Point{p}, maxdist)
 	for j, aj := range g.Actors() {
 		if j == i {
@@ -693,7 +693,7 @@ func (eff EffectMappingMenhir) Apply(g *Game) bool {
 	cost := 1
 	for _, n := range nodes {
 		if n.Cost > cost && draw {
-			g.md.AnimationFrame()
+			g.md.AnimationFrameFast()
 			draw = false
 			cost = n.Cost
 		}
@@ -720,7 +720,7 @@ type EffectTeleportMenhir struct{}
 
 func (eff EffectTeleportMenhir) Apply(g *Game) bool {
 	g.menhirMsg("teleport menhir")
-	mp := &MappingPath{passable: g.Map.Passable}
+	mp := &MapPath{passable: g.Map.Passable}
 	pp := g.PP()
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{pp}, MaxFOVRange)
 	g.rand.Shuffle(len(nodes), func(i, j int) {
@@ -745,7 +745,7 @@ type EffectPoisonMenhir struct{}
 
 func (eff EffectPoisonMenhir) Apply(g *Game) bool {
 	g.menhirMsg("poison menhir")
-	mp := &MappingPath{passable: g.Map.Passable}
+	mp := &MapPath{passable: g.Map.Passable}
 	pp := g.PP()
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{pp}, MaxFOVRange)
 	g.rand.Shuffle(len(nodes), func(i, j int) {
@@ -768,7 +768,7 @@ type EffectFireMenhir struct{}
 
 func (eff EffectFireMenhir) Apply(g *Game) bool {
 	g.menhirMsg("fire menhir")
-	mp := &MappingPath{passable: g.Map.Passable}
+	mp := &MapPath{passable: g.Map.Passable}
 	pp := g.PP()
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{pp}, MaxFOVRange)
 	g.rand.Shuffle(len(nodes), func(i, j int) {

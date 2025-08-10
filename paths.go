@@ -21,7 +21,8 @@ func (mp *MapPath) Neighbors(p gruid.Point) []gruid.Point {
 }
 
 // MappingPath implements the paths.Pather interface and is used to provide pathing
-// information in magic mapping.
+// information in magic mapping and for connected components (filling interior
+// walls).
 type MappingPath struct {
 	passable func(p gruid.Point) bool
 	nbs      paths.Neighbors

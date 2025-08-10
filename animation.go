@@ -9,6 +9,7 @@ import (
 
 // These constants represent various common durations for animation frames.
 const (
+	AnimDurVeryShort   = 30 * time.Millisecond
 	AnimDurShort       = 40 * time.Millisecond
 	AnimDurShortMedium = 60 * time.Millisecond
 	AnimDurMedium      = 80 * time.Millisecond
@@ -160,6 +161,15 @@ func (md *model) AnimationFrame() {
 	md.anims.Frame(AnimDurShort)
 }
 
+// AnimationFrameFast updates the map and waits very briefly.
+func (md *model) AnimationFrameFast() {
+	if DisableAnimations {
+		return
+	}
+	md.startAnimSeq()
+	md.anims.Frame(AnimDurVeryShort)
+}
+
 // HitAnimation animates a player's non-killing hit at a given position.
 func (md *model) HitAnimation(p gruid.Point) {
 	if DisableAnimations || !md.g.InFOV(p) {
@@ -251,6 +261,29 @@ func (md *model) WoundedAnimation() {
 	md.startAnimSeq()
 	md.anims.DrawColor(g.PP(), ColorOrange)
 	md.anims.Frame(AnimDurMedium)
+}
+
+// SporesAnimation alerts the player they got lignified.
+func (md *model) SporesAnimation(ps []paths.Node) {
+	if DisableAnimations {
+		return
+	}
+	md.startAnimSeq()
+	g := md.g
+	cost := 0
+	for _, n := range ps {
+		if n.Cost > cost {
+			cost = n.Cost
+			md.anims.Frame(AnimDurVeryShort)
+			md.startAnimSeq()
+		}
+		p := n.P
+		if !g.InFOV(p) {
+			continue
+		}
+		md.anims.DrawColor(p, ColorYellow)
+	}
+	md.anims.Frame(AnimDurVeryShort)
 }
 
 // TeleportAnimation animates an actor teleport between two positions.

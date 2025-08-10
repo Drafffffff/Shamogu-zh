@@ -126,14 +126,14 @@ func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point) bool {
 // mushroom).
 func (g *Game) releaseSpores(i ID) {
 	const maxdist = 2*MaxFOVRange - 1
-	mp := &MappingPath{passable: g.Map.Passable}
+	mp := &MapPath{passable: g.Map.Passable}
 	ei := g.Entity(i)
-	g.PR.BreadthFirstMap(mp, []gruid.Point{ei.P}, maxdist)
+	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{ei.P}, maxdist)
 	if g.PR.BreadthFirstMapAt(g.PP()) > maxdist {
 		return
 	}
 	g.Logf("The %s releases lignifying spores.", ei.Name)
-	// TODO: maybe animation for spores?
+	g.md.SporesAnimation(nodes)
 	for j, aj := range g.Actors() {
 		if i == j {
 			continue

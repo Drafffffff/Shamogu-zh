@@ -317,7 +317,7 @@ func (g *Game) useFakePortal() {
 	g.LogStyled("You try to activate the magic portal…", logSpecial)
 	g.StoryLog("Triggered a malfunctioning portal")
 	const maxdist = MaxFOVRange + 3
-	mp := &MappingPath{passable: g.Map.Passable}
+	mp := &MapPath{passable: g.Map.Passable}
 	g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, maxdist)
 	g.MakeNoise(g.PP(), NoiseFakePortal)
 	g.LogStyled("An eerie sound came out, but nothing happened!", logSpecial)
