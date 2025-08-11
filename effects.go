@@ -559,6 +559,7 @@ func (eff EffectLignify) Apply(g *Game) bool {
 		}
 	}
 	if done {
+		g.md.PlayerAnimation(ColorYellow, AnimDurLong)
 		g.Log("Growing roots lignified your foes.")
 	} else {
 		g.Log("No lignifiable foes in view.")

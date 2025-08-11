@@ -252,15 +252,20 @@ func (md *model) RangedAttackAnimation(a *Actor, from, to gruid.Point) {
 	}
 }
 
-// WoundedAnimations alerts the player when they're hurt.
-func (md *model) WoundedAnimation() {
+// PlayerAnimation momentarily changes the player's color.
+func (md *model) PlayerAnimation(c gruid.Color, d time.Duration) {
 	if DisableAnimations {
 		return
 	}
 	g := md.g
 	md.startAnimSeq()
-	md.anims.DrawColor(g.PP(), ColorOrange)
-	md.anims.Frame(AnimDurMedium)
+	md.anims.DrawColor(g.PP(), c)
+	md.anims.Frame(AnimDurLong)
+}
+
+// WoundedAnimations briefly alerts the player when they're hurt.
+func (md *model) WoundedAnimation() {
+	md.PlayerAnimation(ColorOrange, AnimDurMedium)
 }
 
 // NoiseAnimation animates noise (like barking) at the given point.
