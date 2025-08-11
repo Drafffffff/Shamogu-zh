@@ -270,7 +270,7 @@ func (md *model) NoiseAnimation(p gruid.Point) {
 	}
 	md.startAnimSeq()
 	md.anims.DrawRune(p, '♪')
-	md.anims.Frame(AnimDurMedium)
+	md.anims.Frame(AnimDurLong)
 }
 
 // SporesAnimation alerts the player they got lignified.
