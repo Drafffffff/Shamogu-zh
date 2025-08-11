@@ -263,6 +263,16 @@ func (md *model) WoundedAnimation() {
 	md.anims.Frame(AnimDurMedium)
 }
 
+// NoiseAnimation animates noise (like barking) at the given point.
+func (md *model) NoiseAnimation(p gruid.Point) {
+	if DisableAnimations {
+		return
+	}
+	md.startAnimSeq()
+	md.anims.DrawRune(p, '♪')
+	md.anims.Frame(AnimDurMedium)
+}
+
 // SporesAnimation alerts the player they got lignified.
 func (md *model) SporesAnimation(ps []paths.Node) {
 	if DisableAnimations {

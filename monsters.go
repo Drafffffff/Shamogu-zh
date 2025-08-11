@@ -106,6 +106,7 @@ func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point) bool {
 		switch {
 		case ai.DoesAny(MonsBarking):
 			g.Logf("The %s barks.", ei.Name)
+			g.md.NoiseAnimation(ei.P)
 			g.MakeNoise(ei.P, NoiseBark)
 			g.PutStatus(PlayerID, g.PlayerActor(), StatusFear, DurationFearBark)
 			if ai.Has(StatusConfusion) {

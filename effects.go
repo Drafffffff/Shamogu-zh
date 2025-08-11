@@ -491,7 +491,9 @@ func (eff EffectBark) Apply(g *Game) bool {
 	mp := &MapPath{passable: g.Map.Passable}
 	g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, maxdist)
 	g.Log("You bark.")
-	g.MakeNoise(g.PP(), NoiseBark)
+	pp := g.PP()
+	g.md.NoiseAnimation(pp)
+	g.MakeNoise(pp, NoiseBark)
 	for i, ai := range g.Monsters() {
 		ei := g.Entity(i)
 		if g.PR.BreadthFirstMapAt(ei.P) <= maxdist {
