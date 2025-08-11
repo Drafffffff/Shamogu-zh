@@ -423,7 +423,7 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 			// more newbie-friendliness.
 			dmg--
 		}
-		if attack*n >= aj.HP && dmg < aj.HP {
+		if min(5, attack*n) >= aj.HP && dmg < aj.HP {
 			// We avoided death with a lucky roll.
 			g.Stats.Lucky++
 		}
