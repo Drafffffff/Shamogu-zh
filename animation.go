@@ -278,8 +278,8 @@ func (md *model) NoiseAnimation(p gruid.Point) {
 	md.anims.Frame(AnimDurLong)
 }
 
-// SporesAnimation alerts the player they got lignified.
-func (md *model) SporesAnimation(ps []paths.Node) {
+// FloodAnimation alerts the player they got lignified.
+func (md *model) FloodAnimation(ps []paths.Node, c gruid.Color) {
 	if DisableAnimations {
 		return
 	}
@@ -296,7 +296,7 @@ func (md *model) SporesAnimation(ps []paths.Node) {
 		if !g.InFOV(p) {
 			continue
 		}
-		md.anims.DrawColor(p, ColorYellow)
+		md.anims.DrawColor(p, c)
 	}
 	md.anims.Frame(AnimDurVeryShort)
 }

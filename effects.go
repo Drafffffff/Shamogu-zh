@@ -524,7 +524,8 @@ func (eff EffectNoxiousSmell) Apply(g *Game) bool {
 func (g *Game) confusingSmell(i ID, maxdist, duration int) {
 	p := g.Entity(i).P
 	mp := &MapPath{passable: g.Map.Passable}
-	g.PR.BreadthFirstMap(mp, []gruid.Point{p}, maxdist)
+	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{p}, maxdist)
+	g.md.FloodAnimation(nodes, ColorGreen)
 	for j, aj := range g.Actors() {
 		if j == i {
 			continue

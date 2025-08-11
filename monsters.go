@@ -134,7 +134,7 @@ func (g *Game) releaseSpores(i ID) {
 		return
 	}
 	g.Logf("The %s releases lignifying spores.", ei.Name)
-	g.md.SporesAnimation(nodes)
+	g.md.FloodAnimation(nodes, ColorYellow)
 	for j, aj := range g.Actors() {
 		if i == j {
 			continue
