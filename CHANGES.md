@@ -14,8 +14,9 @@
 * New unique monster: walking mushroom. It's less sturdy than a walking tree
   but releases lignifying spores on sight from afar, affecting other monsters
   too. Also, its melee hits are confusing.
-* New unique monster: noisy imp. It performs music just for the player. It
-  avoids fighting.
+* New unique monster: noisy imp. It performs music just for the player,
+  attracting nearby monsters. It avoids fighting similarly to afraid monsters.
+* New unique monster: teleporting ghost. Its hits teleport the player away.
 * Improve “poison cloud” ability of the Venomous Viper spirit so that the
   poison clouds are created up to two free tiles away (before a monster or
   obstacle). This creates more varied possibilities for tactical movement,

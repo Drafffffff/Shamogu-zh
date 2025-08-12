@@ -301,6 +301,7 @@ const (
 	MadOctopode
 	NoisyImp
 	RampagingBoar
+	TeleportingGhost
 	TemporalCat
 	ThunderPorcupine
 	UndeadKnight
@@ -326,10 +327,11 @@ var MonsData = []monsterInfo{
 	FearsomeLich:     {"fearsome lich", 'L', 2, 2, 5, PatternRanged | MonsFear | MonsIgnoreDefense | MonsImmunityPoison | MonsNotable},
 	FireLama:         {"fire lama", 'l', 2, 0, 4, PatternRanged | MonsSpitFire},
 	FourHeadedHydra:  {"four-headed hydra", 'H', 2, 0, 6, PatternFourDirs | MonsFourHeaded | MonsHeavyFootsteps | MonsNotable},
-	NoisyImp:         {"noisy imp", 'I', 2, 2, 4, MonsNoisy | MonsLightFootsteps | MonsNotable},
+	NoisyImp:         {"noisy imp", 'I', 2, 2, 4, MonsMusic | MonsLightFootsteps | MonsNotable},
 	MadOctopode:      {"mad octopode", 'O', 3, 2, 5, PatternCatchUnbalance | MonsImmunityImbalance | VenomousMelee | MonsCreep | MonsNotable},
 	LashingFrog:      {"lashing frog", 'F', 2, 1, 4, PatternCatchUnbalance},
 	RampagingBoar:    {"rampaging boar", 'B', 3, 0, 4, PatternRampage | PushingUnbalance | MonsDig},
+	TeleportingGhost: {"teleporting ghost", 'G', 2, 3, 3, MonsTeleport | MonsImmunityPoison | MonsImmunityImbalance | MonsImmunityLignification | MonsSilent},
 	TemporalCat:      {"temporal cat", 'c', 2, 0, 4, PatternSwapDaze | MonsLightFootsteps},
 	ThunderPorcupine: {"thunder porcupine", 'p', 2, 0, 3, DazingSpines | MonsImmunityDaze | MonsLightFootsteps},
 	UndeadKnight:     {"undead knight", 'K', 3, 3, 4, PatternFourDirs | MonsFear | MonsImmunityPoison | MonsNotable},
@@ -385,13 +387,17 @@ func (g *Game) genMonsters() {
 	}
 	// number of early, mid, late monsters.
 	nE, nM, nL := nMonsE[g.Map.Level-1], nMonsM[g.Map.Level-1], nMonsL[g.Map.Level-1]
-	if g.ProcInfo.WalkingMushroom == g.Map.Level {
+	if g.ProcInfo.WanderingUnique1 == g.Map.Level {
 		nM--
 		g.genMonster(WalkingMushroom)
 	}
-	if g.ProcInfo.NoisyImp == g.Map.Level {
+	if g.ProcInfo.WanderingUnique2 == g.Map.Level {
 		nM--
-		g.genMonster(NoisyImp)
+		if g.IntN(2) == 0 {
+			g.genMonster(NoisyImp)
+		} else {
+			g.genMonster(TeleportingGhost)
+		}
 	}
 	switch g.Map.Level {
 	case g.ProcInfo.MonsEarly:

@@ -348,6 +348,16 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int)
 		}
 	case ai.DoesAny(MonsBlink) && aj.IsAlive():
 		g.blinkOther(i, j, ai, aj)
+	case ai.DoesAny(MonsTeleport) && aj.IsAlive() && g.TeleportActor(j, aj):
+		if j == PlayerID {
+			g.Logf("The %s teleported you away!", ei.Name)
+			g.PutStatus(PlayerID, aj, StatusNausea, DurationNauseaTeleport)
+		} else {
+			g.Logf("The confused %s teleported the %s away!", ei.Name, ej.Name)
+		}
+		if ai.Has(StatusConfusion) {
+			g.TeleportActor(i, ai)
+		}
 	}
 	// Extra defense effects.
 	switch {

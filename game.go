@@ -293,8 +293,10 @@ func (nt NoiseType) Noise() int {
 	switch nt {
 	case NoiseCombat:
 		return 5
-	case NoiseExplosion, NoiseMapping, NoiseMusic, NoiseFakePortal:
+	case NoiseExplosion, NoiseMapping, NoiseFakePortal:
 		return MaxFOVRange + 3
+	case NoiseMusic:
+		return 2 * MaxFOVRange
 	default:
 		return MaxFOVRange
 	}

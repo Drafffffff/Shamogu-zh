@@ -6,23 +6,23 @@ const MapLevels = 9
 // ProcInfo contains information for procedural generation, like which items
 // were already generated, and so on.
 type ProcInfo struct {
-	Layouts         []MapLayout // map layouts
-	Earthquake      int         // level with extra rubble
-	FakePortal      int         // level with fake portal
-	GuardianTotem   int         // level with early totem guardian
-	GuardianPortal  int         // level with mid portal guardian
-	WalkingMushroom int         // level with walking mushroom
-	NoisyImp        int         // level with noisy imp
-	MonsEarly       int         // special early level
-	MonsMid         int         // special mid level
-	MonsLate        int         // special late level
-	Spirits         []int       // spirit index for each dungeon level (-1 if no spirit)
-	Menhirs         []int       // menhir-generation data
-	MenhirIdx       int         // current index in Menhirs
-	Comestibles     []int       // comestible-generation data
-	ComestibleIdx   int         // current index in Comestibles
-	NComestibles    []int       // number of comestibles per level
-	NMenhirs        []int       // number of menhirs per level
+	Layouts          []MapLayout // map layouts
+	Earthquake       int         // level with extra rubble
+	FakePortal       int         // level with fake portal
+	GuardianTotem    int         // level with early totem guardian
+	GuardianPortal   int         // level with mid portal guardian
+	WanderingUnique1 int         // level with walking mushroom
+	WanderingUnique2 int         // level with noisy imp or teleporting ghost
+	MonsEarly        int         // special early level
+	MonsMid          int         // special mid level
+	MonsLate         int         // special late level
+	Spirits          []int       // spirit index for each dungeon level (-1 if no spirit)
+	Menhirs          []int       // menhir-generation data
+	MenhirIdx        int         // current index in Menhirs
+	Comestibles      []int       // comestible-generation data
+	ComestibleIdx    int         // current index in Comestibles
+	NComestibles     []int       // number of comestibles per level
+	NMenhirs         []int       // number of menhirs per level
 }
 
 // InitProcInfo initializes procedural generation starting information.
@@ -60,8 +60,8 @@ func (g *Game) flavoursProcGen() {
 		}
 	}
 	gpi.GuardianPortal = 6 + g.IntN(3)
-	gpi.WalkingMushroom = 4 + g.IntN(6)
-	gpi.NoisyImp = 4 + g.IntN(6)
+	gpi.WanderingUnique1 = 4 + g.IntN(6)
+	gpi.WanderingUnique2 = 4 + g.IntN(6)
 	gpi.MonsEarly = g.IntN(4)
 	gpi.MonsMid = 4 + g.IntN(3)
 	gpi.MonsLate = 7 + g.IntN(3)
@@ -73,9 +73,9 @@ func (g *Game) flavoursProcGen() {
 	case 1:
 		gpi.FakePortal = 0
 	case 2:
-		gpi.WalkingMushroom = 0
+		gpi.WanderingUnique1 = 0
 	case 3:
-		gpi.NoisyImp = 0
+		gpi.WanderingUnique2 = 0
 	}
 }
 

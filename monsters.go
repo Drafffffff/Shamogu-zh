@@ -221,14 +221,14 @@ func (g *Game) monsterBumpTo(i ID, ai *Actor, to gruid.Point) {
 // a straight direction from the player, they'll flee randomly in a direction
 // that avoids them (if any is free). Reports whether turn is finished.
 func (g *Game) monsterFlee(i ID, ai *Actor) bool {
-	if !ai.Has(StatusFear) && !ai.DoesAny(MonsNoisy) {
+	if !ai.Has(StatusFear) && (!ai.DoesAny(MonsMusic) || ai.Has(StatusBerserk)) {
 		return false
 	}
 	ei, pl := g.Entity(i), g.PlayerEntity()
 	if !g.InFOV(ei.P) {
 		return false
 	}
-	if ai.DoesAny(MonsNoisy) && g.IntN(2) == 0 {
+	if ai.DoesAny(MonsMusic) && g.IntN(3) > 0 {
 		g.MakeNoise(ei.P, NoiseMusic)
 	}
 	if g.ActorInRange(ei.P, pl.P) != PlayerID {
