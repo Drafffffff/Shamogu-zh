@@ -151,7 +151,7 @@ func (g *Game) releaseSpores(i ID) {
 // should be adjacent to the monster's (the next position in the movement
 // path).
 func (g *Game) monsterBumpTo(i ID, ai *Actor, to gruid.Point) {
-	if ai.Has(StatusFear) && g.monsterFlee(i, ai) {
+	if g.monsterFlee(i, ai) {
 		return
 	}
 	ei := g.Entity(i)
@@ -221,9 +221,15 @@ func (g *Game) monsterBumpTo(i ID, ai *Actor, to gruid.Point) {
 // a straight direction from the player, they'll flee randomly in a direction
 // that avoids them (if any is free). Reports whether turn is finished.
 func (g *Game) monsterFlee(i ID, ai *Actor) bool {
+	if !ai.Has(StatusFear) && !ai.DoesAny(MonsNoisy) {
+		return false
+	}
 	ei, pl := g.Entity(i), g.PlayerEntity()
 	if !g.InFOV(ei.P) {
 		return false
+	}
+	if ai.DoesAny(MonsNoisy) && g.IntN(2) == 0 {
+		g.MakeNoise(ei.P, NoiseMusic)
 	}
 	if g.ActorInRange(ei.P, pl.P) != PlayerID {
 		// If the monster is almost adjacent to the player, they'll

@@ -11,7 +11,8 @@ type ProcInfo struct {
 	FakePortal      int         // level with fake portal
 	GuardianTotem   int         // level with early totem guardian
 	GuardianPortal  int         // level with mid portal guardian
-	WanderingUnique int         // level with wandering unique
+	WalkingMushroom int         // level with walking mushroom
+	NoisyImp        int         // level with noisy imp
 	MonsEarly       int         // special early level
 	MonsMid         int         // special mid level
 	MonsLate        int         // special late level
@@ -59,7 +60,8 @@ func (g *Game) flavoursProcGen() {
 		}
 	}
 	gpi.GuardianPortal = 6 + g.IntN(3)
-	gpi.WanderingUnique = 4 + g.IntN(6)
+	gpi.WalkingMushroom = 4 + g.IntN(6)
+	gpi.NoisyImp = 4 + g.IntN(6)
 	gpi.MonsEarly = g.IntN(4)
 	gpi.MonsMid = 4 + g.IntN(3)
 	gpi.MonsLate = 7 + g.IntN(3)
@@ -70,6 +72,10 @@ func (g *Game) flavoursProcGen() {
 		gpi.Earthquake = 0
 	case 1:
 		gpi.FakePortal = 0
+	case 2:
+		gpi.WalkingMushroom = 0
+	case 3:
+		gpi.NoisyImp = 0
 	}
 }
 

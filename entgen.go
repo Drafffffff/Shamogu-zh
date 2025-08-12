@@ -299,6 +299,7 @@ const (
 	FourHeadedHydra
 	LashingFrog
 	MadOctopode
+	NoisyImp
 	RampagingBoar
 	TemporalCat
 	ThunderPorcupine
@@ -325,6 +326,7 @@ var MonsData = []monsterInfo{
 	FearsomeLich:     {"fearsome lich", 'L', 2, 2, 5, PatternRanged | MonsFear | MonsIgnoreDefense | MonsImmunityPoison | MonsNotable},
 	FireLama:         {"fire lama", 'l', 2, 0, 4, PatternRanged | MonsSpitFire},
 	FourHeadedHydra:  {"four-headed hydra", 'H', 2, 0, 6, PatternFourDirs | MonsFourHeaded | MonsHeavyFootsteps | MonsNotable},
+	NoisyImp:         {"noisy imp", 'I', 2, 2, 4, MonsNoisy | MonsLightFootsteps | MonsNotable},
 	MadOctopode:      {"mad octopode", 'O', 3, 2, 5, PatternCatchUnbalance | MonsImmunityImbalance | VenomousMelee | MonsCreep | MonsNotable},
 	LashingFrog:      {"lashing frog", 'F', 2, 1, 4, PatternCatchUnbalance},
 	RampagingBoar:    {"rampaging boar", 'B', 3, 0, 4, PatternRampage | PushingUnbalance | MonsDig},
@@ -332,7 +334,7 @@ var MonsData = []monsterInfo{
 	ThunderPorcupine: {"thunder porcupine", 'p', 2, 0, 3, DazingSpines | MonsImmunityDaze | MonsLightFootsteps},
 	UndeadKnight:     {"undead knight", 'K', 3, 3, 4, PatternFourDirs | MonsFear | MonsImmunityPoison | MonsNotable},
 	VenomousViper:    {"venomous viper", 'v', 2, 1, 4, VenomousMelee | MonsImmunityPoison | MonsCreep},
-	WalkingMushroom:  {"walking mushroom", 'M', 2, 2, 5, MonsSpores | MonsConfusion | MonsImmunityConfusion | MonsImmunityLignification | VulnerabilityFire | MonsNotable},
+	WalkingMushroom:  {"walking mushroom", 'M', 2, 1, 5, MonsSpores | MonsConfusion | MonsImmunityConfusion | MonsImmunityLignification | VulnerabilityFire | MonsNotable},
 	WalkingTree:      {"walking tree", 'T', 2, 4, 5, MonsLignify | MonsImmunityImbalance | MonsImmunityPoison | MonsImmunityLignification | VulnerabilityFire | MonsHeavyFootsteps | MonsNotable},
 	WindFox:          {"wind fox", 'f', 2, 0, 4, PatternRangedRecoil | MonsLightFootsteps},
 }
@@ -383,9 +385,13 @@ func (g *Game) genMonsters() {
 	}
 	// number of early, mid, late monsters.
 	nE, nM, nL := nMonsE[g.Map.Level-1], nMonsM[g.Map.Level-1], nMonsL[g.Map.Level-1]
-	if g.ProcInfo.WanderingUnique == g.Map.Level {
+	if g.ProcInfo.WalkingMushroom == g.Map.Level {
 		nM--
 		g.genMonster(WalkingMushroom)
+	}
+	if g.ProcInfo.NoisyImp == g.Map.Level {
+		nM--
+		g.genMonster(NoisyImp)
 	}
 	switch g.Map.Level {
 	case g.ProcInfo.MonsEarly:

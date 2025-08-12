@@ -283,6 +283,7 @@ const (
 	NoiseFakePortal
 	NoiseLightning
 	NoiseMapping
+	NoiseMusic
 	NoiseRoar
 	NoiseWind
 )
@@ -292,7 +293,7 @@ func (nt NoiseType) Noise() int {
 	switch nt {
 	case NoiseCombat:
 		return 5
-	case NoiseExplosion, NoiseMapping, NoiseFakePortal:
+	case NoiseExplosion, NoiseMapping, NoiseMusic, NoiseFakePortal:
 		return MaxFOVRange + 3
 	default:
 		return MaxFOVRange
@@ -317,6 +318,8 @@ func (nt NoiseType) Msg() string {
 		return "PANG!"
 	case NoiseMapping:
 		return "RING-RING!"
+	case NoiseMusic:
+		return "Noisy Imp sings “♫ larilon, larila ♫ ♪”."
 	case NoiseRoar:
 		return "ROAR!"
 	case NoiseWind:
