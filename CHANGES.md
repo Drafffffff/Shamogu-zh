@@ -58,7 +58,17 @@
 * Improvements in monster group formation. In particular, less groups of three
   monsters than before and more groups of two, so somewhat better coverage of
   the map in mid and late game, but smaller likeliness of large monster groups.
+* Adjust slightly down the duration of fire clouds to 6-12 turns.
 * Add a few new special vaults.
+* Add concise information about current tile in the status bar which tells
+  whether there's fog, an item, or a special kind of terrain under the player.
+* Animation improvements. Monster deaths are now always animated when in view,
+  independently of the cause. Hits between confused monsters are now animated
+  too, making it clearer what's happening. Other minor enhancements.
+* Improve various tiles (footsteps, translucent walls, food…).
+
+Fixes:
+
 * Nadre explosions now properly blow up nearby walls too, like in Boohu and
   Harmonist.
 * Fix spelling and formatting issues in a few log messages. Avoid case of
@@ -66,12 +76,10 @@
 * Fix field of view sometimes not being updated just after cloud creation but
   later at the end of a turn, which could allow monsters to attack once from a
   distance before the update.
-* Add concise information about current tile in the status bar which tells
-  whether there's fog, an item, or a special kind of terrain under the player.
-* Animation improvements. Monster deaths are now always animated when in view,
-  independently of the cause. Hits between confused monsters are now animated
-  too, making it clearer what's happening.
-* Improve a few tiles (footsteps, translucent walls, food).
+* Some confused monsters actions that happened outside of view incorrectly
+  appeared in the game logs.
+* Improve/fix the pagedown/scrolling instructions when details of all entities
+  in a single examined tile don't fit.
 
 # v1.0.0-beta.1 2025-07-22
 
