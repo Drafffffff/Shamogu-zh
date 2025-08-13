@@ -216,7 +216,7 @@ func (eff EffectFirebreathPepper) Apply(g *Game) bool {
 }
 
 func (eff EffectFirebreathPepper) Desc() string {
-	return fmt.Sprintf("Makes you breathe a fire beam in the current direction doing %d damage and inflicting the @OFire@N status. Burns foliage, producing fire clouds lasting 4-12 turns. Removes @ODaze@N. Restores %+d HP.",
+	return fmt.Sprintf("Makes you breathe a fire beam in the current direction doing %d damage and inflicting the @OFire@N status. Burns foliage, producing fire clouds lasting 6-14 turns. Removes @ODaze@N. Restores %+d HP.",
 		FireDamage, HealFirebreathPepper)
 }
 
@@ -679,7 +679,7 @@ func (eff EffectFireRetreat) Name() string {
 }
 
 func (eff EffectFireRetreat) Desc() string {
-	return "Walk backwards up to two tiles while leaving a fire cloud lasting 4-12 turns."
+	return "Walk backwards up to two tiles while leaving a fire cloud lasting 6-14 turns."
 }
 
 func (g *Game) menhirMsg(name string) {
@@ -789,5 +789,5 @@ func (eff EffectFireMenhir) Apply(g *Game) bool {
 }
 
 func (eff EffectFireMenhir) Desc() string {
-	return fmt.Sprintf("Makes many fire clouds appear in a %d-radius distance, each one lasting 4-12 turns.", MaxFOVRange)
+	return fmt.Sprintf("Makes many fire clouds appear in a %d-radius distance, each one lasting 6-14 turns.", MaxFOVRange)
 }
