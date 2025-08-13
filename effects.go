@@ -315,7 +315,7 @@ func (eff EffectJump) Apply(g *Game) bool {
 		g.Log("There’s no room to jump in that direction.")
 		return false
 	}
-	g.md.TeleportAnimation(from, to, true)
+	g.md.MoveAnimation(from, to)
 	g.BumpMoveActor(PlayerID, pa, to)
 	g.Log("You jump.")
 	for p := from.Add(dir); p != to; p = p.Add(dir) {
