@@ -28,7 +28,7 @@ func (ck CloudKind) String() string {
 	case CloudFog:
 		return "fog"
 	case CloudFire:
-		return "fire"
+		return "fire cloud"
 	case CloudPoison:
 		return "poisonous cloud"
 	default:
@@ -41,7 +41,7 @@ func (ck CloudKind) Desc() string {
 	case CloudFog:
 		return "The fog obstructs vision."
 	case CloudFire:
-		return "The fire cloud obstructs vision and may burn foliage and creatures."
+		return "The fire cloud obstructs vision and burns foliage and creatures."
 	case CloudPoison:
 		return "The poisonous cloud obstructs vision and poisons creatures."
 	default:
