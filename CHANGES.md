@@ -1,9 +1,9 @@
 # v? ?
 
-* New secondary spirit: Fire Salamander. It features a *fire retreat* ability
-  that makes the player retreat up to two tiles while leaving a fire cloud on
-  the previous position, as long as there's room for the retreat. The new
-  spirit also confers +1 attack and a chance of burning foes on hit (like
+* New secondary spirit: **Fire Salamander**. It features a *fire retreat*
+  ability that makes the player retreat up to two tiles while leaving a fire
+  cloud on the previous position, as long as there's room for the retreat. The
+  new spirit also confers +1 attack and a chance of burning foes on hit (like
   phoenixes do) and the upgraded version confers fire resistance (half duration
   of Fire effects).  As a drawback, it inflicts bad hearing on the player,
   making it harder to hear footsteps and impossible to hear creeping and
@@ -11,30 +11,30 @@
   Hound spirit, hearing becomes normal again (neither good nor bad). Fire
   Salamander is hence a spirit that offers very good offense capabilities and
   some mobility, but it can significantly impair stealth tactics.
-* New unique monster: walking mushroom. It's less sturdy than a walking tree
-  but releases lignifying spores on sight from afar, affecting other monsters
-  too. Also, its melee hits are confusing.
-* New unique monster: noisy imp. It performs music just for the player,
+* New unique monster: **walking mushroom**. It's less sturdy than a walking
+  tree but releases lignifying spores on sight from afar, affecting other
+  monsters too. Also, its melee hits are confusing.
+* New unique monster: **noisy imp**. It performs music just for the player,
   attracting nearby monsters. It avoids fighting similarly to afraid monsters.
-* New unique monster: teleporting ghost. Its hits teleport the player away.
+* New unique monster: **teleporting ghost**. Its hits teleport the player away.
 * Improve “poison cloud” ability of the Venomous Viper spirit so that the
-  poison clouds are created up to two free tiles away (before a monster or
+  poison clouds are created *up to two free tiles away* (before a monster or
   obstacle). This creates more varied possibilities for tactical movement,
   while still restricting safe movements in a similar but less extreme way, and
   providing similar defense from ranged monsters.
-* When the player or a monster is both afraid and cornered with no possible
+* When the player or a monster is both *afraid and cornered* with no possible
   escape, they now become berserk for a short while!
 * Using “sprint” or “jump” abilities while imbalanced may now sometimes lead to
   a dazing fall.
-* Space-distorting attacks now swap clouds too. While getting swapped into a
+* Space-distorting attacks now *swap clouds* too. While getting swapped into a
   cloud of fire or poison by foes was (very occasionally) fun, Temporal Cat
-  players not being able to safely attack monsters on dangerous clouds was
-  more annoying than fun. And in both cases, it could result in unexpected
-  dangerous situations that would've required explicit examination to be
-  avoided: when a monster is on a tile with a cloud, only the monster is drawn,
-  and while that limitation could be solved for the tiles version with image
-  layers, introducing that kind of visual clutter doesn't fit the simplicity of
-  the game.
+  players not being able to safely attack monsters on dangerous clouds was more
+  annoying than fun. And in both cases, it could result in unexpected dangerous
+  situations that would've required explicit examination to be avoided: when a
+  monster is on a tile with a cloud, only the monster is drawn, and while that
+  limitation could be solved for the tiles version with image layers,
+  introducing that kind of visual clutter doesn't fit the simplicity of the
+  game.
 * Players with the Rampaging Boar spirit don't move into poison or fire clouds
   after pushing anymore. While sometimes funny, it had similar issues as
   swapping into unexpected clouds. Monster boars and dragons still move into
@@ -60,6 +60,9 @@
   the map in mid and late game, but smaller likeliness of large monster groups.
 * Adjust slightly down the duration of fire clouds to 6-12 turns.
 * Add a few new special vaults.
+
+UI and graphics:
+
 * Add concise information about current tile in the status bar which tells
   whether there's fog, an item, or a special kind of terrain under the player.
 * Animation improvements. Monster deaths are now always animated when in view,
@@ -76,10 +79,10 @@ Fixes:
 * Fix field of view sometimes not being updated just after cloud creation but
   later at the end of a turn, which could allow monsters to attack once from a
   distance before the update.
-* Some confused monsters actions that happened outside of view incorrectly
+* Some confused monster actions that happened outside of view incorrectly
   appeared in the game logs.
-* Improve/fix the pagedown/scrolling instructions when details of all entities
-  in a single examined tile don't fit.
+* Improve/fix the page-down and scrolling instructions when details of all
+  entities in a single examined tile don't fit.
 
 # v1.0.0-beta.1 2025-07-22
 
