@@ -315,8 +315,8 @@ func (eff EffectJump) Apply(g *Game) bool {
 		g.Log("There’s no room to jump in that direction.")
 		return false
 	}
-	g.md.MoveAnimation(from, to)
 	g.BumpMoveActor(PlayerID, pa, to)
+	g.md.MoveAnimation(from, to)
 	g.Log("You jump.")
 	for p := from.Add(dir); p != to; p = p.Add(dir) {
 		if i, ai := g.ActorAt(p); i >= 0 {
