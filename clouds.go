@@ -186,7 +186,7 @@ func (g *Game) RemoveCloud(j int) {
 
 // fireCloudDuration returns the typical duration of a fire cloud.
 func (g *Game) fireCloudDuration() int {
-	return 6 + g.IntN(9)
+	return 6 + g.IntN(7)
 }
 
 // poisonCloudDuration returns the typical duration of a poisonous cloud.
