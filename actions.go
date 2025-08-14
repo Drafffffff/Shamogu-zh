@@ -1653,5 +1653,9 @@ Killing all monsters does not provide any benefit, so once you have enough food 
 Monsters usually give up quickly their search once they don’t see you: use foliage and rubble to lose them.
 
 Watch out for @Mfootstep @Mnoise@N: while going through dense foliage, it can be very helpful to avoid unwanted encounters. Also be particularly wary of @Mmagenta@N “heavy steps”!
+
+@YWIZARD MODE@N
+
+While the recommended way to discover the game is to progressively improve your skills by analyzing and enjoying your previous deaths, frustrated casual players should consider enabling @MWizard Mode@N(W) before giving up. Without further enabling extra cheats, it works as a kind of “adventure mode” that simply resurrects you each time you die. Resurrections are recorded in the game’s timeline, so you can check later how many lives you spent and try to do better next time until you can win in the default permadeath mode.
 `)
 }
