@@ -46,11 +46,11 @@ type Game struct {
 	Prev gruid.Point // previous position of player
 	Turn int         // current game's turn
 
-	Logs     *Logs      // game log
-	ProcInfo *ProcInfo  // information for procedural generation
-	Stats    *Stats     // game statistics
-	Version  string     // game's version
-	Wizard   WizardMode // wizard mode (default: no)
+	Logs     *Logs     // game log
+	ProcInfo *ProcInfo // information for procedural generation
+	Stats    *Stats    // game statistics
+	Version  string    // game's version
+	Wizard   Wizard    // wizard mode (default: no)
 
 	instant bool       // whether the last action was instant-effect
 	win     bool       // whether we just won the game

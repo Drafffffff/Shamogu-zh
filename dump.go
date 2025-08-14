@@ -81,8 +81,13 @@ func (g *Game) LevelStats() {
 func (g *Game) DumpSummary() string {
 	var sb strings.Builder
 	fmt.Fprintf(&sb, " ♣ Shamogu v%s Game Summary ♣\n\n", Version)
-	if g.Wizard != WizardNone {
-		fmt.Fprintf(&sb, "**WIZARD MODE**\n")
+	if g.Wizard.Mode != WizardNone {
+		fmt.Fprintf(&sb, "ENABLED WIZARD MODE (%d %s",
+			g.Wizard.Resurrections, Countable("resurrection", g.Wizard.Resurrections))
+		if g.Wizard.Extra {
+			sb.WriteString(" & EXTRA CHEATS")
+		}
+		sb.WriteString(").\n")
 	}
 	pa := g.PlayerActor()
 	if g.win {

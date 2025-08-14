@@ -360,7 +360,7 @@ func (o *CorruptionOrb) Desc() string {
 
 func (o *CorruptionOrb) Use(g *Game, i ID) bool {
 	o.Broken = true
-	if g.Wizard == WizardNone {
+	if g.Wizard.Mode == WizardNone {
 		g.LogStyled("You destroy the Orb of Corruption… You win!", logSpecial)
 	} else {
 		g.LogStyled("You destroy the Orb of Corruption… **WIZARD**!", logSpecial)

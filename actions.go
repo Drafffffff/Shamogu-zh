@@ -845,9 +845,10 @@ func init() {
 }
 
 func (a ActionMenu) Handle(md *model) (gruid.Effect, bool) {
+	const nwizard = 1 // number of wizard actions
 	md.menuActions = menuActions
-	if md.g.Wizard == WizardNone {
-		md.menuActions = md.menuActions[:len(md.menuActions)-1]
+	if !md.g.Wizard.Extra {
+		md.menuActions = md.menuActions[:len(md.menuActions)-nwizard]
 	}
 	hstyle := gruid.Style{}.WithFg(ColorCyan)
 	entries := []ui.MenuEntry{}
@@ -1170,37 +1171,50 @@ func (a ActionQuitConfirm) Handle(md *model) (gruid.Effect, bool) {
 	return nil, false
 }
 
+// Wizard collects information relative to wizard mode.
+type Wizard struct {
+	Mode          WizardMode // Currently active wizard mode
+	Resurrections int        // Number of resurrections
+	Extra         bool       // Whether to enable extra wizard cheats
+}
+
 // WizardMode describes the possible wizard modes.
 type WizardMode int
 
 const (
 	WizardNone   WizardMode = iota
-	WizardNormal            // normal visibility
+	WizardNormal            // non-permadeath mode with normal visibility
 	WizardMap               // reveal map (without monsters)
 	WizardSeeAll            // reveal map and monsters
 )
 
 // ActionWizard enters wizard-mode confirmation. When already in wizard mode,
-// switch to next wizard visibility mode.
+// cycle to next wizard visibility mode. The first wizard mode is just a
+// non-permadeath mode, without extra cheats (other than resurrection).
 type ActionWizard struct{}
 
 func (a ActionWizard) Handle(md *model) (gruid.Effect, bool) {
-	switch md.g.Wizard {
+	switch md.g.Wizard.Mode {
 	case WizardNone:
-		md.g.LogStyled("Do you really want to enter wizard mode? (win disabled) [y/N]", logConfirm)
+		md.g.LogStyled("Do you really want to enter Wizard Mode? (non-permadeath mode) [y/N]", logConfirm)
 		md.mode = modeWizardConfirmation
 	case WizardNormal:
-		md.g.Wizard = WizardMap
+		if !md.g.Wizard.Extra {
+			md.g.LogStyled("Do you really want extra cheats? (reveal map) [y/N]", logConfirm)
+			md.mode = modeWizardConfirmation
+		} else {
+			md.g.Wizard.Mode = WizardMap
+		}
 	case WizardMap:
-		md.g.Wizard = WizardSeeAll
+		md.g.Wizard.Mode = WizardSeeAll
 	case WizardSeeAll:
-		md.g.Wizard = WizardNormal
+		md.g.Wizard.Mode = WizardNormal
 	}
 	return nil, false
 }
 
 func (a ActionWizard) String() string {
-	return "Enter wizard mode [win disabled]"
+	return "Enter Wizard Mode (irreversible)"
 }
 
 // ActionWizardConfirm enters wizard-mode.
@@ -1211,19 +1225,30 @@ type ActionWizardConfirm struct {
 func (a ActionWizardConfirm) Handle(md *model) (gruid.Effect, bool) {
 	switch a.State {
 	case confirmTrue:
-		md.g.Wizard = WizardSeeAll
-		md.g.LogStyled("Wizard mode activated: win is disabled.", logSpecial)
-		md.g.StoryLog("Entered wizard mode")
+		if md.g.Wizard.Mode == WizardNone {
+			md.g.Wizard.Mode = WizardNormal
+			md.g.LogStyled("Wizard Mode activated.", logSpecial)
+			md.g.StoryLog("Entered Wizard Mode")
+		} else {
+			md.g.Wizard.Extra = true
+			md.g.Wizard.Mode = WizardMap
+			md.g.StoryLog("Enabled extra Wizard Mode cheats!")
+		}
 		md.mode = modeNormal
 		return nil, false
 	case confirmFalse:
 		md.mode = modeNormal
-		md.g.Log("Keep playing normally, then.")
+		if md.g.Wizard.Mode == WizardNone {
+			md.g.Log("Keep playing normally, then.")
+		} else {
+			md.g.Log("Don’t reveal map, then.")
+		}
 	}
 	return nil, false
 }
 
-// ActionWizardNextLevel enters wizard-mode.
+// ActionWizardNextLevel is a debug cheat to quickly go to next level. Only
+// accessible after revealing map.
 type ActionWizardNextLevel struct{}
 
 func (a ActionWizardNextLevel) Handle(md *model) (gruid.Effect, bool) {
@@ -1233,6 +1258,7 @@ func (a ActionWizardNextLevel) Handle(md *model) (gruid.Effect, bool) {
 		md.mode = modeNormal
 		return nil, false
 	}
+	md.g.StoryLog("Wizard Mode: used next level cheat")
 	g.NextLevel()
 	md.mode = modeNormal
 	return nil, false

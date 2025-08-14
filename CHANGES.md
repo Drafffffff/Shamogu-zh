@@ -61,7 +61,7 @@
 * Adjust slightly down the duration of fire clouds to 6-12 turns.
 * Add a few new special vaults.
 
-UI and graphics:
+UI, graphics, QoL:
 
 * Add concise information about current tile in the status bar which tells
   whether there's fog, an item, or a special kind of terrain under the player.
@@ -69,6 +69,12 @@ UI and graphics:
   independently of the cause. Hits between confused monsters are now animated
   too, making it clearer what's happening. Other minor enhancements.
 * Improve various tiles (footsteps, translucent walls, food…).
+* Wizard mode improvements: intended for development purposes, but now cheat
+  usage is recorded in a more fine-grained way in statistics, so any frustrated
+  casual players might consider using it as an *adventure mode*. Enabling
+  Wizard Mode *once* with `W` only enables non-permadeath mode (each
+  resurrection by the wizard will be recorded in the timeline). Extra cheats
+  are enabled by pressing `W` again one or more times.
 
 Fixes:
 

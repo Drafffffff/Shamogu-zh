@@ -134,7 +134,7 @@ func (md *model) drawWin(gd gruid.Grid) {
 
 func (md *model) drawMap(gd gruid.Grid) {
 	g := md.g
-	if g.Wizard != WizardNone && g.Wizard != WizardNormal {
+	if g.Wizard.Mode != WizardNone && g.Wizard.Mode != WizardNormal {
 		md.drawMapWizard(gd)
 		return
 	}
@@ -210,7 +210,7 @@ func (md *model) drawMapWizard(gd gruid.Grid) {
 		}
 		g.drawTerrainRuneAt(gd, r, p)
 	}
-	if g.Wizard != WizardMap {
+	if g.Wizard.Mode != WizardMap {
 		for _, cl := range g.Map.Clouds.Clouds {
 			drawCloud(gd, cl)
 		}
@@ -218,7 +218,7 @@ func (md *model) drawMapWizard(gd gruid.Grid) {
 	// Entity drawing (with rendering order).
 	sortedIDs := g.sortedIDsByRenderOrder()
 	for _, i := range sortedIDs {
-		if o := g.RenderOrder(i); o == RONone || g.Wizard == WizardMap && o != ROItem {
+		if o := g.RenderOrder(i); o == RONone || g.Wizard.Mode == WizardMap && o != ROItem {
 			continue
 		}
 		e := md.g.Entity(i)
