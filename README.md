@@ -75,8 +75,8 @@ WebAssembly](https://go.dev/wiki/WebAssembly).
 Documentation
 -------------
 
-See the man page shamogu(6) for more information on command line options and use
-of the replay file. For example:
+See the man page shamogu(6) in the `docs/` folder for more information on
+command line options and use of the replay file. For example:
 
     shamogu -r _
 
