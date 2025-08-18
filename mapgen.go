@@ -106,7 +106,7 @@ func (g *Game) generateMap(ml MapLayout) (*MapGen, bool) {
 		mg.genVaults(SmallVaultTemplates, 1, PlacementCenter)
 	}
 	mg.genVaults(BigVaultTemplates, 1, PlacementRandom)
-	mg.genVaults(SmallVaultTemplates, 3+mg.rand.IntN(3), PlacementRandom)
+	mg.genVaults(SmallVaultTemplates, 4+mg.rand.IntN(2), PlacementRandom)
 	mg.connectAllVaults()
 	// Ensure that all the cells are connected.
 	pass := func(p gruid.Point) bool {

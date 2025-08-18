@@ -144,40 +144,49 @@ func (tp *tunnelPath) Neighbors(p gruid.Point) []gruid.Point {
 }
 
 func (tp *tunnelPath) Cost(from, to gruid.Point) int {
-	if tp.mg.vault.At(from) && !tp.mg.tunnel.At(from) {
-		return 50
+	if tp.mg.vault.At(to) {
+		if !tp.mg.tunnel.At(to) {
+			// Tunnels should not go through non-entry vault cells.
+			return 100
+		}
+		// Tunnels should rarely go through another vault entry.
+		return 10
 	}
-	cost := 1
-	t := tp.mg.terrain.At(from)
-	if tp.mg.vault.At(from) {
-		cost += 7
-	} else if !tp.mg.tunnel.At(from) && t != Floor {
+	t := tp.mg.terrain.At(to)
+	if Passable(t) {
+		if !tp.mg.tunnel.At(to) && t != Floor {
+			// Give non-Floor non-tunnel cells a little extra cost.
+			return 2
+		}
+		// Making a tunnel to a free cell is cheap.
+		return 1
+	}
+	// When we have a wall, we favor tunnels that continue through internal
+	// walls.
+	cost := 3
+	tf := tp.mg.terrain.At(from)
+	if from.X == MapWidth-1 || from.X == 0 || from.Y == 0 || from.Y == MapHeight-1 || Passable(tf) {
+		// Slight penalty for tunnels that are on the edge of the map
+		// because they don't look very nice.
+		// Starting a tunnel costs a little too.
 		cost++
 	}
-	if Passable(t) {
-		return cost
-	}
-	wc := countWalls(tp.mg.terrain, from, 1, true)
-	return cost + 8 - wc
+	wc := countLateralWalls(tp.mg.terrain, from, to)
+	return cost - wc
 }
 
-func countWalls(gd rl.Grid, p gruid.Point, radius int, countOut bool) int {
-	count := 0
-	rg := gruid.Range{
-		gruid.Point{p.X - radius, p.Y - radius},
-		gruid.Point{p.X + radius + 1, p.Y + radius + 1},
+func countLateralWalls(gd rl.Grid, from, to gruid.Point) int {
+	n := 0
+	dir := to.Sub(from)
+	for p := range Neighbors(to) {
+		if p.Sub(to) == dir || p == from {
+			continue
+		}
+		if gd.At(p) == rl.Cell(Wall) {
+			n++
+		}
 	}
-	if countOut {
-		osize := rg.Size()
-		rg = rg.Intersect(gd.Range())
-		size := rg.Size()
-		count += osize.X*osize.Y - size.X*size.Y
-	} else {
-		rg = rg.Intersect(gd.Range())
-	}
-	gd = gd.Slice(rg)
-	count += gd.Count(rl.Cell(Wall))
-	return count
+	return n
 }
 
 func (tp *tunnelPath) Estimation(from, to gruid.Point) int {
