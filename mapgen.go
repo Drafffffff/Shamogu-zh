@@ -19,6 +19,9 @@ const (
 	CellularAutomataCave MapLayout = iota
 	RandomWalkCave
 	RandomWalkTreeCave
+	MixedAutomataWalkCave
+	MixedAutomataWalkTreeCave
+	MixedWalkCaveWalkTreeCave
 )
 
 // NLayouts represents the number of different kinds of map layouts.
@@ -60,17 +63,38 @@ func (g *Game) generateMap(ml MapLayout) (*MapGen, bool) {
 		tunnel: make(CacheGrid[bool], MapWidth*MapHeight),
 		vault:  make(CacheGrid[bool], MapWidth*MapHeight),
 	}
+	halves := func() (rl.Grid, rl.Grid) {
+		left := mg.terrain.Slice(mg.terrain.Range().Columns(0, 3+MapWidth/2))
+		right := mg.terrain.Slice(mg.terrain.Range().Columns(-3+MapWidth/2, MapWidth))
+		if mg.rand.IntN(2) == 0 {
+			return right, left
+		}
+		return left, right
+	}
 	switch ml {
 	case CellularAutomataCave:
-		mg.genCellularAutomataCaveMap()
+		mg.genCellularAutomataCaveMap(mg.terrain)
 	case RandomWalkCave:
-		mg.genCaveMap()
+		mg.genCaveMap(mg.terrain)
 	case RandomWalkTreeCave:
-		mg.genTreeCaveMap()
+		mg.genTreeCaveMap(mg.terrain)
+	case MixedAutomataWalkCave:
+		gd1, gd2 := halves()
+		mg.genCellularAutomataCaveMap(gd1)
+		mg.genCaveMap(gd2)
+	case MixedAutomataWalkTreeCave:
+		gd1, gd2 := halves()
+		mg.genCellularAutomataCaveMap(gd1)
+		mg.genTreeCaveMap(gd2)
+	case MixedWalkCaveWalkTreeCave:
+		gd1, gd2 := halves()
+		mg.genCaveMap(gd1)
+		mg.genTreeCaveMap(gd2)
 	default:
 		// should not happen.
-		mg.genCellularAutomataCaveMap()
+		mg.genCellularAutomataCaveMap(mg.terrain)
 	}
+
 	mg.genFoliage()
 	// Vault placement.
 	bigCenter := g.IntN(2) == 0
@@ -98,9 +122,9 @@ func (g *Game) generateMap(ml MapLayout) (*MapGen, bool) {
 }
 
 // genCellularAutomataCaveMap generates a floor/wall map with a cellular automata.
-func (mg *MapGen) genCellularAutomataCaveMap() {
+func (mg *MapGen) genCellularAutomataCaveMap(gd rl.Grid) {
 	// map generator using the rl package from gruid
-	mgen := rl.MapGen{Rand: mg.rand, Grid: mg.terrain}
+	mgen := rl.MapGen{Rand: mg.rand, Grid: gd}
 	// cellular automata map generation with rules that give a cave-like
 	// map.
 	rules := []rl.CellularAutomataRule{
@@ -117,15 +141,19 @@ func (mg *MapGen) genCellularAutomataCaveMap() {
 	mgen.CellularAutomataCave(Wall, Floor, n, rules)
 }
 
-// genCaveMap generates a floor/wall map with a simple random walk.
-func (mg *MapGen) genCaveMap() {
-	size := 21 * (35 + mg.rand.IntN(10))
+// genCaveMap generates a floor/wall map with a simple random walk. The grid gd
+// should not be too small.
+func (mg *MapGen) genCaveMap(gd rl.Grid) {
+	sz := gd.Size()
+	w := ((37 + mg.rand.IntN(6)) * sz.X) / MapWidth
+	size := sz.Y * w
 	mgen := rl.MapGen{
 		Rand: mg.rand,
-		Grid: mg.terrain,
+		Grid: gd,
 	}
 	wlk := walker{rand: mg.rand}
-	mgen.RandomWalkCave(wlk, rl.Cell(Floor), float64(size)/float64(MapWidth*MapHeight), 7+mg.rand.IntN(3))
+	walks := ((7 + mg.rand.IntN(3)) * sz.X) / MapWidth
+	mgen.RandomWalkCave(wlk, rl.Cell(Floor), float64(size)/float64(sz.X*sz.Y), walks)
 }
 
 // walker implements rl.RandomWalker.
@@ -150,9 +178,9 @@ func (w walker) Neighbor(p gruid.Point) gruid.Point {
 
 // genTreeCaveMap generates a floor/wall map with random walk (repeatedly
 // starting from wall until new block is connected to the center).
-func (mg *MapGen) genTreeCaveMap() {
-	gd := mg.terrain
-	center := gruid.Point{40, 10}
+func (mg *MapGen) genTreeCaveMap(gd rl.Grid) {
+	sz := gd.Size()
+	center := gruid.Point{sz.X / 2, sz.Y / 2}
 	center.X += -2 + mg.rand.IntN(3)
 	center.Y += -1 + mg.rand.IntN(2)
 	for x := -1; x <= 1; x++ {
@@ -160,12 +188,13 @@ func (mg *MapGen) genTreeCaveMap() {
 			gd.Set(center.Add(gruid.Point{x, y}), Floor)
 		}
 	}
-	maxCells := 21 * (30 + mg.rand.IntN(5))
+	w := (((30 + mg.rand.IntN(5)) * sz.X) / MapWidth)
+	maxCells := sz.Y * w
 	cells := 1
 	block := make([]gruid.Point, 0, 64)
 loop:
 	for cells < maxCells {
-		block = mg.digBlock(block)
+		block = mg.digBlock(gd, block)
 		if len(block) == 0 {
 			continue loop
 		}
@@ -178,9 +207,9 @@ loop:
 	}
 }
 
-func (mg *MapGen) digBlock(block []gruid.Point) []gruid.Point {
+func (mg *MapGen) digBlock(gd rl.Grid, block []gruid.Point) []gruid.Point {
 	const maxIterations = 10000
-	p := mg.randomWallCell()
+	p := mg.randomWallCell(gd)
 	block = block[:0]
 	count := 0
 	for {
@@ -188,20 +217,20 @@ func (mg *MapGen) digBlock(block []gruid.Point) []gruid.Point {
 		if count >= 1000 && count%500 == 0 {
 			// We haven't found a connected part yet, so try
 			// digging again from another wall.
-			p = mg.randomWallCell()
+			p = mg.randomWallCell(gd)
 			block = block[:0]
 		}
 		if count > maxIterations {
 			panic("infinite loop")
 		}
 		block = append(block, p)
-		if mg.passableNeighbor(p) {
+		if passableNeighbor(gd, p) {
 			break
 		}
 		p = mg.randomNeighbor(p)
 		if !inMap(p) {
 			block = block[:0]
-			p = mg.randomWallCell()
+			p = mg.randomWallCell(gd)
 			continue
 		}
 		if !inMap(p) {
@@ -211,24 +240,18 @@ func (mg *MapGen) digBlock(block []gruid.Point) []gruid.Point {
 	return block
 }
 
-func (mg *MapGen) randomWallCell() gruid.Point {
+func (mg *MapGen) randomWallCell(gd rl.Grid) gruid.Point {
+	sz := gd.Size()
 	const maxIterations = 10000
 	for range maxIterations {
-		x := mg.rand.IntN(MapWidth)
-		y := mg.rand.IntN(MapHeight)
+		x := mg.rand.IntN(sz.X)
+		y := mg.rand.IntN(sz.Y)
 		p := gruid.Point{x, y}
-		if mg.terrain.At(p) == Wall {
+		if gd.At(p) == Wall {
 			return p
 		}
 	}
 	panic("no random wall found")
-}
-
-func (mg *MapGen) passableNeighbor(p gruid.Point) bool {
-	for range NeighborsFunc(p, func(q gruid.Point) bool { return Passable(mg.terrain.At(q)) }) {
-		return true
-	}
-	return false
 }
 
 func (mg *MapGen) randomNeighbor(p gruid.Point) gruid.Point {
@@ -242,6 +265,13 @@ func (mg *MapGen) randomNeighbor(p gruid.Point) gruid.Point {
 	default:
 		return p.Add(gruid.Point{0, -1})
 	}
+}
+
+func passableNeighbor(gd rl.Grid, p gruid.Point) bool {
+	for range NeighborsFunc(p, func(q gruid.Point) bool { return Passable(gd.At(q)) }) {
+		return true
+	}
+	return false
 }
 
 // genFoliage generates foliage with a cellular automata.

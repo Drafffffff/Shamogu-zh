@@ -38,14 +38,23 @@ func (g *Game) InitProcInfo() {
 
 func (g *Game) layoutsProcGen() {
 	layouts := []MapLayout{
-		CellularAutomataCave, CellularAutomataCave, CellularAutomataCave,
-		RandomWalkTreeCave, RandomWalkTreeCave, RandomWalkTreeCave,
-		RandomWalkCave, RandomWalkCave, RandomWalkCave,
+		CellularAutomataCave, RandomWalkTreeCave, RandomWalkCave,
+		CellularAutomataCave, RandomWalkTreeCave, RandomWalkCave,
+		MixedAutomataWalkCave, MixedAutomataWalkTreeCave, MixedWalkCaveWalkTreeCave,
+	}
+	if g.IntN(2) == 0 {
+		layouts[3] = MixedAutomataWalkCave
+	}
+	if g.IntN(2) == 0 {
+		layouts[4] = MixedAutomataWalkTreeCave
+	}
+	if g.IntN(3) == 0 {
+		layouts[5] = MixedWalkCaveWalkTreeCave
 	}
 	g.rand.Shuffle(len(layouts), func(i, j int) {
 		layouts[i], layouts[j] = layouts[j], layouts[i]
 	})
-	layouts[g.rand.IntN(len(layouts))] = MapLayout(g.rand.IntN(NLayouts))
+	// layouts[g.rand.IntN(len(layouts))] = MapLayout(g.rand.IntN(NLayouts))
 	g.ProcInfo.Layouts = layouts
 }
 

@@ -58,6 +58,7 @@
 * Improvements in monster group formation. In particular, less groups of three
   monsters than before and more groups of two, so somewhat better coverage of
   the map in mid and late game, but smaller likeliness of large monster groups.
+* Mixed map generation algorithms in some map levels.
 * Adjust slightly down the duration of fire clouds to 6-12 turns.
 * Add a few new special vaults.
 
