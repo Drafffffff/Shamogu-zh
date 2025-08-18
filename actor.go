@@ -569,16 +569,16 @@ type Behavior struct {
 	Path     []gruid.Point // path to destination
 	Guard    gruid.Point   // position to guard (InvalidPos if not)
 	Target   gruid.Point   // Current goal (if not static)
-	State    MindState     // Wandering, Hunting, ...
+	State    Mindstate     // Wandering, Hunting, ...
 	SkipTurn bool          // skip turn (like after swapped positions with another monster)
 }
 
-// MindState represents the kind of monster behavioral states.
-type MindState int
+// Mindstate represents the kind of monster behavioral states.
+type Mindstate int
 
-// Those constants represent all the possible monster mind states.
+// Those constants represent all the possible monster mindstates.
 const (
-	Wandering MindState = iota
+	Wandering Mindstate = iota
 	Hunting
 )
 
