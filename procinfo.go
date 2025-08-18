@@ -15,6 +15,7 @@ type ProcInfo struct {
 	WanderingUnique2 int         // level with noisy imp or teleporting ghost
 	MonsEarly        int         // special early level
 	MonsMid          int         // special mid level
+	MonsMidLate      int         // special mid-late level
 	MonsLate         int         // special late level
 	Spirits          []int       // spirit index for each dungeon level (-1 if no spirit)
 	Menhirs          []int       // menhir-generation data
@@ -64,6 +65,10 @@ func (g *Game) flavoursProcGen() {
 	gpi.WanderingUnique2 = 4 + g.IntN(6)
 	gpi.MonsEarly = g.IntN(4)
 	gpi.MonsMid = 4 + g.IntN(3)
+	gpi.MonsMidLate = 6 + g.IntN(4)
+	if gpi.MonsMidLate == gpi.MonsMid {
+		gpi.MonsMidLate++
+	}
 	gpi.MonsLate = 7 + g.IntN(3)
 	// Disable very occasionally some events/flavours, for some
 	// extra unpredictability.

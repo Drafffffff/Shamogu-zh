@@ -1,6 +1,8 @@
 package main
 
 import (
+	"slices"
+
 	"codeberg.org/anaseto/gruid"
 	"codeberg.org/anaseto/gruid/paths"
 )
@@ -428,6 +430,18 @@ func (g *Game) genMonsters() {
 			g.genMonster(mk)
 		}
 		nL = 2 // two remaining
+	}
+	if g.Map.Level == g.ProcInfo.MonsMidLate {
+		// Special level with a smaller selection of mid monsters.
+		md := slices.Clone(monsMid)
+		g.rand.Shuffle(len(md), func(i, j int) {
+			md[i], md[j] = md[j], md[i]
+		})
+		md = md[:4]
+		for range nM {
+			g.genMonster(md[g.IntN(len(md))])
+		}
+		nM = 0
 	}
 	for range nE {
 		g.genMonster(monsEarly[g.IntN(len(monsEarly))])
