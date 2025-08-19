@@ -86,6 +86,7 @@ Fixes:
 * Fix field of view sometimes not being updated just after cloud creation but
   later at the end of a turn, which could allow monsters to attack once from a
   distance before the update.
+* Fix healing amount in description of foggy-skin onion.
 * Some confused monster actions that happened outside of view incorrectly
   appeared in the game logs.
 * Improve/fix the page-down and scrolling instructions when details of all
