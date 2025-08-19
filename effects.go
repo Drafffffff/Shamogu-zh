@@ -165,7 +165,7 @@ func (eff EffectFoggySkinOnion) Apply(g *Game) bool {
 
 func (eff EffectFoggySkinOnion) Desc() string {
 	return fmt.Sprintf("Get @BFoggy-Skin@N for %d turns. %s Restores %+d HP.",
-		DurationFoggySkin, statusDesc[StatusFoggySkin], FoggySkinDefenseBonus)
+		DurationFoggySkin, statusDesc[StatusFoggySkin], HealFoggySkinOnion)
 }
 
 type EffectFirebreathPepper struct{ Beam bool }
