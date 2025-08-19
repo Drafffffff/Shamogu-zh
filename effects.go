@@ -19,8 +19,9 @@ const (
 	DurationDazeLightning          = 3
 	DurationDazeTeleport           = 4
 	DurationDazeSpines             = 3
+	DurationFearAmbrosia           = 4
 	DurationFearBark               = 4
-	DurationMonsFear               = 3
+	DurationFearMons               = 3
 	DurationFire                   = 3
 	DurationFirePepper             = 5
 	DurationFoggySkin              = 12
@@ -67,13 +68,17 @@ func (eff EffectAmbrosiaBerries) Apply(g *Game) bool {
 	}
 	g.eatMsg("ambrosia berries", HealAmbrosia)
 	g.AdjustHP(PlayerID, pa, HealAmbrosia)
-	g.PutStatus(PlayerID, pa, StatusConfusion, DurationConfusionAmbrosia)
+	if g.IntN(2) == 0 {
+		g.PutStatus(PlayerID, pa, StatusConfusion, DurationConfusionAmbrosia)
+	} else {
+		g.PutStatus(PlayerID, pa, StatusFear, DurationFearAmbrosia)
+	}
 	return true
 }
 
 func (eff EffectAmbrosiaBerries) Desc() string {
-	return fmt.Sprintf("Restores %+d HP, but @Oconfuses@N you for %d turns.",
-		HealAmbrosia, DurationConfusionAmbrosia)
+	return fmt.Sprintf("Restores %+d HP. Leaves you either @Oconfused@N or @Oafraid@N for %d or %d turns respectively.",
+		HealAmbrosia, DurationConfusionAmbrosia, DurationFearAmbrosia)
 }
 
 type EffectBerserkingFlower struct{}
@@ -243,7 +248,7 @@ func (g *Game) teleportStatuses(i ID, ai *Actor) {
 }
 
 func (eff EffectTeleportMushroom) Desc() string {
-	return fmt.Sprintf("Teleports you away and makes you sense any nearby totemic spirit. Leaves you either @ODazed@N or @OImbalanced@N for %d or %d turns respectively.",
+	return fmt.Sprintf("Teleports you away and makes you sense any nearby totemic spirit. Leaves you either @Odazed@N or @Oimbalanced@N for %d or %d turns respectively.",
 		DurationDazeTeleport, DurationImbalanceTeleport)
 }
 

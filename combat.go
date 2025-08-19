@@ -332,8 +332,8 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int)
 			}
 		}
 	case ai.DoesAll(MonsFear) && g.IntN(5-dmg) < 2:
-		if g.PutStatus(j, aj, StatusFear, DurationMonsFear) {
-			if ai.Has(StatusConfusion) && g.PutStatus(i, ai, StatusFear, DurationMonsFear) && g.InFOV(ei.P) {
+		if g.PutStatus(j, aj, StatusFear, DurationFearMons) {
+			if ai.Has(StatusConfusion) && g.PutStatus(i, ai, StatusFear, DurationFearMons) && g.InFOV(ei.P) {
 				g.Logf("The confused %s frightened itself too!", ei.Name)
 			}
 		}

@@ -24,13 +24,19 @@
   into a “hungry rat” with a new “hunt by smell” trait that makes rats able to
   track you by smell from out of view and, as an extra trait, become berserk if
   they see you eat a comestible.
+* When the player or a monster is both *afraid and cornered* with no possible
+  escape, they now become berserk for a short while!
+* Make “ambrosia berries” either confuse you (existing behavior) or make you
+  afraid. The idea, like for the “teleport mushroom”, is to provide some kind
+  of surprise and require adaptability (a bit like identification systems do in
+  some situations, but in a more restricted way). A fun interaction with the
+  new afraid and cornered mechanic means it can be used to become berserk (with
+  50% chance).
 * Improve “poison cloud” ability of the Venomous Viper spirit so that the
   poison clouds are created *up to two free tiles away* (before a monster or
   obstacle). This creates more varied possibilities for tactical movement,
   while still restricting safe movements in a similar but less extreme way, and
   providing similar defense from ranged monsters.
-* When the player or a monster is both *afraid and cornered* with no possible
-  escape, they now become berserk for a short while!
 * Using “sprint” or “jump” abilities while imbalanced may now sometimes lead to
   a dazing fall.
 * Space-distorting attacks now *swap clouds* too. While getting swapped into a
