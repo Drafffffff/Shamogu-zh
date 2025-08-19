@@ -154,11 +154,11 @@ const (
 	MonsExplodingDeath // explode on death
 	MonsFear           // attack may frighten
 	MonsFourHeaded     // perform 4 attacks per attack
+	MonsHungry         // hunts you with smell, becomes berserk if you eat in view
 	MonsIgnoreDefense  // attack ignores defense
 	MonsLignify        // attack may lignify you (also makes unmovable by force)
 	MonsSpores         // lignifying spores
 	MonsMusic          // makes music for you (noisy imp)
-	MonsNausea         // killing rats can make the player nauseous if adjacent
 	MonsSpitFire       // spit fire when ranged (requires PatternRanged)
 	MonsTeleport       // attack may teleport you
 
@@ -224,10 +224,10 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, MonsExplodingDeath, "explodes on death")
 	desc = traitDesc(desc, t, MonsFear, "@Ofrightening@N hits")
 	desc = traitDesc(desc, t, MonsFourHeaded, "attacks with all four heads")
+	desc = traitDesc(desc, t, MonsHungry, "hunts you with smell, becomes berserk if you eat in view")
 	desc = traitDesc(desc, t, MonsIgnoreDefense, "attack ignores defense")
 	desc = traitDesc(desc, t, MonsLignify, "hits may @Blignify@N you briefly, resists forced movement")
 	desc = traitDesc(desc, t, MonsMusic, "makes music for you, avoids fights")
-	desc = traitDesc(desc, t, MonsNausea, "causes @Onausea@N when killed in melee")
 	desc = traitDesc(desc, t, MonsSpitFire, "spites @OFire@N from afar")
 	desc = traitDesc(desc, t, MonsSpores, "releases @Blignifying@N spores on sight")
 
@@ -263,7 +263,6 @@ const (
 	StatusFoggySkin
 	StatusImbalance
 	StatusLignification
-	StatusNausea
 	StatusPoison
 	StatusSprint
 	StatusTimeStop
@@ -273,7 +272,7 @@ const (
 func (st Status) Bad() bool {
 	switch st {
 	case StatusConfusion, StatusDaze, StatusFear, StatusFire,
-		StatusImbalance, StatusNausea, StatusPoison:
+		StatusImbalance, StatusPoison:
 		return true
 	default:
 		return false
@@ -294,7 +293,6 @@ var statusAbbrevation = []string{
 	StatusImbalance:     "Imb",
 	StatusFoggySkin:     "Fog",
 	StatusLignification: "Lig",
-	StatusNausea:        "Nau",
 	StatusPoison:        "Poi",
 	StatusSprint:        "Spr",
 	StatusTimeStop:      "Tim",
@@ -315,7 +313,6 @@ var statusName = []string{
 	StatusFoggySkin:     "Foggy Skin",
 	StatusImbalance:     "Imbalance",
 	StatusLignification: "Lignification",
-	StatusNausea:        "Nausea",
 	StatusPoison:        "Poison",
 	StatusSprint:        "Sprint",
 	StatusTimeStop:      "Time Stop",
@@ -336,7 +333,6 @@ var statusAdjective = []string{
 	StatusFoggySkin:     "smoky",
 	StatusImbalance:     "imbalanced",
 	StatusLignification: "lignified",
-	StatusNausea:        "nauseous",
 	StatusPoison:        "poisoned",
 	StatusSprint:        "sprinting",
 	StatusTimeStop:      "freezing time",
@@ -362,7 +358,6 @@ var statusDesc = []string{
 	StatusLignification: fmt.Sprintf(
 		"Gives %+d Defense. Provides temporary HP bonus. Protects from @OPoison@N and @OImbalance@N. Prevents movement. Doubles @OFire@N duration. Followed by @OImbalance@N on expiration for %d turns.",
 		LignificationDefenseBonus, DurationImbalanceLignification),
-	StatusNausea: fmt.Sprintf("Eating a comestible will @ODaze@N you for %d turns.", DurationDazePenalty),
 	StatusPoison: fmt.Sprintf("Walking will hurt you for %d damage. Stinky toxins are exuded on expiration, confusing other creatures for %d turns.",
 		PoisonDamage, DurationConfusionToxins),
 	StatusSprint:   "You can move to a visible destination three times as fast on the current direction and twice as fast laterally. You can jump over foes, unbalancing them. Canceled by waiting.",
@@ -398,11 +393,6 @@ func (g *Game) PutStatus(i ID, ai *Actor, st Status, turns int) bool {
 	switch {
 	case st == StatusBerserk:
 		if ai.Has(StatusBerserk) {
-			return false
-		}
-	case st == StatusNausea:
-		if i != PlayerID {
-			// Nausea is a player-only status effect.
 			return false
 		}
 	case st == StatusFire:

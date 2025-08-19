@@ -354,20 +354,20 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int)
 	case ai.DoesAny(MonsTeleport) && aj.IsAlive() && g.TeleportActor(j, aj):
 		if j == PlayerID {
 			g.Logf("The %s teleported you away!", ei.Name)
-			g.PutStatus(PlayerID, aj, StatusNausea, DurationNauseaTeleport)
 		} else {
 			g.Logf("The confused %s teleported the %s away!", ei.Name, ej.Name)
 		}
+		g.teleportStatuses(j, aj)
 		if ai.Has(StatusConfusion) {
-			g.TeleportActor(i, ai)
+			if g.TeleportActor(i, ai) {
+				g.teleportStatuses(j, aj)
+			}
 		}
 	}
 	// Extra defense effects.
 	switch {
 	case aj.DoesAny(DazingSpines) && (ap != AttackRanged || g.AdjacentEntities(i, j)) && g.IntN(5-dmg) == 0:
 		g.PutStatus(i, ai, StatusDaze, DurationDazeSpines)
-	case aj.DoesAny(MonsNausea) && aj.IsDead() && (ap != AttackRanged || g.AdjacentEntities(i, j)):
-		g.PutStatus(i, ai, StatusNausea, DurationNauseaRat)
 	}
 }
 

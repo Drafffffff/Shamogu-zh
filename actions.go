@@ -1515,8 +1515,6 @@ indicates two or more negative statuses.`)
 			details = "Using “sprint” or “jump” abilities while imbalanced may sometimes lead to a @Odazing@N fall."
 		case StatusPoison:
 			details = "Watch out for confusion if any monsters survive poisoning!"
-		case StatusNausea:
-			details = "If you’re already dazed, you won’t be able to eat."
 		case StatusFoggySkin:
 			details = "Player-only effect obtainable by eating a foggy-skin onion."
 		case StatusSprint:

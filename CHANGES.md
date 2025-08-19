@@ -17,6 +17,13 @@
 * New unique monster: **noisy imp**. It performs music just for the player,
   attracting nearby monsters. It avoids fighting similarly to afraid monsters.
 * New unique monster: **teleporting ghost**. Its hits teleport the player away.
+* Remove the “Nausea” status effect, because it was player-only and didn't have
+  interesting interactions. It was mainly useful as a nerf for teleport: now
+  teleport results in either Daze or Imbalance (chosen randomly between both,
+  for some surprise and adaptability). The “disgusting rat” has been renamed
+  into a “hungry rat” with a new “hunt by smell” trait that makes rats able to
+  track you by smell from out of view and, as an extra trait, become berserk if
+  they see you eat a comestible.
 * Improve “poison cloud” ability of the Venomous Viper spirit so that the
   poison clouds are created *up to two free tiles away* (before a monster or
   obstacle). This creates more varied possibilities for tactical movement,

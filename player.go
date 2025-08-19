@@ -84,12 +84,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 }
 
 func (g *Game) logDaze() {
-	pa := g.PlayerActor()
-	if pa.Has(StatusNausea) {
-		g.Log("You’re dazed and nauseous: you need to wait (ENTER).")
-	} else {
-		g.Log("You’re dazed: you need to wait (ENTER) or eat.")
-	}
+	g.Log("You’re dazed: you need to wait (ENTER) or eat.")
 }
 
 // Sprint performs a sprinting bump-movement in the given direction.

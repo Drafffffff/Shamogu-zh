@@ -293,12 +293,12 @@ const (
 	BurningPhoenix
 	ConfusingEye
 	CrazyDruid
-	DisgustingRat
 	EarthDragon
 	ExplodingNadre
 	FearsomeLich
 	FireLama
 	FourHeadedHydra
+	HungryRat
 	LashingFrog
 	MadOctopode
 	NoisyImp
@@ -323,12 +323,12 @@ var MonsData = []monsterInfo{
 	BurningPhoenix:   {"burning phoenix", 'P', 3, 1, 5, PatternRampage | BurningHits | MonsImmunityFire | MonsImmunityLignification | MonsWingFlap | MonsNotable},
 	ConfusingEye:     {"confusing eye", 'e', 2, 0, 2, PatternRanged | MonsConfusion | MonsImmunityConfusion | MonsLightFootsteps},
 	CrazyDruid:       {"crazy druid", 'C', 3, 1, 4, PatternSwap | BurningHits | MonsBerserking | MonsNotable},
-	DisgustingRat:    {"disgusting rat", 'r', 2, 0, 3, MonsNausea | MonsLightFootsteps},
 	EarthDragon:      {"earth dragon", 'D', 4, 2, 6, PushingUnbalance | MonsDig | MonsImmunityFear | MonsHeavyFootsteps | MonsNotable},
 	ExplodingNadre:   {"exploding nadre", 'n', 2, 2, 1, MonsExplodingDeath},
 	FearsomeLich:     {"fearsome lich", 'L', 2, 2, 5, PatternRanged | MonsFear | MonsIgnoreDefense | MonsImmunityPoison | MonsNotable},
 	FireLama:         {"fire lama", 'l', 2, 0, 4, PatternRanged | MonsSpitFire},
 	FourHeadedHydra:  {"four-headed hydra", 'H', 2, 0, 6, PatternFourDirs | MonsFourHeaded | MonsHeavyFootsteps | MonsNotable},
+	HungryRat:        {"hungry rat", 'r', 2, 0, 3, MonsHungry | MonsLightFootsteps},
 	NoisyImp:         {"noisy imp", 'I', 2, 2, 4, MonsMusic | MonsLightFootsteps | MonsNotable},
 	MadOctopode:      {"mad octopode", 'O', 3, 2, 5, PatternCatchUnbalance | MonsImmunityImbalance | VenomousMelee | MonsCreep | MonsNotable},
 	LashingFrog:      {"lashing frog", 'F', 2, 1, 4, PatternCatchUnbalance},
@@ -346,8 +346,8 @@ var MonsData = []monsterInfo{
 // monsEarly represents early level monsters.
 var monsEarly = []monsterKind{
 	BerserkingSpider,
-	DisgustingRat,
 	ConfusingEye,
+	HungryRat,
 	ThunderPorcupine,
 }
 

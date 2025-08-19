@@ -27,6 +27,11 @@ func (g *Game) HandleMonsterTurn(i ID, ai *Actor) {
 	if beh.Target == ei.P || beh.Target == InvalidPos {
 		// The monster's target has either been reached or is invalid:
 		// we spend a turn chosing a new target.
+		if ai.DoesAny(MonsHungry) && g.HungryHunt(ei.P) {
+			beh.Target = g.PP()
+			beh.State = Hunting
+			return
+		}
 		from, maxdist := ei.P, unreachable
 		if beh.Guard != InvalidPos {
 			maxdist = MaxFOVRange - 2
@@ -251,6 +256,18 @@ func (g *Game) monsterFlee(i ID, ai *Actor) bool {
 	to := ps[g.IntN(len(ps))]
 	g.BumpMoveActor(i, ai, to)
 	return true
+}
+
+// HungryHunt reports whether the player is within a hungry hunt's range.
+func (g *Game) HungryHunt(from gruid.Point) bool {
+	pp := g.PP()
+	const maxdist = (3 * MaxFOVRange) / 2
+	if paths.DistanceManhattan(from, pp) > maxdist {
+		return false
+	}
+	dij := &MapPath{passable: g.Map.Passable}
+	g.PR.BreadthFirstMap(dij, []gruid.Point{from}, maxdist)
+	return g.PR.BreadthFirstMapAt(pp) <= maxdist
 }
 
 // RandomPassableWithin returns a random free passable point within a maximal

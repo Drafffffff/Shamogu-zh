@@ -18,17 +18,17 @@ const (
 	DurationDazeJump               = 5
 	DurationDazeLightning          = 3
 	DurationDazePenalty            = 7
+	DurationDazeTeleport           = 4
 	DurationDazeSpines             = 3
 	DurationFearBark               = 4
 	DurationMonsFear               = 3
 	DurationFire                   = 3
 	DurationFoggySkin              = 12
+	DurationImbalanceTeleport      = 6
 	DurationImbalanceGale          = 5
 	DurationImbalanceLignification = 6
 	DurationImbalanceSprint        = 5
 	DurationLignification          = 12
-	DurationNauseaRat              = 5
-	DurationNauseaTeleport         = 7
 	DurationPoison                 = 4
 	DurationPoisonBerserk          = 6
 
@@ -50,14 +50,10 @@ func newHP(a *Actor, hp int) int {
 func (g *Game) eatMsg(name string, hp int) {
 	g.Logf("You eat the %s.", name)
 	pa := g.PlayerActor()
-	var nausea string
-	if pa.Has(StatusNausea) {
-		nausea = "while nauseous "
-	}
 	if hp != 0 {
-		g.StoryLogf("Ate %s %s(HP: %d/%d)", One(name), nausea, newHP(pa, hp), pa.GetMaxHP())
+		g.StoryLogf("Ate %s (HP: %d/%d)", One(name), newHP(pa, hp), pa.GetMaxHP())
 	} else {
-		g.StoryLogf("Ate %s %s", One(name), nausea)
+		g.StoryLogf("Ate %s", One(name))
 	}
 }
 
@@ -229,7 +225,7 @@ func (eff EffectTeleportMushroom) Apply(g *Game) bool {
 		return false
 	}
 	g.eatMsg("teleport mushroom", 0)
-	g.PutStatus(PlayerID, pa, StatusNausea, DurationNauseaTeleport)
+	g.teleportStatuses(PlayerID, pa)
 	if i, _ := g.Spirit(); i >= 0 {
 		if ei := g.Entity(i); paths.DistanceManhattan(ei.P, g.PP()) < 4*MaxFOVRange {
 			g.SenseEntity(ei, "sense")
@@ -238,8 +234,17 @@ func (eff EffectTeleportMushroom) Apply(g *Game) bool {
 	return true
 }
 
+func (g *Game) teleportStatuses(i ID, ai *Actor) {
+	if g.IntN(2) == 0 {
+		g.PutStatus(i, ai, StatusDaze, DurationDazeTeleport)
+	} else {
+		g.PutStatus(i, ai, StatusImbalance, DurationImbalanceTeleport)
+	}
+}
+
 func (eff EffectTeleportMushroom) Desc() string {
-	return "Teleports you away. Gives @ONausea@N but makes you sense any nearby totemic spirit."
+	return fmt.Sprintf("Teleports you away and makes you sense any nearby totemic spirit. Leaves you either @ODazed@N or @OImbalanced@N for %d or %d turns respectively.",
+		DurationDazeTeleport, DurationImbalanceTeleport)
 }
 
 type EffectFocus struct{}
@@ -736,7 +741,9 @@ func (eff EffectTeleportMenhir) Apply(g *Game) bool {
 			continue
 		}
 		if i, ai := g.ActorAt(n.P); i > 0 {
-			g.TeleportActor(i, ai)
+			if g.TeleportActor(i, ai) {
+				g.teleportStatuses(i, ai)
+			}
 		}
 	}
 	return true

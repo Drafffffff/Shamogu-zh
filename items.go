@@ -162,23 +162,22 @@ func (c *Comestible) Desc() string {
 }
 
 func (c *Comestible) Use(g *Game, i ID) bool {
-	pa := g.PlayerActor()
-	nausea := pa.Has(StatusNausea)
-	if nausea && pa.Has(StatusDaze) {
-		g.Log("You cannot eat while both nauseous and dazed.")
-		return false
-	}
+	pp := g.PP()
 	done := c.Effect.Apply(g)
 	if !done {
 		return false
 	}
 	g.Entities[i] = emptySlot()
-	if nausea {
-		g.Log("You ate while nauseous.")
-		g.PutStatus(PlayerID, pa, StatusDaze, DurationDazePenalty)
-	}
 	g.Stats.EatenComestibles++
 	g.Stats.MapEatenComestibles[g.Map.Level-1]++
+	if pp == g.PP() {
+		// We didn't teleport.
+		for i, ai := range g.Monsters() {
+			if ai.DoesAny(MonsHungry) && g.InFOV(g.Entity(i).P) {
+				g.PutStatus(i, ai, StatusBerserk, DurationBerserk)
+			}
+		}
+	}
 	return true
 }
 
