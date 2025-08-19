@@ -17,12 +17,12 @@ const (
 	DurationDazeFall               = 2
 	DurationDazeJump               = 5
 	DurationDazeLightning          = 3
-	DurationDazePenalty            = 7
 	DurationDazeTeleport           = 4
 	DurationDazeSpines             = 3
 	DurationFearBark               = 4
 	DurationMonsFear               = 3
 	DurationFire                   = 3
+	DurationFirePepper             = 5
 	DurationFoggySkin              = 12
 	DurationImbalanceTeleport      = 6
 	DurationImbalanceGale          = 5
@@ -197,7 +197,7 @@ func (eff EffectFirebreathPepper) Apply(g *Game) bool {
 			if !done {
 				eat()
 			}
-			g.PutStatus(j, aj, StatusFire, DurationFire)
+			g.PutStatus(j, aj, StatusFire, DurationFirePepper)
 		}
 		p = p.Add(g.Dir)
 	}
@@ -212,8 +212,8 @@ func (eff EffectFirebreathPepper) Apply(g *Game) bool {
 }
 
 func (eff EffectFirebreathPepper) Desc() string {
-	return fmt.Sprintf("Makes you breathe a fire beam in the current direction doing %d damage and inflicting the @OFire@N status. Burns foliage, producing fire clouds lasting 6-12 turns. Removes @ODaze@N. Restores %+d HP.",
-		FireDamage, HealFirebreathPepper)
+	return fmt.Sprintf("Makes you breathe a fire beam in the current direction doing %d damage and inflicting @OFire@N for %d turns. Burns foliage, producing fire clouds lasting 6-12 turns. Removes @ODaze@N. Restores %+d HP.",
+		FireDamage, DurationFirePepper, HealFirebreathPepper)
 }
 
 type EffectTeleportMushroom struct{}
