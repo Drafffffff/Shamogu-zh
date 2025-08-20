@@ -177,7 +177,7 @@ func (g *Game) RemoveCloud(j int) {
 			g.Map.Terrain.Set(cj.P, Floor)
 		}
 		cj.Kind = CloudNormal
-		cj.Duration = g.fireCloudDuration()
+		cj.Duration = 4 + g.IntN(5)
 		cg.Clouds[j] = cj
 		return
 	}
