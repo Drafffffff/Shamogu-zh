@@ -28,7 +28,23 @@ func init() {
 }
 
 func splitVaults(s string) []string {
-	return strings.Split(strings.TrimSpace(strings.ReplaceAll(s, " ", "")), "\n\n")
+	vaults := strings.Split(strings.TrimSpace(strings.ReplaceAll(s, " ", "")), "\n\n")
+	for _, v := range vaults {
+		// We ensure all vaults contains essential places.
+		if !strings.ContainsRune(v, 'W') {
+			log.Fatalf("No W in vault:\n%s", v)
+		}
+		if !strings.ContainsRune(v, '>') {
+			log.Fatalf("No > in vault:\n%s", v)
+		}
+		if !strings.ContainsRune(v, '!') {
+			log.Fatalf("No ! in vault:\n%s", v)
+		}
+		if !strings.ContainsAny(v, "+-") {
+			log.Fatalf("No + nor - in vault:\n%s", v)
+		}
+	}
+	return vaults
 }
 
 // vault represents a special vault region.
@@ -186,7 +202,13 @@ func (mg *MapGen) RandomPlace(kind placeKind) gruid.Point {
 func (mg *MapGen) RandomVaultsPlace(vs []*vault, kind placeKind) gruid.Point {
 	// We assume len(vs) > 0 and that there are remaining free places of
 	// that kind.
+	const maxIterations = 10000
+	count := 0
 	for {
+		count++
+		if count > maxIterations {
+			panic("infinite loop")
+		}
 		p := mg.RandomVaultPlace(vs[mg.rand.IntN(len(vs))], kind)
 		if p != InvalidPos {
 			return p
