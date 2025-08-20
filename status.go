@@ -122,7 +122,7 @@ func (md *model) updateStatus() {
 			entries = append(entries, ui.MenuEntry{
 				Text:     stt.WithText("@r§@N "),
 				Disabled: true})
-		case CloudFog:
+		case CloudNormal:
 			entries = append(entries, ui.MenuEntry{
 				Text:     stt.WithText("§ "),
 				Disabled: true})

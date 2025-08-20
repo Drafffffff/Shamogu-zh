@@ -207,15 +207,21 @@ func (g *Game) monsterDeath(i ID, ai *Actor) {
 	if g.InFOV(ei.P) {
 		g.Logf("The %s explodes.", ei.Name)
 	}
-	g.MakeNoise(ei.P, NoiseExplosion)
+	g.ExplosionAt(ei.P)
+}
+
+// ExplosionAt makes a fire explosion at the given position.
+func (g *Game) ExplosionAt(at gruid.Point) {
+	g.MakeNoise(at, NoiseExplosion)
 	var nbs paths.Neighbors
-	ps := append(nbs.Cardinal(ei.P, inMap), ei.P)
+	ps := append(nbs.Cardinal(at, inMap), at)
 	g.md.ExplosionAnimation(ps)
 	for _, q := range ps {
 		if g.Map.Burnable(q) {
 			g.FireCloudAt(q)
 		} else {
 			g.dig(q)
+			g.CloudAt(q, 2+g.IntN(3))
 		}
 		if j, aj := g.ActorAt(q); j >= 0 {
 			g.PutStatus(j, aj, StatusFire, DurationFire)

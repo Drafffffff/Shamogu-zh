@@ -32,6 +32,10 @@
   some situations, but in a more restricted way). A fun interaction with the
   new afraid and cornered mechanic means it can be used to become berserk (with
   50% chance).
+* Make “firebreath pepper” produce a nadre-like explosion when reaching a wall,
+  providing a limited means of wall destruction for non-Boar players. Make
+  explosions produce dust or smoke clouds. Also, slightly increase Fire
+  duration from firebreath pepper.
 * Improve “poison cloud” ability of the Venomous Viper spirit so that the
   poison clouds are created *up to two free tiles away* (before a monster or
   obstacle). This creates more varied possibilities for tactical movement,

@@ -18,6 +18,7 @@ func (g *Game) InitPlayer() {
 		g.Entities[i] = emptySlot()
 	}
 	// g.Entities[PrimarySpiritID+1] = spiritEntity(secondarySpirits[4])
+	// g.Entities[PrimarySpiritID+3] = comestibleEntity(ComestibleData[4])
 	g.ComputePlayerStats()
 }
 

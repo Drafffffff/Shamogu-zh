@@ -141,7 +141,7 @@ func (g *Game) DangerInProximity() bool {
 
 func (g *Game) dangerousCloudInFOV() bool {
 	for _, cl := range g.Map.Clouds.Clouds {
-		if g.InFOV(cl.P) && cl.Kind != CloudFog {
+		if g.InFOV(cl.P) && cl.Kind != CloudNormal {
 			return true
 		}
 	}

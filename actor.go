@@ -92,6 +92,8 @@ func (g *Game) AdjustHP(i ID, a *Actor, amount int) {
 			g.Logf("You feel better (+%d HP).", a.HP-ohp)
 		} else if a.HP < ohp {
 			g.Logf("You feel weaker (-%d HP).", ohp-a.HP)
+		} else {
+			g.Log("You feel no change (+0 HP).")
 		}
 	}
 }
@@ -204,7 +206,7 @@ func (t Traits) String() string {
 		desc = append(desc, "bad hearing")
 	}
 	desc = traitDesc(desc, t, GoodSmell, "smells food from afar")
-	desc = traitDesc(desc, t, TrailingCloud, "movement leaves fog behind")
+	desc = traitDesc(desc, t, TrailingCloud, "movement leaves dust behind")
 	desc = traitDesc(desc, t, WoodyLegs, "can move while lignified (with reduced duration)")
 
 	desc = traitDesc(desc, t, VulnerabilityFire, "double @OFire@N duration")
@@ -623,7 +625,7 @@ func (g *Game) exudeFog(i ID) {
 			// player-only).
 			continue
 		}
-		g.AddCloud(Cloud{Kind: CloudFog, Duration: 2 + g.IntN(3), P: q})
+		g.AddCloud(Cloud{Kind: CloudNormal, Duration: 2 + g.IntN(3), P: q})
 	}
 }
 

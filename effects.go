@@ -23,7 +23,7 @@ const (
 	DurationFearBark               = 4
 	DurationFearMons               = 3
 	DurationFire                   = 3
-	DurationFirePepper             = 5
+	DurationFirePepper             = 4
 	DurationFoggySkin              = 12
 	DurationImbalanceTeleport      = 6
 	DurationImbalanceGale          = 5
@@ -173,51 +173,34 @@ type EffectFirebreathPepper struct{ Beam bool }
 
 func (eff EffectFirebreathPepper) Apply(g *Game) bool {
 	pp := g.PP()
-	p := pp.Add(g.Dir)
 	pa := g.PlayerActor()
-	done := false
-	eat := func() {
-		done = true
-		g.eatMsg("firebreath pepper", HealFirebreathPepper)
-		g.MakeNoise(pp, NoiseRoar)
-		g.AdjustHP(PlayerID, pa, HealFirebreathPepper)
-		g.md.FirebreathAnimation(p, g.Dir)
-		pa.Statuses[StatusDaze] = 0
-	}
-	for i := 0; i < MaxFOVRange; i++ {
-		if !done && !g.InFOV(p) {
-			eat()
-		}
+	g.eatMsg("firebreath pepper", HealFirebreathPepper)
+	g.MakeNoise(pp, NoiseRoar)
+	g.AdjustHP(PlayerID, pa, HealFirebreathPepper)
+	g.md.FirebreathAnimation(pp.Add(g.Dir), g.Dir)
+	pa.Statuses[StatusDaze] = 0
+	p := pp
+	for range MaxFOVRange {
+		p = p.Add(g.Dir)
 		t := g.Map.Terrain.At(p)
 		if !Passable(t) {
-			break
+			g.ExplosionAt(p)
+			return true
 		}
 		if t == Foliage {
-			if !done {
-				eat()
-			}
 			g.FireCloudAt(p)
 		}
 		if j, aj := g.ActorAt(p); j >= 0 {
-			if !done {
-				eat()
-			}
 			g.PutStatus(j, aj, StatusFire, DurationFirePepper)
 		}
-		p = p.Add(g.Dir)
 	}
-	if !done {
-		if pa.Has(StatusDaze) || pa.HP < pa.GetMaxHP() {
-			eat()
-		} else {
-			g.Log("Breathing fire in the current direction is useless.")
-		}
-	}
-	return done
+	// Leave cloud at the last tile if passable.
+	g.CloudAt(p, 2+g.IntN(3))
+	return true
 }
 
 func (eff EffectFirebreathPepper) Desc() string {
-	return fmt.Sprintf("Makes you breathe a fire beam in the current direction doing %d damage and inflicting @OFire@N for %d turns. Burns foliage, producing fire clouds lasting 6-12 turns. Removes @ODaze@N. Restores %+d HP.",
+	return fmt.Sprintf("Makes you breathe a fire beam in the current direction doing %d damage and inflicting @OFire@N for %d turns. Burns foliage, producing fire clouds lasting 6-12 turns. Makes walls explode. Removes @ODaze@N. Restores %+d HP.",
 		FireDamage, DurationFirePepper, HealFirebreathPepper)
 }
 

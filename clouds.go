@@ -4,8 +4,8 @@ import (
 	"codeberg.org/anaseto/gruid"
 )
 
-// Cloud represents a cloud, which can be of some specific kind (like fog), and
-// has a duration.
+// Cloud represents a cloud, which can be of some specific kind (like fire),
+// and has a duration.
 type Cloud struct {
 	Kind     CloudKind
 	P        gruid.Point
@@ -17,16 +17,16 @@ type CloudKind int
 
 // These constants represent the possible kind of clouds.
 const (
-	NoCloud CloudKind = iota
-	CloudFog
-	CloudFire
-	CloudPoison
+	NoCloud     CloudKind = iota
+	CloudNormal           // obstructs vision (steam, dust, smoke)
+	CloudFire             // burns & obstructs vision
+	CloudPoison           // poisons & obstructs vision
 )
 
 func (ck CloudKind) String() string {
 	switch ck {
-	case CloudFog:
-		return "fog"
+	case CloudNormal:
+		return "cloud"
 	case CloudFire:
 		return "fire cloud"
 	case CloudPoison:
@@ -38,8 +38,8 @@ func (ck CloudKind) String() string {
 
 func (ck CloudKind) Desc() string {
 	switch ck {
-	case CloudFog:
-		return "The fog obstructs vision."
+	case CloudNormal:
+		return "The steam, dust or smoke cloud obstructs vision."
 	case CloudFire:
 		return "The fire cloud obstructs vision and burns foliage and creatures."
 	case CloudPoison:
@@ -170,13 +170,13 @@ func (g *Game) RemoveCloud(j int) {
 	cj := cg.Clouds[j]
 	if cj.Kind == CloudFire {
 		// RemoveCloud is used for cloud expiration, so when we have a
-		// could of fire, we replace it with a new cloud of fog
+		// could of fire, we replace it with a new normal cloud (smoke)
 		// instead.
 		t := g.Map.Terrain.At(cj.P)
 		if t == Foliage {
 			g.Map.Terrain.Set(cj.P, Floor)
 		}
-		cj.Kind = CloudFog
+		cj.Kind = CloudNormal
 		cj.Duration = g.fireCloudDuration()
 		cg.Clouds[j] = cj
 		return
@@ -224,6 +224,11 @@ func (g *Game) UpdateClouds() {
 			}
 		}
 	}
+}
+
+// CloudAt adds a normal cloud (steam, dust, smoke) at the given position.
+func (g *Game) CloudAt(p gruid.Point, d int) {
+	g.AddCloud(Cloud{Kind: CloudNormal, P: p, Duration: d})
 }
 
 // FireCloudAt adds a fire cloud at the given position.
