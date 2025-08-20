@@ -332,7 +332,7 @@ var statusAdjective = []string{
 	StatusFear:          "afraid",
 	StatusFire:          "on flame",
 	StatusFocus:         "focusing",
-	StatusFoggySkin:     "smoky",
+	StatusFoggySkin:     "foggy",
 	StatusImbalance:     "imbalanced",
 	StatusLignification: "lignified",
 	StatusPoison:        "poisoned",

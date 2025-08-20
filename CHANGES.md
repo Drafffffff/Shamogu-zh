@@ -36,6 +36,9 @@
   providing a limited means of wall destruction for non-Boar players. Make
   explosions produce dust or smoke clouds. Also, slightly increase Fire
   duration from firebreath pepper.
+* Allow use of “berserking flower” while berserk (prolonging the effect, but
+  granting the debuff) or “lignification fruit” while lignified. Generally, we
+  don't want to prevent eating artificially.
 * Improve “poison cloud” ability of the Venomous Viper spirit so that the
   poison clouds are created *up to two free tiles away* (before a monster or
   obstacle). This creates more varied possibilities for tactical movement,

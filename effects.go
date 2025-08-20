@@ -62,10 +62,6 @@ type EffectAmbrosiaBerries struct{}
 
 func (eff EffectAmbrosiaBerries) Apply(g *Game) bool {
 	pa := g.PlayerActor()
-	if pa.HP == pa.GetMaxHP() && pa.Has(StatusConfusion) {
-		g.Log("You’re already confused and at full health.")
-		return false
-	}
 	g.eatMsg("ambrosia berries", HealAmbrosia)
 	g.AdjustHP(PlayerID, pa, HealAmbrosia)
 	if g.IntN(2) == 0 {
@@ -85,11 +81,14 @@ type EffectBerserkingFlower struct{}
 
 func (eff EffectBerserkingFlower) Apply(g *Game) bool {
 	pa := g.PlayerActor()
-	if pa.Has(StatusBerserk) {
-		g.Log("You’re already berserk.")
-		return false
-	}
 	g.eatMsg("berserking flower", 0)
+	if pa.Has(StatusBerserk) {
+		// The berserking flower can be used to prolong berserk
+		// duration, but you'll still get the Poison debuff.
+		pa.Statuses[StatusBerserk] = 0
+		g.AdjustHP(PlayerID, pa, -pa.HPBonus())
+		g.PutStatus(PlayerID, pa, StatusPoison, DurationPoisonBerserk)
+	}
 	g.PutStatus(PlayerID, pa, StatusBerserk, DurationBerserk)
 	return true
 }
@@ -103,15 +102,22 @@ type EffectLignificationFruit struct{}
 
 func (eff EffectLignificationFruit) Apply(g *Game) bool {
 	pa := g.PlayerActor()
-	if pa.Has(StatusLignification) {
-		g.Log("You’re already lignified.")
-		return false
-	}
 	if pa.Has(StatusFoggySkin) {
-		g.Log("You cannot lignify yourself while smoky.")
+		// NOTE: not being able to eat a lignification fruit while
+		// foggy is the only eating restriction currently. The
+		// restriction should maybe be removed, but it might be
+		// disappointing if nothing happens and, at the same time, it
+		// feels that you shouldn't be able to cancel foggy skin, so
+		// I'm not sure what the effect would be.
+		g.Log("You cannot lignify yourself while foggy.")
 		return false
 	}
 	g.eatMsg("lignification fruit", 0)
+	if pa.Has(StatusLignification) {
+		// If already lignified, cancel previous effects.
+		pa.Statuses[StatusLignification] = 0
+		g.AdjustHP(PlayerID, pa, -pa.HPBonus())
+	}
 	g.PutStatus(PlayerID, pa, StatusLignification, DurationLignification)
 	return true
 }
@@ -154,10 +160,6 @@ type EffectFoggySkinOnion struct{ Beam bool }
 
 func (eff EffectFoggySkinOnion) Apply(g *Game) bool {
 	pa := g.PlayerActor()
-	if pa.Has(StatusFoggySkin) {
-		g.Log("Your skin is already smoky.")
-		return false
-	}
 	g.eatMsg("foggy-skin onion", HealFoggySkinOnion)
 	g.AdjustHP(PlayerID, pa, HealFoggySkinOnion)
 	g.PutStatus(PlayerID, pa, StatusFoggySkin, DurationFoggySkin)
@@ -208,12 +210,12 @@ type EffectTeleportMushroom struct{}
 
 func (eff EffectTeleportMushroom) Apply(g *Game) bool {
 	pa := g.PlayerActor()
-	if !g.TeleportActor(PlayerID, pa) {
-		g.Log("You cannot teleport while lignified.")
-		return false
-	}
 	g.eatMsg("teleport mushroom", 0)
-	g.teleportStatuses(PlayerID, pa)
+	if g.TeleportActor(PlayerID, pa) {
+		g.teleportStatuses(PlayerID, pa)
+	} else {
+		g.Log("You resist teleport while lignified.")
+	}
 	if i, _ := g.Spirit(); i >= 0 {
 		if ei := g.Entity(i); paths.DistanceManhattan(ei.P, g.PP()) < 4*MaxFOVRange {
 			g.SenseEntity(ei, "sense")
