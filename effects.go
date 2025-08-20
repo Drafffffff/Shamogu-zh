@@ -347,32 +347,18 @@ func (eff EffectPushingGale) Apply(g *Game) bool {
 	pp := g.PP()
 	g.Log("A strong gale pushes the air away from you.")
 	g.MakeNoise(pp, NoiseWind)
-	for _, dir := range directions {
+	g.RemoveCloudAt(pp)
+	for _, dir := range Directions {
 		g.pushingGale(pp, dir)
 	}
 	return true
 }
 
-func (eff EffectPushingGale) Name() string {
-	return "pushing gale"
-}
-
-func (eff EffectPushingGale) Desc() string {
-	return fmt.Sprintf("Hurt foes in the four cardinal directions for 1-2 damage, pushing them away and leaving them @Ounbalanced@N for %d turns.",
-		DurationImbalanceGale)
-}
-
-var directions = []gruid.Point{
-	{1, 0},
-	{0, -1},
-	{-1, 0},
-	{0, 1},
-}
-
 func (g *Game) pushingGale(from, dir gruid.Point) {
-	const maxdist = MaxFOVRange - 1
+	const maxdist = MaxFOVRange
 	at := from
 	for n, p := 0, at.Add(dir); n < maxdist && g.Map.Passable(p); p = p.Add(dir) {
+		g.RemoveCloudAt(p)
 		at = p
 		n++
 	}
@@ -402,6 +388,15 @@ func (g *Game) pushingGale(from, dir gruid.Point) {
 			g.md.MoveAnimation(from, to)
 		}
 	}
+}
+
+func (eff EffectPushingGale) Name() string {
+	return "pushing gale"
+}
+
+func (eff EffectPushingGale) Desc() string {
+	return fmt.Sprintf("Hurt foes in the four cardinal directions for 1-2 damage, pushing them away and leaving them @Ounbalanced@N for %d turns. Dissipates clouds.",
+		DurationImbalanceGale)
 }
 
 type EffectTimeStop struct{}

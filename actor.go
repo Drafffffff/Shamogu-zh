@@ -639,7 +639,7 @@ func (g *Game) handleCornered(i ID, ai *Actor) {
 	if !g.InFOV(from) {
 		return
 	}
-	for _, dir := range directions {
+	for _, dir := range Directions {
 		p := from.Add(dir)
 		if !inMap(p) {
 			continue

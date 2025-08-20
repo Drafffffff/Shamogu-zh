@@ -91,7 +91,7 @@ var primarySpirits = []spiritInfo{
 		Name:        "Wind Fox",
 		MaxCharges:  [2]int{2, 4},
 		Ability:     [2]Ability{EffectPushingGale{}, EffectPushingGale{}},
-		BonusTraits: [2]Traits{PatternRanged, PatternRangedRecoil}},
+		BonusTraits: [2]Traits{PatternRangedRecoil, PatternRangedRecoil}},
 	{
 		Name:        "Temporal Cat",
 		MaxCharges:  [2]int{2, 3},

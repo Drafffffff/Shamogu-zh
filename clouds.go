@@ -184,6 +184,15 @@ func (g *Game) RemoveCloud(j int) {
 	cg.removeCloud(j)
 }
 
+// RemoveCloudAt removes any cloud at the given (valid) position.
+func (g *Game) RemoveCloudAt(p gruid.Point) {
+	cg := g.Map.Clouds
+	i := point2idx(p)
+	if j := cg.Grid[i]; j >= 0 {
+		g.RemoveCloud(j)
+	}
+}
+
 // fireCloudDuration returns the typical duration of a fire cloud.
 func (g *Game) fireCloudDuration() int {
 	return 6 + g.IntN(7)

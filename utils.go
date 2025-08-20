@@ -6,6 +6,14 @@ import (
 	"codeberg.org/anaseto/gruid"
 )
 
+// Directions contains the four cardinal directions.
+var Directions = []gruid.Point{
+	{1, 0},
+	{0, -1},
+	{-1, 0},
+	{0, 1},
+}
+
 // toDir normalizes each coordinate.
 func toDir(p gruid.Point) gruid.Point {
 	if p.X != 0 {
