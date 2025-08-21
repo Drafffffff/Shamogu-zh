@@ -135,18 +135,11 @@ func (eff EffectClarityLeaves) Apply(g *Game) bool {
 	g.AdjustHP(PlayerID, pa, HealClarityLeaves)
 	g.RemoveStatus(PlayerID, pa, StatusConfusion)
 	pp := g.PP()
-	sense := false
 	for i := range g.Monsters() {
 		ei := g.Entity(i)
 		if paths.DistanceManhattan(ei.P, pp) < 3*MaxFOVRange {
-			if ei.KnownP != ei.P {
-				sense = true
-			}
-			ei.KnownP = ei.P
+			g.SenseEntity(ei, "sense")
 		}
-	}
-	if sense {
-		g.Log("You sensed some monsters.")
 	}
 	return true
 }
