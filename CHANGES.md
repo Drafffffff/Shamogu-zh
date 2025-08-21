@@ -39,11 +39,11 @@
 * Allow use of “berserking flower” while berserk (prolonging the effect, but
   granting the debuff) or “lignification fruit” while lignified. Generally, we
   don't want to prevent eating artificially.
-* Make “recoil” and “pushing gale” dissipate clouds, providing the first cloud
-  dissipating source but also, more importantly, making recoil less dangerous
-  for the player. Also, make “recoil” active even with the non-upgraded Wind
-  Fox (pushing is active on the non-upgraded Rampaging Boar, so having recoil
-  only on upgraded Wind Fox seemed a bit strange).
+* Make “pushing gale” dissipate clouds, providing the first cloud
+  dissipating source which, due to “recoil”, can be quite useful for Wind Fox
+  players. Also, make “recoil” active even with the non-upgraded Wind Fox
+  (pushing is active on the non-upgraded Rampaging Boar, so having recoil only
+  on upgraded Wind Fox seemed a bit strange).
 * Improve “poison cloud” ability of the Venomous Viper spirit so that the
   poison clouds are created *up to two free tiles away* (before a monster or
   obstacle). This creates more varied possibilities for tactical movement,

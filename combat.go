@@ -590,7 +590,7 @@ func (g *Game) swapSpaceDistortion(i, j ID, ai, aj *Actor, dmg int, dazed bool) 
 }
 
 // recoil handles extra recoil effects for actors with the PatternRangedRecoil
-// trait. Any clouds on the recoil path dissipate.
+// trait.
 func (g *Game) recoil(i, j ID, ai *Actor) bool {
 	ei, ej := g.Entity(i), g.Entity(j)
 	dir := toDir(ei.P.Sub(ej.P))
@@ -601,13 +601,11 @@ func (g *Game) recoil(i, j ID, ai *Actor) bool {
 	if i, _ := g.ActorAt(npi); i >= 0 {
 		return false
 	}
-	g.RemoveCloudAt(npi)
 	if paths.DistanceManhattan(ei.P, ej.P) == 1 {
 		p := npi.Add(dir)
 		if g.Map.Passable(p) {
 			if i, _ := g.ActorAt(p); i < 0 {
 				npi = p
-				g.RemoveCloudAt(p)
 			}
 		}
 	}
