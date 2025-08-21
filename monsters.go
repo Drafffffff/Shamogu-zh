@@ -271,7 +271,8 @@ func (g *Game) HungryHunt(from gruid.Point) bool {
 }
 
 // RandomPassableWithin returns a random free passable point within a maximal
-// path distance maxdist from the given point.
+// path distance maxdist from the given point, with some bias toward the origin
+// point.
 func (g *Game) RandomPassableWithin(from gruid.Point, maxdist int) gruid.Point {
 	dij := &MapPath{passable: g.Map.Passable}
 	nodes := g.PR.BreadthFirstMap(dij, []gruid.Point{from}, maxdist)
@@ -279,7 +280,12 @@ func (g *Game) RandomPassableWithin(from gruid.Point, maxdist int) gruid.Point {
 		// Should not happen.
 		return from
 	}
-	return nodes[g.IntN(len(nodes))].P
+	p := nodes[g.IntN(len(nodes))].P
+	q := nodes[g.IntN(len(nodes))].P
+	if paths.DistanceManhattan(from, p) > paths.DistanceManhattan(from, q) {
+		return q
+	}
+	return p
 }
 
 // RandomPassableNearbyTarget returns a random free passable point somewhat
