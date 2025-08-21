@@ -485,7 +485,7 @@ func (md *model) drawSpiritSelection() {
 	gdslice := md.gd.Slice(gruid.NewRange(0, spiritSelectionMargin, UIWidth, UIHeight))
 	gdslice.Copy(menugd)
 	md.desc.Draw(gdslice.Slice(gdslice.Range().Columns(UIWidth/2, UIWidth)))
-	ui.Textf("Shamanic Mountain Guardian - Shamogu v%s", Version).WithStyle(gruid.Style{}.WithFg(ColorMagenta)).
+	ui.Textf("Shamanic Mountain Guardian - Shamogu %s", Version).WithStyle(gruid.Style{}.WithFg(ColorMagenta)).
 		Draw(md.gd.Slice(gruid.NewRange(-25+UIWidth/2, 3, UIWidth, UIHeight)))
 	ui.Text(`All life in your mountain is being corrupted. Beasts are losing their mind and ` +
 		`becoming aggressive. These disturbing events started to happen after a dungeon portal suddenly ` +
@@ -496,7 +496,7 @@ func (md *model) drawSpiritSelection() {
 }
 
 func (md *model) drawLoadGameScreen() {
-	ui.Textf("Shamanic Mountain Guardian - Shamogu v%s", Version).WithStyle(gruid.Style{}.WithFg(ColorMagenta)).
+	ui.Textf("Shamanic Mountain Guardian - Shamogu %s", Version).WithStyle(gruid.Style{}.WithFg(ColorMagenta)).
 		Draw(md.gd.Slice(gruid.NewRange(-25+UIWidth/2, 5, UIWidth, UIHeight)))
 	ui.Text("—Press any key to load saved game—").
 		Draw(md.gd.Slice(gruid.NewRange(-22+UIWidth/2, 18, UIWidth, UIHeight)))

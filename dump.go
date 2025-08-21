@@ -5,6 +5,8 @@ import (
 	"maps"
 	"slices"
 	"strings"
+
+	"runtime/debug"
 )
 
 // Stats gathers various game statistics from a run.
@@ -80,7 +82,14 @@ func (g *Game) LevelStats() {
 // of the game.
 func (g *Game) DumpSummary() string {
 	var sb strings.Builder
-	fmt.Fprintf(&sb, " ♣ Shamogu v%s Game Summary ♣\n\n", Version)
+	var version string
+	info, ok := debug.ReadBuildInfo()
+	if ok {
+		version = info.Main.Version
+	} else {
+		version = Version
+	}
+	fmt.Fprintf(&sb, " ♣ Game Summary (Shamogu %s) ♣\n\n", version)
 	if g.Wizard.Mode != WizardNone {
 		fmt.Fprintf(&sb, "ENABLED WIZARD MODE (%d %s",
 			g.Wizard.Resurrections, Countable("resurrection", g.Wizard.Resurrections))

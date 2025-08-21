@@ -7,8 +7,8 @@ import (
 	"codeberg.org/anaseto/gruid/paths"
 )
 
-// Version is the game's version string.
-const Version = "1.0.0-beta.1"
+// Version is the game's version string of the last release.
+const Version = "v1.0.0-beta.1"
 
 // InvalidPos is a special variable containing an invalid position.
 var InvalidPos = gruid.Point{-1, -1}

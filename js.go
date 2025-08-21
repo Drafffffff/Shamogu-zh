@@ -120,7 +120,7 @@ func (md *mainMenu) Update(msg gruid.Msg) gruid.Effect {
 
 func (md *mainMenu) Draw() gruid.Grid {
 	md.gd.Fill(gruid.Cell{Rune: ' '})
-	ui.Textf("Shamanic Mountain Guardian - Shamogu v%s", Version).WithStyle(gruid.Style{}.WithFg(ColorMagenta)).
+	ui.Textf("Shamanic Mountain Guardian - Shamogu %s", Version).WithStyle(gruid.Style{}.WithFg(ColorMagenta)).
 		Draw(md.gd.Slice(gruid.NewRange(-25+UIWidth/2, 5, UIWidth, UIHeight)))
 	gd := md.gd.Slice(gruid.NewRange(-17+UIWidth/2, 7, UIWidth, UIHeight))
 	drawGamePicture(gd)
