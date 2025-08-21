@@ -213,7 +213,7 @@ func (g *Game) genItems(mg *MapGen) {
 		portal.P = mg.RandomVaultsPlace(mg.vaults[len(mg.vaults)/2:], PlaceStatic)
 		g.Map.Portal = portal.P
 		g.AddEntity(portal)
-		if g.ProcInfo.FakePortal == g.Map.Level {
+		if g.ProcInfo.FakePortal[g.Map.Level-1] {
 			portal := &Entity{Name: "magic portal", Rune: '>', Role: &Portal{Fake: true}}
 			portal.P = mg.RandomVaultsPlace(mg.vaults[len(mg.vaults)/2:], PlaceStatic)
 			g.AddEntity(portal)

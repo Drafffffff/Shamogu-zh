@@ -4,11 +4,12 @@ package main
 const MapLevels = 9
 
 // ProcInfo contains information for procedural generation, like which items
-// were already generated, and so on.
+// were already generated, and so on. Note that slices indexed by map level
+// start from zero (for map level 1).
 type ProcInfo struct {
 	Layouts          []MapLayout // map layouts
 	Earthquake       int         // level with extra rubble
-	FakePortal       int         // level with fake portal
+	FakePortal       []bool      // levels with fake portal
 	GuardianTotem    int         // level with early totem guardian
 	GuardianPortal   int         // level with mid portal guardian
 	WanderingUnique1 int         // level with walking mushroom
@@ -61,7 +62,19 @@ func (g *Game) layoutsProcGen() {
 func (g *Game) flavoursProcGen() {
 	gpi := g.ProcInfo
 	gpi.Earthquake = 2 + g.IntN(MapLevels-1)
-	gpi.FakePortal = 2 + g.IntN(MapLevels-2)
+	gpi.FakePortal = make([]bool, MapLevels)
+	nfakes := 1 // at least one fake portal per game
+	if g.IntN(4) > 0 {
+		nfakes++
+	}
+	if g.IntN(10) == 0 {
+		nfakes++
+	}
+	for range nfakes {
+		// Chose random level in 2..8 (included) for malfunctioning
+		// portal.
+		gpi.FakePortal[1+g.IntN(7)] = true
+	}
 	for {
 		gpi.GuardianTotem = 3 + g.IntN(3)
 		if gpi.Spirits[gpi.GuardianTotem-1] >= 0 {
@@ -85,10 +98,8 @@ func (g *Game) flavoursProcGen() {
 	case 0:
 		gpi.Earthquake = 0
 	case 1:
-		gpi.FakePortal = 0
-	case 2:
 		gpi.WanderingUnique1 = 0
-	case 3:
+	case 2:
 		gpi.WanderingUnique2 = 0
 	}
 }
