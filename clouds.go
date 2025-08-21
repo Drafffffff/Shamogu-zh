@@ -160,22 +160,20 @@ func (cg *CloudGrid) removeCloud(j int) {
 	cg.Clouds = cg.Clouds[:nl]
 }
 
-// RemoveCloud removes a cloud at a given index.
-func (g *Game) RemoveCloud(j int) {
+// EndCloud ends a cloud at a given index. It leaves smoke and destroys foliage
+// for fire clouds on foliage.
+func (g *Game) EndCloud(j int) {
 	cg := g.Map.Clouds
 	if j < 0 || j >= len(cg.Clouds) {
 		// Should not happen.
 		return
 	}
 	cj := cg.Clouds[j]
-	if cj.Kind == CloudFire {
-		// RemoveCloud is used for cloud expiration, so when we have a
-		// could of fire, we replace it with a new normal cloud (smoke)
-		// instead.
-		t := g.Map.Terrain.At(cj.P)
-		if t == Foliage {
-			g.Map.Terrain.Set(cj.P, Floor)
-		}
+	if cj.Kind == CloudFire && g.Map.Terrain.At(cj.P) == Foliage {
+		// EndCloud is used for cloud expiration, so when we have a
+		// cloud of fire on foliage, we replace it with a new normal
+		// cloud (smoke) instead and remove the foliage.
+		g.Map.Terrain.Set(cj.P, Floor)
 		cj.Kind = CloudNormal
 		cj.Duration = 4 + g.IntN(5)
 		cg.Clouds[j] = cj
@@ -189,7 +187,7 @@ func (g *Game) RemoveCloudAt(p gruid.Point) {
 	cg := g.Map.Clouds
 	i := point2idx(p)
 	if j := cg.Grid[i]; j >= 0 {
-		g.RemoveCloud(j)
+		cg.removeCloud(j)
 	}
 }
 
@@ -211,7 +209,7 @@ func (g *Game) UpdateClouds() {
 		cl := &cg.Clouds[i]
 		cl.Duration--
 		if cl.Duration <= 0 {
-			g.RemoveCloud(i)
+			g.EndCloud(i)
 		} else {
 			i++
 		}

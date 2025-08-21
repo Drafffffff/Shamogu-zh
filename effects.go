@@ -347,7 +347,6 @@ func (eff EffectPushingGale) Apply(g *Game) bool {
 	pp := g.PP()
 	g.Log("A strong gale pushes the air away from you.")
 	g.MakeNoise(pp, NoiseWind)
-	g.RemoveCloudAt(pp)
 	for _, dir := range Directions {
 		g.pushingGale(pp, dir)
 	}
@@ -358,7 +357,7 @@ func (g *Game) pushingGale(from, dir gruid.Point) {
 	const maxdist = MaxFOVRange
 	at := from
 	for n, p := 0, at.Add(dir); n < maxdist && g.Map.Passable(p); p = p.Add(dir) {
-		g.RemoveCloudAt(p)
+		g.blowClouds(p, dir)
 		at = p
 		n++
 	}
@@ -387,6 +386,19 @@ func (g *Game) pushingGale(from, dir gruid.Point) {
 			g.MoveActor(i, ai, to)
 			g.md.MoveAnimation(from, to)
 		}
+	}
+}
+
+func (g *Game) blowClouds(p, dir gruid.Point) {
+	if g.Map.Terrain.At(p) != Foliage || g.Map.Clouds.At(p).Kind != CloudFire {
+		// The strong gale dissipates the cloud (except if it's a fire
+		// cloud on a dense foliage cell).
+		g.RemoveCloudAt(p)
+		return
+	}
+	if p = p.Add(dir); g.Map.Burnable(p) && !g.FireAt(p) {
+		// Make fire on foliage propagate in the given direction.
+		g.FireCloudAt(p)
 	}
 }
 

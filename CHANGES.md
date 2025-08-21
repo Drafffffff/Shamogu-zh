@@ -41,9 +41,11 @@
   don't want to prevent eating artificially.
 * Make “pushing gale” dissipate clouds, providing the first cloud
   dissipating source which, due to “recoil”, can be quite useful for Wind Fox
-  players. Also, make “recoil” active even with the non-upgraded Wind Fox
-  (pushing is active on the non-upgraded Rampaging Boar, so having recoil only
-  on upgraded Wind Fox seemed a bit strange).
+  players. Also, as a special interaction, “pushing gale” propagates fire
+  clouds on foliage tiles instead of dissipating them.
+* Make “recoil” active even with the non-upgraded Wind Fox (pushing is active
+  on the non-upgraded Rampaging Boar, so having recoil only on upgraded Wind
+  Fox seemed a bit strange).
 * Improve “poison cloud” ability of the Venomous Viper spirit so that the
   poison clouds are created *up to two free tiles away* (before a monster or
   obstacle). This creates more varied possibilities for tactical movement,
