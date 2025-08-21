@@ -134,8 +134,12 @@ func (md *model) drawWin(gd gruid.Grid) {
 
 func (md *model) drawMap(gd gruid.Grid) {
 	g := md.g
-	if g.Wizard.Mode != WizardNone && g.Wizard.Mode != WizardNormal {
-		md.drawMapWizard(gd)
+	switch g.Wizard.Mode {
+	case WizardReveal:
+		md.drawMapWizardReveal(gd)
+		return
+	case WizardRevealTerrain:
+		md.drawMapWizardRevealTerrain(gd)
 		return
 	}
 	// Terrain drawing.
@@ -200,7 +204,7 @@ func (g *Game) sortedIDsByRenderOrder() []ID {
 	return sortedIDs
 }
 
-func (md *model) drawMapWizard(gd gruid.Grid) {
+func (md *model) drawMapWizardReveal(gd gruid.Grid) {
 	g := md.g
 	// Terrain drawing.
 	for p, t := range g.Map.Terrain.All() {
@@ -210,15 +214,13 @@ func (md *model) drawMapWizard(gd gruid.Grid) {
 		}
 		g.drawTerrainRuneAt(gd, r, p)
 	}
-	if g.Wizard.Mode != WizardMap {
-		for _, cl := range g.Map.Clouds.Clouds {
-			drawCloud(gd, cl)
-		}
+	for _, cl := range g.Map.Clouds.Clouds {
+		drawCloud(gd, cl)
 	}
 	// Entity drawing (with rendering order).
 	sortedIDs := g.sortedIDsByRenderOrder()
 	for _, i := range sortedIDs {
-		if o := g.RenderOrder(i); o == RONone || g.Wizard.Mode == WizardMap && o != ROItem {
+		if o := g.RenderOrder(i); o == RONone {
 			continue
 		}
 		e := md.g.Entity(i)
@@ -226,6 +228,38 @@ func (md *model) drawMapWizard(gd gruid.Grid) {
 	}
 	// Travel path highlighting.
 	md.drawTravelPath(gd)
+}
+
+func (md *model) drawMapWizardRevealTerrain(gd gruid.Grid) {
+	g := md.g
+	// Terrain drawing.
+	for p, t := range g.Map.Terrain.All() {
+		r := MapRune(t)
+		if (r == '#' || r == '◊') && !g.Map.PassableNeighbor(p) {
+			r = ' '
+		}
+		g.drawTerrainRuneAt(gd, r, p)
+	}
+	// Entity drawing (with rendering order).
+	sortedIDs := g.sortedIDsByRenderOrder()
+	for _, i := range sortedIDs {
+		if g.RenderOrder(i) != ROItem {
+			continue
+		}
+		e := md.g.Entity(i)
+		g.drawEntityAt(gd, e, e.P)
+	}
+	it := gd.Iterator()
+	for it.Next() {
+		c := it.Cell()
+		if c.Style.Fg == ColorForegroundSecondary {
+			c.Style.Fg = ColorForeground
+		}
+		if c.Style.Bg == ColorBackgroundSecondary {
+			c.Style.Bg = ColorBackground
+		}
+		it.SetCell(c)
+	}
 }
 
 func (g *Game) drawTerrainRuneAt(gd gruid.Grid, r rune, p gruid.Point) {

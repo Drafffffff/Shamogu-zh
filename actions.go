@@ -1182,10 +1182,10 @@ type Wizard struct {
 type WizardMode int
 
 const (
-	WizardNone   WizardMode = iota
-	WizardNormal            // non-permadeath mode with normal visibility
-	WizardMap               // reveal map (without monsters)
-	WizardSeeAll            // reveal map and monsters
+	WizardNone          WizardMode = iota
+	WizardNormal                   // non-permadeath mode with normal visibility
+	WizardReveal                   // reveal map and monsters
+	WizardRevealTerrain            // reveal map (without monsters)
 )
 
 // ActionWizard enters wizard-mode confirmation. When already in wizard mode,
@@ -1203,11 +1203,11 @@ func (a ActionWizard) Handle(md *model) (gruid.Effect, bool) {
 			md.g.LogStyled("Do you really want extra cheats? (reveal map) [y/N]", logConfirm)
 			md.mode = modeWizardConfirmation
 		} else {
-			md.g.Wizard.Mode = WizardMap
+			md.g.Wizard.Mode = WizardReveal
 		}
-	case WizardMap:
-		md.g.Wizard.Mode = WizardSeeAll
-	case WizardSeeAll:
+	case WizardReveal:
+		md.g.Wizard.Mode = WizardRevealTerrain
+	case WizardRevealTerrain:
 		md.g.Wizard.Mode = WizardNormal
 	}
 	return nil, false
@@ -1231,7 +1231,7 @@ func (a ActionWizardConfirm) Handle(md *model) (gruid.Effect, bool) {
 			md.g.StoryLog("Entered Wizard Mode")
 		} else {
 			md.g.Wizard.Extra = true
-			md.g.Wizard.Mode = WizardMap
+			md.g.Wizard.Mode = WizardReveal
 			md.g.StoryLog("Enabled extra Wizard Mode cheats!")
 		}
 		md.mode = modeNormal
