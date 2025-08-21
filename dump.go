@@ -89,7 +89,7 @@ func (g *Game) DumpSummary() string {
 	} else {
 		version = Version
 	}
-	fmt.Fprintf(&sb, " ♣ Game Summary (Shamogu %s) ♣\n\n", version)
+	fmt.Fprintf(&sb, " ♣ Game Summary — Shamogu %s ♣\n\n", version)
 	if g.Wizard.Mode != WizardNone {
 		fmt.Fprintf(&sb, "ENABLED WIZARD MODE (%d %s",
 			g.Wizard.Resurrections, Countable("resurrection", g.Wizard.Resurrections))
