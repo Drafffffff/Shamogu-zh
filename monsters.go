@@ -34,10 +34,10 @@ func (g *Game) HandleMonsterTurn(i ID, ai *Actor) {
 		}
 		from, maxdist := ei.P, unreachable
 		if beh.Guard != InvalidPos {
-			maxdist = MaxFOVRange - 2
+			maxdist = MaxFOVRange - 1
 			from = beh.Guard
 		} else if beh.State == Hunting {
-			maxdist = (3 * MaxFOVRange) / 2
+			maxdist = MaxFOVRange + 5
 		}
 		if maxdist < unreachable {
 			beh.Target = g.RandomPassableWithin(from, maxdist)
