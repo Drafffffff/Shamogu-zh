@@ -761,9 +761,9 @@ func equipItem(md *model, i ID) bool {
 		r = nextRuneKey(r)
 	}
 	if spirit && from == to {
-		// XXX: if all spirit slots are maximally upgraded, give
-		// instead a special bonus? Maybe not worth it (only one extra
-		// totem currently).
+		// NOTE: At some point I considered providing another kind of
+		// benefit when all spirits were already upgraded, but I
+		// decided against it to not encourage perfectionism.
 		g.Log("No spirit upgrades or new slots available.")
 		return false
 	}
