@@ -1602,11 +1602,11 @@ func itemHelpText() string {
 	return strings.TrimSpace(`
 @CComestibles@N are found in every level. When the player is over them, pressing the @MInteract @MKey@N(e) allows to pick them. When your inventory is full, you’ll have to pick a comestible to leave on the ground before picking a new one.  Opening the @MInventory@N(i) allows to eat an equipped comestible or any comestible on the ground.
 
-@CTotems@N are found on some levels. By pressing the @MInteract @MKey@N(e), their spirit may either be chosen as a new secondary spirit or used to upgrade one of your existing spirits. Opening the @MInventory@N(i) allows then to use your chosen spirits. Beware that monsters that see you chosing a spirit will go berserk.
+@CTotems@N are found on some levels. By pressing the @MInteract @MKey@N(e), their spirit may either be chosen as a new secondary spirit or used to upgrade one of your existing spirits. Opening the @MInventory@N(i) allows then to use your chosen spirits. Beware that monsters that see you chosing a spirit will go berserk!
 
 @CMenhirs@N are static items found on map levels. Pressing the @MInteract @MKey@N(e) will activate them, producing specific effects.
 
-@CPortals@N are static items found once on each map level, rarely twice.  Pressing the @MInteract @MKey@N(e) will make you reach the next map level. When doing so, spirit charges and HP are restored.
+@CPortals@N are static items found once on each map level, rarely twice.  Pressing the @MInteract @MKey@N(e) will make you reach the next map level. When doing so, spirit charges and HP are restored. Occasionally, you’ll come across a malfunctioning portal whose activation will frighten nearby monsters.
 `)
 }
 
