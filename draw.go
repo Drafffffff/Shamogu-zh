@@ -161,10 +161,21 @@ func (md *model) drawMap(gd gruid.Grid) {
 		return cmp.Compare(g.RenderOrder(i), g.RenderOrder(j))
 	})
 	for _, i := range SortedIDs {
-		if g.RenderOrder(i) == RONone {
+		o := g.RenderOrder(i)
+		if o == RONone {
 			continue
 		}
 		e := md.g.Entity(i)
+		if o == ROItem && g.CloudAt(e.P) {
+			// Favor clouds over items, but in case of normal
+			// clouds, show the color of the item.
+			if g.Map.Clouds.At(e.P).Kind == CloudNormal {
+				c := gd.At(e.P)
+				c.Style.Fg = e.Color()
+				gd.Set(e.P, c)
+			}
+			continue
+		}
 		if e.Noise && !g.InFOV(e.P) {
 			c := gd.At(e.P)
 			c.Rune = '♫'
@@ -220,10 +231,21 @@ func (md *model) drawMapWizardReveal(gd gruid.Grid) {
 	// Entity drawing (with rendering order).
 	sortedIDs := g.sortedIDsByRenderOrder()
 	for _, i := range sortedIDs {
-		if o := g.RenderOrder(i); o == RONone {
+		o := g.RenderOrder(i)
+		if o == RONone {
 			continue
 		}
 		e := md.g.Entity(i)
+		if o == ROItem && g.CloudAt(e.P) {
+			// Favor clouds over items, but in case of normal
+			// clouds, show the color of the item.
+			if g.Map.Clouds.At(e.P).Kind == CloudNormal {
+				c := gd.At(e.P)
+				c.Style.Fg = e.Color()
+				gd.Set(e.P, c)
+			}
+			continue
+		}
 		g.drawEntityAt(gd, e, e.P)
 	}
 	// Travel path highlighting.

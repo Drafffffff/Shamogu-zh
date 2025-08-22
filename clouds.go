@@ -233,8 +233,8 @@ func (g *Game) UpdateClouds() {
 	}
 }
 
-// CloudAt adds a normal cloud (steam, dust, smoke) at the given position.
-func (g *Game) CloudAt(p gruid.Point, d int) {
+// NormalCloudAt adds a normal cloud (steam, dust, smoke) at the given position.
+func (g *Game) NormalCloudAt(p gruid.Point, d int) {
 	g.AddCloud(Cloud{Kind: CloudNormal, P: p, Duration: d})
 }
 
@@ -251,6 +251,11 @@ func (g *Game) PoisonCloudAt(p gruid.Point) {
 // FireAt reports whether there's a fire at the given position.
 func (g *Game) FireAt(p gruid.Point) bool {
 	return g.Map.Clouds.At(p).Kind == CloudFire
+}
+
+// FireAt reports whether there's a fire at the given position.
+func (g *Game) CloudAt(p gruid.Point) bool {
+	return g.Map.Clouds.At(p).Kind != NoCloud
 }
 
 // InflictFireDamage inflicts fire damage to an actor.

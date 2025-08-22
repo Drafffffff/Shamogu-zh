@@ -175,7 +175,7 @@ func (g *Game) BumpMoveActor(i ID, ai *Actor, to gruid.Point) {
 	}
 	p := g.Entity(i).P
 	if ai.DoesAny(TrailingCloud) && g.Map.Terrain.At(p) == Floor {
-		g.CloudAt(p, 2)
+		g.NormalCloudAt(p, 2)
 	}
 	if ai.DoesAny(MonsDig) {
 		// Monsters that dig may attempt moving into walls, so they

@@ -221,7 +221,7 @@ func (g *Game) ExplosionAt(at gruid.Point) {
 			g.FireCloudAt(q)
 		} else {
 			g.dig(q)
-			g.CloudAt(q, 2+g.IntN(3))
+			g.NormalCloudAt(q, 2+g.IntN(3))
 		}
 		if j, aj := g.ActorAt(q); j >= 0 {
 			g.PutStatus(j, aj, StatusFire, DurationFire)

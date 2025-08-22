@@ -625,7 +625,7 @@ func (g *Game) exudeFog(i ID) {
 			// player-only).
 			continue
 		}
-		g.CloudAt(q, 2+g.IntN(3))
+		g.NormalCloudAt(q, 2+g.IntN(3))
 	}
 }
 

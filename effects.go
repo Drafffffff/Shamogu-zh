@@ -190,7 +190,7 @@ func (eff EffectFirebreathPepper) Apply(g *Game) bool {
 		}
 	}
 	// Leave cloud at the last tile if passable.
-	g.CloudAt(p, 2+g.IntN(3))
+	g.NormalCloudAt(p, 2+g.IntN(3))
 	return true
 }
 
