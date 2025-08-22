@@ -18,7 +18,7 @@
   attracting nearby monsters. It avoids fighting similarly to afraid monsters.
 * New unique monster: **warping wraith**. Its hits teleport the player away.
   Alternates with noisy imp.
-* New portial guardian monster: **blazing golem**. A sturdy magical golem that
+* New portal guardian monster: **blazing golem**. A sturdy magical golem that
   explodes on death.
 * New totem guardian monster: **totem wasp**. Rampaging and venomous wasps that
   like to use totems as their nest.
