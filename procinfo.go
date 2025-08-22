@@ -86,9 +86,9 @@ func (g *Game) flavoursProcGen() {
 			}
 		}
 	}
-	gpi.GuardianTotem1 = randTotemLevel(3, 3)
+	gpi.GuardianTotem1 = randTotemLevel(3, 4)
 	for gpi.GuardianTotem2 == 0 || gpi.GuardianTotem2 == gpi.GuardianTotem1 {
-		gpi.GuardianTotem2 = randTotemLevel(3, 5)
+		gpi.GuardianTotem2 = randTotemLevel(3, 4)
 	}
 	gpi.GuardianPortal2 = 6 + g.IntN(3)
 	for gpi.GuardianPortal1 == 0 || gpi.GuardianPortal1 == gpi.GuardianPortal2 {
