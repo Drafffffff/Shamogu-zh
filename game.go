@@ -145,6 +145,8 @@ func (g *Game) HandleTurnCount() {
 		g.LogStyled("You need to hurry to the portal!", logSpecial)
 	case 1000:
 		g.LogStyled("You've been found!", logSpecial)
+		g.genMonster(BlazingGolem)
+		g.genMonster(BlazingGolem)
 	}
 }
 
