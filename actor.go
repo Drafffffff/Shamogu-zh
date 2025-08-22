@@ -131,7 +131,7 @@ const (
 	GoodSmell        // smell food from a distance
 	Pushing          // pushing without unbalancing
 	PushingUnbalance // unbalancing pushing (like boar and earth-dragon)
-	TrailingCloud    // leave cloud behind after moving
+	TrailingCloud    // leave dust behind after moving (on floor tiles)
 	VenomousMelee    // (non-ranged) attacks may poison foes
 	WoodyLegs        // can move while lignified
 
