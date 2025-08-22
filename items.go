@@ -333,11 +333,10 @@ func (g *Game) NextLevel() {
 	// We return false because after generating a new level we don't want
 	// to end the turn. However, we still upgrade the turn counter, as it
 	// wouldn't be intuitive otherwise.
-	g.Stats.MapTurns[g.Map.Level-1]++
-	g.LevelStats()
+	g.IncrTurn()   // call before InitLevel
+	g.LevelStats() // call before InitLevel
 	clear(g.Map.Noise)
 	g.InitLevel()
-	g.Turn++
 	g.Logs.NextTick = g.Logs.Index
 	g.md.targ.CancelExamine()
 	g.LogStyled("You reached a new region through the portal.", logSpecial)

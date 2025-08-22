@@ -132,9 +132,28 @@ func (g *Game) EndTurn() {
 	g.UpdateFOV()
 	g.UpdateKnowledge()
 	g.ComputeNoise()
-	g.IncrTurn()
+	g.HandleTurnCount()
 }
 
+// HandleTurnCount() increments the turn count and handles watching.
+func (g *Game) HandleTurnCount() {
+	g.IncrTurn()
+	nmt := g.Stats.MapTurns[g.Map.Level-1]
+	switch nmt {
+	case 950:
+		g.LogStyled("You feel a presence searching for intruders.", logSpecial)
+		g.LogStyled("You need to hurry to the portal!", logSpecial)
+	case 1000:
+		g.LogStyled("You've been found!", logSpecial)
+	}
+}
+
+// Marked reports whether you've been found by the Orb of Corruption.
+func (g *Game) Marked() bool {
+	return g.Stats.MapTurns[g.Map.Level-1] >= 1000
+}
+
+// IncrTurn() increments the turn count.
 func (g *Game) IncrTurn() {
 	g.Turn++
 	g.Stats.MapTurns[g.Map.Level-1]++

@@ -27,7 +27,7 @@ func (g *Game) HandleMonsterTurn(i ID, ai *Actor) {
 	if beh.Target == ei.P || beh.Target == InvalidPos {
 		// The monster's target has either been reached or is invalid:
 		// we spend a turn chosing a new target.
-		if ai.DoesAny(MonsHungry) && g.HungryHunt(ei.P) {
+		if ai.DoesAny(MonsHungry) && g.HungryHunt(ei.P) || g.Marked() && beh.Guard == InvalidPos {
 			beh.Target = g.PP()
 			beh.State = Hunting
 			return
