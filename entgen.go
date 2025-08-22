@@ -407,7 +407,7 @@ func (g *Game) genMonsters() {
 		}
 	}
 	if g.ProcInfo.GuardianTotem2 == g.Map.Level {
-		nM--
+		nE--
 		g.genMonsterGuardian(TotemWasp, g.Map.Totem)
 		g.genMonsterGuardian(TotemWasp, g.Map.Totem)
 	}

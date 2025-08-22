@@ -91,7 +91,9 @@ func (g *Game) flavoursProcGen() {
 		gpi.GuardianTotem2 = randTotemLevel(3, 5)
 	}
 	gpi.GuardianPortal2 = 6 + g.IntN(3)
-	gpi.GuardianPortal1 = gpi.GuardianPortal2 - 1 - g.IntN(3)
+	for gpi.GuardianPortal1 == 0 || gpi.GuardianPortal1 == gpi.GuardianPortal2 {
+		gpi.GuardianPortal1 = 4 + g.IntN(4)
+	}
 	gpi.WanderingUnique1 = 4 + g.IntN(6)
 	gpi.WanderingUnique2 = 4 + g.IntN(6)
 	gpi.MonsEarly = g.IntN(4)
