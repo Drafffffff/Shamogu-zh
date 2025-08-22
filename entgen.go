@@ -41,7 +41,7 @@ func (g *Game) GenEntities(mg *MapGen) {
 // genPlayerOnNewLevel places the player in the map with replenished charges and HP.
 func (g *Game) genPlayerOnNewLevel(mg *MapGen) {
 	p := g.PlayerEntity()
-	p.P = mg.RandomVaultsPlace(mg.vaults[:len(mg.vaults)/3], PlaceWaypoint)
+	mg.pi, p.P = mg.RandomVaultsPlace(mg.vaults[:len(mg.vaults)/3], PlaceWaypoint)
 	if p.P == InvalidPos {
 		panic("invalid player position")
 	}
@@ -210,17 +210,17 @@ func (g *Game) genItems(mg *MapGen) {
 	// Portal.
 	if g.Map.Level < MapLevels {
 		portal := &Entity{Name: "magic portal", Rune: '>', Role: &Portal{}}
-		portal.P = mg.RandomVaultsPlace(mg.vaults[len(mg.vaults)/2:], PlaceStatic)
+		_, portal.P = mg.RandomVaultsPlace(mg.vaults[len(mg.vaults)/2:], PlaceStatic)
 		g.Map.Portal = portal.P
 		g.AddEntity(portal)
 		if g.ProcInfo.FakePortal[g.Map.Level-1] {
 			portal := &Entity{Name: "magic portal", Rune: '>', Role: &Portal{Fake: true}}
-			portal.P = mg.RandomVaultsPlace(mg.vaults[len(mg.vaults)/2:], PlaceStatic)
+			_, portal.P = mg.RandomVaultsPlace(mg.vaults[len(mg.vaults)/2:], PlaceStatic)
 			g.AddEntity(portal)
 		}
 	} else {
 		orb := &Entity{Name: "Orb of Corruption", Rune: '☼', Role: &CorruptionOrb{}}
-		orb.P = mg.RandomVaultsPlace(mg.vaults[(2*len(mg.vaults))/3:], PlaceStatic)
+		_, orb.P = mg.RandomVaultsPlace(mg.vaults[(2*len(mg.vaults))/3:], PlaceStatic)
 		g.Map.Orb = orb.P
 		g.AddEntity(orb)
 	}
@@ -237,7 +237,8 @@ func (g *Game) genItems(mg *MapGen) {
 		spr := sp.Role.(*Spirit)
 		spr.Charges = spr.MaxCharges[spr.Level]
 		sp.Rune = '!'
-		sp.P = mg.RandomPlace(PlaceItem)
+		tvaults := slices.Delete(slices.Clone(mg.vaults), mg.pi, mg.pi+1)
+		_, sp.P = mg.RandomVaultsPlace(tvaults, PlaceItem)
 		g.Map.Totem = sp.P
 		g.AddEntity(sp)
 	}

@@ -194,12 +194,13 @@ func (mg *MapGen) UnusedEntry(v *vault) int {
 
 // RandomPlace returns a random free place of the given kind (among all vaults).
 func (mg *MapGen) RandomPlace(kind placeKind) gruid.Point {
-	return mg.RandomVaultsPlace(mg.vaults, kind)
+	_, v := mg.RandomVaultsPlace(mg.vaults, kind)
+	return v
 }
 
 // RandomVaultsPlace returns a random free place of the given kind among given
 // vaults.
-func (mg *MapGen) RandomVaultsPlace(vs []*vault, kind placeKind) gruid.Point {
+func (mg *MapGen) RandomVaultsPlace(vs []*vault, kind placeKind) (int, gruid.Point) {
 	// We assume len(vs) > 0 and that there are remaining free places of
 	// that kind.
 	const maxIterations = 10000
@@ -209,9 +210,10 @@ func (mg *MapGen) RandomVaultsPlace(vs []*vault, kind placeKind) gruid.Point {
 		if count > maxIterations {
 			panic("infinite loop")
 		}
-		p := mg.RandomVaultPlace(vs[mg.rand.IntN(len(vs))], kind)
+		i := mg.rand.IntN(len(vs))
+		p := mg.RandomVaultPlace(vs[i], kind)
 		if p != InvalidPos {
-			return p
+			return i, p
 		}
 	}
 }

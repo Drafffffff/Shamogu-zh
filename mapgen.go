@@ -33,6 +33,7 @@ type MapGen struct {
 	vaults  []*vault        // list of special vaults
 	tunnel  CacheGrid[bool] // in tunnel
 	vault   CacheGrid[bool] // in vault
+	pi      int             // player's vault
 	PR      *paths.PathRange
 	rand    *rand.Rand
 }
