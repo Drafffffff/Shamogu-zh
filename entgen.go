@@ -290,6 +290,7 @@ const (
 	AcidMound monsterKind = iota
 	BarkingHound
 	BerserkingSpider
+	BlazingGolem
 	BlinkButterfly
 	BurningPhoenix
 	ConfusingEye
@@ -304,13 +305,14 @@ const (
 	MadOctopode
 	NoisyImp
 	RampagingBoar
-	TeleportingGhost
 	TemporalCat
 	ThunderPorcupine
+	TotemWasp
 	UndeadKnight
 	VenomousViper
 	WalkingMushroom
 	WalkingTree
+	WarpingWraith
 	WindFox
 )
 
@@ -320,6 +322,7 @@ var MonsData = []monsterInfo{
 	AcidMound:        {"acid mound", 'a', 2, 0, 5, MonsIgnoreDefense | MonsImmunityImbalance | MonsCreep},
 	BarkingHound:     {"barking hound", 'h', 3, 0, 4, MonsBarking | GoodHearing | MonsImmunityFear},
 	BerserkingSpider: {"berserking spider", 's', 2, 1, 3, MonsBerserking | MonsSilent},
+	BlazingGolem:     {"blazing golem", 'G', 3, 4, 4, MonsExplodingDeath | MonsImmunityFire | MonsImmunityPoison | MonsImmunityFear | MonsImmunityConfusion | MonsHeavyFootsteps | MonsNotable},
 	BlinkButterfly:   {"blinking butterfly", 'b', 2, 3, 2, MonsBlink | MonsImmunityImbalance | MonsImmunityLignification | MonsWingFlap},
 	BurningPhoenix:   {"burning phoenix", 'P', 3, 1, 5, PatternRampage | BurningHits | MonsImmunityFire | MonsImmunityLignification | MonsWingFlap | MonsNotable},
 	ConfusingEye:     {"confusing eye", 'e', 2, 0, 2, PatternRanged | MonsConfusion | MonsImmunityConfusion | MonsLightFootsteps},
@@ -334,13 +337,14 @@ var MonsData = []monsterInfo{
 	MadOctopode:      {"mad octopode", 'O', 3, 2, 5, PatternCatchUnbalance | MonsImmunityImbalance | VenomousMelee | MonsCreep | MonsNotable},
 	LashingFrog:      {"lashing frog", 'F', 2, 1, 4, PatternCatchUnbalance},
 	RampagingBoar:    {"rampaging boar", 'B', 3, 0, 4, PatternRampage | PushingUnbalance | MonsDig},
-	TeleportingGhost: {"teleporting ghost", 'G', 2, 3, 3, MonsTeleport | MonsImmunityPoison | MonsImmunityImbalance | MonsImmunityLignification | MonsSilent},
 	TemporalCat:      {"temporal cat", 'c', 2, 0, 4, PatternSwapDaze | MonsLightFootsteps},
 	ThunderPorcupine: {"thunder porcupine", 'p', 2, 0, 3, DazingSpines | MonsImmunityDaze | MonsLightFootsteps},
+	TotemWasp:        {"totem wasp", 'w', 2, 1, 2, PatternRampage | VenomousMelee | MonsImmunityLignification | MonsWingFlap | MonsNotable},
 	UndeadKnight:     {"undead knight", 'K', 3, 3, 4, PatternFourDirs | MonsFear | MonsImmunityPoison | MonsNotable},
 	VenomousViper:    {"venomous viper", 'v', 2, 1, 4, VenomousMelee | MonsImmunityPoison | MonsCreep},
 	WalkingMushroom:  {"walking mushroom", 'M', 2, 1, 5, MonsSpores | MonsConfusion | MonsImmunityConfusion | MonsImmunityLignification | VulnerabilityFire | MonsNotable},
 	WalkingTree:      {"walking tree", 'T', 2, 4, 5, MonsLignify | MonsImmunityImbalance | MonsImmunityPoison | MonsImmunityLignification | VulnerabilityFire | MonsHeavyFootsteps | MonsNotable},
+	WarpingWraith:    {"warping wraith", 'W', 2, 3, 3, MonsTeleport | MonsImmunityPoison | MonsImmunityImbalance | MonsImmunityLignification | MonsSilent},
 	WindFox:          {"wind fox", 'f', 2, 0, 4, PatternRangedRecoil | MonsLightFootsteps},
 }
 
@@ -382,10 +386,10 @@ func (g *Game) genMonsters() {
 		g.genMonsterGuardian(FearsomeLich, g.Map.Orb)
 		g.genMonsterGuardian(UndeadKnight, g.Map.Orb)
 	}
-	if g.ProcInfo.GuardianPortal == g.Map.Level {
+	if g.ProcInfo.GuardianPortal2 == g.Map.Level {
 		g.genMonsterGuardian(MadOctopode, g.Map.Portal)
 	}
-	if g.ProcInfo.GuardianTotem == g.Map.Level {
+	if g.ProcInfo.GuardianTotem1 == g.Map.Level {
 		g.genMonsterGuardian(CrazyDruid, g.Map.Totem)
 	}
 	// number of early, mid, late monsters.
@@ -399,8 +403,17 @@ func (g *Game) genMonsters() {
 		if g.IntN(2) == 0 {
 			g.genMonster(NoisyImp)
 		} else {
-			g.genMonster(TeleportingGhost)
+			g.genMonster(WarpingWraith)
 		}
+	}
+	if g.ProcInfo.GuardianTotem2 == g.Map.Level {
+		nM--
+		g.genMonsterGuardian(TotemWasp, g.Map.Totem)
+		g.genMonsterGuardian(TotemWasp, g.Map.Totem)
+	}
+	if g.ProcInfo.GuardianPortal1 == g.Map.Level {
+		nM--
+		g.genMonsterGuardian(BlazingGolem, g.Map.Portal)
 	}
 	switch g.Map.Level {
 	case g.ProcInfo.MonsEarly:

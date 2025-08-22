@@ -10,8 +10,10 @@ type ProcInfo struct {
 	Layouts          []MapLayout // map layouts
 	Earthquake       int         // level with extra rubble
 	FakePortal       []bool      // levels with fake portal
-	GuardianTotem    int         // level with early totem guardian
-	GuardianPortal   int         // level with mid portal guardian
+	GuardianTotem1   int         // level with early totem guardian
+	GuardianTotem2   int         // level with early totem guardian
+	GuardianPortal1  int         // level with early-mid portal guardian
+	GuardianPortal2  int         // level with mid-late portal guardian
 	WanderingUnique1 int         // level with walking mushroom
 	WanderingUnique2 int         // level with noisy imp or teleporting ghost
 	MonsEarly        int         // special early level
@@ -75,14 +77,21 @@ func (g *Game) flavoursProcGen() {
 		// portal.
 		gpi.FakePortal[1+g.IntN(7)] = true
 	}
-	for {
-		gpi.GuardianTotem = 3 + g.IntN(3)
-		if gpi.Spirits[gpi.GuardianTotem-1] >= 0 {
-			// There's a totem to guard on that level.
-			break
+	randTotemLevel := func(n, m int) int {
+		for {
+			i := n + g.IntN(m)
+			if gpi.Spirits[i-1] >= 0 {
+				// There's a totem to guard on that level.
+				return i
+			}
 		}
 	}
-	gpi.GuardianPortal = 6 + g.IntN(3)
+	gpi.GuardianTotem1 = randTotemLevel(3, 3)
+	for gpi.GuardianTotem2 == 0 || gpi.GuardianTotem2 == gpi.GuardianTotem1 {
+		gpi.GuardianTotem2 = randTotemLevel(3, 5)
+	}
+	gpi.GuardianPortal2 = 6 + g.IntN(3)
+	gpi.GuardianPortal1 = gpi.GuardianPortal2 - 1 - g.IntN(3)
 	gpi.WanderingUnique1 = 4 + g.IntN(6)
 	gpi.WanderingUnique2 = 4 + g.IntN(6)
 	gpi.MonsEarly = g.IntN(4)

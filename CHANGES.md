@@ -16,7 +16,12 @@
   monsters too. Also, its melee hits are confusing.
 * New unique monster: **noisy imp**. It performs music just for the player,
   attracting nearby monsters. It avoids fighting similarly to afraid monsters.
-* New unique monster: **teleporting ghost**. Its hits teleport the player away.
+* New unique monster: **warping wraith**. Its hits teleport the player away.
+  Alternates with noisy imp.
+* New unique monster: **blazing golem**. A sturdy magical portal guardian that
+  explodes on death.
+* New special monster: **totem wasp**. Rampaging and venomous wasps that like
+  to use totems as their nest.
 * Remove the “Nausea” status effect, because it was player-only and didn't have
   interesting interactions. It was mainly useful as a nerf for teleport: now
   teleport results in either Daze or Imbalance (chosen randomly between both,
