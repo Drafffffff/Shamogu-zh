@@ -259,7 +259,7 @@ func (g *Game) MakeNoise(at gruid.Point, nt NoiseType) {
 			g.Map.Noise[at] = nt
 		}
 		if nt == NoiseExplosion {
-			g.StoryLogf("Nadre explosion (distance: %d)", paths.DistanceManhattan(at, pp))
+			g.StoryLogf("Explosion (distance: %d)", paths.DistanceManhattan(at, pp))
 		}
 		g.LogStyled(nt.Msg(), logNotable)
 	}
