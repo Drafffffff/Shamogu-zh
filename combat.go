@@ -645,11 +645,15 @@ func (g *Game) Dig(i ID, a *Actor, at gruid.Point, log bool) bool {
 }
 
 func (g *Game) dig(at gruid.Point) {
-	if g.Map.Passable(at) {
+	t := g.Map.Terrain.At(at)
+	if Passable(t) {
 		return
 	}
 	g.Stats.Digs++
 	g.Map.Terrain.Set(at, Rubble)
+	if t == TranslucentWall {
+		g.PoisonCloudAt(at)
+	}
 	g.MakeNoise(at, NoiseDig)
 	pp := g.PP()
 	if paths.DistanceManhattan(pp, at) <= MaxFOVRange {

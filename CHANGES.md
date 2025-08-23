@@ -22,6 +22,10 @@
   explodes on death.
 * New totem guardian monster: **totem wasp**. Rampaging and venomous wasps that
   like to use totems as their nest.
+* Make translucent walls liberate a poison cloud when destroyed. Thematically,
+  they are walls that contain a special poisonous gas that makes them
+  translucent and, on destruction, that gas is expelled, resulting in a poison
+  cloud and ordinary rubble.
 * Remove the “Nausea” status effect, because it was player-only and didn't have
   interesting interactions. It was mainly useful as a nerf for teleport: now
   teleport results in either Daze or Imbalance (chosen randomly between both,

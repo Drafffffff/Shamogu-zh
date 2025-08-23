@@ -106,8 +106,8 @@ func (cg *CloudGrid) At(p gruid.Point) Cloud {
 	return Cloud{}
 }
 
-// AddCloud adds a cloud at a given position. If there's already a could it
-// does nothing, unless they're of same type and the new one has a longer
+// AddCloud adds a cloud at a given position. If there's already a cloud it
+// does nothing, unless it's of same type and the new one has a longer
 // duration.
 func (g *Game) AddCloud(cl Cloud) {
 	cg := g.Map.Clouds

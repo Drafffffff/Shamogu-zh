@@ -4,7 +4,6 @@ package main
 
 import (
 	"codeberg.org/anaseto/gruid"
-	// "codeberg.org/anaseto/gruid/paths"
 	"codeberg.org/anaseto/gruid/rl"
 )
 
@@ -14,10 +13,7 @@ const (
 	Floor                          // passable ground
 	Foliage                        // passable but difficult to see through
 	Rubble                         // passable, but blocks vision like walls
-	TranslucentWall                // obstructing, but does not block vision
-
-	// unused for now
-	// Tree
+	TranslucentWall                // obstructing, but does not block vision, contains poison gas
 
 	Unknown // cell is unknown (for KnownTerrain field of Map)
 )
@@ -34,8 +30,6 @@ func TerrainName(t rl.Cell) string {
 		return "rubble"
 	case TranslucentWall:
 		return "translucent wall"
-	// case Tree:
-	// 	return "tree"
 	default:
 		return "unknown place"
 	}
@@ -51,12 +45,8 @@ func TerrainDesc(t rl.Cell) string {
 		return "Dense foliage that is difficult to see through. Flammable."
 	case Rubble:
 		return "A collection of rocks broken into smaller ones. Passable, but blocks vision."
-	// case Portal:
-	// 	return "A magical portal leading to the next level. Replenishes spirit charges and HP."
 	case TranslucentWall:
-		return "An obstructing pile of translucent rocks."
-	// case Tree:
-	// 	return "Banana tree."
+		return "An obstructing pile of translucent rocks. Contains poison gas."
 	default:
 		return "unknown place"
 	}
