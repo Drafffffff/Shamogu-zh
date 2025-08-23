@@ -187,6 +187,8 @@ func (g *Game) ComputeNoise() {
 	badhearing := !pa.DoesAny(GoodHearing) && pa.DoesAny(BadHearing)
 	const maxdist = MaxFOVRange + 5
 	g.PRnoise.BreadthFirstMap(dij, []gruid.Point{g.PP()}, maxdist)
+	nheared := 0 // number of heared monsters
+	var a *Actor // actor corresponding to heared monster (when there's only one)
 	for i, ai := range g.Monsters() {
 		ei := g.Entity(i)
 		if g.InFOV(ei.P) {
@@ -201,7 +203,8 @@ func (g *Game) ComputeNoise() {
 				// Good hearing allows to hear almost silent
 				// monsters like spiders when nearby.
 				ei.Noise = true
-				g.Log("You hear an imperceptible air movement.")
+				a = ai
+				nheared++
 			}
 			continue
 		}
@@ -210,7 +213,8 @@ func (g *Game) ComputeNoise() {
 			// away. However, bad hearing (ground vibration-based)
 			// allows to hear heavy footsteps in a normal way.
 			ei.Noise = true
-			g.Log("You hear heavy footsteps.")
+			a = ai
+			nheared++
 			continue
 		}
 		if badhearing && ai.DoesAny(MonsCreep|MonsWingFlap) {
@@ -231,7 +235,13 @@ func (g *Game) ComputeNoise() {
 		if ei.Noise = goodhearing && dist <= MaxFOVRange+1 || dist <= MaxFOVRange-1; !ei.Noise {
 			continue
 		}
-		g.Logf("You hear %s.", monsterNoiseString(ai))
+		a = ai
+		nheared++
+	}
+	if nheared == 1 {
+		g.Logf("You hear %s.", monsterNoiseString(a))
+	} else if nheared > 1 {
+		g.Logf("You hear %d monsters.", nheared)
 	}
 }
 

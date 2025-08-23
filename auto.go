@@ -136,7 +136,9 @@ func (md *model) UpdateAutoExplore() (next gruid.Point, ok bool) {
 		md.buildAutoExploreMap(sources)
 	}
 	if g.DangerInProximity() {
-		g.Log("You cannot auto-explore while danger is nearby.")
+		if md.auto.mode == noAuto {
+			g.Log("You cannot auto-explore while danger is nearby.")
+		}
 		return next, false
 	}
 	ap := &MapPath{passable: g.PlayerPassableFunc()}
