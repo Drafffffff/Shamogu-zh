@@ -449,7 +449,7 @@ func (md *model) drawTargInfo() {
 			if a, ok := e.Role.(*Actor); ok {
 				noise = monsterNoiseString(a)
 			}
-			formatBox("monster noise", fmt.Sprintf("You heard %s around there.", noise), ColorOrange)
+			formatBox("monster noise", fmt.Sprintf("You heard %s around there.", noise), ColorForeground)
 			continue
 		}
 		if e.KnownP == InvalidPos {

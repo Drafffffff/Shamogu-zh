@@ -82,6 +82,8 @@
 * While sprinting, the frog's “jump” ability now unbalances foes without
   hurting them, but still dazes them, effectively combining the effects of the
   two kinds of jumps in a sensible way.
+* A few small improvements in footstep hearing: more deterministic and better
+  UI (use a different color for each footstep noise class).
 * Improve a bit monster distribution. Mostly, bias toward early-mid-late
   monsters depending on map level has been increased, making the various phases
   more distinct. Early and Mid game difficulty remains similar. Late game has

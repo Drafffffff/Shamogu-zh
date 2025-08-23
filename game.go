@@ -185,7 +185,7 @@ func (g *Game) ComputeNoise() {
 	pa := g.PlayerActor()
 	goodhearing := pa.DoesAny(GoodHearing) && !pa.DoesAny(BadHearing)
 	badhearing := !pa.DoesAny(GoodHearing) && pa.DoesAny(BadHearing)
-	maxdist := (3 * MaxFOVRange) / 2
+	const maxdist = MaxFOVRange + 5
 	g.PRnoise.BreadthFirstMap(dij, []gruid.Point{g.PP()}, maxdist)
 	for i, ai := range g.Monsters() {
 		ei := g.Entity(i)
@@ -197,22 +197,18 @@ func (g *Game) ComputeNoise() {
 			continue
 		}
 		if ai.DoesAny(MonsSilent) {
-			if goodhearing && g.IntN(dist) < MaxFOVRange/2 {
-				// Good hearing allows to occasionally hear
-				// almost silent monsters like spiders.
+			if goodhearing && dist <= MaxFOVRange-2 {
+				// Good hearing allows to hear almost silent
+				// monsters like spiders when nearby.
 				ei.Noise = true
 				g.Log("You hear an imperceptible air movement.")
 			}
 			continue
 		}
-		if badhearing {
-			// Bad hearing reduces the chance of hearing normal and
-			// heavy footsteps.
-			dist *= 2
-			dist += 2
-		}
-		if ai.DoesAny(MonsHeavyFootsteps) && (goodhearing || g.IntN(dist) <= MaxFOVRange) {
-			// Good hearing allows to always hear heavy footsteps.
+		if ai.DoesAny(MonsHeavyFootsteps) && (goodhearing || dist <= MaxFOVRange+2) {
+			// Good hearing allows to hear heavy footsteps from far
+			// away. However, bad hearing (ground vibration-based)
+			// allows to hear heavy footsteps in a normal way.
 			ei.Noise = true
 			g.Log("You hear heavy footsteps.")
 			continue
@@ -223,9 +219,16 @@ func (g *Game) ComputeNoise() {
 			continue
 		}
 		if ai.DoesAny(MonsLightFootsteps | MonsCreep) {
-			dist += 4
+			// Light footsteps and creeping are slightly harder to
+			// hear.
+			dist++
 		}
-		if ei.Noise = goodhearing && g.IntN(dist) <= MaxFOVRange || g.IntN(dist) <= MaxFOVRange/2; !ei.Noise {
+		if badhearing {
+			// Bad hearing reduces the distance at which light
+			// footsteps and normal footsteps can be heard.
+			dist += 3
+		}
+		if ei.Noise = goodhearing && dist <= MaxFOVRange+1 || dist <= MaxFOVRange-1; !ei.Noise {
 			continue
 		}
 		g.Logf("You hear %s.", monsterNoiseString(ai))
@@ -235,17 +238,17 @@ func (g *Game) ComputeNoise() {
 func monsterNoiseString(ai *Actor) string {
 	switch {
 	case ai.DoesAny(MonsSilent):
-		return "an imperceptible air movement"
+		return "an @Yimperceptible air movement@N"
 	case ai.DoesAny(MonsHeavyFootsteps):
-		return "heavy footsteps"
+		return "@Mheavy footsteps@N"
 	case ai.DoesAny(MonsWingFlap):
-		return "the flapping of wings"
+		return "the @Cflapping of wings@N"
 	case ai.DoesAny(MonsCreep):
-		return "a creep noise"
+		return "a @Gcreep noise@N"
 	case ai.DoesAny(MonsLightFootsteps):
-		return "light footsteps"
+		return "@Olight footsteps@N"
 	default:
-		return "footsteps"
+		return "@Rfootsteps@N"
 	}
 }
 
@@ -256,12 +259,18 @@ func noiseColor(e *Entity) gruid.Color {
 		return ColorOrange
 	}
 	switch {
+	case a.DoesAny(MonsSilent):
+		return ColorYellow
+	case a.DoesAny(MonsLightFootsteps):
+		return ColorOrange
+	case a.DoesAny(MonsCreep):
+		return ColorGreen
+	case a.DoesAny(MonsWingFlap):
+		return ColorCyan
 	case a.DoesAny(MonsHeavyFootsteps):
 		return ColorMagenta
-	case a.DoesAny(MonsWingFlap):
-		return ColorRed
 	default:
-		return ColorOrange
+		return ColorRed
 	}
 }
 
