@@ -31,8 +31,8 @@ func init() {
 	gob.Register(EffectSprint{})
 	gob.Register(EffectFireRetreat{})
 
-	gob.Register(EffectMappingMenhir{})
-	gob.Register(EffectTeleportMenhir{})
+	gob.Register(EffectEarthMenhir{})
+	gob.Register(EffectWarpingMenhir{})
 	gob.Register(EffectPoisonMenhir{})
 	gob.Register(EffectFireMenhir{})
 

@@ -656,7 +656,7 @@ func (g *Game) dig(at gruid.Point) {
 	}
 	g.MakeNoise(at, NoiseDig)
 	pp := g.PP()
-	if paths.DistanceManhattan(pp, at) <= MaxFOVRange {
+	if t == TranslucentWall && paths.DistanceManhattan(pp, at) <= MaxFOVRange {
 		g.UpdateFOV()
 		g.UpdateKnowledge()
 		if pp != at {

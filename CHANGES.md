@@ -16,8 +16,9 @@
   monsters too. Also, its melee hits are confusing.
 * New unique monster: **noisy imp**. It performs music just for the player,
   attracting nearby monsters. It avoids fighting similarly to afraid monsters.
-* New unique monster: **warping wraith**. Its hits teleport the player away.
-  Alternates with noisy imp.
+* New special monster: **warping wraith**. Its hits teleport the player away.
+  It can be sent by the dungeon to protect the portal after using a warping
+  menhir.
 * New portal guardian monster: **blazing golem**. A sturdy magical golem that
   explodes on death.
 * New totem guardian monster: **totem wasp**. Rampaging and venomous wasps that
@@ -26,6 +27,13 @@
   they are walls that contain a special poisonous gas that makes them
   translucent and, on destruction, that gas is expelled, resulting in a poison
   cloud and ordinary rubble.
+* Rework menhirs. The “mapping menhir” is now called “earth menhir” and reveals
+  all map walls but no other features; it also destroys most nearby walls,
+  instead of just making noise. Other menhirs remain similar, but offer some
+  partial information about the map too: “poison menhirs” reveal translucent
+  walls (which now contain poison), “fire menhirs” reveal foliage (that can be
+  burnt), and “warping menhirs” (previously called “teleport menhirs”) reveal
+  portals.
 * Remove the “Nausea” status effect, because it was player-only and didn't have
   interesting interactions. It was mainly useful as a nerf for teleport: now
   teleport results in either Daze or Imbalance (chosen randomly between both,

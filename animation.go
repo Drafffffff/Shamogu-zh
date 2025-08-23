@@ -9,12 +9,13 @@ import (
 
 // These constants represent various common durations for animation frames.
 const (
-	AnimDurVeryShort   = 30 * time.Millisecond
-	AnimDurShort       = 40 * time.Millisecond
-	AnimDurShortMedium = 60 * time.Millisecond
-	AnimDurMedium      = 80 * time.Millisecond
-	AnimDurMediumLong  = 100 * time.Millisecond
-	AnimDurLong        = 150 * time.Millisecond
+	AnimDurExtremelyShort = 15 * time.Millisecond
+	AnimDurVeryShort      = 30 * time.Millisecond
+	AnimDurShort          = 40 * time.Millisecond
+	AnimDurShortMedium    = 60 * time.Millisecond
+	AnimDurMedium         = 80 * time.Millisecond
+	AnimDurMediumLong     = 100 * time.Millisecond
+	AnimDurLong           = 150 * time.Millisecond
 )
 
 // Animations provides support for animations.
@@ -167,7 +168,7 @@ func (md *model) AnimationFrameFast() {
 		return
 	}
 	md.startAnimSeq()
-	md.anims.Frame(AnimDurVeryShort)
+	md.anims.Frame(AnimDurExtremelyShort)
 }
 
 // HitAnimation animates a player's non-killing hit at a given position.

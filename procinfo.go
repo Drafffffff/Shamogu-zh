@@ -211,11 +211,15 @@ func (g *Game) comestiblesProcGen() {
 }
 
 func (g *Game) menhirsProcGen() {
+	// Maximum of 4 in any level.
 	g.ProcInfo.NMenhirs = []int{
-		1, 1, 1, 1, 1,
+		1, 1, 1, 1, 2,
 		2, 2, 2, 2,
 	}
-	g.ProcInfo.NMenhirs[g.IntN(MapLevels)]++
-	g.ProcInfo.NMenhirs[1+g.IntN(4)]++
-	g.ProcInfo.NMenhirs[5+g.IntN(4)]++
+	// Extra menhirs.
+	g.ProcInfo.NMenhirs[g.IntN(MapLevels)]++ // levels 1-9
+	g.ProcInfo.NMenhirs[g.IntN(3)]++         // levels 1-3
+	g.ProcInfo.NMenhirs[3+g.IntN(2)]++       // levels 4-5
+	g.ProcInfo.NMenhirs[5+g.IntN(2)]++       // levels 6-7
+	g.ProcInfo.NMenhirs[7+g.IntN(2)]++       // levels 8-9
 }

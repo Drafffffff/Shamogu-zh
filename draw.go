@@ -166,7 +166,7 @@ func (md *model) drawMap(gd gruid.Grid) {
 			continue
 		}
 		e := md.g.Entity(i)
-		if o == ROItem && g.CloudAt(e.P) {
+		if o == ROItem && g.CloudAt(e.P) && g.InFOV(e.P) {
 			// Favor clouds over items, but in case of normal
 			// clouds, show the color of the item.
 			if g.Map.Clouds.At(e.P).Kind == CloudNormal {
@@ -429,7 +429,7 @@ func (md *model) drawTargInfo() {
 			msg = "an explosion"
 		case NoiseLightning:
 			msg = "a spark"
-		case NoiseMapping:
+		case NoiseEarthquake:
 			msg = "dull echo"
 		case NoiseRoar:
 			msg = "a roar"

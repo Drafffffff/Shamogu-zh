@@ -188,12 +188,22 @@ func comestibleEntity(ci itemInfo) *Entity {
 		Role:   &Comestible{Effect: ci.Effect}}
 }
 
+// menhirKind represents the various kinds of menhirs.
+type menhirKind int
+
+const (
+	MenhirEarth menhirKind = iota
+	MenhirFire
+	MenhirPoison
+	MenhirWarping
+)
+
 // MenhirData provides information about the various kinds of menhirs.
 var MenhirData = []itemInfo{
-	{"fire menhir", EffectFireMenhir{}},
-	{"mapping menhir", EffectMappingMenhir{}},
-	{"poison menhir", EffectPoisonMenhir{}},
-	{"teleport menhir", EffectTeleportMenhir{}},
+	MenhirEarth:   {"earth menhir", EffectEarthMenhir{}},
+	MenhirFire:    {"fire menhir", EffectFireMenhir{}},
+	MenhirPoison:  {"poison menhir", EffectPoisonMenhir{}},
+	MenhirWarping: {"warping menhir", EffectWarpingMenhir{}},
 }
 
 // menhirEntity generates a new menhir Entity entity using the given data.
@@ -208,27 +218,51 @@ func menhirEntity(ci itemInfo) *Entity {
 // genItems generates items for the new level.
 func (g *Game) genItems(mg *MapGen) {
 	// Portal.
+	portalIdxs := []int{}
 	if g.Map.Level < MapLevels {
+		var i int
 		portal := &Entity{Name: "magic portal", Rune: '>', Role: &Portal{}}
-		_, portal.P = mg.RandomVaultsPlace(mg.vaults[len(mg.vaults)/2:], PlaceStatic)
+		i, portal.P = mg.RandomVaultsPlace(mg.vaults[len(mg.vaults)/2:], PlaceStatic)
+		portalIdxs = append(portalIdxs, i)
 		g.Map.Portal = portal.P
 		g.AddEntity(portal)
 		if g.ProcInfo.FakePortal[g.Map.Level-1] {
 			portal := &Entity{Name: "magic portal", Rune: '>', Role: &Portal{Fake: true}}
-			_, portal.P = mg.RandomVaultsPlace(mg.vaults[len(mg.vaults)/2:], PlaceStatic)
+			i, portal.P = mg.RandomVaultsPlace(mg.vaults[len(mg.vaults)/2:], PlaceStatic)
+			portalIdxs = append(portalIdxs, i)
 			g.AddEntity(portal)
 		}
 	} else {
+		var i int
 		orb := &Entity{Name: "Orb of Corruption", Rune: '☼', Role: &CorruptionOrb{}}
-		_, orb.P = mg.RandomVaultsPlace(mg.vaults[(2*len(mg.vaults))/3:], PlaceStatic)
+		i, orb.P = mg.RandomVaultsPlace(mg.vaults[(2*len(mg.vaults))/3:], PlaceStatic)
 		g.Map.Orb = orb.P
+		portalIdxs = append(portalIdxs, i)
 		g.AddEntity(orb)
 	}
 	// Menhirs.
 	nmenhirs := g.ProcInfo.NMenhirs[g.Map.Level-1]
-	for range nmenhirs {
-		me := menhirEntity(MenhirData[g.NextMenhirIdx()])
-		me.P = mg.RandomPlace(PlaceStatic)
+	menhirIdxs := []int{}
+	for range min(nmenhirs, len(MenhirData)) {
+		idx := g.NextMenhirIdx()
+		for slices.Contains(menhirIdxs, idx) {
+			// Never generate twice the same menhir in a given level.
+			idx = g.NextMenhirIdx()
+		}
+		menhirIdxs = append(menhirIdxs, idx)
+		tvaults := mg.vaults
+		if menhirKind(idx) == MenhirWarping {
+			// Never generate warping menhir in vault containing a
+			// portal or the orb of corruption.
+			tvaults = []*vault{}
+			for i, v := range mg.vaults {
+				if !slices.Contains(portalIdxs, i) {
+					tvaults = append(tvaults, v)
+				}
+			}
+		}
+		me := menhirEntity(MenhirData[idx])
+		_, me.P = mg.RandomVaultsPlace(tvaults, PlaceStatic)
 		g.AddEntity(me)
 	}
 	// Totemic spirit.
@@ -401,11 +435,7 @@ func (g *Game) genMonsters() {
 	}
 	if g.ProcInfo.WanderingUnique2 == g.Map.Level {
 		nM--
-		if g.IntN(2) == 0 {
-			g.genMonster(NoisyImp)
-		} else {
-			g.genMonster(WarpingWraith)
-		}
+		g.genMonster(NoisyImp)
 	}
 	if g.ProcInfo.GuardianTotem2 == g.Map.Level {
 		nE--
@@ -477,7 +507,7 @@ var nMonsL = [MapLevels]int{0, 0, 1, 1, 2, 2, 3, 4, 5}
 
 // genMonster spawns a monster of the given kind on a random free floor.
 func (g *Game) genMonster(mk monsterKind) {
-	p := g.PlayerEntity().P
+	p := g.PP()
 	q := g.randomFreeFloor()
 	// XXX: use walkable-path distance?
 	for paths.DistanceManhattan(p, q) <= MaxFOVRange+1 {

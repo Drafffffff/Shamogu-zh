@@ -137,7 +137,7 @@ func (eff EffectClarityLeaves) Apply(g *Game) bool {
 	pp := g.PP()
 	for i := range g.Monsters() {
 		ei := g.Entity(i)
-		if paths.DistanceManhattan(ei.P, pp) < 3*MaxFOVRange {
+		if paths.DistanceManhattan(ei.P, pp) <= 3*MaxFOVRange {
 			g.SenseEntity(ei, "sense")
 		}
 	}
@@ -145,7 +145,7 @@ func (eff EffectClarityLeaves) Apply(g *Game) bool {
 }
 
 func (eff EffectClarityLeaves) Desc() string {
-	return fmt.Sprintf("Removes @OConfusion@N and makes you sense nearby monsters. Restores %+d HP.",
+	return fmt.Sprintf("Removes @OConfusion@N and makes you sense nearby monsters (3x view range). Restores %+d HP.",
 		HealClarityLeaves)
 }
 
@@ -210,9 +210,8 @@ func (eff EffectTeleportMushroom) Apply(g *Game) bool {
 		g.Log("You resist teleport while lignified.")
 	}
 	if i, _ := g.Spirit(); i >= 0 {
-		if ei := g.Entity(i); paths.DistanceManhattan(ei.P, g.PP()) < 4*MaxFOVRange {
-			g.SenseEntity(ei, "sense")
-		}
+		ei := g.Entity(i)
+		g.SenseEntity(ei, "sense")
 	}
 	return true
 }
@@ -226,7 +225,7 @@ func (g *Game) teleportStatuses(i ID, ai *Actor) {
 }
 
 func (eff EffectTeleportMushroom) Desc() string {
-	return fmt.Sprintf("Teleports you away and makes you sense any nearby totemic spirit. Leaves you either @Odazed@N or @Oimbalanced@N for %d or %d turns respectively.",
+	return fmt.Sprintf("Teleports you away and makes you sense any totemic spirit. Leaves you either @Odazed@N or @Oimbalanced@N for %d or %d turns respectively.",
 		DurationDazeTeleport, DurationImbalanceTeleport)
 }
 
@@ -681,15 +680,17 @@ func (g *Game) menhirMsg(name string) {
 	g.Logf("You activate the %s.", name)
 }
 
-type EffectMappingMenhir struct{}
+type EffectEarthMenhir struct{}
 
-func (eff EffectMappingMenhir) Apply(g *Game) bool {
-	const maxdist = MaxFOVRange * 4
-	g.menhirMsg("mapping menhir")
-	g.MakeNoise(g.PP(), NoiseMapping)
+func (eff EffectEarthMenhir) Apply(g *Game) bool {
+	const maxdist = MaxFOVRange * 2 // "earthquake" distance
+	g.menhirMsg("earth menhir")
+	// Reveal walls (but not the translucent ones) and destroy nearby ones.
+	g.MakeNoise(g.PP(), NoiseEarthquake)
 	mp := &MappingPath{passable: func(p gruid.Point) bool { return g.Map.Terrain.At(p) != Wall }}
-	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, maxdist)
+	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, unreachable)
 	var draw bool
+	var nbs paths.Neighbors
 	cost := 1
 	for _, n := range nodes {
 		if n.Cost > cost && draw {
@@ -698,34 +699,44 @@ func (eff EffectMappingMenhir) Apply(g *Game) bool {
 			cost = n.Cost
 		}
 		t := g.Map.Terrain.At(n.P)
-		if g.Map.KnownTerrain.At(n.P) != t {
+		if t != Wall {
+			continue
+		}
+		if n.Cost <= maxdist && g.IntN(5) > 0 {
+			g.earthMenhirDig(nbs, n.P)
+			g.Map.KnownTerrain.Set(n.P, Rubble)
+			draw = true
+		} else if g.Map.KnownTerrain.At(n.P) != t {
 			g.Map.KnownTerrain.Set(n.P, t)
 			draw = true
-		}
-	}
-	for i := range g.ItemEntities() {
-		ei := g.Entity(i)
-		if g.PR.BreadthFirstMapAt(ei.P) <= maxdist {
-			g.SenseEntity(ei, "sense")
 		}
 	}
 	return true
 }
 
-func (eff EffectMappingMenhir) Desc() string {
-	return "Maps the surrounding area by producing a noisy echoing sound."
+// earthMenhirDig is similar to dig but without the noise and extra behaviors
+// (because we want a single noise source at the "earthquake" centre).
+func (g *Game) earthMenhirDig(nbs paths.Neighbors, at gruid.Point) {
+	g.Stats.Digs++
+	g.Map.Terrain.Set(at, Rubble)
+	ps := append(nbs.Cardinal(at, inMap), at)
+	for _, q := range ps {
+		g.NormalCloudAt(q, 2+g.IntN(3))
+	}
 }
 
-type EffectTeleportMenhir struct{}
+func (eff EffectEarthMenhir) Desc() string {
+	return "Destroys nearby walls and reveals remaining map walls."
+}
 
-func (eff EffectTeleportMenhir) Apply(g *Game) bool {
-	g.menhirMsg("teleport menhir")
+type EffectWarpingMenhir struct{}
+
+func (eff EffectWarpingMenhir) Apply(g *Game) bool {
+	g.menhirMsg("warping menhir")
+	// Teleport nearby monsters away.
 	mp := &MapPath{passable: g.Map.Passable}
 	pp := g.PP()
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{pp}, MaxFOVRange)
-	g.rand.Shuffle(len(nodes), func(i, j int) {
-		nodes[i], nodes[j] = nodes[j], nodes[i]
-	})
 	for _, n := range nodes {
 		if n.P == pp {
 			continue
@@ -736,17 +747,40 @@ func (eff EffectTeleportMenhir) Apply(g *Game) bool {
 			}
 		}
 	}
+	// Reveal portal or orb of corruption.
+	for _, ei := range g.NPMapEntities() {
+		switch ei.Role.(type) {
+		case *Portal:
+			g.SenseEntity(ei, "sense")
+		case *CorruptionOrb:
+			g.SenseEntity(ei, "sense")
+		}
+	}
+	if g.IntN(3) == 0 {
+		// Dungeon sends a warping wraith to investigate: first goes to
+		// the menhir, then back to the portal.
+		q := g.randomFreeFloor()
+		for paths.DistanceManhattan(pp, q) <= 3*MaxFOVRange {
+			q = g.randomFreeFloor()
+		}
+		e := g.genMonsterAt(WarpingWraith, q)
+		if r, ok := e.Role.(*Actor); ok {
+			r.Behavior.Target = pp
+			r.Behavior.Guard = g.Map.Portal
+		}
+	}
 	return true
 }
 
-func (eff EffectTeleportMenhir) Desc() string {
-	return fmt.Sprintf("Teleports away monsters in a %d-radius distance.", MaxFOVRange)
+func (eff EffectWarpingMenhir) Desc() string {
+	return fmt.Sprintf("Teleports away monsters in a %d-radius distance. Reveals location of any portals. The dungeon might sense you and send a monster to investigate.", MaxFOVRange)
 }
 
 type EffectPoisonMenhir struct{}
 
 func (eff EffectPoisonMenhir) Apply(g *Game) bool {
 	g.menhirMsg("poison menhir")
+	// Spawn poison clouds randomly.
 	mp := &MapPath{passable: g.Map.Passable}
 	pp := g.PP()
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{pp}, MaxFOVRange)
@@ -759,17 +793,26 @@ func (eff EffectPoisonMenhir) Apply(g *Game) bool {
 		}
 		g.PoisonCloudAt(n.P)
 	}
+	// Reveal translucent walls (which contain poison gas).
+	for p, t := range g.Map.Terrain.All() {
+		if t == TranslucentWall {
+			g.Map.KnownTerrain.Set(p, t)
+		} else if g.Map.KnownTerrain.At(p) == TranslucentWall {
+			g.Map.KnownTerrain.Set(p, t)
+		}
+	}
 	return true
 }
 
 func (eff EffectPoisonMenhir) Desc() string {
-	return fmt.Sprintf("Makes many poisonous clouds appear in a %d-radius distance.", MaxFOVRange)
+	return fmt.Sprintf("Makes many poisonous clouds appear in a %d-radius distance. Reveals translucent walls.", MaxFOVRange)
 }
 
 type EffectFireMenhir struct{}
 
 func (eff EffectFireMenhir) Apply(g *Game) bool {
 	g.menhirMsg("fire menhir")
+	// Spawn fire clouds randomly.
 	mp := &MapPath{passable: g.Map.Passable}
 	pp := g.PP()
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{pp}, MaxFOVRange)
@@ -782,9 +825,34 @@ func (eff EffectFireMenhir) Apply(g *Game) bool {
 		}
 		g.FireCloudAt(n.P)
 	}
+	// Reveal foliage.
+	g.UpdateFOV() // update just FOV (it strictly becomes smaller)
+	g.revealFoliage()
 	return true
 }
 
+func (g *Game) revealFoliage() {
+	mp := &MapPath{passable: g.Map.Passable}
+	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, unreachable)
+	var draw bool
+	cost := 1
+	for _, n := range nodes {
+		if n.Cost > cost && draw {
+			g.md.AnimationFrameFast()
+			draw = false
+			cost = n.Cost
+		}
+		t := g.Map.Terrain.At(n.P)
+		if t != Foliage {
+			continue
+		}
+		if g.Map.KnownTerrain.At(n.P) != t {
+			g.Map.KnownTerrain.Set(n.P, t)
+			draw = true
+		}
+	}
+}
+
 func (eff EffectFireMenhir) Desc() string {
-	return fmt.Sprintf("Makes many fire clouds appear in a %d-radius distance, each one lasting 6-12 turns.", MaxFOVRange)
+	return fmt.Sprintf("Makes many fire clouds appear in a %d-radius distance, each one lasting 6-12 turns. Reveals foliage.", MaxFOVRange)
 }
