@@ -314,7 +314,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int)
 	if ai.DoesAny(VenomousMelee) && (ap != AttackRanged || g.AdjacentEntities(i, j)) && g.IntN(6-dmg) < 2 {
 		if g.PutStatus(j, aj, StatusPoison, DurationPoison) && i != PlayerID {
 			if g.InFOV(ei.P) {
-				g.LogfStyled("The confused %s bit itself too!", logHurtMons, ei.Name)
+				g.LogfStyled("The confused %s bits itself too!", logHurtMons, ei.Name)
 			}
 			g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
 		}
@@ -357,17 +357,15 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int)
 		}
 	case ai.DoesAny(MonsBlink) && aj.IsAlive():
 		g.blinkOther(i, j, ai, aj)
-	case ai.DoesAny(MonsTeleport) && aj.IsAlive() && g.TeleportActor(j, aj):
+	case ai.DoesAny(MonsTeleport) && aj.IsAlive() && !aj.ResistsMove():
 		if j == PlayerID {
-			g.Logf("The %s teleported you away!", ei.Name)
+			g.Logf("The %s teleports you away!", ei.Name)
 		} else {
-			g.Logf("The confused %s teleported the %s away!", ei.Name, ej.Name)
+			g.Logf("The confused %s teleports the %s away!", ei.Name, ej.Name)
 		}
-		g.teleportStatuses(j, aj)
+		g.TeleportActor(j, aj)
 		if ai.Has(StatusConfusion) {
-			if g.TeleportActor(i, ai) {
-				g.teleportStatuses(j, aj)
-			}
+			g.TeleportActor(i, ai)
 		}
 	}
 	// Extra defense effects.
@@ -488,7 +486,7 @@ func (g *Game) logBumpMiss(i, j ID, ap AttackKind) {
 func (g *Game) monsConfusionPenalty(i ID, ai *Actor) {
 	if ai.Has(StatusConfusion) {
 		if g.InFOV(g.Entity(i).P) {
-			g.LogfStyled("The confused %s hurt itself too!", logHurtMons, g.Entity(i).Name)
+			g.LogfStyled("The confused %s hurts itself too!", logHurtMons, g.Entity(i).Name)
 		}
 		g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
 	}

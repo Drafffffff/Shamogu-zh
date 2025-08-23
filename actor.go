@@ -682,6 +682,7 @@ func (g *Game) TeleportActor(i ID, ai *Actor) bool {
 		g.md.TeleportAnimation(from, to, i == PlayerID || g.InFOV(to))
 	}
 	g.MoveActor(i, ai, to)
+	g.teleportStatuses(i, ai)
 	return true
 }
 

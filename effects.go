@@ -204,14 +204,12 @@ type EffectTeleportMushroom struct{}
 func (eff EffectTeleportMushroom) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	g.eatMsg("teleport mushroom", 0)
-	if g.TeleportActor(PlayerID, pa) {
-		g.teleportStatuses(PlayerID, pa)
-	} else {
+	if !g.TeleportActor(PlayerID, pa) {
 		g.Log("You resist teleport while lignified.")
 	}
-	if i, _ := g.Spirit(); i >= 0 {
-		ei := g.Entity(i)
-		g.SenseEntity(ei, "sense")
+	if j, _ := g.Spirit(); j >= 0 {
+		ej := g.Entity(j)
+		g.SenseEntity(ej, "sense")
 	}
 	return true
 }
@@ -742,9 +740,7 @@ func (eff EffectWarpingMenhir) Apply(g *Game) bool {
 			continue
 		}
 		if i, ai := g.ActorAt(n.P); i > 0 {
-			if g.TeleportActor(i, ai) {
-				g.teleportStatuses(i, ai)
-			}
+			g.TeleportActor(i, ai)
 		}
 	}
 	// Reveal portal or orb of corruption.
