@@ -28,9 +28,9 @@ func (ck CloudKind) String() string {
 	case CloudNormal:
 		return "cloud"
 	case CloudFire:
-		return "fire cloud"
+		return "fire"
 	case CloudPoison:
-		return "poisonous cloud"
+		return "poison"
 	default:
 		return "cloud"
 	}
