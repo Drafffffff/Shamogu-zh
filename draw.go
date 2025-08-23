@@ -303,12 +303,7 @@ func (g *Game) drawTerrainRuneAt(gd gruid.Grid, r rune, p gruid.Point) {
 func drawCloud(gd gruid.Grid, cl Cloud) {
 	c := gd.At(cl.P)
 	c.Rune = '§'
-	switch cl.Kind {
-	case CloudFire:
-		c.Style.Fg = ColorRed
-	case CloudPoison:
-		c.Style.Fg = ColorGreen
-	}
+	c.Style.Fg = cl.Kind.Color()
 	gd.Set(cl.P, c)
 }
 
@@ -381,10 +376,10 @@ func (md *model) drawTargInfo() {
 	formatBox := func(title, s string, fg gruid.Color) {
 		md.desc.Content = stt.WithText(s).Format(MapWidth/2 - 3)
 		if md.desc.Content.Size().Y+y > MapHeight {
-			md.desc.Box = &ui.Box{Title: ui.NewStyledText(title, gruid.Style{}.WithFg(fg)),
-				Footer: ui.NewStyledText("scroll/page down for more…", gruid.Style{}.WithFg(ColorMagenta))}
+			md.desc.Box = &ui.Box{Title: stt.WithText(title).WithStyle(gruid.Style{Fg: fg}),
+				Footer: ui.NewStyledText("scroll/page down for more…", gruid.Style{Fg: ColorMagenta})}
 		} else {
-			md.desc.Box = &ui.Box{Title: ui.NewStyledText(title, gruid.Style{}.WithFg(fg))}
+			md.desc.Box = &ui.Box{Title: stt.WithText(title).WithStyle(gruid.Style{Fg: fg})}
 		}
 		y += md.desc.Draw(md.gd.Slice(gruid.NewRange(0, y, MapWidth/2-1, 2+MapHeight).Add(p))).Size().Y
 	}
@@ -393,7 +388,8 @@ func (md *model) drawTargInfo() {
 	if !info.unknown {
 		features = append(features, TerrainName(g.Map.KnownTerrain.At(md.targ.p)))
 		if info.cloud != NoCloud {
-			features = append(features, info.cloud.String())
+			clstr := info.cloud.String()
+			features = append(features, fmt.Sprintf("@%c%s@N", info.cloud.ColorRune(), clstr))
 		}
 		if info.lighted && info.sees {
 			features = append(features, "lighted")

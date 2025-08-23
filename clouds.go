@@ -36,6 +36,30 @@ func (ck CloudKind) String() string {
 	}
 }
 
+// Color returns the color of the cloud.
+func (ck CloudKind) Color() gruid.Color {
+	switch ck {
+	case CloudFire:
+		return ColorRed
+	case CloudPoison:
+		return ColorGreen
+	default:
+		return ColorForeground
+	}
+}
+
+// ColorRune returns the markup color rune of the cloud.
+func (ck CloudKind) ColorRune() rune {
+	switch ck {
+	case CloudFire:
+		return 'R'
+	case CloudPoison:
+		return 'G'
+	default:
+		return 'N'
+	}
+}
+
 func (ck CloudKind) Desc() string {
 	switch ck {
 	case CloudNormal:

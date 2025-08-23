@@ -130,7 +130,7 @@ func (md *model) initWidgets() {
 	})
 	md.pager.markup = ui.StyledText{}.WithMarkups(Markups)
 	style := ui.MenuStyle{
-		Active: gruid.Style{}.WithFg(ColorYellow),
+		Active: gruid.Style{Fg: ColorYellow},
 	}
 	md.menu = &menu{}
 	md.menu.main = ui.NewMenu(ui.MenuConfig{
@@ -247,7 +247,7 @@ func InitConfig() error {
 var spiritKeys = []rune{'H', 'B', 'F', 'f', 'c'}
 
 func (md *model) openSpiritSelectionMenu() {
-	hstyle := gruid.Style{}.WithFg(ColorCyan)
+	hstyle := gruid.Style{Fg: ColorCyan}
 	entries := []ui.MenuEntry{}
 	for i, si := range primarySpirits {
 		r := spiritKeys[i]
@@ -264,7 +264,7 @@ func (md *model) openSpiritSelectionMenu() {
 		})
 	}
 	altBgEntries(entries)
-	md.menu.main.SetBox(&ui.Box{Title: ui.Text("New Game").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
+	md.menu.main.SetBox(&ui.Box{Title: ui.Text("New Game").WithStyle(gruid.Style{Fg: ColorYellow})})
 	md.menu.main.SetEntries(entries)
 	md.menu.main.SetActiveInvokable(0)
 	md.updateItemDesc(spiritEntity(primarySpirits[0]))
