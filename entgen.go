@@ -170,10 +170,10 @@ type itemInfo struct {
 // ComestibleData provides information about the various kinds of comestibles.
 var ComestibleData = []itemInfo{
 	{"ambrosia berries", EffectAmbrosiaBerries{}},
-	{"clarity leaves", EffectClarityLeaves{}},
 	{"berserking flower", EffectBerserkingFlower{}},
-	{"foggy-skin onion", EffectFoggySkinOnion{}},
+	{"clarity leaves", EffectClarityLeaves{}},
 	{"firebreath pepper", EffectFirebreathPepper{}},
+	{"foggy-skin onion", EffectFoggySkinOnion{}},
 	{"lignification fruit", EffectLignificationFruit{}},
 	{"teleport mushroom", EffectTeleportMushroom{}},
 }
@@ -190,10 +190,10 @@ func comestibleEntity(ci itemInfo) *Entity {
 
 // MenhirData provides information about the various kinds of menhirs.
 var MenhirData = []itemInfo{
-	{"mapping menhir", EffectMappingMenhir{}},
-	{"teleport menhir", EffectTeleportMenhir{}},
-	{"poison menhir", EffectPoisonMenhir{}},
 	{"fire menhir", EffectFireMenhir{}},
+	{"mapping menhir", EffectMappingMenhir{}},
+	{"poison menhir", EffectPoisonMenhir{}},
+	{"teleport menhir", EffectTeleportMenhir{}},
 }
 
 // menhirEntity generates a new menhir Entity entity using the given data.
