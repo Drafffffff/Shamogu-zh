@@ -170,9 +170,6 @@ func RunReplay(file string) {
 // setLogOutput sets standard log output to the logs file in the game's data
 // directory.
 func setLogOutput() *os.File {
-	if Tiles {
-		return nil
-	}
 	dataDir, err := DataDir()
 	if err != nil {
 		log.Print(err)
@@ -184,7 +181,11 @@ func setLogOutput() *os.File {
 		log.Print(err)
 		return nil
 	}
-	log.SetOutput(f)
+	if Tiles {
+		log.SetOutput(io.MultiWriter(f, os.Stderr))
+	} else {
+		log.SetOutput(f)
+	}
 	return f
 }
 
