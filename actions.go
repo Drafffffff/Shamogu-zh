@@ -1487,14 +1487,9 @@ func statusesHelpText() string {
 	var sb strings.Builder
 	sb.WriteString(`@YCOLORS@N
 
-In the status bar and descriptions, positive status effects are shown as
-@BBlue@N and negative ones are @OOrange@N.
+In the status bar and descriptions, positive status effects are shown as @BBlue@N and negative ones are @OOrange@N.
 
-On the map, monster color may change depending on active status effects.  By
-default, status-free wandering monsters are @OOrange@N and hunting monsters are
-@ORed@N. @MMagenta@N indicates a positive status. @YYellow@N indicates both
-positive and negative statuses. @GGreen@N indicates a negative status. @CCyan@N
-indicates two or more negative statuses.`)
+On the map, monster color may change depending on active status effects.  By default, status-free wandering monsters are @OOrange@N and hunting monsters are @ORed@N. @MMagenta@N indicates a positive status. @YYellow@N indicates both positive and negative statuses. @GGreen@N indicates a negative status. @CCyan@N indicates two or more negative statuses.`)
 	sb.WriteString("\n\n")
 	sb.WriteString(`@YSTATUSES@N`)
 	sb.WriteString("\n\n")
@@ -1549,10 +1544,10 @@ func combatHelpText() string {
 	return strings.TrimSpace(`
 @YCOMBAT DAMAGE@N
 
-Combat damage is affected by attack (A) and defense (D). Maximum damage is the minimum of attack A and 3. Higher values of A increase chances of higher damage when attacking, while higher values of D decrease that chance when defending.  Zero damage represents a miss.
+Combat damage is affected by attack (A) and defense (D). Maximum damage is the minimum of attack A and 3. Higher values of A increase chances of higher damage when attacking, while higher values of D decrease that chance when defending. Zero damage represents a miss.
 
 Players under the @BFocus@N status effect and four-headed hydras perform four
-damage-rolls per attack, for a theoretical maximum damage of 4×A.
+damage-rolls per attack, doing four times as much damage.
 
 Special effects like @BBerserk@N or @BDig@N may then increase effective total attack damage by one, bypassing defense and the maximum damage limit.
 
@@ -1570,19 +1565,23 @@ In Shamogu, both the player and the monsters may use one of several attack patte
 
 @CRampaging@N attacks allow to charge from as far as you can see. When charging, there is a bonus of 1 to attack, except against lignified foes that resist forced movement.
 
-@CPushing@N attacks may push foes one tile away.  Rampaging boars, as well as Rampaging Boar spirit players, perform both @CRampaging@N and @CPushing@N.
+@CPushing@N attacks may push foes one tile away. Rampaging boars, as well as Rampaging Boar spirit players, perform both @CRampaging@N and @CPushing@N.
 
 @CRanged@N attacks are performed without moving from as far as you can see.
 
+@CCatching@N attacks are ranged attacks that catch foes @Mon successful hits@N and move them next to you. When catching a foe from afar, there is a bonus of 1 to attack.
+
 @CRecoil@N is an extra attack effect that happens for wind fox monsters, as well as upgraded Wind Fox spirit players. After an attack, they may move backwards one tile when ranged, or two cells when in melee.
 
-@CCatching@N attacks are ranged attacks that catch foes @Mon @Msuccessful @Mhits@N and move them next to you. When catching a foe from afar, there is a bonus of 1 to attack.
-
-@CSpace-Distorting@N attacks are ranged attacks that @Mswap @Mpositions@N on successful hits, but result in normal movement on misses. Any foes adjacent to the landing hit position are blinked away. Also, note that such attacks reverse your current direction.
+@CSpace-Distorting@N attacks are ranged attacks that @Mswap positions@N on successful hits, but result in normal movement on misses. Any foes adjacent to the landing hit position are blinked away. Also, note that such attacks reverse your current direction.
 
 @YNOISE@N
 
-Combat and some other actions produce noise, as shown with onomatopoeias in the game logs. Ranged and melee combat can be heard from a few tiles away only, but various other noise sources may reach farther, up to a field of view and a half range in the worst case. Also, note that monsters cannot hear your footsteps or, at the very least, they don’t care about such small noises! Players and monsters with the “good hearing” trait may hear a bit farther and with greater chance.
+Combat and some other actions produce noise, as shown with onomatopoeias in the game logs. Ranged and melee combat can be heard from a few tiles away only, but various other noise sources may reach farther, up to two times the view range in the worst case. 
+
+Shamogu also shows visually the sound made by monsters out of view: @Rfootsteps@N, @Olight footsteps@N, @Gcreep noise@N, @Cflapping of wings@N, and @Mheavy footsteps@N. Note that monsters cannot hear your footsteps or, at the very least, they don’t care about such small noises!
+
+Players and monsters with the “good hearing” trait may hear sounds farther than usual.
 `)
 }
 
@@ -1600,13 +1599,13 @@ func (a ActionHelpItems) String() string {
 
 func itemHelpText() string {
 	return strings.TrimSpace(`
-@CComestibles@N are found in every level. When the player is over them, pressing the @MInteract @MKey@N(e) allows to pick them. When your inventory is full, you’ll have to pick a comestible to leave on the ground before picking a new one.  Opening the @MInventory@N(i) allows to eat an equipped comestible or any comestible on the ground.
+@CComestibles@N are found in every level. When the player is over them, pressing the @MInteract Key@N(e) allows to pick them. When your inventory is full, you’ll have to pick a comestible to leave on the ground before picking a new one. Opening the @MInventory@N(i) allows to eat an equipped comestible or any comestible on the ground.
 
-@CTotems@N are found on some levels. By pressing the @MInteract @MKey@N(e), their spirit may either be chosen as a new secondary spirit or used to upgrade one of your existing spirits. Opening the @MInventory@N(i) allows then to use your chosen spirits. Beware that monsters that see you chosing a spirit will go berserk!
+@CTotems@N are found on some levels. By pressing the @MInteract Key@N(e), their spirit may either be chosen as a new secondary spirit or used to upgrade one of your existing spirits. Opening the @MInventory@N(i) allows then to use your chosen spirits. Beware that monsters that see you chosing a spirit will go berserk!
 
-@CMenhirs@N are static items found on map levels. Pressing the @MInteract @MKey@N(e) will activate them, revealing partial map information and producing other specific effects.
+@CMenhirs@N are static items found on map levels. Pressing the @MInteract Key@N(e) will activate them, revealing partial map information and producing other specific effects.
 
-@CPortals@N are static items found once on each map level, rarely twice.  Pressing the @MInteract @MKey@N(e) will make you reach the next map level. When doing so, spirit charges and HP are restored. Occasionally, you’ll come across a malfunctioning portal whose activation will frighten nearby monsters.
+@CPortals@N are static items found once on each map level. Pressing the @MInteract Key@N(e) will make you reach the next map level. When doing so, spirit charges and HP are restored. Occasionally, you’ll come across an extra malfunctioning portal whose activation will frighten nearby monsters.
 `)
 }
 
@@ -1632,11 +1631,11 @@ Always check your inventory to see if some spirit ability or comestible can help
 
 Wasting spirit charges and comestibles is bad, but dying without using them is worse!
 
-Most items and abilities have several effects and can be used for several purposes.  For example, barking or freezing time may be useful both when attacking and fleeing, but freezing time can also help wait for some problematic status effect to end.
+Most items and abilities have several effects and can be used for several purposes. For example, barking or freezing time may be useful both when attacking and fleeing, but freezing time can also help wait for some problematic status effect to end.
 
 @YCOMBAT TIPS@N
 
-Try to always get the @Mfirst @Mhit@N against monsters. In particular, avoid moving yourself in front of ranged or rampaging monsters. Zigzag if necessary.  Don’t forget that even plain melee monsters can charge frontally from one tile away!
+Try to always get the @Mfirst hit@N against monsters. In particular, avoid moving yourself in front of ranged or rampaging monsters. Zigzag if necessary. Don’t forget that even plain melee monsters can charge frontally from one tile away!
 
 Try to learn the characteristics of each kind of monster.
 
@@ -1646,11 +1645,11 @@ Some monsters have special attacks, like acid mounds ignoring defense, or venomo
 
 @YSTEALTH TIPS@N
 
-Killing all monsters does not provide any benefit, so once you have enough food items and don’t need more totems or already found one, you can skip exploring the rest of the map and go through a portal to the next level. Also, missing a totem occasionally is acceptable.
+Killing all the monsters does not provide any benefit. So, once you have enough food items and don’t need more totems or already found one, you can skip exploring the rest of the map and go through a portal to the next level. Also, missing a totem or two is acceptable.
 
 Monsters usually give up quickly their search once they don’t see you: use foliage and rubble to lose them.
 
-Watch out for @Mfootstep @Mnoise@N: while going through dense foliage, it can be very helpful to avoid unwanted encounters. Also be particularly wary of @Mmagenta@N “heavy steps”!
+Watch out for @Mfootstep noise@N: while going through dense foliage, it can be very helpful to avoid unwanted encounters.
 
 @YWIZARD MODE@N
 
