@@ -401,7 +401,7 @@ func (g *Game) SmellFood() {
 		if ei.KnownP == ei.P {
 			continue
 		}
-		if paths.DistanceManhattan(ei.P, pp) < 3*MaxFOVRange {
+		if paths.DistanceManhattan(ei.P, pp) <= 2*MaxFOVRange {
 			// NOTE: using path-distance would be more realistic,
 			// but maybe not worth the extra computation each turn.
 			ei.KnownP = ei.P
