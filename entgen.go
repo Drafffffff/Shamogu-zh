@@ -506,31 +506,35 @@ var nMonsM = [MapLevels]int{2, 3, 4, 6, 8, 10, 10, 10, 10}
 var nMonsL = [MapLevels]int{0, 0, 1, 1, 2, 2, 3, 4, 5}
 
 // genMonster spawns a monster of the given kind on a random free floor.
-func (g *Game) genMonster(mk monsterKind) {
+func (g *Game) genMonster(mk monsterKind) (ID, *Entity) {
 	p := g.PP()
 	q := g.randomFreeFloor()
 	// XXX: use walkable-path distance?
 	for paths.DistanceManhattan(p, q) <= MaxFOVRange+1 {
 		q = g.randomFreeFloor()
 	}
-	g.genMonsterAt(mk, q)
-}
-
-func (g *Game) genMonsterAt(mk monsterKind, p gruid.Point) *Entity {
-	mons := monster(MonsData[mk])
-	mons.P = p
-	g.Map.ActorCache.SetU(mons.P, ID(len(g.Entities)))
-	g.AddEntity(mons)
-	return mons
+	return g.genMonsterAt(mk, q)
 }
 
 // genMonsterGardian spawns a gardian monster of the given kind around a
 // certain position.
-func (g *Game) genMonsterGuardian(mk monsterKind, at gruid.Point) {
+func (g *Game) genMonsterGuardian(mk monsterKind, at gruid.Point) (ID, *Actor) {
 	p := g.randomFreeNearby(at, 5)
-	mons := g.genMonsterAt(mk, p)
+	id, mons := g.genMonsterAt(mk, p)
 	a := mons.Actor()
 	a.Behavior.Guard = at
+	return id, a
+}
+
+// genMonsterAt spawns a monster of the given kind on the given position
+// (assumed to be free).
+func (g *Game) genMonsterAt(mk monsterKind, p gruid.Point) (ID, *Entity) {
+	mons := monster(MonsData[mk])
+	mons.P = p
+	id := ID(len(g.Entities))
+	g.Map.ActorCache.SetU(mons.P, id)
+	g.AddEntity(mons)
+	return id, mons
 }
 
 // monster generates a new monster entity using the given data.

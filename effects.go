@@ -752,24 +752,21 @@ func (eff EffectWarpingMenhir) Apply(g *Game) bool {
 			g.SenseEntity(ei, "sense")
 		}
 	}
-	if g.IntN(3) == 0 {
-		// Dungeon sends a warping wraith to investigate: first goes to
-		// the menhir, then back to the portal.
-		q := g.randomFreeFloor()
-		for paths.DistanceManhattan(pp, q) <= 3*MaxFOVRange {
-			q = g.randomFreeFloor()
+	if g.IntN(2+(MapLevels-g.Map.Level)/2) == 0 {
+		// Dungeon sends a warping wraith to investigate: it first goes
+		// to the menhir, then back to the portal.
+		q := g.Map.Orb
+		if q == InvalidPos {
+			q = g.Map.Portal
 		}
-		e := g.genMonsterAt(WarpingWraith, q)
-		if r, ok := e.Role.(*Actor); ok {
-			r.Behavior.Target = pp
-			r.Behavior.Guard = g.Map.Portal
-		}
+		_, a := g.genMonsterGuardian(WarpingWraith, q)
+		a.Behavior.Target = pp
 	}
 	return true
 }
 
 func (eff EffectWarpingMenhir) Desc() string {
-	return fmt.Sprintf("Teleports away monsters in a %d-radius distance. Reveals location of any portals. The dungeon might sense you and send a monster to investigate.", MaxFOVRange)
+	return fmt.Sprintf("Teleports away monsters in a %d-radius distance. Reveals location of any portals. The dungeon might sense you and send a wraith to investigate: the deeper you are, the more likely.", MaxFOVRange)
 }
 
 type EffectPoisonMenhir struct{}
