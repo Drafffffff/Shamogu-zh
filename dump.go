@@ -167,6 +167,7 @@ func (g *Game) dumpPlayer(sb *strings.Builder) {
 }
 
 func (g *Game) dumpDungeon(sb *strings.Builder) {
+	// Entities.
 	var ids CacheGrid[ID]
 	ids = ids.New()
 	sortedIDs := g.sortedIDsByRenderOrder()
@@ -177,6 +178,17 @@ func (g *Game) dumpDungeon(sb *strings.Builder) {
 		}
 		ids.Set(ei.P, i)
 	}
+	// Monster noise.
+	var noise CacheGrid[ID]
+	noise = noise.New()
+	for _, i := range sortedIDs {
+		ei := g.Entity(i)
+		if ai, ok := ei.Role.(*Actor); ok && ei.Noise && ai.IsAlive() {
+			noise.Set(ei.P, i)
+			continue
+		}
+	}
+	// Draw map.
 	for p := range g.Map.KnownTerrain.Points() {
 		if p.X%MapWidth == 0 {
 			if p.Y == 0 {
@@ -187,6 +199,11 @@ func (g *Game) dumpDungeon(sb *strings.Builder) {
 		}
 		r := g.Map.RuneAt(p)
 		if !g.InFOV(p) {
+			if i := noise.At(p); i > 0 {
+				r = '♫'
+			} else if _, ok := g.Map.Noise[p]; ok {
+				r = '♪'
+			}
 			sb.WriteRune(r)
 			continue
 		}
