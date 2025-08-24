@@ -217,9 +217,13 @@ func (g *Game) menhirsProcGen() {
 		2, 2, 2, 2,
 	}
 	// Extra menhirs.
-	g.ProcInfo.NMenhirs[g.IntN(MapLevels)]++ // levels 1-9
-	g.ProcInfo.NMenhirs[g.IntN(3)]++         // levels 1-3
-	g.ProcInfo.NMenhirs[3+g.IntN(2)]++       // levels 4-5
-	g.ProcInfo.NMenhirs[5+g.IntN(2)]++       // levels 6-7
-	g.ProcInfo.NMenhirs[7+g.IntN(2)]++       // levels 8-9
+	g.ProcInfo.NMenhirs[2+g.IntN(MapLevels-2)]++ // levels 3-9
+	g.ProcInfo.NMenhirs[g.IntN(2)]++             // levels 1-2
+	g.ProcInfo.NMenhirs[2+g.IntN(2)]++           // levels 3-4
+	g.ProcInfo.NMenhirs[5+g.IntN(2)]++           // levels 6-7
+	g.ProcInfo.NMenhirs[7+g.IntN(2)]++           // levels 8-9
+	for i, n := range g.ProcInfo.NMenhirs {
+		// Never generate more than 3 menhirs on a given level.
+		g.ProcInfo.NMenhirs[i] = min(3, n)
+	}
 }
