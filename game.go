@@ -142,9 +142,13 @@ func (g *Game) HandleTurnCount() {
 	switch nmt {
 	case 950:
 		g.LogStyled("You feel a presence searching for intruders.", logSpecial)
-		g.LogStyled("You need to hurry to the portal!", logSpecial)
+		if g.Map.Portal != InvalidPos {
+			g.LogStyled("You need to hurry to the portal!", logSpecial)
+		} else {
+			g.LogStyled("You need to hurry!", logSpecial)
+		}
 	case 1000:
-		g.LogStyled("You've been found!", logSpecial)
+		g.LogStyled("You've been found by the dungeon core!", logSpecial)
 		g.genMonster(BlazingGolem)
 		g.genMonster(BlazingGolem)
 	}
