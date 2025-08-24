@@ -119,7 +119,7 @@ func (g *Game) Dump() string {
 	sb.WriteString(summary)
 	g.dumpPlayer(&sb)
 	sb.WriteString("\nLast messages:\n")
-	for _, e := range g.Logs.Entries[max(0, len(g.Logs.Entries)-15):] {
+	for _, e := range g.Logs.Entries[max(0, len(g.Logs.Entries)-20):] {
 		fmt.Fprintf(&sb, "%s\n", e.dumpString())
 	}
 	sb.WriteString("\nMap:\n")
