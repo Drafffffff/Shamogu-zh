@@ -404,6 +404,9 @@ func (g *Game) SmellFood() {
 		if paths.DistanceManhattan(ei.P, pp) <= 2*MaxFOVRange {
 			// NOTE: using path-distance would be more realistic,
 			// but maybe not worth the extra computation each turn.
+			// Also, using path-distance would leak information
+			// about walls (if the player goes through the tedious
+			// task of doing some math).
 			ei.KnownP = ei.P
 			g.Logf("You smelled %s.", One(ei.Name))
 		}
