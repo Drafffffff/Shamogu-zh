@@ -252,6 +252,23 @@ func (g *Game) ComputeNoise() {
 func monsterNoiseString(ai *Actor) string {
 	switch {
 	case ai.DoesAny(MonsSilent):
+		return "an imperceptible air movement"
+	case ai.DoesAny(MonsHeavyFootsteps):
+		return "heavy footsteps"
+	case ai.DoesAny(MonsWingFlap):
+		return "the flapping of wings"
+	case ai.DoesAny(MonsCreep):
+		return "a creep noise"
+	case ai.DoesAny(MonsLightFootsteps):
+		return "light footsteps"
+	default:
+		return "footsteps"
+	}
+}
+
+func monsterNoiseStringStyled(ai *Actor) string {
+	switch {
+	case ai.DoesAny(MonsSilent):
 		return "an @Yimperceptible air movement@N"
 	case ai.DoesAny(MonsHeavyFootsteps):
 		return "@Mheavy footsteps@N"

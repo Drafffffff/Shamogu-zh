@@ -447,7 +447,7 @@ func (md *model) drawTargInfo() {
 		if !info.sees && e.Noise && e.P == md.targ.p {
 			noise := "footsteps"
 			if a, ok := e.Role.(*Actor); ok {
-				noise = monsterNoiseString(a)
+				noise = monsterNoiseStringStyled(a)
 			}
 			formatBox("monster noise", fmt.Sprintf("You heard %s around there.", noise), ColorForeground)
 			continue
