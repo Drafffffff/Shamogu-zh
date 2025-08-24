@@ -1577,7 +1577,7 @@ In Shamogu, both the player and the monsters may use one of several attack patte
 
 @YNOISE@N
 
-Combat and some other actions produce noise, as shown with onomatopoeias in the game logs. Ranged and melee combat can be heard from a few tiles away only, but various other noise sources may reach farther, up to two times the view range in the worst case. 
+Combat and some other actions produce noise, as shown with onomatopoeias in the game logs. Ranged and melee combat can be heard from a few tiles away only, but various other noise sources may reach farther, up to two times the view range in the worst case.
 
 Shamogu also shows visually the sound made by monsters out of view: @Rfootsteps@N, @Olight footsteps@N, @Gcreep noise@N, @Cflapping of wings@N, and @Mheavy footsteps@N. Note that monsters cannot hear your footsteps or, at the very least, they don’t care about such small noises!
 
