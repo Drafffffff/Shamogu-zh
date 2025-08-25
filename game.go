@@ -229,14 +229,14 @@ func (g *Game) ComputeNoise() {
 		if ai.DoesAny(MonsLightFootsteps | MonsCreep) {
 			// Light footsteps and creeping are slightly harder to
 			// hear.
-			dist++
+			dist += 2
 		}
 		if badhearing {
 			// Bad hearing reduces the distance at which light
 			// footsteps and normal footsteps can be heard.
-			dist += 3
+			dist += 2
 		}
-		if ei.Noise = goodhearing && dist <= MaxFOVRange+1 || dist <= MaxFOVRange-1; !ei.Noise {
+		if ei.Noise = goodhearing && dist <= MaxFOVRange+2 || dist <= MaxFOVRange; !ei.Noise {
 			continue
 		}
 		a = ai
