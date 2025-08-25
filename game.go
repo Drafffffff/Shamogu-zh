@@ -353,9 +353,9 @@ const (
 func (nt NoiseType) Noise() int {
 	switch nt {
 	case NoiseCombat:
-		return 5
+		return 4
 	case NoiseExplosion, NoiseFakePortal:
-		return MaxFOVRange + 3
+		return MaxFOVRange + 4
 	case NoiseMusic, NoiseEarthquake:
 		return 2 * MaxFOVRange
 	default:
@@ -402,9 +402,7 @@ func (g *Game) SmellFood() {
 			continue
 		}
 		if paths.DistanceManhattan(ei.P, pp) <= 2*MaxFOVRange {
-			// NOTE: using path-distance would be more realistic,
-			// but maybe not worth the extra computation each turn.
-			// Also, using path-distance would leak information
+			// NOTE: using path-distance would leak information
 			// about walls (if the player goes through the tedious
 			// task of doing some math).
 			ei.KnownP = ei.P

@@ -229,7 +229,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, MonsHungry, "hunts you with smell, becomes berserk if you eat in view")
 	desc = traitDesc(desc, t, MonsIgnoreDefense, "attack ignores defense")
 	desc = traitDesc(desc, t, MonsLignify, "hits may @Blignify@N you briefly, resists forced movement")
-	desc = traitDesc(desc, t, MonsMusic, "makes music for you, avoids fights")
+	desc = traitDesc(desc, t, MonsMusic, "plays guitar for you, avoids fights")
 	desc = traitDesc(desc, t, MonsSpitFire, "spites @OFire@N from afar")
 	desc = traitDesc(desc, t, MonsSpores, "releases @Blignifying@N spores on sight")
 

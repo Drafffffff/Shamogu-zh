@@ -681,7 +681,7 @@ func (g *Game) menhirMsg(name string) {
 type EffectEarthMenhir struct{}
 
 func (eff EffectEarthMenhir) Apply(g *Game) bool {
-	const maxdist = MaxFOVRange * 2 // "earthquake" distance
+	const maxdist = MaxFOVRange + 4 // "earthquake" distance
 	g.menhirMsg("earth menhir")
 	// Reveal walls (but not the translucent ones) and destroy nearby ones.
 	g.MakeNoise(g.PP(), NoiseEarthquake)
@@ -700,9 +700,11 @@ func (eff EffectEarthMenhir) Apply(g *Game) bool {
 		if t != Wall {
 			continue
 		}
-		if n.Cost <= maxdist && g.IntN(5) > 0 {
+		if n.Cost <= maxdist {
 			g.earthMenhirDig(nbs, n.P)
-			g.Map.KnownTerrain.Set(n.P, Rubble)
+			if g.Map.KnownTerrain.At(n.P) == Wall {
+				g.Map.KnownTerrain.Set(n.P, Rubble)
+			}
 			draw = true
 		} else if g.Map.KnownTerrain.At(n.P) != t {
 			g.Map.KnownTerrain.Set(n.P, t)
