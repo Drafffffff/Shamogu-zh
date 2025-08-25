@@ -1227,11 +1227,12 @@ func (a ActionWizardConfirm) Handle(md *model) (gruid.Effect, bool) {
 	case confirmTrue:
 		if md.g.Wizard.Mode == WizardNone {
 			md.g.Wizard.Mode = WizardNormal
-			md.g.LogStyled("Wizard Mode activated.", logSpecial)
+			md.g.LogStyled("Wizard Mode enabled.", logSpecial)
 			md.g.StoryLog("Entered Wizard Mode")
 		} else {
 			md.g.Wizard.Extra = true
 			md.g.Wizard.Mode = WizardReveal
+			md.g.LogStyled("Extra cheats enabled.", logSpecial)
 			md.g.StoryLog("Enabled extra Wizard Mode cheats!")
 		}
 		md.mode = modeNormal
