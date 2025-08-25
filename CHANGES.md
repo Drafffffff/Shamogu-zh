@@ -19,8 +19,8 @@ New content:
 * New unique monster: **noisy imp**. It performs music just for the player,
   attracting nearby monsters. It avoids fighting similarly to afraid monsters.
 * New special monster: **warping wraith**. Its hits teleport the player away.
-  It can be sent by the dungeon to protect the portal after using a warping
-  menhir.
+  It may be sent by the dungeon to investigate and protect the portal after you
+  use a warping menhir.
 * New portal guardian monster: **blazing golem**. A sturdy magical golem that
   explodes on death.
 * New totem guardian monster: **totem wasp**. Rampaging and venomous wasps that
@@ -43,20 +43,20 @@ Reworked and improved content:
   escape, they now become berserk for a short while!
 * A few small improvements in footstep hearing: more deterministic and better
   UI (use a different color for each monster noise class).
-* Remove the “Nausea” status effect, because it was player-only and didn't have
+* Remove the Nausea status effect, because it was player-only and didn't have
   interesting interactions. It was mainly useful as a nerf for teleport: now
   teleport results in either Daze or Imbalance (chosen randomly between both,
   for some surprise and adaptability). The “disgusting rat” has been renamed
   into a “hungry rat” with a new “hunt by smell” trait that makes rats able to
   track you by smell from out of view and, as an extra trait, become berserk if
   they see you eat a comestible.
-* Remove most eating restrictions. For example, “berserking flower” can now be
-  eaten even if already Berserk: it will end Berserk early and apply it again.
-  That means you can use it to safely prolong Berserk when only one turn is
-  left, but you still get the Poison debuff. The only remaining restriction is
-  that you cannot eat a “lignification fruit” while you have the Foggy-Skin
-  status (restriction may be removed in the future if I find some interesting
-  interaction).
+* Remove most eating restrictions. For example, a “berserking flower” can now
+  be eaten even if already Berserk: it will end Berserk early and apply it
+  again. That means you can use it to safely prolong Berserk when only one turn
+  is left, but you still get the Poison debuff. The only remaining restriction
+  is that you cannot eat a “lignification fruit” while you have the Foggy-Skin
+  status (the restriction may be removed in the future if I find some
+  interesting interaction).
 * Make “ambrosia berries” either confuse you (existing behavior) or make you
   afraid. The idea, like for the “teleport mushroom”, is to provide some kind
   of surprise and require adaptability (a bit like identification systems do in
@@ -67,9 +67,6 @@ Reworked and improved content:
   providing a limited means of wall destruction for non-Boar players. Make
   explosions produce dust or smoke clouds. Also, slightly increase Fire
   duration from firebreath pepper.
-* Allow use of “berserking flower” while berserk (prolonging the effect, but
-  granting the debuff) or “lignification fruit” while lignified. Generally, we
-  don't want to prevent eating artificially.
 * Make “pushing gale” dissipate clouds, providing the first cloud
   dissipating source which, due to “recoil”, can be quite useful for Wind Fox
   players. Also, as a special interaction, “pushing gale” propagates fire
@@ -166,7 +163,7 @@ Fixes:
   later at the end of a turn, which could allow monsters to attack once from a
   distance before the update.
 * Fix spelling and formatting issues in a few log messages. Avoid case of
-  duplicated "Saw *monster*" entries in timeline.
+  duplicated “Saw *monster*” entries in timeline.
 * Fix healing amount in description of foggy-skin onion.
 * Some confused monster actions that happened outside of view incorrectly
   appeared in the game logs.
