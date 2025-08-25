@@ -277,8 +277,10 @@ func (md *model) drawMapWizardRevealTerrain(gd gruid.Grid) {
 		if c.Style.Fg == ColorForegroundSecondary {
 			c.Style.Fg = ColorForeground
 		}
-		if c.Style.Bg == ColorBackgroundSecondary {
+		if c.Rune == ' ' {
 			c.Style.Bg = ColorBackground
+		} else {
+			c.Style.Bg = ColorBackgroundSecondary
 		}
 		it.SetCell(c)
 	}
