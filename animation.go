@@ -177,7 +177,7 @@ func (md *model) HitAnimation(p gruid.Point) {
 		return
 	}
 	md.startAnimSeq()
-	md.anims.Draw(p, '√', ColorMagenta)
+	md.anims.Draw(p, '√', ColorGreen)
 	md.anims.Frame(AnimDurMedium)
 }
 
@@ -187,7 +187,7 @@ func (md *model) DeathAnimation(p gruid.Point) {
 		return
 	}
 	md.startAnimSeq()
-	md.anims.Draw(p, '∞', ColorMagenta)
+	md.anims.Draw(p, '∞', ColorCyan)
 	md.anims.Frame(AnimDurMedium)
 }
 
@@ -271,12 +271,12 @@ func (md *model) WoundedAnimation() {
 
 // GoodStatusAnimation briefly alerts the player when they get a good status.
 func (md *model) GoodStatusAnimation() {
-	md.PlayerAnimation(ColorViolet, AnimDurShortMedium)
+	md.PlayerAnimation(ColorGreen, AnimDurShortMedium)
 }
 
 // BadStatusAnimation briefly alerts the player when they get a bad status.
 func (md *model) BadStatusAnimation() {
-	md.PlayerAnimation(ColorGreen, AnimDurShortMedium)
+	md.PlayerAnimation(ColorMagenta, AnimDurShortMedium)
 }
 
 // NoiseAnimation animates noise (like barking) at the given point.
@@ -312,15 +312,17 @@ func (md *model) FloodAnimation(ps []paths.Node, c gruid.Color) {
 	md.anims.Frame(AnimDurVeryShort)
 }
 
-// TeleportAnimation animates an actor teleport between two positions.
+// TeleportAnimation animates an actor teleport between two positions. Should
+// be called while the actor is still at from.
 func (md *model) TeleportAnimation(from, to gruid.Point, showto bool) {
 	if DisableAnimations {
 		return
 	}
 	md.startAnimSeq()
-	md.anims.Draw(from, 'Φ', ColorCyan)
+	c := md.anims.grid.At(from)
+	md.anims.Draw(from, 'Φ', c.Style.Fg)
 	if showto {
-		md.anims.Draw(to, 'Φ', ColorCyan)
+		md.anims.Draw(to, 'Φ', c.Style.Fg)
 	}
 	md.anims.Frame(AnimDurMediumLong)
 }
