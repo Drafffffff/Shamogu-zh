@@ -84,17 +84,23 @@ func NewMap() *Map {
 	return m
 }
 
-// inMap returns true for inMap map positions (assumming they're relative to
-// the map's corner).
+// inMap reports whether a position is within map bounds (assumming they're
+// relative to the upper-left map's corner).
 func inMap(p gruid.Point) bool {
 	return p.X >= 0 && p.X < MapWidth && p.Y >= 0 && p.Y < MapHeight
 }
 
-// Passable returns true if the given position is passable. In other words,
+// Passable reports whether the given position is passable. In other words,
 // that it's not an obstacle.
 func (m *Map) Passable(p gruid.Point) bool {
 	// Cells outside the map are considered as walls, so not walkable.
 	return Passable(m.Terrain.At(p))
+}
+
+// NoWallAt reports whether the given position is not a (regular) wall.
+func (m *Map) NoWallAt(p gruid.Point) bool {
+	// Cells outside the map are considered as walls, so not walkable.
+	return m.Terrain.At(p) != Wall
 }
 
 // Passable reports whether a given terrain type is Passable.

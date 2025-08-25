@@ -269,6 +269,16 @@ func (md *model) WoundedAnimation() {
 	md.PlayerAnimation(ColorOrange, AnimDurMedium)
 }
 
+// GoodStatusAnimation briefly alerts the player when they get a good status.
+func (md *model) GoodStatusAnimation() {
+	md.PlayerAnimation(ColorViolet, AnimDurShortMedium)
+}
+
+// BadStatusAnimation briefly alerts the player when they get a bad status.
+func (md *model) BadStatusAnimation() {
+	md.PlayerAnimation(ColorGreen, AnimDurShortMedium)
+}
+
 // NoiseAnimation animates noise (like barking) at the given point.
 func (md *model) NoiseAnimation(p gruid.Point) {
 	if DisableAnimations {

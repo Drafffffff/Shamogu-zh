@@ -392,16 +392,17 @@ func (g *Game) PutStatus(i ID, ai *Actor, st Status, turns int) bool {
 	if ai.IsDead() {
 		return false
 	}
+	active := ai.Has(st) // whether the status is already active
 	switch {
 	case st == StatusBerserk:
-		if ai.Has(StatusBerserk) {
+		if active {
 			return false
 		}
 	case st == StatusFire:
 		if ai.Has(StatusFoggySkin) || ai.DoesAny(MonsImmunityFire) {
 			return false
 		}
-		if !ai.Has(StatusFire) {
+		if !active {
 			g.InflictFireDamage(i, ai)
 			if ai.IsDead() {
 				return false
@@ -451,7 +452,7 @@ func (g *Game) PutStatus(i ID, ai *Actor, st Status, turns int) bool {
 			turns *= 2
 		}
 	case st == StatusLignification &&
-		(ai.DoesAny(MonsImmunityLignification) || ai.Has(StatusLignification) || ai.Has(StatusFoggySkin)):
+		(ai.DoesAny(MonsImmunityLignification) || active || ai.Has(StatusFoggySkin)):
 		return false
 	case st == StatusPoison:
 		if ai.Has(StatusLignification) || ai.DoesAny(MonsImmunityPoison) {
@@ -501,6 +502,15 @@ func (g *Game) PutStatus(i ID, ai *Actor, st Status, turns int) bool {
 		g.RemoveStatus(i, ai, StatusFocus)
 	case StatusFocus:
 		g.RemoveStatus(i, ai, StatusSprint)
+	}
+	if i == PlayerID && !active {
+		// Alert the player with a short animation when a new status
+		// becomes active.
+		if st.Bad() {
+			g.md.BadStatusAnimation()
+		} else {
+			g.md.GoodStatusAnimation()
+		}
 	}
 	return true
 }

@@ -552,7 +552,9 @@ func (eff EffectLignify) Apply(g *Game) bool {
 		}
 	}
 	if done {
-		g.md.PlayerAnimation(ColorYellow, AnimDurLong)
+		mp := &MapPath{passable: inMap}
+		nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, MaxFOVRange)
+		g.md.FloodAnimation(nodes, ColorYellow)
 		g.Log("Growing roots lignified your foes.")
 	} else {
 		g.Log("No lignifiable foes in view.")
@@ -685,7 +687,7 @@ func (eff EffectEarthMenhir) Apply(g *Game) bool {
 	g.menhirMsg("earth menhir")
 	// Reveal walls (but not the translucent ones) and destroy nearby ones.
 	g.MakeNoise(g.PP(), NoiseEarthquake)
-	mp := &MappingPath{passable: func(p gruid.Point) bool { return g.Map.Terrain.At(p) != Wall }}
+	mp := &MappingPath{passable: g.Map.NoWallAt}
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, unreachable)
 	var draw bool
 	var nbs paths.Neighbors
@@ -700,7 +702,7 @@ func (eff EffectEarthMenhir) Apply(g *Game) bool {
 		if t != Wall {
 			continue
 		}
-		if n.Cost <= maxdist {
+		if n.Cost <= maxdist && g.Map.PassableNeighbor(n.P) {
 			g.earthMenhirDig(nbs, n.P)
 			if g.Map.KnownTerrain.At(n.P) == Wall {
 				g.Map.KnownTerrain.Set(n.P, Rubble)
@@ -734,7 +736,7 @@ type EffectWarpingMenhir struct{}
 func (eff EffectWarpingMenhir) Apply(g *Game) bool {
 	g.menhirMsg("warping menhir")
 	// Teleport nearby monsters away.
-	mp := &MapPath{passable: g.Map.Passable}
+	mp := &MappingPath{passable: g.Map.NoWallAt}
 	pp := g.PP()
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{pp}, MaxFOVRange)
 	for _, n := range nodes {
@@ -776,7 +778,7 @@ type EffectPoisonMenhir struct{}
 func (eff EffectPoisonMenhir) Apply(g *Game) bool {
 	g.menhirMsg("poison menhir")
 	// Spawn poison clouds randomly.
-	mp := &MapPath{passable: g.Map.Passable}
+	mp := &MappingPath{passable: g.Map.NoWallAt}
 	pp := g.PP()
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{pp}, MaxFOVRange)
 	g.rand.Shuffle(len(nodes), func(i, j int) {
@@ -808,7 +810,7 @@ type EffectFireMenhir struct{}
 func (eff EffectFireMenhir) Apply(g *Game) bool {
 	g.menhirMsg("fire menhir")
 	// Spawn fire clouds randomly.
-	mp := &MapPath{passable: g.Map.Passable}
+	mp := &MappingPath{passable: g.Map.NoWallAt}
 	pp := g.PP()
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{pp}, MaxFOVRange)
 	g.rand.Shuffle(len(nodes), func(i, j int) {
