@@ -30,7 +30,7 @@ type Ability interface {
 type Item interface {
 	// Desc returns a description of the item.
 	Desc() string
-	// Use takes a game state and the item's id and returns true if a
+	// Use takes a game state and the item's id and reports whether a
 	// turn-taking action was performed.
 	Use(*Game, ID) bool
 }

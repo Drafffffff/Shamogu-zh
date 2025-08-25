@@ -93,7 +93,7 @@ func (g *Game) monsterDiscord(i ID, ai *Actor) bool {
 }
 
 // MonsterUpdateTarget makes an ai entity aware about a new target position.
-// It returns true if the monster's mindstate changed.
+// It reports whether the monster's mindstate changed.
 func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point) bool {
 	ei, beh := g.Entity(i), ai.Behavior
 	if beh.State == Hunting {

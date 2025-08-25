@@ -111,13 +111,13 @@ func (g *Game) ResetKnowledge() {
 	}
 }
 
-// InFOV returns true if p is in the player's field of view.
+// InFOV reports whether p is in the player's field of view.
 func (g *Game) InFOV(p gruid.Point) bool {
 	cost, ok := g.Map.FOV.At(p)
 	return ok && cost <= MaxFOVRange && g.Map.FOV.Visible(p)
 }
 
-// DangerInFOV returns true if there is a foe in the player's field of view.
+// DangerInFOV reports whether there is a foe in the player's field of view.
 func (g *Game) DangerInFOV() bool {
 	for i, ai := range g.Monsters() {
 		if ai.IsAlive() && g.InFOV(g.Entity(i).P) {
@@ -127,7 +127,7 @@ func (g *Game) DangerInFOV() bool {
 	return g.dangerousCloudInFOV()
 }
 
-// DangerInProximity returns true if there is a sensed foe in the player's
+// DangerInProximity reports whether there is a sensed foe in the player's
 // proximity (either from seen in FOV or from footstep noise).
 func (g *Game) DangerInProximity() bool {
 	for i, ai := range g.Monsters() {

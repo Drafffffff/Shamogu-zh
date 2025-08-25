@@ -1340,7 +1340,7 @@ func (a actionAuto) String() string {
 	return "action on msgAuto"
 }
 
-// KbTargetingMode returns true if the action is used in keyboard targeting mode.
+// KbTargetingMode reports whether the action is used in keyboard targeting mode.
 func KbTargetingMode(a Action) bool {
 	switch a.(type) {
 	case ActionCursorBump, ActionCursorRun, ActionTravel:

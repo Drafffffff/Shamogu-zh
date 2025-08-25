@@ -81,7 +81,7 @@ func (e *Entity) Color() (fg gruid.Color) {
 	return fg
 }
 
-// IsActor returns true if e has an Actor component.
+// IsActor reports whether e has an Actor component.
 func (e *Entity) IsActor() bool {
 	_, ok := e.Role.(*Actor)
 	return ok
@@ -92,13 +92,13 @@ func (e *Entity) Actor() *Actor {
 	return e.Role.(*Actor)
 }
 
-// IsAlive returns true if e has an Actor component, and is alive.
+// IsAlive reports whether e has an Actor component, and is alive.
 func (e *Entity) IsAlive() bool {
 	a, ok := e.Role.(*Actor)
 	return ok && a.HP > 0
 }
 
-// IsItem returns true if e has an Item component.
+// IsItem reports whether e has an Item component.
 func (e *Entity) IsItem() bool {
 	_, ok := e.Role.(Item)
 	return ok
