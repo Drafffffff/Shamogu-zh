@@ -736,7 +736,7 @@ type EffectWarpingMenhir struct{}
 func (eff EffectWarpingMenhir) Apply(g *Game) bool {
 	g.menhirMsg("warping menhir")
 	// Teleport nearby monsters away.
-	mp := &MappingPath{passable: g.Map.NoWallAt}
+	mp := &MapPath{passable: g.Map.NoWallAt}
 	pp := g.PP()
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{pp}, MaxFOVRange)
 	for _, n := range nodes {
@@ -778,7 +778,7 @@ type EffectPoisonMenhir struct{}
 func (eff EffectPoisonMenhir) Apply(g *Game) bool {
 	g.menhirMsg("poison menhir")
 	// Spawn poison clouds randomly.
-	mp := &MappingPath{passable: g.Map.NoWallAt}
+	mp := &MapPath{passable: g.Map.NoWallAt}
 	pp := g.PP()
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{pp}, MaxFOVRange)
 	g.rand.Shuffle(len(nodes), func(i, j int) {
@@ -810,7 +810,7 @@ type EffectFireMenhir struct{}
 func (eff EffectFireMenhir) Apply(g *Game) bool {
 	g.menhirMsg("fire menhir")
 	// Spawn fire clouds randomly.
-	mp := &MappingPath{passable: g.Map.NoWallAt}
+	mp := &MapPath{passable: g.Map.NoWallAt}
 	pp := g.PP()
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{pp}, MaxFOVRange)
 	g.rand.Shuffle(len(nodes), func(i, j int) {
