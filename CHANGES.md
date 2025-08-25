@@ -1,5 +1,7 @@
 # v? ?
 
+New content:
+
 * New secondary spirit: **Fire Salamander**. It features a *fire retreat*
   ability that makes the player retreat up to two tiles while leaving a fire
   cloud on the previous position, as long as there's room for the retreat. The
@@ -23,6 +25,9 @@
   explodes on death.
 * New totem guardian monster: **totem wasp**. Rampaging and venomous wasps that
   like to use totems as their nest.
+
+Reworked and improved content:
+
 * Make translucent walls liberate a poison cloud when destroyed. Thematically,
   they are walls that contain a special poisonous gas that makes them
   translucent and, on destruction, that gas is expelled, resulting in a poison
@@ -34,6 +39,10 @@
   walls (which now contain poison), “fire menhirs” reveal foliage (that can be
   burnt), and “warping menhirs” (previously called “teleport menhirs”) reveal
   portals.
+* When the player or a monster is both *afraid and cornered* with no possible
+  escape, they now become berserk for a short while!
+* A few small improvements in footstep hearing: more deterministic and better
+  UI (use a different color for each monster noise class).
 * Remove the “Nausea” status effect, because it was player-only and didn't have
   interesting interactions. It was mainly useful as a nerf for teleport: now
   teleport results in either Daze or Imbalance (chosen randomly between both,
@@ -41,8 +50,13 @@
   into a “hungry rat” with a new “hunt by smell” trait that makes rats able to
   track you by smell from out of view and, as an extra trait, become berserk if
   they see you eat a comestible.
-* When the player or a monster is both *afraid and cornered* with no possible
-  escape, they now become berserk for a short while!
+* Remove most eating restrictions. For example, “berserking flower” can now be
+  eaten even if already Berserk: it will end Berserk early and apply it again.
+  That means you can use it to safely prolong Berserk when only one turn is
+  left, but you still get the Poison debuff. The only remaining restriction is
+  that you cannot eat a “lignification fruit” while you have the Foggy-Skin
+  status (restriction may be removed in the future if I find some interesting
+  interaction).
 * Make “ambrosia berries” either confuse you (existing behavior) or make you
   afraid. The idea, like for the “teleport mushroom”, is to provide some kind
   of surprise and require adaptability (a bit like identification systems do in
@@ -68,6 +82,7 @@
   obstacle). This creates more varied possibilities for tactical movement,
   while still restricting safe movements in a similar but less extreme way, and
   providing similar defense from ranged monsters.
+* Adjust slightly down the duration of fire clouds to 6-12 turns.
 * Using “sprint” or “jump” abilities while imbalanced may now sometimes lead to
   a dazing fall.
 * Space-distorting attacks now *swap clouds* too. While getting swapped into a
@@ -84,14 +99,20 @@
   swapping into unexpected clouds. Monster boars and dragons still move into
   dangerous clouds after pushing, because they're enraged and corrupted, so not
   as smart!
+* Players with the Sprinting Gazelle now leave dust behind only on floor tiles
+  (in particular not on foliage ones).
 * The “sprint” and “focus” abilities now cancel each other. It's never really
   useful nor thematic to have both at the same time, so hydra players have now
   an instant sprint cancellation option (at the cost of a spirit charge).
 * While sprinting, the frog's “jump” ability now unbalances foes without
   hurting them, but still dazes them, effectively combining the effects of the
   two kinds of jumps in a sensible way.
-* A few small improvements in footstep hearing: more deterministic and better
-  UI (use a different color for each footstep noise class).
+* Add simple boredom clock: if you spend too much time on a single level (more
+  than necessary with normal play), the dungeon core will detect your presence
+  and mark you until you go through a portal.
+
+Monster behavior and distribution improvements:
+
 * Improve a bit monster distribution. Mostly, bias toward early-mid-late
   monsters depending on map level has been increased, making the various phases
   more distinct. Early and Mid game difficulty remains similar. Late game has
@@ -104,17 +125,23 @@
 * Improvements in monster group formation. In particular, less groups of three
   monsters than before and more groups of two, so somewhat better coverage of
   the map in mid and late game, but smaller likeliness of large monster groups.
-* Mixed map generation algorithms in some map levels.
-* Adjust slightly down the duration of fire clouds to 6-12 turns.
+
+Map generation:
+
+* Mixed map generation algorithms in some map levels and some other smaller
+  improvements in map generation.
+* Malfunctioning portals are now more common (around 1-3 per game, with 2 being
+  the most common). Some minor adjustments in menhir distribution (in
+  particular, the same type can't appear twice on a given map level anymore).
 * Add a few new special vaults.
 
 UI, graphics, QoL:
 
 * Add concise information about current tile in the status bar which tells
   whether there's fog, an item, or a special kind of terrain under the player.
-* Animation improvements. Monster deaths are now always animated when in view,
-  independently of the cause. Hits between confused monsters are now animated
-  too, making it clearer what's happening. Other minor enhancements.
+* Animation improvements and fixes. Monster deaths are now always animated when
+  in view, independently of the cause. Hits between confused monsters are now
+  animated too, making it clearer what's happening. Other minor enhancements.
 * Improve various tiles (footsteps, translucent walls, food…).
 * Wizard mode improvements: intended for development purposes, but now cheat
   usage is recorded in a more fine-grained way in statistics, so any frustrated
@@ -122,16 +149,24 @@ UI, graphics, QoL:
   Wizard Mode *once* with `W` only enables non-permadeath mode (each
   resurrection by the wizard will be recorded in the timeline). Extra cheats
   are enabled by pressing `W` again one or more times.
+* Refine drawing of tiles with both a cloud and an item: clouds are now drawn
+  over items, but if the cloud is not dangerous, the color of the item is used
+  (which never conflicts with the color of dangerous clouds).
+* A few improvements in game statistic's dump: ASCII map now shows monster
+  noise too, the number of last messages was increased a bit.
+* A few help improvements.
 
 Fixes:
 
 * Nadre explosions now properly blow up nearby walls too, like in Boohu and
   Harmonist.
-* Fix spelling and formatting issues in a few log messages. Avoid case of
-  duplicated "Saw *monster*" entries in timeline.
+* Make the player never appear on a vault with a totem: not really a bug, but
+  it wasn't very fun.
 * Fix field of view sometimes not being updated just after cloud creation but
   later at the end of a turn, which could allow monsters to attack once from a
   distance before the update.
+* Fix spelling and formatting issues in a few log messages. Avoid case of
+  duplicated "Saw *monster*" entries in timeline.
 * Fix healing amount in description of foggy-skin onion.
 * Some confused monster actions that happened outside of view incorrectly
   appeared in the game logs.
