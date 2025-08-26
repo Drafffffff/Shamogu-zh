@@ -547,7 +547,8 @@ func (eff EffectLignify) Apply(g *Game) bool {
 		if !g.InFOV(ei.P) {
 			continue
 		}
-		if g.PutStatus(i, ai, StatusLignification, DurationLignification/2) {
+		if g.PutStatus(i, ai, StatusLignification, DurationLignification/2) && !done {
+			g.Log("Growing roots lignify your foes.")
 			done = true
 		}
 	}
@@ -555,7 +556,6 @@ func (eff EffectLignify) Apply(g *Game) bool {
 		mp := &MapPath{passable: inMap}
 		nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, MaxFOVRange)
 		g.md.FloodAnimation(nodes, ColorYellow)
-		g.Log("Growing roots lignified your foes.")
 	} else {
 		g.Log("No lignifiable foes in view.")
 	}

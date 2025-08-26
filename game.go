@@ -406,7 +406,7 @@ func (g *Game) SmellFood() {
 			// about walls (if the player goes through the tedious
 			// task of doing some math).
 			ei.KnownP = ei.P
-			g.Logf("You smelled %s.", One(ei.Name))
+			g.Logf("You smell %s.", One(ei.Name))
 		}
 	}
 }

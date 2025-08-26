@@ -139,7 +139,7 @@ func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKi
 		g.md.WoundedAnimation()
 		if g.Wizard.Mode != WizardNone && aj.IsDead() {
 			aj.HP = aj.MaxHP
-			g.LogStyled("*** Wizard mode resurrected you! ***", logSpecial)
+			g.LogStyled("*** Wizard mode resurrects you! ***", logSpecial)
 			g.StoryLog("Resurrected by the Wizard!")
 			g.Wizard.Resurrections++
 		}
@@ -574,9 +574,9 @@ func (g *Game) swapSpaceDistortion(i, j ID, ai, aj *Actor, dmg int, dazed bool) 
 		if k, ak := g.ActorAt(p); k >= 0 && k != j && !ak.ResistsMove() {
 			ek := g.Entity(k)
 			if to, ok := g.BlinkPos(ek.P); ok {
+				g.Logf("The space distortion blinks the %s away.", ek.Name)
 				g.md.TeleportAnimation(ek.P, to, true)
 				g.MoveActor(k, ak, to)
-				g.Logf("The temporal distortion blinked the %s away.", ek.Name)
 			}
 		}
 	}
