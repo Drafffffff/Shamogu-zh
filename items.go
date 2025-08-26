@@ -289,14 +289,14 @@ type Portal struct {
 
 func (p *Portal) Desc() string {
 	if p.Used {
-		return "Malfunctioning magic portal that doesn’t lead anywhere, despite looking normal."
+		return "Malfunctioning magical portal that doesn’t lead anywhere, despite looking normal."
 	}
 	return fmt.Sprintf("@CActivable@N.\n%s", "A magical portal leading to the next level. Replenishes spirit charges and HP.")
 }
 
 func (p *Portal) Use(g *Game, i ID) bool {
 	if p.Used {
-		g.Log("This magic portal is malfunctional and cannot be used.")
+		g.Log("This portal is malfunctional and cannot be triggered anymore.")
 		return false
 	}
 	if p.Fake {
@@ -308,6 +308,7 @@ func (p *Portal) Use(g *Game, i ID) bool {
 		log.Printf("saving game before new level: %v", err)
 	}
 	g.StoryLog("Entered a magical portal!")
+	g.LogStyled("You enter the portal.", logSpecial)
 	g.NextLevel()
 	return false
 }
@@ -339,7 +340,6 @@ func (g *Game) NextLevel() {
 	g.InitLevel()
 	g.Logs.NextTick = g.Logs.Index
 	g.md.targ.CancelExamine()
-	g.LogStyled("You reached a new region through the portal.", logSpecial)
 }
 
 // CorruptionOrb represents the orb of corruption.

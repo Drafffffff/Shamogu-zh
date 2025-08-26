@@ -1259,7 +1259,8 @@ func (a ActionWizardNextLevel) Handle(md *model) (gruid.Effect, bool) {
 		md.mode = modeNormal
 		return nil, false
 	}
-	md.g.StoryLog("Wizard Mode: used next level cheat")
+	md.g.StoryLog("Wizard Mode: used “go to next level” cheat")
+	g.LogStyled("You use the “go to next level” cheat.", logSpecial)
 	g.NextLevel()
 	md.mode = modeNormal
 	return nil, false
