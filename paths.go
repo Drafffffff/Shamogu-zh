@@ -52,12 +52,12 @@ func (g *Game) PlayerPassableFunc() func(gruid.Point) bool {
 	knownAt := g.Map.KnownTerrain.At
 	if g.PlayerActor().Statuses.Has(StatusDig) {
 		return func(p gruid.Point) bool {
-			return inMap(p) && knownAt(p) != Unknown
+			return inMap(p) && knownAt(p) != Unknown && g.NoTrapAt(p)
 		}
 	}
 	passable := g.Map.Passable
 	return func(p gruid.Point) bool {
-		return passable(p) && knownAt(p) != Unknown
+		return passable(p) && knownAt(p) != Unknown && g.NoTrapAt(p)
 	}
 }
 
@@ -100,15 +100,21 @@ func (aip *MonPath) Estimation(from, to gruid.Point) int {
 // MonPath returns a path between two positions for a monster actor.
 func (g *Game) MonPath(i ID, ai *Actor, from, to gruid.Point) []gruid.Point {
 	pp := g.PP()
+	ei := g.Entity(i)
+	beh := ei.Role.(*Actor).Behavior
+	passable := g.Map.Passable
+	if beh.State != Hunting {
+		passable = func(p gruid.Point) bool {
+			return g.Map.Passable(p) && g.NoTrapAt(p)
+		}
+	}
 	aip := &MonPath{
 		actorAt:  g.Map.BoolCache.At,
 		pp:       pp,
-		passable: g.Map.Passable,
+		passable: passable,
 		rand:     g.rand,
 		confused: ai.Has(StatusConfusion)}
 	var path []gruid.Point
-	ei := g.Entity(i)
-	beh := ei.Role.(*Actor).Behavior
 	if beh.State != Hunting && paths.DistanceManhattan(from, pp) > MaxFOVRange &&
 		paths.DistanceManhattan(from, to) > MaxFOVRange {
 		path = g.PR.JPSPath(beh.Path, from, to, aip.passable, false)

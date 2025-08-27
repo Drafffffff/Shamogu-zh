@@ -79,7 +79,7 @@ my %names = (
     "♫" => "footsteps",
     '"' => "quotes",
     '+' => "plus",
-    '=' => "equal",
+    '=' => "rune",
     '>' => "portal",
     '’' => "apostrophe",
     '“' => "lquotes",

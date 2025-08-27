@@ -25,6 +25,9 @@ New content:
   explodes on death.
 * New totem guardian monster: **totem wasp**. Rampaging and venomous wasps that
   like to use totems as their nest.
+* New kind of item: **runic trap**. They represent *visible* traps that are
+  triggered when stepped on by the player or a monster. Wandering monsters
+  avoid traps, but hunting ones do not. Effects depend on the kind of rune.
 
 Reworked and improved content:
 

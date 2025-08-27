@@ -6,7 +6,8 @@ import (
 	"codeberg.org/anaseto/gruid"
 )
 
-// Directions contains the four cardinal directions.
+// Directions contains the four cardinal directions in direct order (east,
+// north, west, south).
 var Directions = []gruid.Point{
 	{1, 0},
 	{0, -1},

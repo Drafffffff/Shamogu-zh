@@ -28,7 +28,7 @@ func (e *Entity) String() string {
 	return e.Name
 }
 
-// Color returns the color of an entity
+// Color returns the color of an entity.
 func (e *Entity) Color() (fg gruid.Color) {
 	switch r := e.Role.(type) {
 	case *Actor:
@@ -77,6 +77,8 @@ func (e *Entity) Color() (fg gruid.Color) {
 		fg = ColorYellow
 	case *Comestible:
 		fg = ColorYellow
+	case *RunicTrap:
+		fg = r.Color()
 	}
 	return fg
 }
@@ -165,6 +167,7 @@ func (g *Game) MoveActor(i ID, ai *Actor, to gruid.Point) {
 			ai.Behavior.Path = ai.Behavior.Path[1:]
 		}
 	}
+	g.TriggerTrapAt(to)
 }
 
 // BumpMoveActor is like MoveActor but with extra effects specific to

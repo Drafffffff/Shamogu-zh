@@ -493,6 +493,8 @@ func (md *model) drawTargInfo() {
 			sb.WriteString(r.Desc())
 		case *CorruptionOrb:
 			sb.WriteString(r.Desc())
+		case *RunicTrap:
+			sb.WriteString(r.Desc())
 		}
 		formatBox(name, sb.String(), e.Color())
 	}

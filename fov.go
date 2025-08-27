@@ -88,6 +88,9 @@ func (g *Game) SenseEntity(e *Entity, verb string) {
 		case *CorruptionOrb:
 			g.LogfStyled("You %s the Orb of Corruption!", logNotable, verb)
 			g.StoryLogf("Found the Orb of Corruption (distance: %d)", g.ppDist(e.P))
+		case *RunicTrap:
+			g.LogfStyled("You %s %s.", logNotable, verb, One(e.Name))
+			g.StoryLogf("Spotted %s (distance: %d)", One(e.Name), g.ppDist(e.P))
 		default:
 			g.LogfStyled("You %s %s.", logNotable, verb, One(e.Name))
 			g.StoryLogf("Discovered %s (distance: %d)", One(e.Name), g.ppDist(e.P))

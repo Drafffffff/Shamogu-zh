@@ -344,6 +344,7 @@ const (
 	itemSpirit
 	itemMenhir
 	itemPortal // includes CorruptionOrb too
+	itemRune
 )
 
 func item2type(it Item) itemType {
@@ -358,6 +359,8 @@ func item2type(it Item) itemType {
 		return itemPortal
 	case *CorruptionOrb:
 		return itemPortal
+	case *RunicTrap:
+		return itemRune
 	default:
 		panic("unexpected item")
 	}
@@ -409,6 +412,8 @@ func (a ActionNextItem) String() string {
 	case itemPortal:
 		// Also works for the orb of corruption.
 		return "Examine next known portal"
+	case itemRune:
+		return "Examine next known runic trap"
 	default:
 		// Should not happen.
 		return "Examine next known item"
@@ -913,7 +918,7 @@ var configActions = []Action{
 	ActionToggleWarningFirePois{},
 }
 
-var configKeys = []rune{'=', 'c', 'w', 't'}
+var configKeys = []rune{':', 'c', 'w', 't'}
 
 func (a ActionConfig) Handle(md *model) (gruid.Effect, bool) {
 	md.menuActions = configActions
@@ -1020,6 +1025,7 @@ var configurableKeyActions = [...]configurableAction{
 	ActionNextItem{itemSpirit},
 	ActionNextItem{itemMenhir},
 	ActionNextItem{itemPortal},
+	ActionNextItem{itemRune},
 	ActionNextMonster{},
 	ActionPreviousMonster{},
 	ActionTravel{},
@@ -1449,7 +1455,7 @@ func (md *model) KeysHelp() {
 		"Close menu, inventory…", "SPACE or ESC or mouse left outside",
 		"Advanced Game Actions", "",
 		"View previous messages", "m",
-		"Examine next portal/menhir", "> &",
+		"Examine next portal/menhir/rune", "> & =",
 		"Examine next totem/comestible", "! %",
 		"Examine previous/next monster", "- +",
 		"Run", runKeys,

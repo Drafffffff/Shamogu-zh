@@ -32,6 +32,7 @@ func (g *Game) GenEntities(mg *MapGen) {
 	clear(g.Entities[FirstMapID+1:])
 	g.Entities = g.Entities[:FirstMapID+1]
 	g.Map.ActorCache = g.Map.ActorCache.New()
+	g.Map.RuneCache = g.Map.RuneCache.New()
 	// Generate new items and actors.
 	g.genPlayerOnNewLevel(mg)
 	g.genItems(mg)
@@ -286,6 +287,10 @@ func (g *Game) genItems(mg *MapGen) {
 			co.P = g.randomFreeItemFloor()
 		}
 		g.AddEntity(co)
+	}
+	// Runic traps.
+	for range 2 + g.IntN(3) {
+		g.genRunicTrap()
 	}
 }
 
@@ -575,5 +580,72 @@ loop:
 			continue loop
 		}
 		return p
+	}
+}
+
+// runicTrap generates a new runic trap entity using the given data.
+func runicTrap(mr MagicRune) *Entity {
+	return &Entity{
+		Name:   mr.String(),
+		Rune:   '=',
+		KnownP: InvalidPos,
+		Role:   &RunicTrap{Rune: mr},
+	}
+}
+
+func (g *Game) genRunicTrap() (ID, *Entity) {
+loop:
+	for {
+		p := g.RandomPassable()
+		for i := range g.ItemEntities() {
+			if g.Entity(i).P == p {
+				continue loop
+			}
+		}
+		passable := func(q gruid.Point) bool {
+			qt := g.Map.Terrain.At(q)
+			return Passable(qt) && g.Map.RuneCache.At(q) <= 0
+		}
+		pass := false
+		n := 0 // number of passability toggles
+		nfree := 0
+		directions := append(slices.Clone(Directions), gruid.Point{1, 0})
+		var pdir gruid.Point // previous direction
+		for i, dir := range directions {
+			q := p.Add(dir)
+			qpass := passable(q)
+			if i == 0 {
+				pdir = dir
+				pass = qpass
+				continue
+			}
+			if qpass {
+				if pass && !passable(q.Add(pdir)) {
+					// Not connex or not connex enough.
+					continue loop
+				}
+				nfree++
+			}
+			if pass != qpass {
+				n++
+			}
+			pass = qpass
+			pdir = dir
+		}
+		if n > 2 || nfree < 2 {
+			// Not connex or not connex enough or not enough free
+			// space.
+			continue
+		}
+		// We replace foliage or rubble with floor for putting the
+		// trap, like we do for other kinds of items.
+		g.Map.Terrain.Set(p, Floor)
+		// We add a new runic trap entity at the suitable position.
+		e := runicTrap(MagicRune(1 + g.IntN(NRunes)))
+		e.P = p
+		id := ID(len(g.Entities))
+		g.Map.RuneCache.SetU(p, id)
+		g.AddEntity(e)
+		return id, e
 	}
 }

@@ -65,6 +65,7 @@ type Map struct {
 
 	BoolCache  CacheGrid[bool] // for boolean caching in algorithms
 	ActorCache CacheGrid[ID]   // for caching actor positions
+	RuneCache  CacheGrid[ID]   // for caching runic trap positions
 
 	Orb    gruid.Point // position of Orb of Corruption (if on the map)
 	Portal gruid.Point // position of (true) portal
