@@ -664,6 +664,7 @@ func (eff EffectFireRetreat) Apply(g *Game) bool {
 	g.Log("You retreat.")
 	g.BumpMoveActor(PlayerID, pa, to)
 	g.md.MoveAnimation(from, to)
+	g.RemoveCloudAt(from)
 	g.FireCloudAt(from)
 	return true
 }
