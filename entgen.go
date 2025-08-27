@@ -290,7 +290,7 @@ func (g *Game) genItems(mg *MapGen) {
 	}
 	// Runic traps.
 	for range 2 + g.IntN(3) {
-		g.genRunicTrap()
+		g.genRunicTrap(mg)
 	}
 }
 
@@ -593,10 +593,13 @@ func runicTrap(mr MagicRune) *Entity {
 	}
 }
 
-func (g *Game) genRunicTrap() (ID, *Entity) {
+func (g *Game) genRunicTrap(mg *MapGen) (ID, *Entity) {
 loop:
 	for {
 		p := g.RandomPassable()
+		if !mg.vault.At(p) && g.IntN(3) > 0 {
+			continue
+		}
 		for i := range g.ItemEntities() {
 			if g.Entity(i).P == p {
 				continue loop
