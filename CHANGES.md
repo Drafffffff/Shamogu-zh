@@ -71,6 +71,8 @@ Reworked and improved content:
   dissipating source which, due to “recoil”, can be quite useful for Wind Fox
   players. Also, as a special interaction, “pushing gale” propagates fire
   clouds on foliage tiles instead of dissipating them.
+* New clouds can replace existing clouds of different types. If the type is the
+  same, the duration is still the maximum of the old and new ones, like before.
 * Make “recoil” active even with the non-upgraded Wind Fox (pushing is active
   on the non-upgraded Rampaging Boar, so having recoil only on upgraded Wind
   Fox seemed a bit strange).
