@@ -38,10 +38,10 @@ func (md *model) UpdateRun(delta gruid.Point) {
 	blocked := g.dirBlocked(p, a.delta)
 	a.dirChange = false
 	if blocked && nbs > 0 {
-		if g.PlayerPassable(left(p, a.delta)) {
+		if g.PlayerPassableNoTraps(left(p, a.delta)) {
 			a.delta = left(p, a.delta).Sub(p)
 			a.dirChange = true
-		} else if g.PlayerPassable(right(p, a.delta)) {
+		} else if g.PlayerPassableNoTraps(right(p, a.delta)) {
 			a.delta = right(p, a.delta).Sub(p)
 			a.dirChange = true
 		}
@@ -58,7 +58,7 @@ func (md *model) KeepRunning() bool {
 		return false
 	}
 	p := g.PP().Add(md.auto.delta)
-	if !g.PlayerPassable(p) {
+	if !g.PlayerPassableNoTraps(p) {
 		return false
 	}
 	nbs := g.dirNeighbors(p, md.auto.delta)
@@ -84,17 +84,17 @@ const (
 )
 
 func (g *Game) dirNeighbors(p, dir gruid.Point) (dn dirNeighbors) {
-	if !g.PlayerPassable(left(p, dir)) {
+	if !g.PlayerPassableNoTraps(left(p, dir)) {
 		dn += dirBlockedLeft
 	}
-	if !g.PlayerPassable(right(p, dir)) {
+	if !g.PlayerPassableNoTraps(right(p, dir)) {
 		dn += dirBlockedRight
 	}
 	return dn
 }
 
 func (g *Game) dirBlocked(p, dir gruid.Point) bool {
-	return !g.PlayerPassable(p.Add(dir))
+	return !g.PlayerPassableNoTraps(p.Add(dir))
 }
 
 func right(p gruid.Point, dir gruid.Point) gruid.Point {
@@ -141,7 +141,7 @@ func (md *model) UpdateAutoExplore() (next gruid.Point, ok bool) {
 		}
 		return next, false
 	}
-	ap := &MapPath{passable: g.PlayerPassableFunc()}
+	ap := &MapPath{passable: g.PlayerPassableNoTrapsFunc()}
 	pp := g.PP()
 	if md.auto.PRauto.BreadthFirstMapAt(pp) > unreachable {
 		g.Log("You cannot reach some places.")
@@ -205,7 +205,7 @@ const unreachable = 9999
 
 func (md *model) buildAutoExploreMap(sources []gruid.Point) {
 	g := md.g
-	ap := &MapPath{passable: g.PlayerPassableFunc()}
+	ap := &MapPath{passable: g.PlayerPassableNoTrapsFunc()}
 	md.auto.PRauto.BreadthFirstMap(ap, sources, unreachable)
 	md.auto.aemRebuild = false
 }

@@ -92,7 +92,7 @@ func (a ActionRun) Handle(md *model) (gruid.Effect, bool) {
 		return nil, false
 	}
 	p := g.PP().Add(a.Delta)
-	if !g.PlayerPassable(p) {
+	if !g.PlayerPassableNoTraps(p) {
 		g.Log("You cannot run in that direction.")
 		return nil, false
 	}

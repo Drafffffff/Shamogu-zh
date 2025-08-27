@@ -39,16 +39,22 @@ func (mp *MappingPath) Neighbors(p gruid.Point) []gruid.Point {
 // PlayerPath returns a player path between two map positions.
 func (g *Game) PlayerPath(from, to gruid.Point) []gruid.Point {
 	path := []gruid.Point{}
-	path = g.PR.JPSPath(path, from, to, g.PlayerPassableFunc(), false)
+	if g.NoTrapAt(to) {
+		path = g.PR.JPSPath(path, from, to, g.PlayerPassableNoTrapsFunc(), false)
+	} else {
+		// If there is a trap in the destination, we don't avoid traps,
+		// as that's what the player is asking for.
+		path = g.PR.JPSPath(path, from, to, g.PlayerPassableFunc(), false)
+	}
 	if len(path) == 0 {
 		return nil
 	}
 	return path
 }
 
-// PlayerPassableFunc returns a passability function suited for computing a
-// player path.
-func (g *Game) PlayerPassableFunc() func(gruid.Point) bool {
+// PlayerPassableNoTrapsFunc returns a passability function suited for computing a
+// player path. It considers tiles containing traps.
+func (g *Game) PlayerPassableNoTrapsFunc() func(gruid.Point) bool {
 	knownAt := g.Map.KnownTerrain.At
 	if g.PlayerActor().Statuses.Has(StatusDig) {
 		return func(p gruid.Point) bool {
@@ -61,9 +67,24 @@ func (g *Game) PlayerPassableFunc() func(gruid.Point) bool {
 	}
 }
 
-// PlayerPassable reports whether a given position is passable for the player.
-func (g *Game) PlayerPassable(p gruid.Point) bool {
-	return g.PlayerPassableFunc()(p)
+// PlayerPassableFunc returns a passability function suited for
+// computing a player path. It considers tiles containing traps as passable.
+func (g *Game) PlayerPassableFunc() func(gruid.Point) bool {
+	knownAt := g.Map.KnownTerrain.At
+	if g.PlayerActor().Statuses.Has(StatusDig) {
+		return func(p gruid.Point) bool {
+			return inMap(p) && knownAt(p) != Unknown
+		}
+	}
+	passable := g.Map.Passable
+	return func(p gruid.Point) bool {
+		return passable(p) && knownAt(p) != Unknown
+	}
+}
+
+// PlayerPassableNoTraps reports whether a given position is passable for the player.
+func (g *Game) PlayerPassableNoTraps(p gruid.Point) bool {
+	return g.PlayerPassableNoTrapsFunc()(p)
 }
 
 // MonPath implements paths.Astar for monster movement.
