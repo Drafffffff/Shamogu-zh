@@ -1550,6 +1550,12 @@ func (a ActionHelpCombat) String() string {
 
 func combatHelpText() string {
 	return strings.TrimSpace(`
+@YTURN-BASED SYSTEM@N
+
+Shamogu is a turn-based game. Each actor acts once per turn: the player acts
+first, then the monsters do. Monsters act one after another, but except during
+some animations, you’ll only see the final state, as if they acted all at once.
+
 @YCOMBAT DAMAGE@N
 
 Combat damage is affected by attack (A) and defense (D). Maximum damage is the minimum of attack A and 3. Higher values of A increase chances of higher damage when attacking, while higher values of D decrease that chance when defending. Zero damage represents a miss.
