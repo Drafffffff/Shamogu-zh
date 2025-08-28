@@ -207,16 +207,16 @@ func (t Traits) String() string {
 	}
 	desc = traitDesc(desc, t, GoodSmell, "smells food from afar")
 	desc = traitDesc(desc, t, TrailingCloud, "movement leaves dust behind")
-	desc = traitDesc(desc, t, WoodyLegs, "can move while lignified (with reduced duration)")
+	desc = traitDesc(desc, t, WoodyLegs, "woody legs (can move while lignified)")
 
 	desc = traitDesc(desc, t, VulnerabilityFire, "double @OFire@N duration")
 
-	desc = traitDesc(desc, t, ResistanceConfusion, "half @OConfusion@N duration")
-	desc = traitDesc(desc, t, ResistanceDaze, "half @ODaze@N duration")
-	desc = traitDesc(desc, t, ResistanceFear, "half @OFear@N duration")
-	desc = traitDesc(desc, t, ResistanceFire, "half @OFire@N duration")
-	desc = traitDesc(desc, t, ResistanceImbalance, "half @OImbalance@N duration")
-	desc = traitDesc(desc, t, ResistancePoison, "half @OPoison@N duration")
+	desc = traitDesc(desc, t, ResistanceConfusion, "@OConfusion@N resistance (half duration)")
+	desc = traitDesc(desc, t, ResistanceDaze, "@ODaze@N resistance (half duration)")
+	desc = traitDesc(desc, t, ResistanceFear, "@OFear@N resistance (half duration)")
+	desc = traitDesc(desc, t, ResistanceFire, "@OFire@N resistance (half duration)")
+	desc = traitDesc(desc, t, ResistanceImbalance, "@OImbalance@N resistance (half duration)")
+	desc = traitDesc(desc, t, ResistancePoison, "@OPoison@N resistance (half duration)")
 
 	desc = traitDesc(desc, t, MonsBarking, "barks on sight and @Ofrightens@N you")
 	desc = traitDesc(desc, t, MonsBerserking, "hits may @Bberserk@N you briefly")
