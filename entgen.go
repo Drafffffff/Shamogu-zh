@@ -598,6 +598,8 @@ func runicTrap(mr MagicRune) *Entity {
 }
 
 func (g *Game) genRunicTrap(mg *MapGen) (ID, *Entity) {
+	// TODO: generate one or maybe two traps in corridors while checking
+	// there's another path.
 loop:
 	for {
 		p := g.RandomPassable()
