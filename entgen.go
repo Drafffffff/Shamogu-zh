@@ -506,9 +506,9 @@ func (g *Game) genMonsters() {
 	}
 }
 
-var nMonsE = [MapLevels]int{3, 5, 6, 6, 5, 5, 5, 4, 4}
+var nMonsE = [MapLevels]int{3, 5, 6, 6, 5, 5, 5, 4, 3}
 var nMonsM = [MapLevels]int{2, 3, 4, 6, 8, 10, 10, 10, 10}
-var nMonsL = [MapLevels]int{0, 0, 1, 1, 2, 2, 3, 4, 5}
+var nMonsL = [MapLevels]int{0, 0, 1, 1, 2, 2, 3, 4, 6}
 
 // genMonster spawns a monster of the given kind on a random free floor.
 func (g *Game) genMonster(mk monsterKind) (ID, *Entity) {
