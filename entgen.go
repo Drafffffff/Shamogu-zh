@@ -644,7 +644,7 @@ loop:
 		// trap, like we do for other kinds of items.
 		g.Map.Terrain.Set(p, Floor)
 		// We add a new runic trap entity at the suitable position.
-		e := runicTrap(MagicRune(1 + g.IntN(NRunes)))
+		e := runicTrap(MagicRune(g.IntN(NRunes)))
 		e.P = p
 		id := ID(len(g.Entities))
 		g.Map.RuneCache.SetU(p, id)

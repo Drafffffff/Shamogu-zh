@@ -1,20 +1,23 @@
 package main
 
 import (
+	"fmt"
+
 	"codeberg.org/anaseto/gruid"
 )
 
 // RunicTrap represents a triggerable runic trap.
 type RunicTrap struct {
-	Rune MagicRune // magic rune
+	Used      bool      // whether the rune has already been triggered
+	KnownUsed bool      // whether the rune is known to have already been triggered
+	Rune      MagicRune // magic rune
 }
 
 // MagicRune represents the various kinds of runes used in runic traps.
 type MagicRune int
 
 const (
-	RuneInert MagicRune = iota
-	RuneBerserk
+	RuneBerserk MagicRune = iota
 	RuneFire
 	RuneLignification
 	RunePoison
@@ -22,7 +25,7 @@ const (
 )
 
 // NRunes is the number of non-inert distinct magical runes.
-const NRunes = int(RuneWarp)
+const NRunes = 1 + int(RuneWarp)
 
 // String returns the name of the runic trap.
 func (mr MagicRune) String() string {
@@ -38,12 +41,16 @@ func (mr MagicRune) String() string {
 	case RuneWarp:
 		return "warp rune"
 	default:
-		return "inert rune"
+		// Should not happen.
+		return "unknown rune"
 	}
 }
 
 // Color returns the color of the runic trap.
 func (rt RunicTrap) Color() gruid.Color {
+	if rt.KnownUsed {
+		return ColorForeground
+	}
 	switch rt.Rune {
 	case RuneBerserk:
 		return ColorMagenta
@@ -56,25 +63,30 @@ func (rt RunicTrap) Color() gruid.Color {
 	case RuneWarp:
 		return ColorViolet
 	default:
+		// Should not happen.
 		return ColorForeground
 	}
 }
 
 // Desc returns the description of the runic trap.
 func (rt RunicTrap) Desc() string {
+	if rt.KnownUsed {
+		return "The rune has already been triggered."
+	}
 	switch rt.Rune {
 	case RuneBerserk:
-		return "Applies Berserk status when stepped on."
+		return fmt.Sprintf("Applies @BBerserk@N status for %d turns when stepped on.", DurationBerserkTotem)
 	case RuneFire:
-		return "Spawns a fire cloud when stepped on."
+		return "Spawns a fire cloud lasting 6-12 turns when stepped on."
 	case RuneLignification:
-		return "Applies Lignification status when stepped on."
+		return fmt.Sprintf("Applies @BLignification@N status for %d turns when stepped on.", DurationLignification/2)
 	case RunePoison:
-		return "Spawns a poison cloud when stepped on."
+		return "Spawns a poison cloud lasting 6-10 turns when stepped on."
 	case RuneWarp:
-		return "Teleports you away when stepped on."
+		return "Teleports away any actor that steps on it."
 	default:
-		return "The already triggered rune became inert."
+		// Should not happen.
+		return "Unknown effect."
 	}
 }
 
@@ -97,7 +109,7 @@ func (g *Game) TriggerTrapAt(p gruid.Point) {
 	}
 	ei := g.Entity(i)
 	rt, ok := ei.Role.(*RunicTrap)
-	if !ok {
+	if !ok || rt.Used {
 		return
 	}
 	if j, _ := g.ActorAt(p); j >= 0 {
@@ -126,7 +138,9 @@ func (g *Game) TriggerTrapAt(p gruid.Point) {
 			g.TeleportActor(i, ai)
 		}
 	}
-	rt.Rune = RuneInert
-	ei.Name = RuneInert.String()
+	rt.Used = true
+	if g.InFOV(p) {
+		rt.KnownUsed = true
+	}
 	g.Map.RuneCache.SetU(p, 0)
 }

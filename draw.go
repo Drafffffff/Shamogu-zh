@@ -495,6 +495,9 @@ func (md *model) drawTargInfo() {
 			sb.WriteString(r.Desc())
 		case *RunicTrap:
 			sb.WriteString(r.Desc())
+			if r.KnownUsed {
+				name += " (inert)"
+			}
 		}
 		formatBox(name, sb.String(), e.Color())
 	}
