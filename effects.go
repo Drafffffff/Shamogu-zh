@@ -207,7 +207,7 @@ func (eff EffectTeleportMushroom) Apply(g *Game) bool {
 	if !g.TeleportActor(PlayerID, pa) {
 		g.Log("You resist teleport while lignified.")
 	}
-	if j, _ := g.Spirit(); j >= 0 {
+	if j := g.TotemID(); j >= 0 {
 		ej := g.Entity(j)
 		g.SenseEntity(ej, "sense")
 	}

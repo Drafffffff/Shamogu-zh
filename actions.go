@@ -341,7 +341,7 @@ type itemType int
 
 const (
 	itemComestible itemType = iota
-	itemSpirit
+	itemTotem
 	itemMenhir
 	itemPortal // includes CorruptionOrb too
 	itemRune
@@ -352,7 +352,9 @@ func item2type(it Item) itemType {
 	case *Comestible:
 		return itemComestible
 	case *Spirit:
-		return itemSpirit
+		return itemTotem
+	case *EmptyTotem:
+		return itemTotem
 	case *Menhir:
 		return itemMenhir
 	case *Portal:
@@ -405,7 +407,7 @@ func (a ActionNextItem) String() string {
 	switch a.Type {
 	case itemComestible:
 		return "Examine next known comestible"
-	case itemSpirit:
+	case itemTotem:
 		return "Examine next known spirit"
 	case itemMenhir:
 		return "Examine next known menhir"
@@ -1022,7 +1024,7 @@ var configurableKeyActions = [...]configurableAction{
 	ActionViewMessages{},
 	ActionExamineModeToggle{},
 	ActionNextItem{itemComestible},
-	ActionNextItem{itemSpirit},
+	ActionNextItem{itemTotem},
 	ActionNextItem{itemMenhir},
 	ActionNextItem{itemPortal},
 	ActionNextItem{itemRune},

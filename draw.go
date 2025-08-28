@@ -480,24 +480,20 @@ func (md *model) drawTargInfo() {
 			}
 			sb.WriteByte('\n')
 			fmt.Fprintf(&sb, "@CTraits:@N %s.", r.Traits)
+		case *Spirit:
+			sb.WriteString("@CTotemic spirit.@N\n" + r.Desc())
 		case *Menhir:
 			sb.WriteString(r.Desc())
 			if r.Used {
 				name += " (inert)"
 			}
-		case *Comestible:
-			sb.WriteString(r.Desc())
-		case *Spirit:
-			sb.WriteString("@CTotemic spirit.@N\n" + r.Desc())
-		case *Portal:
-			sb.WriteString(r.Desc())
-		case *CorruptionOrb:
-			sb.WriteString(r.Desc())
 		case *RunicTrap:
 			sb.WriteString(r.Desc())
 			if r.KnownUsed {
 				name += " (inert)"
 			}
+		case Item:
+			sb.WriteString(r.Desc())
 		}
 		formatBox(name, sb.String(), e.Color())
 	}

@@ -267,15 +267,19 @@ func (g *Game) genItems(mg *MapGen) {
 		g.AddEntity(me)
 	}
 	// Totemic spirit.
+	totemVaults := slices.Delete(slices.Clone(mg.vaults), mg.pi, mg.pi+1)
 	if spiritIndex := g.ProcInfo.Spirits[g.Map.Level-1]; spiritIndex >= 0 {
 		sp := spiritEntity(secondarySpirits[spiritIndex])
 		spr := sp.Role.(*Spirit)
 		spr.Charges = spr.MaxCharges[spr.Level]
 		sp.Rune = '!'
-		tvaults := slices.Delete(slices.Clone(mg.vaults), mg.pi, mg.pi+1)
-		_, sp.P = mg.RandomVaultsPlace(tvaults, PlaceItem)
+		_, sp.P = mg.RandomVaultsPlace(totemVaults, PlaceItem)
 		g.Map.Totem = sp.P
 		g.AddEntity(sp)
+	} else if g.Map.Level < MapLevels {
+		_, p := mg.RandomVaultsPlace(totemVaults, PlaceItem)
+		g.Map.Totem = p
+		g.AddEntity(&Entity{Name: "empty totem", Rune: '!', P: p, Role: &EmptyTotem{}})
 	}
 	// Comestibles.
 	nitems := g.ProcInfo.NComestibles[g.Map.Level-1]

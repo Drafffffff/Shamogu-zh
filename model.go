@@ -172,7 +172,7 @@ func (md *model) initKeys() {
 		"+":                 ActionNextMonster{},
 		"-":                 ActionPreviousMonster{},
 		"%":                 ActionNextItem{itemComestible},
-		"!":                 ActionNextItem{itemSpirit},
+		"!":                 ActionNextItem{itemTotem},
 		"&":                 ActionNextItem{itemMenhir},
 		">":                 ActionNextItem{itemPortal},
 		"=":                 ActionNextItem{itemRune},

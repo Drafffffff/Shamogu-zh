@@ -408,15 +408,18 @@ func (g *Game) Comestibles() iter.Seq2[ID, Item] {
 	}
 }
 
-// Spirit returns the spirit on the map (if any). NOTE: there should never be
-// more than one, otherwise this function returns the first one.
-func (g *Game) Spirit() (ID, *Spirit) {
+// TotemID returns the ID of the map's totem (if any). NOTE: there should never
+// be more than one, otherwise this function returns the first one.
+func (g *Game) TotemID() ID {
 	for id, e := range g.NPMapEntities() {
-		if it, ok := e.Role.(*Spirit); ok {
-			return id, it
+		switch e.Role.(type) {
+		case *Spirit:
+			return id
+		case *EmptyTotem:
+			return id
 		}
 	}
-	return -1, nil
+	return -1
 }
 
 // PlayerSpirits returns an iterator over player's primary and secondary spirits.

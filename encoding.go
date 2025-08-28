@@ -69,6 +69,7 @@ func init() {
 	gob.Register(&Portal{})
 	gob.Register(&CorruptionOrb{})
 	gob.Register(&RunicTrap{})
+	gob.Register(&EmptyTotem{})
 
 	// Other roles.
 	gob.Register(&Actor{})

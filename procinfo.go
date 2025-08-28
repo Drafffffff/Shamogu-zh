@@ -135,8 +135,9 @@ func (g *Game) spiritProcGen() {
 	}
 	// Games generate at most 6 totems among possible ones.
 	copy(mapSpirits, spirits[:min(6, len(spirits))])
-	// We shuffle over more levels to possibly leave early ones without
-	// spirit.
+	// We shuffle totems in map levels 2-8. The first level always contains
+	// a totem, and levels 2-8 contain five totems and two empty ones. The
+	// ninth level never contains a totem.
 	s := mapSpirits[1:8]
 	g.rand.Shuffle(len(s), func(i, j int) {
 		s[i], s[j] = s[j], s[i]

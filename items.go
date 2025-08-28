@@ -152,6 +152,18 @@ func (sp *Spirit) Use(g *Game, i ID) bool {
 
 const ConfusionDamage = 1
 
+// EmptyTotem represents a totem without spirit.
+type EmptyTotem struct{}
+
+func (sp *EmptyTotem) Desc() string {
+	return "The totem does not have a spirit or it already left."
+}
+
+func (sp *EmptyTotem) Use(g *Game, i ID) bool {
+	g.Log("You cannot equip a spirit from an empty totem.")
+	return false
+}
+
 // Comestible represents a collectable comestible item.
 type Comestible struct {
 	Effect Effect // effect on use

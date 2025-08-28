@@ -85,6 +85,9 @@ func (g *Game) SenseEntity(e *Entity, verb string) {
 		case *Spirit:
 			g.LogfStyled("You %s %s totem.", logNotable, verb, One(e.Name))
 			g.StoryLogf("Spotted %s totem (distance: %d)", One(e.Name), g.ppDist(e.P))
+		case *EmptyTotem:
+			g.LogStyled("You see an empty totem.", logNotable)
+			g.StoryLogf("Spotted an empty totem (distance: %d)", g.ppDist(e.P))
 		case *CorruptionOrb:
 			g.LogfStyled("You %s the Orb of Corruption!", logNotable, verb)
 			g.StoryLogf("Found the Orb of Corruption (distance: %d)", g.ppDist(e.P))

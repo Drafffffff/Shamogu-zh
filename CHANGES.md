@@ -28,6 +28,9 @@ New content:
 * New kind of item: **runic trap**. They represent *visible* traps that are
   triggered when stepped on by the player or a monster. Wandering monsters
   avoid traps, but hunting ones do not. Effects depend on the kind of rune.
+* New **empty totem** static item on map levels without a regular totem. Its
+  purpose is to make it so the player doesn't feel the need to explore all the
+  map corners on those maps (feature suggested by @mlochbaum in issue #1).
 
 Reworked and improved content:
 
