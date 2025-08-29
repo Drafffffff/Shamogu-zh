@@ -708,9 +708,37 @@ func (eff EffectEarthMenhir) Apply(g *Game) bool {
 				g.Map.KnownTerrain.Set(n.P, Rubble)
 			}
 			draw = true
-		} else if g.Map.KnownTerrain.At(n.P) != t {
+		} else if g.Map.KnownTerrain.At(n.P) != t && g.Map.revelableWallAt(n.P) {
 			g.Map.KnownTerrain.Set(n.P, t)
 			draw = true
+		}
+	}
+	return true
+}
+
+// revelableWallAt reports whether there's a earth-menhir revelable wall at the
+// given position (wall adjacent to an interior wall).
+func (m *Map) revelableWallAt(p gruid.Point) bool {
+	if m.Terrain.At(p) != Wall {
+		return false
+	}
+	for q := range Neighbors(p) {
+		if m.interiorWallAt(q) {
+			return true
+		}
+	}
+	return false
+}
+
+// interiorWallAt reports whether there's an interior wall at the given
+// position (wall not connected to any passable tile).
+func (m *Map) interiorWallAt(p gruid.Point) bool {
+	if m.Terrain.At(p) != Wall {
+		return false
+	}
+	for q := range Neighbors(p) {
+		if m.Terrain.At(q) != Wall {
+			return false
 		}
 	}
 	return true
@@ -728,7 +756,7 @@ func (g *Game) earthMenhirDig(nbs paths.Neighbors, at gruid.Point) {
 }
 
 func (eff EffectEarthMenhir) Desc() string {
-	return "Destroys nearby walls and reveals remaining map walls."
+	return "Destroys nearby walls and reveals the frontier consisting of map walls adjacent to interior ones."
 }
 
 type EffectWarpingMenhir struct{}
