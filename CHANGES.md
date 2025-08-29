@@ -140,6 +140,8 @@ Map generation:
 * Malfunctioning portals are now more common (around 1-3 per game, with 2 being
   the most common). Some minor adjustments in menhir distribution (in
   particular, the same type can't appear twice on a given map level anymore).
+* Improved placement of non-vault comestibles, now more often present in
+  spots next to walls than before (suggested by @mlochbaum).
 * Add a few new special vaults.
 
 UI, graphics, QoL:

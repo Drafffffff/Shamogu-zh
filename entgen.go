@@ -321,7 +321,7 @@ func (g *Game) genItems(mg *MapGen) {
 func (g *Game) randomFreeItemFloor() gruid.Point {
 loop:
 	for {
-		p := g.RandomPassable()
+		p := g.RandomPassableBiased()
 		for i := range g.ItemEntities() {
 			if g.Entity(i).P == p {
 				continue loop
@@ -332,6 +332,27 @@ loop:
 		// clarity, it's better this way.
 		g.Map.Terrain.Set(p, Floor)
 		return p
+	}
+}
+
+// RandomPassableBiased is like RandomPassable, but biased toward positions
+// next to walls.
+func (g *Game) RandomPassableBiased() gruid.Point {
+	m := g.Map.Terrain
+	size := m.Size()
+	var nbs paths.Neighbors
+	for {
+		p := gruid.Point{g.rand.IntN(size.X), g.rand.IntN(size.Y)}
+		if t := m.At(p); Passable(t) {
+			return p
+		}
+		ps := nbs.All(p, g.Map.Passable)
+		if len(ps) == 0 {
+			continue
+		}
+		// Return a passable neighbor (including diagonals to increase
+		// bias toward corners and dead ends).
+		return ps[g.IntN(len(ps))]
 	}
 }
 
