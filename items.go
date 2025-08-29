@@ -108,7 +108,7 @@ func (sp *Spirit) UpgradeDesc() string {
 	fmt.Fprintf(&sb, "@BCharges:@N %+d", sp.MaxCharges[1]-sp.MaxCharges[0])
 	if sp.BonusTraits[1] != sp.BonusTraits[0] {
 		sb.WriteByte('\n')
-		fmt.Fprintf(&sb, "@BTraits:@N %s.", sp.BonusTraits[1]&^sp.BonusTraits[0])
+		fmt.Fprintf(&sb, "@BNew traits:@N %s.", sp.BonusTraits[1]&^sp.BonusTraits[0])
 	}
 	return desc + "\n\n" + sb.String()
 }
