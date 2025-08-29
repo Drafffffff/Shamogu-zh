@@ -1591,7 +1591,7 @@ In Shamogu, both the player and the monsters may use one of several attack patte
 
 @YNOISE@N
 
-Combat and some other actions produce noise, as shown with onomatopoeias in the game logs. Some noises can be heard from a few tiles away only, while others may reach farther, up to two times the view range in the worst case. There are four increasing noise levels: the fist corresponds to combat and shows as a lowercase “Smash!”, the second includes “ROAR!” and “CRACK!”, the third “POP-BOOM!”, and the fourth “RING-RING!”. Beware that monsters will investigate the source of those noises.
+Combat and some other actions produce noise, as shown with onomatopoeias in the game logs. Some noises can be heard from a few tiles away only, while others may reach farther, up to two times the view range in the worst case. Possible noises include a gentle “Smash!”, a more serious “ROAR!” or “CRACK!”, a problematic “POP-BOOM!”, or an even more alarming “RING-RING!”. Beware that monsters will investigate the source of those noises.
 
 Shamogu also shows visually the sound made by monsters out of view: @Rfootsteps@N, @Olight footsteps@N, @Gcreep noise@N, @Cflapping of wings@N, and @Mheavy footsteps@N. Note that monsters cannot hear your footsteps or, at the very least, they don’t care about such small noises!
 
