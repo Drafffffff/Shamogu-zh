@@ -382,7 +382,7 @@ func (nt NoiseType) Msg() string {
 	case NoiseEarthMenhir:
 		return "RING-RING!"
 	case NoiseMusic:
-		return "Noisy Imp sings “♫ larilon, larila ♫ ♪”."
+		return "Noisy Imp belts “♫ larilon, larila ♫ ♪”."
 	case NoiseRoar:
 		return "ROAR!"
 	case NoiseWind:
