@@ -138,7 +138,7 @@ func (g *Game) Sprint(dir gruid.Point) bool {
 	if jump {
 		// Path contains a monster or two: jumping over them unbalances them.
 		for p := from; p != to; p = p.Add(dir) {
-			if i, ai := g.ActorAt(to); i >= 0 {
+			if i, ai := g.ActorAt(p); i >= 0 {
 				g.PutStatus(i, ai, StatusImbalance, DurationImbalanceSprint)
 			}
 		}
