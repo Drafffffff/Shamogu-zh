@@ -621,11 +621,9 @@ func (g *Game) genRunicTrap(mg *MapGen) (ID, *Entity) {
 loop:
 	for {
 		p := g.RandomPassable()
-		if !mg.vault.At(p) && g.IntN(4) > 0 {
+		inVault := mg.vault.At(p)
+		if !inVault && g.IntN(4) > 0 {
 			// Make vault cells more likely candidates.
-			// TODO: We probably want to add extra considerations
-			// or at least remove tiles that are in uninteresting
-			// corners.
 			continue
 		}
 		for i := range g.ItemEntities() {
@@ -637,6 +635,10 @@ loop:
 		if n > 2 || nfree < 2 {
 			// Not connex or not connex enough or not enough free
 			// space.
+			continue
+		}
+		if !inVault && n == 2 && nfree == 2 {
+			// Likely an uninteresting corner.
 			continue
 		}
 		return g.genRunicTrapAt(p)
