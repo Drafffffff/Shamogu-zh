@@ -341,9 +341,9 @@ const (
 	NoiseCombat
 	NoiseDig
 	NoiseExplosion
+	NoiseEarthMenhir
 	NoiseFakePortal
 	NoiseLightning
-	NoiseEarthquake
 	NoiseMusic
 	NoiseRoar
 	NoiseWind
@@ -356,7 +356,7 @@ func (nt NoiseType) Noise() int {
 		return 4
 	case NoiseExplosion, NoiseFakePortal:
 		return MaxFOVRange + 4
-	case NoiseMusic, NoiseEarthquake:
+	case NoiseMusic, NoiseEarthMenhir:
 		return 2 * MaxFOVRange
 	default:
 		return MaxFOVRange
@@ -379,8 +379,8 @@ func (nt NoiseType) Msg() string {
 		return "THRUM!"
 	case NoiseLightning:
 		return "PANG!"
-	case NoiseEarthquake:
-		return "CREAK-CRACK!"
+	case NoiseEarthMenhir:
+		return "RING-RING!"
 	case NoiseMusic:
 		return "Noisy Imp sings “♫ larilon, larila ♫ ♪”."
 	case NoiseRoar:

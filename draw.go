@@ -429,12 +429,16 @@ func (md *model) drawTargInfo() {
 			msg = "rocks falling"
 		case NoiseExplosion:
 			msg = "an explosion"
+		case NoiseEarthMenhir:
+			msg = "noisy echo" // should not happen (player-only now)
+		case NoiseFakePortal:
+			msg = "an eerie sound" // should not happen (player-only now)
 		case NoiseLightning:
-			msg = "a spark"
-		case NoiseEarthquake:
-			msg = "dull echo"
+			msg = "a spark" // should not happen (player-only now)
 		case NoiseRoar:
-			msg = "a roar"
+			msg = "a roar" // should not happen (player-only now)
+		case NoiseWind:
+			msg = "a whistle" // should not happen (player-only now)
 		}
 		formatBox("noise", fmt.Sprintf("You heard %s around there.", msg), ColorCyan)
 	}

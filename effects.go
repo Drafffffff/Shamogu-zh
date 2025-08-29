@@ -686,7 +686,7 @@ func (eff EffectEarthMenhir) Apply(g *Game) bool {
 	const maxdist = MaxFOVRange + 4 // "earthquake" distance
 	g.menhirMsg("earth menhir")
 	// Reveal walls (but not the translucent ones) and destroy nearby ones.
-	g.MakeNoise(g.PP(), NoiseEarthquake)
+	g.MakeNoise(g.PP(), NoiseEarthMenhir)
 	mp := &MappingPath{passable: g.Map.NoWallAt}
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, unreachable)
 	var draw bool
@@ -706,6 +706,8 @@ func (eff EffectEarthMenhir) Apply(g *Game) bool {
 			g.earthMenhirDig(nbs, n.P)
 			if g.Map.KnownTerrain.At(n.P) == Wall {
 				g.Map.KnownTerrain.Set(n.P, Rubble)
+			} else if g.Map.revelableWallAt(n.P) {
+				g.Map.KnownTerrain.Set(n.P, t)
 			}
 			draw = true
 		} else if g.Map.KnownTerrain.At(n.P) != t && g.Map.revelableWallAt(n.P) {
@@ -756,7 +758,7 @@ func (g *Game) earthMenhirDig(nbs paths.Neighbors, at gruid.Point) {
 }
 
 func (eff EffectEarthMenhir) Desc() string {
-	return "Destroys nearby walls and reveals the frontier consisting of map walls adjacent to interior ones."
+	return "Emits noisy echoing sound that disintegrates nearby walls and reveals the frontier formed by map walls adjacent to interior ones."
 }
 
 type EffectWarpingMenhir struct{}
