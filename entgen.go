@@ -162,6 +162,11 @@ func spiritEntity(si spiritInfo) *Entity {
 			BonusHP:      si.BonusHP}}
 }
 
+// genEmptyTotemAt generates a new empty totem entity at the given point.
+func (g *Game) genEmptyTotemAt(p gruid.Point) ID {
+	return g.AddEntity(&Entity{Name: "empty totem", Rune: '!', P: p, Role: &EmptyTotem{}})
+}
+
 // itemInfo gathers information for item generation.
 type itemInfo struct {
 	Name   string
@@ -279,7 +284,7 @@ func (g *Game) genItems(mg *MapGen) {
 	} else if g.Map.Level < MapLevels {
 		_, p := mg.RandomVaultsPlace(totemVaults, PlaceItem)
 		g.Map.Totem = p
-		g.AddEntity(&Entity{Name: "empty totem", Rune: '!', P: p, Role: &EmptyTotem{}})
+		g.genEmptyTotemAt(p)
 	}
 	// Comestibles.
 	nitems := g.ProcInfo.NComestibles[g.Map.Level-1]

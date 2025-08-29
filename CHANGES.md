@@ -33,6 +33,7 @@ New content:
 * New **empty totem** static item on map levels without a regular totem. Its
   purpose is to make it so the player doesn't feel the need to explore all the
   map corners on those maps (feature suggested by @mlochbaum in issue #1).
+  Normal totems now become empty totems once you've picked their spirit.
 
 Reworked and improved content:
 

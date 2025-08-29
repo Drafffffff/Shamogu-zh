@@ -227,6 +227,8 @@ func (g *Game) EquipItemAt(i ID) bool {
 			g.AdjustHP(PlayerID, pa, hpmaxDelta)
 		}
 		ej.P = InvalidPos
+		et := g.Entity(g.genEmptyTotemAt(g.PP()))
+		et.Seen = true
 		g.totemPickupBerserk()
 		return true
 	case *Comestible:
@@ -260,7 +262,7 @@ func (g *Game) totemPickupBerserk() {
 		}
 	}
 	if berserk {
-		g.LogStyled("Picking a totem makes monsters in view berserk!", logSpecial)
+		g.LogStyled("Picking a spirit makes monsters in view berserk!", logSpecial)
 	}
 }
 
