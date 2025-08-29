@@ -203,11 +203,18 @@ type EffectTeleportMushroom struct{}
 
 func (eff EffectTeleportMushroom) Apply(g *Game) bool {
 	pa := g.PlayerActor()
+	j := g.TotemID()
+	if pa.Has(StatusLignification) {
+		if j < 0 || g.Entity(j).Seen {
+			g.Log("Eating that while lignified is useless now.")
+			return false
+		}
+	}
 	g.eatMsg("teleport mushroom", 0)
 	if !g.TeleportActor(PlayerID, pa) {
 		g.Log("You resist teleport while lignified.")
 	}
-	if j := g.TotemID(); j >= 0 {
+	if j >= 0 {
 		ej := g.Entity(j)
 		g.SenseEntity(ej, "sense")
 	}
