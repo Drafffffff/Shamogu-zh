@@ -1513,7 +1513,7 @@ On the map, monster color may change depending on active status effects.  By def
 		case StatusBerserk, StatusLignification:
 			details = "HP never falls below 1 on expiration."
 		case StatusConfusion:
-			details = "Confused monsters will attack other monsters too when adjacent. Some monsters may even hurt or affect themselves when performing special actions like digging, spiting fire, barking, or pushing."
+			details = "Confused monsters will attack other monsters too when adjacent. Some monsters may even hurt or affect themselves when performing special actions like digging, spitting fire, barking, or pushing."
 		case StatusFear:
 			details = "Monsters will flee when facing you. Ambushing charges against unseen foes can still happen. At the end of a turn, a cornered and afraid actor with no possible escape will become berserk. "
 		case StatusImbalance:
