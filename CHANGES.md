@@ -41,9 +41,9 @@ Reworked and improved content:
   translucent and, on destruction, that gas is expelled, resulting in a poison
   cloud and ordinary rubble.
 * Rework menhirs. The “mapping menhir” is now called “earth menhir” and only reveals
-  the frontier formed by map map walls adjacent to interior ones; its noisy
-  echoing sound also destroys most nearby walls. Other menhirs remain similar,
-  but offer some partial information about the map too: “poison menhirs” reveal
+  the frontier formed by map walls adjacent to interior ones; its noisy echoing
+  sound also destroys most nearby walls. Other menhirs remain similar, but
+  offer some partial information about the map too: “poison menhirs” reveal
   translucent walls (which now contain poison), “fire menhirs” reveal foliage
   (that can be burnt), and “warping menhirs” (previously called “teleport
   menhirs”) reveal portals.
