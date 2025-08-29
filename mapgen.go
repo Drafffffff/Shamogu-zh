@@ -32,6 +32,7 @@ type MapGen struct {
 	terrain rl.Grid         // map terrain
 	vaults  []*vault        // list of special vaults
 	tunnel  CacheGrid[bool] // in tunnel
+	xtunnel []gruid.Point   // points belonging to extra tunnels
 	vault   CacheGrid[bool] // in vault
 	pi      int             // player's vault
 	PR      *paths.PathRange
@@ -505,7 +506,7 @@ func (mg *MapGen) connectAllVaults() {
 			continue
 		}
 		nearest := mg.nearestConnectedVault(i)
-		ok := mg.connectVaultPair(nearest, vi)
+		ok := mg.connectVaultPair(nearest, vi, false)
 		if !ok {
 			panic("connect rooms")
 		}
@@ -527,7 +528,7 @@ func (mg *MapGen) connectAllVaults() {
 				continue
 			}
 			count++
-			mg.connectVaultPair(vi, mg.nearVault(vi))
+			mg.connectVaultPair(vi, mg.nearVault(vi), true)
 		}
 	}
 	// Sort rooms by X position.
@@ -541,7 +542,7 @@ func (mg *MapGen) connectAllVaults() {
 
 // connectVaultPair connects a pair of vaults using a shortest path according
 // to tunnelPath.
-func (mg *MapGen) connectVaultPair(v1, v2 *vault) bool {
+func (mg *MapGen) connectVaultPair(v1, v2 *vault, extra bool) bool {
 	if v1 == v2 {
 		return false
 	}
@@ -572,6 +573,11 @@ func (mg *MapGen) connectVaultPair(v1, v2 *vault) bool {
 				mg.terrain.Set(p, Floor)
 			} else {
 				mg.terrain.Set(p, fill)
+			}
+			if extra {
+				// This tile belongs to an extra tunnel
+				// exclusively.
+				mg.xtunnel = append(mg.xtunnel, p)
 			}
 		}
 		mg.tunnel.Set(p, true)

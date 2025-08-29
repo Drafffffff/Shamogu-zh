@@ -98,6 +98,12 @@ func (m *Map) Passable(p gruid.Point) bool {
 	return Passable(m.Terrain.At(p))
 }
 
+// PassableWithoutTraps reports whether the given position is passable without
+// traps.
+func (m *Map) PassableWithoutTraps(p gruid.Point) bool {
+	return Passable(m.Terrain.At(p)) && m.RuneCache.At(p) <= 0
+}
+
 // NoWallAt reports whether the given position is not a (regular) wall.
 func (m *Map) NoWallAt(p gruid.Point) bool {
 	// Cells outside the map are considered as walls, so not walkable.

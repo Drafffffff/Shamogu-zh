@@ -293,8 +293,26 @@ func (g *Game) genItems(mg *MapGen) {
 		g.AddEntity(co)
 	}
 	// Runic traps.
-	for range 2 + g.IntN(3) {
+	rto, rtt := 1, 1 // runes in open areas and in tunnels
+	switch g.IntN(4) {
+	case 0:
+		rto++
+	case 1:
+		rtt++
+	}
+	if g.Map.Level >= 6 {
+		// Extra runic trap.
+		if g.IntN(2) == 0 {
+			rto++
+		} else {
+			rtt++
+		}
+	}
+	for range rto {
 		g.genRunicTrap(mg)
+	}
+	for range rtt {
+		g.genRunicTrapInTunnel(mg)
 	}
 }
 
@@ -597,13 +615,17 @@ func runicTrap(mr MagicRune) *Entity {
 	}
 }
 
+// genRunicTrap generates a runic trap at a position that doesn't truly block
+// passage, somewhat biased toward vaults.
 func (g *Game) genRunicTrap(mg *MapGen) (ID, *Entity) {
-	// TODO: generate one or maybe two traps in corridors while checking
-	// there's another path.
 loop:
 	for {
 		p := g.RandomPassable()
-		if !mg.vault.At(p) && g.IntN(3) > 0 {
+		if !mg.vault.At(p) && g.IntN(4) > 0 {
+			// Make vault cells more likely candidates.
+			// TODO: We probably want to add extra considerations
+			// or at least remove tiles that are in uninteresting
+			// corners.
 			continue
 		}
 		for i := range g.ItemEntities() {
@@ -611,50 +633,99 @@ loop:
 				continue loop
 			}
 		}
-		passable := func(q gruid.Point) bool {
-			qt := g.Map.Terrain.At(q)
-			return Passable(qt) && g.Map.RuneCache.At(q) <= 0
-		}
-		pass := false
-		n := 0 // number of passability toggles
-		nfree := 0
-		directions := append(slices.Clone(Directions), gruid.Point{1, 0})
-		var pdir gruid.Point // previous direction
-		for i, dir := range directions {
-			q := p.Add(dir)
-			qpass := passable(q)
-			if i == 0 {
-				pdir = dir
-				pass = qpass
-				continue
-			}
-			if qpass {
-				if pass && !passable(q.Add(pdir)) {
-					// Not connex or not connex enough.
-					continue loop
-				}
-				nfree++
-			}
-			if pass != qpass {
-				n++
-			}
-			pass = qpass
-			pdir = dir
-		}
+		n, nfree := g.neighborInfo(p)
 		if n > 2 || nfree < 2 {
 			// Not connex or not connex enough or not enough free
 			// space.
 			continue
 		}
-		// We replace foliage or rubble with floor for putting the
-		// trap, like we do for other kinds of items.
-		g.Map.Terrain.Set(p, Floor)
-		// We add a new runic trap entity at the suitable position.
-		e := runicTrap(MagicRune(g.IntN(NRunes)))
-		e.P = p
-		id := ID(len(g.Entities))
-		g.Map.RuneCache.SetU(p, id)
-		g.AddEntity(e)
-		return id, e
+		return g.genRunicTrapAt(p)
 	}
+}
+
+// genRunicTrapInTunnel generates a runic trap in an extra tunnel, if possible.
+// It blocks locally the passage, but there's always an alternative path.
+func (g *Game) genRunicTrapInTunnel(mg *MapGen) (ID, *Entity) {
+	if len(mg.xtunnel) == 0 {
+		return g.genRunicTrap(mg)
+	}
+	// We shuffle extra tunnel tiles. XXX: We maybe should keep track of
+	// tunnels separately instead, to give equal chance to each tunnel
+	// whether it's long or short.
+	g.rand.Shuffle(len(mg.xtunnel), func(i, j int) {
+		mg.xtunnel[i], mg.xtunnel[j] = mg.xtunnel[j], mg.xtunnel[i]
+	})
+loop:
+	for _, p := range mg.xtunnel {
+		for i := range g.ItemEntities() {
+			if g.Entity(i).P == p {
+				continue loop
+			}
+		}
+		// n, nfree := g.pointInfo(p)
+		// if n != 4 || nfree != 2 {
+		// 	// Not really a tunnel.
+		// 	continue
+		// }
+		passable := func(q gruid.Point) bool {
+			return g.Map.Passable(q) && g.NoTrapAt(q) && q != p
+		}
+		var dir, q gruid.Point
+		for _, d := range Directions {
+			q = p.Add(d)
+			dir = d
+			if passable(q) {
+				break
+			}
+		}
+		path := g.PR.JPSPath(nil, q, p.Sub(dir), passable, false)
+		if path == nil {
+			continue
+		}
+		return g.genRunicTrapAt(p)
+	}
+	return g.genRunicTrap(mg)
+}
+
+// genRunicTrapAt adds a new runic trap entity at the given position. It
+// replaces foliage or rubble with floor on that tile.
+func (g *Game) genRunicTrapAt(p gruid.Point) (ID, *Entity) {
+	g.Map.Terrain.Set(p, Floor)
+	e := runicTrap(MagicRune(g.IntN(NRunes)))
+	e.P = p
+	id := ID(len(g.Entities))
+	g.Map.RuneCache.SetU(p, id)
+	g.AddEntity(e)
+	return id, e
+}
+
+// neighborInfo returns the number of passability toggles (non-passable/passable
+// alternations) and passable neighbors without traps.
+func (g *Game) neighborInfo(p gruid.Point) (n int, nfree int) {
+	passable := g.Map.PassableWithoutTraps
+	pass := false
+	directions := append(slices.Clone(Directions), gruid.Point{1, 0})
+	var pdir gruid.Point // previous direction
+	for i, dir := range directions {
+		q := p.Add(dir)
+		qpass := passable(q)
+		if i == 0 {
+			pdir = dir
+			pass = qpass
+			continue
+		}
+		if qpass {
+			if pass && !passable(q.Add(pdir)) {
+				// Not connex or not connex enough.
+				return -1, -1
+			}
+			nfree++
+		}
+		if pass != qpass {
+			n++
+		}
+		pass = qpass
+		pdir = dir
+	}
+	return n, nfree
 }
