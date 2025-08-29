@@ -758,7 +758,7 @@ func (g *Game) earthMenhirDig(nbs paths.Neighbors, at gruid.Point) {
 }
 
 func (eff EffectEarthMenhir) Desc() string {
-	return "Emits noisy echoing sound that disintegrates nearby walls and reveals the frontier formed by map walls adjacent to interior ones."
+	return "Emits a noisy echoing sound that disintegrates nearby walls and reveals the frontier formed by map walls adjacent to interior ones."
 }
 
 type EffectWarpingMenhir struct{}

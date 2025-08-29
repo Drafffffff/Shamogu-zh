@@ -28,6 +28,8 @@ New content:
 * New kind of item: **runic trap**. They represent *visible* traps that are
   triggered when stepped on by the player or a monster. Wandering monsters
   avoid traps, but hunting ones do not. Effects depend on the kind of rune.
+  Placement is designed so that there's always at least one path that avoids
+  traps.
 * New **empty totem** static item on map levels without a regular totem. Its
   purpose is to make it so the player doesn't feel the need to explore all the
   map corners on those maps (feature suggested by @mlochbaum in issue #1).
@@ -38,13 +40,13 @@ Reworked and improved content:
   they are walls that contain a special poisonous gas that makes them
   translucent and, on destruction, that gas is expelled, resulting in a poison
   cloud and ordinary rubble.
-* Rework menhirs. The “mapping menhir” is now called “earth menhir” and reveals
-  all map walls but no other features; it also destroys most nearby walls,
-  instead of just making noise. Other menhirs remain similar, but offer some
-  partial information about the map too: “poison menhirs” reveal translucent
-  walls (which now contain poison), “fire menhirs” reveal foliage (that can be
-  burnt), and “warping menhirs” (previously called “teleport menhirs”) reveal
-  portals.
+* Rework menhirs. The “mapping menhir” is now called “earth menhir” and only reveals
+  the frontier formed by map map walls adjacent to interior ones; its noisy
+  echoing sound also destroys most nearby walls. Other menhirs remain similar,
+  but offer some partial information about the map too: “poison menhirs” reveal
+  translucent walls (which now contain poison), “fire menhirs” reveal foliage
+  (that can be burnt), and “warping menhirs” (previously called “teleport
+  menhirs”) reveal portals.
 * When the player or a monster is both *afraid and cornered* with no possible
   escape, they now become berserk for a short while!
 * A few small improvements in footstep hearing: more deterministic and better
