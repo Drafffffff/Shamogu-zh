@@ -124,7 +124,7 @@ func (md *model) updateStatus() {
 				Disabled: true})
 		case CloudNormal:
 			entries = append(entries, ui.MenuEntry{
-				Text:     stt.WithText("§ "),
+				Text:     stt.WithText("§ ").WithStyle(gruid.Style{Attrs: AttrInMap}),
 				Disabled: true})
 		}
 		if md.targ.kb {
