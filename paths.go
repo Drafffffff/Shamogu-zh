@@ -38,16 +38,15 @@ func (mp *MappingPath) Neighbors(p gruid.Point) []gruid.Point {
 
 // PlayerPath returns a player path between two map positions.
 func (g *Game) PlayerPath(from, to gruid.Point) []gruid.Point {
-	path := []gruid.Point{}
+	var path []gruid.Point
 	if g.NoTrapAt(to) {
 		path = g.PR.JPSPath(path, from, to, g.PlayerPassableNoTrapsFunc(), false)
-	} else {
-		// If there is a trap in the destination, we don't avoid traps,
-		// as that's what the player is asking for.
-		path = g.PR.JPSPath(path, from, to, g.PlayerPassableFunc(), false)
 	}
 	if len(path) == 0 {
-		return nil
+		// If there is a trap in the destination or there's no other
+		// available known path, we don't avoid traps, as that's what
+		// the player is asking for.
+		path = g.PR.JPSPath(path, from, to, g.PlayerPassableFunc(), false)
 	}
 	return path
 }
