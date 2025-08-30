@@ -24,6 +24,8 @@ type Stats struct {
 	SpiritUses          int            // number of ability uses
 	EatenComestibles    int            // number of eaten comestibles
 	ActivatedMenhirs    int            // number of activated menhirs
+	MonsterTrapTriggers int            // number of triggered traps by the monsters
+	PlayerTrapTriggers  int            // number of triggered traps by the player
 	Digs                int            // number of digs (destroyed walls)
 	MapTurns            [MapLevels]int // number of turns per level
 	MapExplorePerc      [MapLevels]int // exploration percent per level
@@ -32,6 +34,7 @@ type Stats struct {
 	MapEatenComestibles [MapLevels]int // eaten comestibles per level
 	MapSpiritUses       [MapLevels]int // spirit uses per level
 	MapActivatedMenhirs [MapLevels]int // activated menhirs per level
+	MapTriggeredTraps   [MapLevels]int // number of triggered traps per level
 }
 
 // newStats returns newly initialized structure for statistics.
@@ -226,6 +229,10 @@ func (g *Game) dumpKilledMonsters(sb *strings.Builder) {
 }
 
 func (g *Game) dumpStatistics(sb *strings.Builder) {
+	// NOTE: if the player dumps game statistics while playing, there are
+	// some minor information leaks (like number of destroyed walls or trap
+	// triggers including out of view ones you might not still be aware
+	// of). Avoiding those is not worth the effort.
 	timesPer100 := func(n int) string {
 		return fmt.Sprintf("%d %s (%.1f per 100 turns)",
 			n, times(n), float64(n)*100/float64(max(1, g.Turn)))
@@ -234,6 +241,7 @@ func (g *Game) dumpStatistics(sb *strings.Builder) {
 		g.Stats.SpiritUses, times(g.Stats.SpiritUses),
 		g.Stats.EatenComestibles, Countable("comestible", g.Stats.EatenComestibles),
 		g.Stats.ActivatedMenhirs, Countable("menhir", g.Stats.ActivatedMenhirs))
+	fmt.Fprintf(sb, "You triggered %d %s.\n", g.Stats.PlayerTrapTriggers, Countable("trap", g.Stats.PlayerTrapTriggers))
 	fmt.Fprintf(sb, "You hit foes %s.\n", timesPer100(g.Stats.Hits))
 	fmt.Fprintf(sb, "You missed foes %s.\n", timesPer100(g.Stats.Misses))
 	fmt.Fprintf(sb, "You got hurt %d %s and endured %d damage.\n", g.Stats.Hurt, times(g.Stats.Hurt), g.Stats.Damage)
@@ -247,7 +255,8 @@ func (g *Game) dumpStatistics(sb *strings.Builder) {
 	fmt.Fprintf(sb, "There were %d fire %s and %d poison %s.\n",
 		g.Stats.FireClouds, Countable("cloud", g.Stats.FireClouds),
 		g.Stats.PoisonClouds, Countable("cloud", g.Stats.PoisonClouds))
-	fmt.Fprintf(sb, "There were %d destroyed %s.\n", g.Stats.Digs, Countable("wall", g.Stats.Digs))
+	fmt.Fprintf(sb, "There were %d destroyed walls.\n", g.Stats.Digs)
+	fmt.Fprintf(sb, "There were %d traps triggered by monsters.\n", g.Stats.MonsterTrapTriggers)
 	// Statistics per map level.
 	levels := g.Map.Level - 1
 	if g.win || g.PlayerActor().IsDead() {
@@ -277,6 +286,7 @@ func (g *Game) dumpStatistics(sb *strings.Builder) {
 	perLevel("Eaten comestibles", g.Stats.MapEatenComestibles[:levels])
 	perLevel("Spirit uses", g.Stats.MapSpiritUses[:levels])
 	perLevel("Activated menhirs", g.Stats.MapActivatedMenhirs[:levels])
+	perLevel("Triggered traps", g.Stats.MapTriggeredTraps[:levels])
 }
 
 func times(n int) string {
