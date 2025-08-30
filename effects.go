@@ -880,7 +880,7 @@ func (g *Game) revealFoliage() {
 		if t != Foliage {
 			continue
 		}
-		if g.Map.KnownTerrain.At(n.P) != t {
+		if g.Map.KnownTerrain.At(n.P) != t && g.IntN(5) < 2 {
 			g.Map.KnownTerrain.Set(n.P, t)
 			draw = true
 		}
@@ -888,5 +888,5 @@ func (g *Game) revealFoliage() {
 }
 
 func (eff EffectFireMenhir) Desc() string {
-	return fmt.Sprintf("Makes many fire clouds appear in a %d-radius distance, each one lasting 6-12 turns. Reveals foliage.", MaxFOVRange)
+	return fmt.Sprintf("Makes many fire clouds appear in a %d-radius distance, each one lasting 6-12 turns. Reveals foliage partially.", MaxFOVRange)
 }

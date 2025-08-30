@@ -45,9 +45,9 @@ Reworked and improved content:
   the frontier formed by map walls adjacent to interior ones; its noisy echoing
   sound also destroys most nearby walls. Other menhirs remain similar, but
   offer some partial information about the map too: “poison menhirs” reveal
-  translucent walls (which now contain poison), “fire menhirs” reveal foliage
-  (that can be burnt), and “warping menhirs” (previously called “teleport
-  menhirs”) reveal portals.
+  translucent walls (which now contain poison), “fire menhirs” partially reveal
+  foliage (that can be burnt), and “warping menhirs” (previously called
+  “teleport menhirs”) reveal portals.
 * When the player or a monster is both *afraid and cornered* with no possible
   escape, they now become berserk for a short while!
 * A few small improvements in footstep hearing: more deterministic and better
