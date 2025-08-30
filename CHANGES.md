@@ -178,6 +178,7 @@ Fixes:
 * Fix spelling and formatting issues in a few log messages. Avoid case of
   duplicated “Saw *monster*” entries in timeline.
 * Fix healing amount in description of foggy-skin onion.
+* Fix application of Imbalance when jumping with the Sprinting Gazelle's sprint.
 * Some confused monster actions that happened outside of view incorrectly
   appeared in the game logs.
 * Improve/fix the page-down and scrolling instructions when details of all
