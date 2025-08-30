@@ -209,7 +209,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, TrailingCloud, "movement leaves dust behind")
 	desc = traitDesc(desc, t, WoodyLegs, "woody legs (can move while lignified)")
 
-	desc = traitDesc(desc, t, VulnerabilityFire, "double @OFire@N duration")
+	desc = traitDesc(desc, t, VulnerabilityFire, "@OFire@N vulnerability (double duration)")
 
 	desc = traitDesc(desc, t, ResistanceConfusion, "@OConfusion@N resistance (half duration)")
 	desc = traitDesc(desc, t, ResistanceDaze, "@ODaze@N resistance (half duration)")
