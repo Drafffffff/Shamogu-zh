@@ -536,9 +536,13 @@ func (g *Game) genMonsters() {
 	case g.ProcInfo.MonsLateSwarm:
 		// Special late level (8-9) with many early and mid-level
 		// monsters but less late ones.
-		nE += 4
-		nM += 5
-		nL -= 4
+		n := 0 // adjustment to ensure at least nL == 1 on the 8th level
+		if g.Map.Level == 8 {
+			n++
+		}
+		nE += 3 - n
+		nM += 6 - n
+		nL -= 4 - n
 		switch g.IntN(3) {
 		case 0:
 			// Special level with more early-level monsters and
