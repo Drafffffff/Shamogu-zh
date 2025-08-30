@@ -124,8 +124,10 @@ Monster behavior and distribution improvements:
 * Improve a bit monster distribution. Mostly, bias toward early-mid-late
   monsters depending on map level has been increased, making the various phases
   more distinct. Early and Mid game difficulty remains similar. Late game has
-  now overall less monsters than before, but a bit more of dangerous ones, so
-  it has become more stealth-friendly while still being challenging enough.
+  now usually less monsters than before, but a bit more of dangerous ones, so
+  it has become more stealth-friendly while still being challenging enough,
+  except in case of a special “swarm” level, favoring greater numbers over
+  individual monster dangerousness.
 * Improve wandering monster destination selection. It's still quite random with
   some bias toward close locations, but there's some extra bias toward
   special vaults, so that interesting places are visited more often by

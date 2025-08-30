@@ -533,14 +533,39 @@ func (g *Game) genMonsters() {
 			g.genMonster(mk)
 		}
 		nL = 2 // two remaining
+	case g.ProcInfo.MonsLateSwarm:
+		// Special late level (8-9) with many early and mid-level
+		// monsters but less late ones.
+		nE += 4
+		nM += 5
+		nL -= 4
+		switch g.IntN(3) {
+		case 0:
+			// Special level with more early-level monsters and
+			// less mid-ones. Also, use smaller selection of early
+			// monsters.
+			nE += 3
+			nM -= 2
+			md := g.monsterSelection(monsEarly, 2)
+			for range nE {
+				g.genMonster(md[g.IntN(len(md))])
+			}
+			nE = 0
+		case 1:
+			// Special level biased toward more mid monsters and
+			// with a smaller selection of them.
+			nE -= 2
+			nM++
+			md := g.monsterSelection(monsMid, 3)
+			for range nM {
+				g.genMonster(md[g.IntN(len(md))])
+			}
+			nM = 0
+		}
 	}
 	if g.Map.Level == g.ProcInfo.MonsMidLate {
 		// Special level with a smaller selection of mid monsters.
-		md := slices.Clone(monsMid)
-		g.rand.Shuffle(len(md), func(i, j int) {
-			md[i], md[j] = md[j], md[i]
-		})
-		md = md[:4]
+		md := g.monsterSelection(monsMid, 4)
 		for range nM {
 			g.genMonster(md[g.IntN(len(md))])
 		}
@@ -560,6 +585,16 @@ func (g *Game) genMonsters() {
 var nMonsE = [MapLevels]int{3, 5, 6, 6, 5, 5, 5, 4, 3}
 var nMonsM = [MapLevels]int{2, 3, 4, 6, 8, 10, 10, 10, 10}
 var nMonsL = [MapLevels]int{0, 0, 1, 1, 2, 2, 3, 4, 6}
+
+// monsterSelection returns a random monster kind subset of size n.
+func (g *Game) monsterSelection(mks []monsterKind, n int) []monsterKind {
+	md := slices.Clone(mks)
+	g.rand.Shuffle(len(md), func(i, j int) {
+		md[i], md[j] = md[j], md[i]
+	})
+	md = md[:min(n, len(md))]
+	return md
+}
 
 // genMonster spawns a monster of the given kind on a random free floor.
 func (g *Game) genMonster(mk monsterKind) (ID, *Entity) {

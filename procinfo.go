@@ -16,10 +16,11 @@ type ProcInfo struct {
 	GuardianPortal2  int         // level with mid-late portal guardian
 	WanderingUnique1 int         // level with walking mushroom
 	WanderingUnique2 int         // level with noisy imp or teleporting ghost
-	MonsEarly        int         // special early level
-	MonsMid          int         // special mid level
-	MonsMidLate      int         // special mid-late level
-	MonsLate         int         // special late level
+	MonsEarly        int         // special early level (1-3)
+	MonsMid          int         // special mid level (4-6)
+	MonsMidLate      int         // special mid-late level (6-9)
+	MonsLate         int         // special late level (7-9)
+	MonsLateSwarm    int         // special “swarm” late level (8-9)
 	Spirits          []int       // spirit index for each dungeon level (-1 if no spirit)
 	Menhirs          []int       // menhir-generation data
 	MenhirIdx        int         // current index in Menhirs
@@ -98,11 +99,22 @@ func (g *Game) flavoursProcGen() {
 	gpi.WanderingUnique2 = 4 + g.IntN(6)
 	gpi.MonsEarly = g.IntN(4)
 	gpi.MonsMid = 4 + g.IntN(3)
-	gpi.MonsMidLate = 6 + g.IntN(4)
+	gpi.MonsMidLate = 6 + g.IntN(4) // 6-9 but != MonsMid or MonsLateSwarm
 	if gpi.MonsMidLate == gpi.MonsMid {
 		gpi.MonsMidLate++
 	}
 	gpi.MonsLate = 7 + g.IntN(3)
+	switch gpi.MonsLate {
+	case 7:
+		gpi.MonsLateSwarm = 8 + g.IntN(2)
+	case 8:
+		gpi.MonsLateSwarm = 9
+	case 9:
+		gpi.MonsLateSwarm = 7
+	}
+	if gpi.MonsMidLate == gpi.MonsLateSwarm {
+		gpi.MonsMidLate-- // still > MonsMid
+	}
 	// Disable very occasionally some events/flavours, for some
 	// extra unpredictability.
 	switch g.IntN(10) {
