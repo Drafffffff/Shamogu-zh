@@ -112,6 +112,10 @@ func (g *Game) flavoursProcGen() {
 	case 9:
 		gpi.MonsLateSwarm = 7
 	}
+	if g.IntN(3) == 0 {
+		// No swarm level 1/3 of the time.
+		gpi.MonsLateSwarm = 0
+	}
 	if gpi.MonsMidLate == gpi.MonsLateSwarm {
 		gpi.MonsMidLate-- // still > MonsMid
 	}
