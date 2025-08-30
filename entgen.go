@@ -327,10 +327,13 @@ func (g *Game) randomFreeItemFloor() gruid.Point {
 loop:
 	for {
 		p := g.RandomPassableBiased()
-		for i := range g.ItemEntities() {
-			if g.Entity(i).P == p {
-				continue loop
-			}
+		if i, _ := g.ItemAt(p); i >= 0 {
+			continue loop
+		}
+		if p == g.PP() {
+			// Avoid putting a comestible on the player's starting
+			// position, for clarity.
+			continue loop
 		}
 		// We replace foliage or rubble with floor for putting the
 		// item. We could allow items on non-floor cells, but for
@@ -601,20 +604,20 @@ func monster(mi monsterInfo) *Entity {
 }
 
 // randomFreeFloor returns a random map floor position that is not occuppied by
-// an actor.
+// an actor or a trap.
 func (g *Game) randomFreeFloor() gruid.Point {
 loop:
 	for {
 		p := g.RandomPassable()
-		if i, _ := g.ActorAt(p); i >= 0 {
+		if i, _ := g.ActorAt(p); i >= 0 || !g.NoTrapAt(p) {
 			continue loop
 		}
 		return p
 	}
 }
 
-// randomFreeNearby returns a random map floor position that is not occuppied
-// by an actor near the given position.
+// randomFreeNearby returns a random map floor position near the given position
+// and that is not occuppied by an actor or trap.
 func (g *Game) randomFreeNearby(at gruid.Point, maxdist int) gruid.Point {
 	n := 0
 loop:
@@ -623,7 +626,7 @@ loop:
 			return g.randomFreeFloor()
 		}
 		p := g.RandomPassableWithin(at, maxdist)
-		if i, _ := g.ActorAt(p); i >= 0 {
+		if i, _ := g.ActorAt(p); i >= 0 || !g.NoTrapAt(p) {
 			n++
 			continue loop
 		}
@@ -652,10 +655,12 @@ loop:
 			// Make vault cells more likely candidates.
 			continue
 		}
-		for i := range g.ItemEntities() {
-			if g.Entity(i).P == p {
-				continue loop
-			}
+		if i, _ := g.ItemAt(p); i >= 0 {
+			continue loop
+		}
+		if p == g.PP() {
+			// Don't put a trap on the player's starting position.
+			continue loop
 		}
 		n, nfree := g.neighborInfo(p)
 		if n > 2 || nfree < 2 {
@@ -685,10 +690,8 @@ func (g *Game) genRunicTrapInTunnel(mg *MapGen) (ID, *Entity) {
 	})
 loop:
 	for _, p := range mg.xtunnel {
-		for i := range g.ItemEntities() {
-			if g.Entity(i).P == p {
-				continue loop
-			}
+		if i, _ := g.ItemAt(p); i >= 0 {
+			continue loop
 		}
 		// n, nfree := g.pointInfo(p)
 		// if n != 4 || nfree != 2 {
