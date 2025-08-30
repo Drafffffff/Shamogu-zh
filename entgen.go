@@ -551,29 +551,29 @@ func (g *Game) genMonsters() {
 			nE += 3
 			nM -= 2
 			md := g.monsterSelection(monsEarly, 2)
-			for range nE {
+			for range nE - 1 {
 				g.genMonster(md[g.IntN(len(md))])
 			}
-			nE = 0
+			nE = 1
 		case 1:
 			// Special level biased toward more mid monsters and
 			// with a smaller selection of them.
 			nE -= 2
 			nM++
 			md := g.monsterSelection(monsMid, 3)
-			for range nM {
+			for range nM - 1 {
 				g.genMonster(md[g.IntN(len(md))])
 			}
-			nM = 0
+			nM = 1
 		}
 	}
 	if g.Map.Level == g.ProcInfo.MonsMidLate {
 		// Special level with a smaller selection of mid monsters.
 		md := g.monsterSelection(monsMid, 4)
-		for range nM {
+		for range nM - 1 {
 			g.genMonster(md[g.IntN(len(md))])
 		}
-		nM = 0
+		nM = 1
 	}
 	for range nE {
 		g.genMonster(monsEarly[g.IntN(len(monsEarly))])
