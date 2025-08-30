@@ -21,6 +21,7 @@ type ProcInfo struct {
 	MonsMidLate      int         // special mid-late level (6-9)
 	MonsLate         int         // special late level (7-9)
 	MonsLateSwarm    int         // special “swarm” late level (8-9)
+	TrapLevel        int         // special level with lots of traps (5-9)
 	Spirits          []int       // spirit index for each dungeon level (-1 if no spirit)
 	Menhirs          []int       // menhir-generation data
 	MenhirIdx        int         // current index in Menhirs
@@ -28,6 +29,8 @@ type ProcInfo struct {
 	ComestibleIdx    int         // current index in Comestibles
 	NComestibles     []int       // number of comestibles per level
 	NMenhirs         []int       // number of menhirs per level
+	Runes            []int       // rune-generation data
+	RuneIdx          int         // current index in Runes
 }
 
 // InitProcInfo initializes procedural generation starting information.
@@ -119,6 +122,7 @@ func (g *Game) flavoursProcGen() {
 	if gpi.MonsMidLate == gpi.MonsLateSwarm {
 		gpi.MonsMidLate-- // still > MonsMid
 	}
+	gpi.TrapLevel = 5 + g.IntN(5)
 	// Disable very occasionally some events/flavours, for some
 	// extra unpredictability.
 	switch g.IntN(10) {
@@ -243,4 +247,22 @@ func (g *Game) menhirsProcGen() {
 		// Never generate more than 3 menhirs on a given level.
 		g.ProcInfo.NMenhirs[i] = min(3, n)
 	}
+}
+
+// runeProcGen creates a random sequence of runes kinds that still
+// ensures that all runes appear at least once in a while.
+func (g *Game) runeProcGen() {
+	g.ProcInfo.Runes = g.genRandomIndices(NRunes)
+}
+
+// NextRune returns the next rune kind to be generated.
+func (g *Game) NextRune() MagicRune {
+	gpi := g.ProcInfo
+	if gpi.RuneIdx >= len(gpi.Runes) {
+		gpi.RuneIdx = 0
+		g.runeProcGen()
+	}
+	i := gpi.Runes[gpi.RuneIdx]
+	gpi.RuneIdx++
+	return MagicRune(i)
 }

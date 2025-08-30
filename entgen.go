@@ -313,6 +313,10 @@ func (g *Game) genItems(mg *MapGen) {
 			rtt++
 		}
 	}
+	if g.Map.Level == g.ProcInfo.TrapLevel {
+		rto += 4
+		rtt++
+	}
 	for range rto {
 		g.genRunicTrap(mg)
 	}
@@ -761,7 +765,8 @@ loop:
 // replaces foliage or rubble with floor on that tile.
 func (g *Game) genRunicTrapAt(p gruid.Point) (ID, *Entity) {
 	g.Map.Terrain.Set(p, Floor)
-	e := runicTrap(MagicRune(g.IntN(NRunes)))
+	r := g.NextRune()
+	e := runicTrap(r)
 	e.P = p
 	id := ID(len(g.Entities))
 	g.Map.RuneCache.SetU(p, id)
