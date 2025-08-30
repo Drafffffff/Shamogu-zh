@@ -321,7 +321,7 @@ func (g *Game) genItems(mg *MapGen) {
 	}
 }
 
-// randomFreeItemFloor returns a random map floor position that is not occuppied by
+// randomFreeItemFloor returns a random map floor position that is not occupied by
 // an item.
 func (g *Game) randomFreeItemFloor() gruid.Point {
 loop:
@@ -447,7 +447,7 @@ var monsEarly = []monsterKind{
 	ThunderPorcupine,
 }
 
-// monsMid represents monters that appear throughout the game (but less often
+// monsMid represents monsters that appear throughout the game (but less often
 // early).
 var monsMid = []monsterKind{
 	AcidMound,

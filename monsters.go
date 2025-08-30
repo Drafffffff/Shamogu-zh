@@ -194,7 +194,7 @@ func (g *Game) monsterBumpTo(i ID, ai *Actor, to gruid.Point) {
 	j, aj := g.ActorAt(to)
 	if j < 0 {
 		// Move and then try charge. An ambushing charge outside FOV
-		// can happend and is allowed even while afraid.
+		// can happen and is allowed even while afraid.
 		delta := to.Sub(ei.P)
 		nto := to.Add(delta)
 		g.BumpMoveActor(i, ai, to)
