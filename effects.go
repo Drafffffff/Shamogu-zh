@@ -554,10 +554,17 @@ func (eff EffectLignify) Apply(g *Game) bool {
 		if !g.InFOV(ei.P) {
 			continue
 		}
-		if g.PutStatus(i, ai, StatusLignification, DurationLignification/2) && !done {
+		if ai.DoesAny(MonsImmunityLignification) || ai.Has(StatusLignification) {
+			// Double-check before so that the "Growing roots"
+			// message appears first and only if the status will
+			// apply.
+			continue
+		}
+		if !done {
 			g.Log("Growing roots lignify your foes.")
 			done = true
 		}
+		g.PutStatus(i, ai, StatusLignification, DurationLignification/2)
 	}
 	if done {
 		mp := &MapPath{passable: inMap}
