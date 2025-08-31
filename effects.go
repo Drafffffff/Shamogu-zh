@@ -15,7 +15,7 @@ const (
 	DurationConfusionAmbrosia      = 7
 	DurationConfusionToxins        = 5
 	DurationDazeFall               = 2
-	DurationDazeJump               = 5
+	DurationDazeJump               = 4
 	DurationDazeLightning          = 3
 	DurationDazeTeleport           = 4
 	DurationDazeSpines             = 3

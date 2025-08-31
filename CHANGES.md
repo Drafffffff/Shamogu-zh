@@ -109,6 +109,10 @@ Reworked and improved content:
   as smart!
 * Players with the Sprinting Gazelle now leave dust behind only on floor tiles
   (in particular not on foliage ones).
+* The Jumping Frog spirit now has 2 extra jump charges (so 4 initially and then
+  6 when upgraded), but the jump's daze duration on monsters is decreased by
+  one.  Hopefully the spirit feels that way more appealing and different at the
+  same time (suggested by @mlochbaum in issue #1).
 * The “sprint” and “focus” abilities now cancel each other. It's never really
   useful nor thematic to have both at the same time, so hydra players have now
   an instant sprint cancellation option (at the cost of a spirit charge).
