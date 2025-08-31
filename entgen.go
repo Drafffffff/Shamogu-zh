@@ -84,7 +84,7 @@ var primarySpirits = []spiritInfo{
 		BonusTraits: [2]Traits{PatternRampage | Pushing, PatternRampage | PushingUnbalance}},
 	{
 		Name:         "Jumping Frog",
-		MaxCharges:   [2]int{4, 6},
+		MaxCharges:   [2]int{3, 5},
 		Ability:      [2]Ability{EffectJump{}, EffectJump{}},
 		BonusDefense: [2]int{1, 1},
 		BonusTraits:  [2]Traits{PatternCatch, PatternCatchUnbalance}},
