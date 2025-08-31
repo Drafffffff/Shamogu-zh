@@ -604,6 +604,7 @@ func (g *Game) recoil(i, j ID, ai *Actor) bool {
 		if g.Map.Passable(p) {
 			if i, _ := g.ActorAt(p); i < 0 {
 				npi = p
+				g.MakeNoise(ei.P, NoiseWind)
 			}
 		}
 	}
