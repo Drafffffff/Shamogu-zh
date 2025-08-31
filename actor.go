@@ -607,14 +607,20 @@ func (g *Game) HandleActorTurn(i ID, ai *Actor) {
 	if ai.IsDead() {
 		return
 	}
+	ei := g.Entity(i)
+	p := ei.P
 	if ai.Behavior != nil {
-		ei := g.Entity(i)
 		ei.Noise = false
-		p := ei.P
 		g.HandleMonsterTurn(i, ai)
-		if ai.Has(StatusFire) && (ei.P == p || g.FireAt(ei.P)) {
-			g.InflictFireDamage(i, ai)
-		}
+	}
+	if ai.Has(StatusFire) &&
+		(i == PlayerID && g.Prev == p || i != PlayerID && ei.P == p || g.FireAt(ei.P)) {
+		g.InflictFireDamage(i, ai)
+	}
+	if ai.IsDead() {
+		// The actor died due to fire or poison (the latter only for a
+		// monster, as it would have happened earlier for the player).
+		return
 	}
 	for st := range ai.Statuses {
 		g.ProgressStatus(i, ai, Status(st))

@@ -145,6 +145,10 @@ Monster behavior and distribution improvements:
 * Improvements in monster group formation. In particular, less groups of three
   monsters than before and more groups of two, so somewhat better coverage of
   the map in mid and late game, but smaller likeliness of large monster groups.
+* Make the order in which monsters act within a turn after the player properly
+  random. It already felt that way, but a very attentive player could sometimes
+  guess that some monster seemed to always act before some other, potentially
+  leading to gamey predictions.
 
 Map generation:
 

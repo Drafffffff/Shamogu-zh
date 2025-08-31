@@ -91,22 +91,32 @@ func (g *Game) InitLevel() {
 // EndTurn processes everything that happens between the end of last player's
 // turn and the beginning of the next turn.
 func (g *Game) EndTurn() {
-	pa := g.PlayerActor()
-	if pp := g.PP(); pa.Has(StatusFire) && (g.Prev == pp || g.FireAt(pp)) {
-		g.InflictFireDamage(PlayerID, pa)
-	}
 	clear(g.Map.Noise)
 	if g.endTurnEarly() {
 		return
 	}
-	for i, ai := range g.Actors() {
+	pa := g.PlayerActor()
+	// We collect actor ids and shuffle monster ones so that we process
+	// monster turns in a non-predictable order. NOTE: alternatively, we
+	// could maybe process them in some clearly predictable order, like
+	// maybe distance to target, favoring tighter line formations, helping
+	// various kinds of beam-like attacks, but it'd a bit harder to explain
+	// to the player (even though it might actually feel more intuitive in
+	// some ways in practice as it'd often seem as if monsters cooperate).
+	var ids []ID
+	for i := range g.Actors() {
+		ids = append(ids, i)
+	}
+	mids := ids[1:]
+	g.rand.Shuffle(len(mids), func(i, j int) { mids[i], mids[j] = mids[j], mids[i] })
+	for _, i := range ids {
 		if pa.IsDead() {
 			// If player is dead, make remaining monsters skip
 			// their turn.
 			break
 		}
 		p := g.PP()
-		g.HandleActorTurn(i, ai)
+		g.HandleActorTurn(i, g.Entity(i).Actor())
 		if p != g.PP() || i == PlayerID {
 			g.UpdateFOV()
 			g.UpdateKnowledge()
@@ -178,6 +188,10 @@ func (g *Game) endTurnEarly() bool {
 		return false
 	}
 	g.HandleActorTurn(PlayerID, pa)
+	if pa.IsDead() {
+		// The player died before turn ended.
+		return true
+	}
 	g.UpdateFOV()
 	g.UpdateKnowledge()
 	return true
