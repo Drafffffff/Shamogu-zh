@@ -1510,8 +1510,10 @@ On the map, monster color may change depending on active status effects.  By def
 		sb.WriteString(desc)
 		var details string
 		switch st {
-		case StatusBerserk, StatusLignification:
+		case StatusBerserk:
 			details = "HP never falls below 1 on expiration."
+		case StatusLignification:
+			details = "HP never falls below 1 on expiration. Cancels @BSprint@N."
 		case StatusConfusion:
 			details = "Confused monsters will attack other monsters too when adjacent. Some monsters may even hurt or affect themselves when performing special actions like digging, spitting fire, barking, or pushing."
 		case StatusFear:
@@ -1523,11 +1525,11 @@ On the map, monster color may change depending on active status effects.  By def
 		case StatusFoggySkin:
 			details = "Player-only effect obtainable by eating a foggy-skin onion."
 		case StatusSprint:
-			details = "Player-only effect obtainable with the Sprinting Gazelle spirit."
+			details = "Disables normal attack. Player-only effect obtainable with the Sprinting Gazelle spirit."
 		case StatusTimeStop:
 			details = "Player-only effect obtainable with the Temporal Cat spirit."
 		case StatusFocus:
-			details = "Player-only effect obtainable with the Four-Headed Hydra spirit."
+			details = "Cancels @BSprint@N. Player-only effect obtainable with the Four-Headed Hydra spirit."
 		}
 		if details != "" {
 			sb.WriteRune(' ')
@@ -1585,7 +1587,7 @@ In Shamogu, both the player and the monsters may use one of several attack patte
 
 @CCatching@N attacks are ranged attacks that catch foes @Mon successful hits@N and move them next to you. When catching a foe from afar, there is a bonus of 1 to attack.
 
-@CRecoil@N is an extra attack effect that happens for wind fox monsters, as well as upgraded Wind Fox spirit players. After an attack, they may move backwards one tile when ranged, or two cells when in melee.
+@CRecoil@N is an extra attack effect that happens for wind fox monsters, as well as Wind Fox spirit players. After an attack, they may move backwards one tile when ranged, or two cells when in melee.
 
 @CSpace-Distorting@N attacks are ranged attacks that @Mswap positions@N on successful hits, but result in normal movement on misses. Any foes adjacent to the landing hit position are blinked away. Also, note that such attacks reverse your current direction.
 
