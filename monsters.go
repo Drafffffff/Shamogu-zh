@@ -210,14 +210,13 @@ func (g *Game) monsterBumpTo(i ID, ai *Actor, to gruid.Point) {
 		return
 	}
 	// Outside of player's LOS, we simplify logic: they may lose a turn or
-	// swap positions (if both want to exchange their positions). This is
-	// cheaper and avoids the need for complex logic to prevent blockages.
-	if len(aj.Behavior.Path) < 2 {
-		return
-	}
-	if !aj.Behavior.SkipTurn && (aj.Behavior.Path[1] == ei.P || g.IntN(5) == 0) {
+	// swap positions (if both want to exchange their positions or 1/5 of
+	// the time). This is cheaper and avoids the need for complex logic to
+	// prevent blockages.
+	if aj.CanMove() && !aj.Behavior.SkipTurn && (len(aj.Behavior.Path) >= 2 && aj.Behavior.Path[1] == ei.P || g.IntN(5) == 0) {
 		// Swap monster positions and skip next turn.
 		g.BumpMoveActor(i, ai, to)
+		g.ApplyBumpMoveEffects(j, aj)
 		aj.Behavior.SkipTurn = true
 	}
 }

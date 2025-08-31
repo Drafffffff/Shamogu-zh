@@ -189,6 +189,12 @@ func (g *Game) BumpMoveActor(i ID, ai *Actor, to gruid.Point) {
 		g.dig(to)
 	}
 	g.MoveActor(i, ai, to)
+	g.ApplyBumpMoveEffects(i, ai)
+}
+
+// ApplyBumpMoveEffects applies effects that happen after moving to a new
+// position through normal movement.
+func (g *Game) ApplyBumpMoveEffects(i ID, ai *Actor) {
 	switch {
 	case ai.Has(StatusPoison):
 		g.InflictDamage(i, ai, PoisonDamage, AttackPoison)
