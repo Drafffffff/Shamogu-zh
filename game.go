@@ -100,14 +100,15 @@ func (g *Game) EndTurn() {
 	// monster turns in a non-predictable order. NOTE: alternatively, we
 	// could maybe process them in some clearly predictable order, like
 	// maybe distance to target, favoring tighter line formations, helping
-	// various kinds of beam-like attacks, but it'd a bit harder to explain
-	// to the player (even though it might actually feel more intuitive in
-	// some ways in practice as it'd often seem as if monsters cooperate).
-	var ids []ID
-	for i := range g.Actors() {
+	// various kinds of beam-like attacks, but it'd be a bit harder to
+	// explain to the player (even though it might actually feel more
+	// intuitive in some ways in practice as it'd often seem as if monsters
+	// cooperate).
+	ids := []ID{PlayerID}
+	for i := range g.Monsters() {
 		ids = append(ids, i)
 	}
-	mids := ids[1:]
+	mids := ids[1:] // monster ids (excluding player)
 	g.rand.Shuffle(len(mids), func(i, j int) { mids[i], mids[j] = mids[j], mids[i] })
 	for _, i := range ids {
 		if pa.IsDead() {
