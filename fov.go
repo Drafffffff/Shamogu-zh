@@ -190,7 +190,8 @@ func (lt *lighter) Cost(src, from, to gruid.Point) int {
 	if t == Wall || t == Rubble {
 		return wallcost
 	}
-	if g.Map.Clouds.At(from).Kind != NoCloud {
+	clk := g.Map.Clouds.At(from).Kind
+	if clk == CloudNormal {
 		return wallcost
 	}
 	// specific diagonal costs
@@ -198,7 +199,7 @@ func (lt *lighter) Cost(src, from, to gruid.Point) int {
 	if opaque {
 		return wallcost
 	}
-	if t == Foliage {
+	if t == Foliage || clk != NoCloud {
 		return wallcost + paths.DistanceManhattan(to, from) - 3
 	}
 	if hard {
@@ -237,7 +238,8 @@ func (g *Game) opaqueDiagonal(from, to gruid.Point) (opaque, hard bool) {
 	opaque = true
 	hard = true
 	for _, p := range ps {
-		if g.Map.Clouds.At(p).Kind != NoCloud {
+		clk := g.Map.Clouds.At(p).Kind
+		if clk == CloudNormal {
 			continue
 		}
 		switch g.Map.Terrain.AtU(p) {
@@ -245,6 +247,10 @@ func (g *Game) opaqueDiagonal(from, to gruid.Point) (opaque, hard bool) {
 		case Foliage:
 			opaque = false
 		default:
+			if clk != NoCloud {
+				opaque = false
+				continue
+			}
 			return false, false
 		}
 	}

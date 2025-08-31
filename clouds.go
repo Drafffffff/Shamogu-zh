@@ -65,9 +65,9 @@ func (ck CloudKind) Desc() string {
 	case CloudNormal:
 		return "The steam, dust or smoke cloud obstructs vision."
 	case CloudFire:
-		return "The fire cloud obstructs vision and burns foliage and creatures."
+		return "The fire cloud is difficult to see through. It burns foliage and creatures."
 	case CloudPoison:
-		return "The poisonous cloud obstructs vision and poisons creatures."
+		return "The poisonous cloud is difficult to see through. It poisons creatures."
 	default:
 		// should not happen.
 		return "No description."

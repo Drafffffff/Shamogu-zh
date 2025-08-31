@@ -82,6 +82,12 @@ Reworked and improved content:
   clouds on foliage tiles instead of dissipating them.
 * New clouds can replace existing clouds of different types. If the type is the
   same, the duration is still the maximum of the old and new ones, like before.
+* Unlike plain clouds of fog, dust or smoke, dangerous clouds of fire and
+  poison are now only difficult to see through, like foliage (suggested by
+  @mlochbaum in issue #1). This should make menhir usage obstruct vision less,
+  as well as allow for things like jumping over a fire tile with the Frog or
+  Gazelle spirits. It also allows ranged attacks to reach just behind a fire
+  or poison cloud (which is both good and bad for different reasons).
 * Make “recoil” active even with the non-upgraded Wind Fox (pushing is active
   on the non-upgraded Rampaging Boar, so having recoil only on upgraded Wind
   Fox seemed a bit strange).
