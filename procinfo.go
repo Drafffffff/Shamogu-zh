@@ -132,6 +132,8 @@ func (g *Game) flavoursProcGen() {
 		gpi.WanderingUnique1 = 0
 	case 2:
 		gpi.WanderingUnique2 = 0
+	case 3:
+		gpi.TrapLevel = 0
 	}
 }
 
