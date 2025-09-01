@@ -207,7 +207,7 @@ func (t Traits) String() string {
 		desc = append(desc, "bad hearing")
 	}
 	desc = traitDesc(desc, t, GoodSmell, "smells food from afar")
-	desc = traitDesc(desc, t, LateralJumping, "lateral jump off wall")
+	desc = traitDesc(desc, t, LateralJumping, "can jump off lateral walls")
 	desc = traitDesc(desc, t, TrailingCloud, "movement leaves dust behind")
 	desc = traitDesc(desc, t, WoodyLegs, "woody legs (can move while lignified)")
 
