@@ -87,7 +87,7 @@ var primarySpirits = []spiritInfo{
 		MaxCharges:   [2]int{3, 5},
 		Ability:      [2]Ability{EffectJump{}, EffectJump{}},
 		BonusDefense: [2]int{1, 1},
-		BonusTraits:  [2]Traits{PatternCatch, PatternCatchUnbalance}},
+		BonusTraits:  [2]Traits{PatternCatch | LateralJumping, PatternCatchUnbalance | LateralJumping}},
 	{
 		Name:        "Wind Fox",
 		MaxCharges:  [2]int{2, 4},

@@ -129,6 +129,7 @@ const (
 	DazingSpines     // body covered in dazing spines (porcupine)
 	GoodHearing      // better hearing of noise (footsteps)
 	GoodSmell        // smell food from a distance
+	LateralJumping   // jump by propulsing against walls
 	Pushing          // pushing without unbalancing
 	PushingUnbalance // unbalancing pushing (like boar and earth-dragon)
 	TrailingCloud    // leave dust behind after moving (on floor tiles)
@@ -206,6 +207,7 @@ func (t Traits) String() string {
 		desc = append(desc, "bad hearing")
 	}
 	desc = traitDesc(desc, t, GoodSmell, "smells food from afar")
+	desc = traitDesc(desc, t, LateralJumping, "lateral jump off wall")
 	desc = traitDesc(desc, t, TrailingCloud, "movement leaves dust behind")
 	desc = traitDesc(desc, t, WoodyLegs, "woody legs (can move while lignified)")
 
