@@ -135,6 +135,8 @@ Reworked and improved content:
 * While sprinting, the frog's “jump” ability now unbalances foes without
   hurting them, but still dazes them, effectively combining the effects of the
   two kinds of jumps in a sensible way.
+* The “dig” ability now also guarantees pushing will happen, including the
+  unbalancing effect for the upgraded spirit.
 * Add simple boredom clock: if you spend too much time on a single level (more
   than necessary with normal play), the dungeon core will detect your presence
   and mark you until you go through a portal.

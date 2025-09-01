@@ -298,7 +298,8 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int)
 	}
 	// Extra effects by attack pattern.
 	switch {
-	case ai.DoesAny(Pushing|PushingUnbalance) && ai.CanMove() && !ai.Has(StatusPoison) && !aj.ResistsMove() && g.IntN(5-dmg) < 2:
+	case ai.DoesAny(Pushing|PushingUnbalance) && ai.CanMove() && !ai.Has(StatusPoison) && !aj.ResistsMove() &&
+		(ai.Has(StatusDig) || g.IntN(5-dmg) < 2):
 		g.push(i, j, ai, aj, dmg, ap, bonus)
 	case ai.DoesAny(PatternSwap|PatternSwapDaze) && ap != AttackCharge && ai.CanMove() && !aj.ResistsMove():
 		g.swapSpaceDistortion(i, j, ai, aj, dmg, dazed)

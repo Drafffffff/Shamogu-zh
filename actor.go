@@ -352,7 +352,7 @@ var statusDesc = []string{
 		BerserkAttackBonus, DurationPoisonBerserk),
 	StatusConfusion: "Using spirit abilities will hurt you for 1 damage. Doubles duration of new @OImbalance@N, @ODaze@N and @OFear@N effects.",
 	StatusDaze:      "Forbids all actions except waiting or eating until you’re hurt or it expires.",
-	StatusDig:       "Allows walking into walls. Gives +1 effective damage when charging.",
+	StatusDig:       "Allows walking into walls. Gives +1 effective damage when charging and guarantees pushing.",
 	StatusFear:      "Forbids attacking and walking toward foes.",
 	StatusFire:      fmt.Sprintf("Remaining in place or moving into a cloud of fire will burn you for %d damage.", FireDamage),
 	StatusFocus:     "Attack frontally with all four heads.",
