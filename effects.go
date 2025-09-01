@@ -826,7 +826,7 @@ func (eff EffectPoisonMenhir) Apply(g *Game) bool {
 	g.rand.Shuffle(len(nodes), func(i, j int) {
 		nodes[i], nodes[j] = nodes[j], nodes[i]
 	})
-	for _, n := range nodes[:min(max(3, len(nodes)/3), len(nodes))] {
+	for _, n := range nodes[:min(max(3, len(nodes)/4), len(nodes))] {
 		if n.P == pp {
 			continue
 		}
