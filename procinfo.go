@@ -55,7 +55,7 @@ func (g *Game) layoutsProcGen() {
 	if g.IntN(2) == 0 {
 		layouts[4] = MixedAutomataWalkTreeCave
 	}
-	if g.IntN(3) == 0 {
+	if g.IntN(2) == 0 {
 		layouts[5] = MixedWalkCaveWalkTreeCave
 	}
 	g.rand.Shuffle(len(layouts), func(i, j int) {
