@@ -188,7 +188,7 @@ func (g *Game) LateralJump(dir gruid.Point) bool {
 	g.md.MoveAnimation(from, to)
 	if i, ai := g.ActorAt(over); i >= 0 {
 		if !pa.Has(StatusFear) {
-			g.BumpAttackActor(PlayerID, i, pa, ai, AttackPlain, 1)
+			g.BumpAttackActor(PlayerID, i, pa, ai, AttackPlain, 0)
 		}
 	}
 	if pa.Has(StatusImbalance) && g.IntN(10) == 0 {

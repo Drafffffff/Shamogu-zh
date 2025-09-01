@@ -122,9 +122,10 @@ Reworked and improved content:
   a melee as strong as the Hydra's, as well as increase the specific trait of
   “dazing jump” being a somewhat less scarce resource than other abilities.
 * The Jumping Frog spirit now also allows to perform short jumps by propulsing
-  on lateral walls, giving them some passive mobility useful during combat.
-  Feature inspired from Harmonist's jumps, but adapted to make use of the
-  “current direction” to make it less spammable.
+  on lateral walls, giving them some passive mobility. It also attacks any
+  monster you jump over, so it is quite usable during combat.  Feature inspired
+  from Harmonist's jumps, but adapted to make use of the “current direction” to
+  make it less spammable.
 * The “sprint” and “focus” abilities now cancel each other. It's never really
   useful nor thematic to have both at the same time, so hydra players have now
   an instant sprint cancellation option (at the cost of a spirit charge).
