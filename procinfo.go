@@ -15,7 +15,7 @@ type ProcInfo struct {
 	GuardianPortal1  int         // level with early-mid portal guardian
 	GuardianPortal2  int         // level with mid-late portal guardian
 	WanderingUnique1 int         // level with walking mushroom
-	WanderingUnique2 int         // level with noisy imp or teleporting ghost
+	WanderingUnique2 int         // level with noisy imp
 	MonsEarly        int         // special early level (1-3)
 	MonsMid          int         // special mid level (4-6)
 	MonsMidLate      int         // special mid-late level (6-9)
