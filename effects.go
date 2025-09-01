@@ -364,9 +364,7 @@ func (g *Game) pushingGale(from, dir gruid.Point) {
 			continue
 		}
 		ei := g.Entity(i)
-		hp := ai.HP
-		dmg := min(hp, 1+g.IntN(2))
-		g.InflictDamage(i, ai, dmg, AttackGale)
+		g.InflictDamage(i, ai, 1, AttackGale)
 		if ai.IsDead() {
 			continue
 		}

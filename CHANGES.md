@@ -76,10 +76,6 @@ Reworked and improved content:
   providing a limited means of wall destruction for non-Boar players. Make
   explosions produce dust or smoke clouds. Also, slightly increase Fire
   duration from firebreath pepper.
-* Make “pushing gale” dissipate clouds, providing the first cloud
-  dissipating source which, due to “recoil”, can be quite useful for Wind Fox
-  players. Also, as a special interaction, “pushing gale” propagates fire
-  clouds on foliage tiles instead of dissipating them.
 * New clouds can replace existing clouds of different types. If the type is the
   same, the duration is still the maximum of the old and new ones, like before.
 * Unlike plain clouds of fog, dust or smoke, dangerous clouds of fire and
@@ -88,6 +84,13 @@ Reworked and improved content:
   as well as allow for things like jumping over a fire tile with the Frog or
   Gazelle spirits. It also allows ranged attacks to reach just behind a fire
   or poison cloud (which is both good and bad for different reasons).
+* Make “pushing gale” dissipate clouds, providing the first cloud
+  dissipating source which, due to “recoil”, can be quite useful for Wind Fox
+  players. Also, as a special interaction, “pushing gale” propagates fire
+  clouds on foliage tiles instead of dissipating them.
+* Also, as discussed in issue #1 about Wind Fox balance, make “pushing gale”
+  always do 1 damage (instead of 1-2 damage), and make 2-tile “recoil” in melee
+  produce some wind noise.
 * Make “recoil” active even with the non-upgraded Wind Fox (pushing is active
   on the non-upgraded Rampaging Boar, so having recoil only on upgraded Wind
   Fox seemed a bit strange).
