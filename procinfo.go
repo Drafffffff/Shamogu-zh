@@ -61,7 +61,6 @@ func (g *Game) layoutsProcGen() {
 	g.rand.Shuffle(len(layouts), func(i, j int) {
 		layouts[i], layouts[j] = layouts[j], layouts[i]
 	})
-	// layouts[g.rand.IntN(len(layouts))] = MapLayout(g.rand.IntN(NLayouts))
 	g.ProcInfo.Layouts = layouts
 }
 
