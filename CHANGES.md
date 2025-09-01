@@ -99,7 +99,8 @@ Reworked and improved content:
   obstacle). This creates more varied possibilities for tactical movement,
   while still restricting safe movements in a similar but less extreme way, and
   providing similar defense from ranged monsters.
-* Adjust slightly down the duration of fire clouds to 6-12 turns.
+* Adjust slightly down the duration of fire clouds to 6-12 turns and poison
+  clouds to 4-8 turns.
 * Using “sprint” or “jump” abilities while imbalanced may now sometimes lead to
   a dazing fall.
 * Space-distorting attacks now *swap clouds* too. While getting swapped into a
