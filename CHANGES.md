@@ -119,17 +119,17 @@ Reworked and improved content:
   as smart!
 * Players with the Sprinting Gazelle now leave dust behind only on floor tiles
   (in particular not on foliage ones).
-* The Jumping Frog spirit now has one extra jump charge (so 3 initially and then
-  5 when upgraded), but the jump's daze duration on monsters is decreased by
-  one (somewhat nerfed implementation of buff suggested by @mlochbaum in issue
-  #1). The idea is to compensate for the Frog's lack of passive mobility or
-  a melee as strong as the Hydra's, as well as increase the specific trait of
-  “dazing jump” being a somewhat less scarce resource than other abilities.
-* The Jumping Frog spirit now also allows to perform short jumps by propulsing
+* The Jumping Frog spirit now allows to perform short jumps by propulsing
   on lateral walls, giving them some passive mobility. It also attacks any
-  monster you jump over, so it is quite usable during combat.  Feature inspired
+  monster you jump over, so it is quite useful during combat.  Feature inspired
   from Harmonist's jumps, but adapted to make use of the “current direction” to
   make it less spammable.
+* The Jumping Frog spirit now has one extra jump charge initially (so 3
+  initially and then still 4 when upgraded), but the jump's daze duration on
+  monsters is decreased by one. The idea behind both Jumping Frog's changes is
+  to compensate for the Frog's weak early game and previous lack of passive
+  combat mobility despite not having a melee as strong as the Hydra's (see
+  discussion in issue #1).
 * The “sprint” and “focus” abilities now cancel each other. It's never really
   useful nor thematic to have both at the same time, so hydra players have now
   an instant sprint cancellation option (at the cost of a spirit charge).
