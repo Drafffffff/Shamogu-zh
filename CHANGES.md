@@ -119,12 +119,6 @@ Reworked and improved content:
   as smart!
 * Players with the Sprinting Gazelle now leave dust behind only on floor tiles
   (in particular not on foliage ones).
-* The Jumping Frog spirit now can perform an alternative attack pattern,
-  wall-jump attacks, when positioned between a wall and a monster. The idea is
-  inspired from Harmonist's jumps, but limited to combat to avoid abuse. The
-  idea is to compensate for the Frog's previous lack of passive combat mobility
-  despite not having a melee as strong as the Hydra's (see discussion in issue
-  #1).  Still a **WIP idea** that may evolve or be removed.
 * The Jumping Frog spirit now has one extra jump charge initially (so 3
   initially and then still 4 when upgraded), but the jump's daze duration on
   monsters is decreased by one.

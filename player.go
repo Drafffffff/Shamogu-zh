@@ -70,8 +70,6 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 			return false
 		}
 		switch {
-		case pa.DoesAny(PatternWallJump):
-			return g.WallJumpAttack(dir)
 		case pa.Has(StatusDig):
 			g.dig(to)
 		default:
@@ -157,41 +155,6 @@ func (g *Game) Sprint(dir gruid.Point) bool {
 	}
 	g.md.MoveAnimation(from, to)
 	if n > 1 && pa.Has(StatusImbalance) && g.IntN(DurationSprint) == 0 {
-		g.Log("You fall due to imbalance.")
-		g.PutStatus(PlayerID, pa, StatusDaze, DurationDazeFall)
-	}
-	return true
-}
-
-// WallJumpAttack performs a short-range jumping attack by propulsing against a
-// wall and taking a step over a monster.
-func (g *Game) WallJumpAttack(dir gruid.Point) bool {
-	pl, pa := g.Player()
-	at, over := pl.P.Add(dir), pl.P.Sub(dir)
-	i, ai := g.ActorAt(over)
-	if i < 0 {
-		g.Logf("You cannot walk into the %s.", TerrainName(g.Map.Terrain.At(at)))
-		return false
-	}
-	to := over.Sub(dir)
-	if pa.Has(StatusFear) {
-		g.Log("You’re too afraid for a wall-jump attack.")
-		return false
-	}
-	if !g.InFOV(to) {
-		g.Log("You cannot jump out of view.")
-		return false
-	}
-	if !g.IsFree(to) {
-		g.Log("There’s no room for a wall-jump.")
-		return false
-	}
-	g.Dir = dir
-	from := pl.P
-	g.BumpMoveActor(PlayerID, pa, to)
-	g.md.MoveAnimation(from, to)
-	g.BumpAttackActor(PlayerID, i, pa, ai, AttackPlain, 0)
-	if pa.Has(StatusImbalance) && g.IntN(5) == 0 {
 		g.Log("You fall due to imbalance.")
 		g.PutStatus(PlayerID, pa, StatusDaze, DurationDazeFall)
 	}

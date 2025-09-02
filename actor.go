@@ -123,7 +123,6 @@ const (
 	PatternRangedRecoil   // ranged attack with recoil (wind fox)
 	PatternSwap           // temporal cat swapping-attack
 	PatternSwapDaze       // temporal cat dazing swapping-attack
-	PatternWallJump       // wall-jump attack pattern
 
 	BadHearing       // worse hearing of noise (footsteps)
 	BurningHits      // hits may burn
@@ -194,7 +193,6 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, PatternRangedRecoil, "ranged attack with recoil")
 	desc = traitDesc(desc, t, PatternSwap, "ranged space-distorting attack")
 	desc = traitDesc(desc, t, PatternSwapDaze, "ranged space-distorting attack that may @Odaze@N foes")
-	desc = traitDesc(desc, t, PatternWallJump, "wall-jump attack")
 
 	desc = traitDesc(desc, t, Pushing, "hits may push foes")
 	desc = traitDesc(desc, t, PushingUnbalance, "hits may push and @Ounbalance@N foes")
