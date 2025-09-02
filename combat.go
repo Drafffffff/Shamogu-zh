@@ -627,17 +627,11 @@ func (g *Game) AdjacentEntities(i, j ID) bool {
 
 // Dig attempts to make an actor dig at a given position. It reports true on
 // success.
-func (g *Game) Dig(i ID, a *Actor, at gruid.Point, log bool) bool {
-	if !a.Has(StatusDig) {
-		if log {
-			g.Logf("You cannot walk into the %s.", TerrainName(g.Map.Terrain.At(at)))
-		}
+func (g *Game) Dig(i ID, a *Actor, at gruid.Point) bool {
+	if !inMap(at) {
 		return false
 	}
-	if !inMap(at) {
-		if log {
-			g.Log("You cannot walk out of the map.")
-		}
+	if !a.Has(StatusDig) {
 		return false
 	}
 	g.dig(at)

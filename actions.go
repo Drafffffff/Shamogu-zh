@@ -1519,7 +1519,7 @@ On the map, monster color may change depending on active status effects.  By def
 		case StatusFear:
 			details = "Monsters will flee when facing you. Ambushing charges against unseen foes can still happen. At the end of a turn, a cornered and afraid actor with no possible escape will become berserk. "
 		case StatusImbalance:
-			details = "Using “sprint” or “jump” abilities while imbalanced may sometimes lead to a @Odazing@N fall."
+			details = "Sprinting or jumping while imbalanced may sometimes lead to a @Odazing@N fall."
 		case StatusPoison:
 			details = "Watch out for confusion if any monsters survive poisoning!"
 		case StatusFoggySkin:
@@ -1583,7 +1583,7 @@ In Shamogu, both the player and the monsters may use one of several attack patte
 
 @CPushing@N attacks may push foes one tile away. Rampaging boars, as well as Rampaging Boar spirit players, perform both @CRampaging@N and @CPushing@N.
 
-@CLateral jump@N attacks are performed by players with the Jumping Frog spirit. When moving toward an adjacent lateral wall, the player performs a 2-tile jump in the opposite direction, as long as the destination is visible and there is room. While jumping, the player turns toward the wall and attacks any monster on the jump path.
+@CWall-jump@N attacks are performed by players with the Jumping Frog spirit. When positioned between a wall and a monster, by moving toward the wall the player performs an attack against the monster and a 2-tile jump in the opposite direction, as long as the destination is visible and there is room.
 
 @CRanged@N attacks are performed without moving from as far as you can see.
 

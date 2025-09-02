@@ -123,13 +123,13 @@ const (
 	PatternRangedRecoil   // ranged attack with recoil (wind fox)
 	PatternSwap           // temporal cat swapping-attack
 	PatternSwapDaze       // temporal cat dazing swapping-attack
+	PatternWallJump       // wall-jump attack pattern
 
 	BadHearing       // worse hearing of noise (footsteps)
 	BurningHits      // hits may burn
 	DazingSpines     // body covered in dazing spines (porcupine)
 	GoodHearing      // better hearing of noise (footsteps)
 	GoodSmell        // smell food from a distance
-	LateralJumping   // jump by propulsing against walls
 	Pushing          // pushing without unbalancing
 	PushingUnbalance // unbalancing pushing (like boar and earth-dragon)
 	TrailingCloud    // leave dust behind after moving (on floor tiles)
@@ -194,6 +194,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, PatternRangedRecoil, "ranged attack with recoil")
 	desc = traitDesc(desc, t, PatternSwap, "ranged space-distorting attack")
 	desc = traitDesc(desc, t, PatternSwapDaze, "ranged space-distorting attack that may @Odaze@N foes")
+	desc = traitDesc(desc, t, PatternWallJump, "wall-jump attack")
 
 	desc = traitDesc(desc, t, Pushing, "hits may push foes")
 	desc = traitDesc(desc, t, PushingUnbalance, "hits may push and @Ounbalance@N foes")
@@ -207,7 +208,6 @@ func (t Traits) String() string {
 		desc = append(desc, "bad hearing")
 	}
 	desc = traitDesc(desc, t, GoodSmell, "smells food from afar")
-	desc = traitDesc(desc, t, LateralJumping, "can jump off lateral walls")
 	desc = traitDesc(desc, t, TrailingCloud, "movement leaves dust behind")
 	desc = traitDesc(desc, t, WoodyLegs, "woody legs (can move while lignified)")
 

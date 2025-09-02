@@ -661,7 +661,7 @@ func (eff EffectFireRetreat) Apply(g *Game) bool {
 		if !g.InFOV(p) {
 			break
 		}
-		if !g.Map.Passable(p) && !g.Dig(PlayerID, pa, p, false) {
+		if !g.Map.Passable(p) && !g.Dig(PlayerID, pa, p) {
 			break
 		}
 		if i, _ := g.ActorAt(p); i >= 0 {

@@ -65,10 +65,17 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 	}
 	to := pl.P.Add(dir)
 	if !g.Map.Passable(to) {
-		if pa.DoesAny(LateralJumping) {
-			return g.LateralJump(dir)
+		if !inMap(to) {
+			g.Log("You cannot walk out of the map.")
+			return false
 		}
-		if !g.Dig(PlayerID, pa, to, true) {
+		switch {
+		case pa.DoesAny(PatternWallJump):
+			return g.WallJumpAttack(dir)
+		case pa.Has(StatusDig):
+			g.dig(to)
+		default:
+			g.Logf("You cannot walk into the %s.", TerrainName(g.Map.Terrain.At(to)))
 			return false
 		}
 	}
@@ -125,7 +132,7 @@ func (g *Game) Sprint(dir gruid.Point) bool {
 		if !g.InFOV(p) {
 			break
 		}
-		if !g.Map.Passable(p) && !g.Dig(PlayerID, pa, p, false) {
+		if !g.Map.Passable(p) && !g.Dig(PlayerID, pa, p) {
 			break
 		}
 		if i, _ := g.ActorAt(p); i < 0 {
@@ -156,22 +163,19 @@ func (g *Game) Sprint(dir gruid.Point) bool {
 	return true
 }
 
-// LateralJump performs a lateral jump by propulsing against a wall.
-func (g *Game) LateralJump(dir gruid.Point) bool {
+// WallJumpAttack performs a short-range jumping attack by propulsing against a
+// wall and taking a step over a monster.
+func (g *Game) WallJumpAttack(dir gruid.Point) bool {
 	pl, pa := g.Player()
-	at := pl.P.Add(dir)
-	if !inMap(at) {
-		g.Log("You cannot walk out of the map.")
-		return false
-	}
-	if dir == g.Dir || dir == g.Dir.Mul(-1) {
+	at, over := pl.P.Add(dir), pl.P.Sub(dir)
+	i, ai := g.ActorAt(over)
+	if i < 0 {
 		g.Logf("You cannot walk into the %s.", TerrainName(g.Map.Terrain.At(at)))
 		return false
 	}
-	over := pl.P.Sub(dir)
 	to := over.Sub(dir)
-	if !g.Map.Passable(over) {
-		g.Log("There’s no room for a lateral jump.")
+	if pa.Has(StatusFear) {
+		g.Log("You’re too afraid for a wall-jump attack.")
 		return false
 	}
 	if !g.InFOV(to) {
@@ -179,19 +183,15 @@ func (g *Game) LateralJump(dir gruid.Point) bool {
 		return false
 	}
 	if !g.IsFree(to) {
-		g.Log("There’s no room for a lateral jump.")
+		g.Log("There’s no room for a wall-jump.")
 		return false
 	}
 	g.Dir = dir
 	from := pl.P
 	g.BumpMoveActor(PlayerID, pa, to)
 	g.md.MoveAnimation(from, to)
-	if i, ai := g.ActorAt(over); i >= 0 {
-		if !pa.Has(StatusFear) {
-			g.BumpAttackActor(PlayerID, i, pa, ai, AttackPlain, 0)
-		}
-	}
-	if pa.Has(StatusImbalance) && g.IntN(10) == 0 {
+	g.BumpAttackActor(PlayerID, i, pa, ai, AttackPlain, 0)
+	if pa.Has(StatusImbalance) && g.IntN(5) == 0 {
 		g.Log("You fall due to imbalance.")
 		g.PutStatus(PlayerID, pa, StatusDaze, DurationDazeFall)
 	}
