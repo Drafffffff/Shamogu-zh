@@ -17,21 +17,22 @@ const (
 	DurationDazeFall               = 2
 	DurationDazeJump               = 4
 	DurationDazeLightning          = 3
-	DurationDazeTeleport           = 4
 	DurationDazeSpines             = 3
+	DurationDazeTeleport           = 4
 	DurationFearAmbrosia           = 4
 	DurationFearBark               = 4
 	DurationFearMons               = 3
 	DurationFire                   = 3
 	DurationFirePepper             = 4
 	DurationFoggySkin              = 12
-	DurationImbalanceTeleport      = 6
 	DurationImbalanceGale          = 5
 	DurationImbalanceLignification = 6
 	DurationImbalanceSprint        = 5
+	DurationImbalanceTeleport      = 6
 	DurationLignification          = 12
-	DurationPoison                 = 4
 	DurationPoisonBerserk          = 6
+	DurationPoisonBite             = 4
+	DurationPoisonCloud            = 3
 
 	HealAmbrosia         = 8
 	HealClarityLeaves    = 4
@@ -613,7 +614,7 @@ func (eff EffectPoisonCloud) Name() string {
 }
 
 func (eff EffectPoisonCloud) Desc() string {
-	return "Spit poisonous clouds on the sides and in front of you up to two free tiles away, lasting 4-8 turns."
+	return "Spit poisonous clouds on the sides and in front of you up to two free tiles away, lasting 5-8 turns."
 }
 
 type EffectSprint struct{}

@@ -313,7 +313,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int)
 	}
 	// Extra attack effects (shared by both player and monsters).
 	if ai.DoesAny(VenomousMelee) && (ap != AttackRanged || g.AdjacentEntities(i, j)) && g.IntN(6-dmg) < 2 {
-		if g.PutStatus(j, aj, StatusPoison, DurationPoison) && i != PlayerID {
+		if g.PutStatus(j, aj, StatusPoison, DurationPoisonBite) && i != PlayerID {
 			if g.InFOV(ei.P) {
 				g.LogfStyled("The confused %s bits itself too!", logHurtMons, ei.Name)
 			}

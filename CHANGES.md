@@ -100,7 +100,8 @@ Reworked and improved content:
   while still restricting safe movements in a similar but less extreme way, and
   providing similar defense from ranged monsters.
 * Adjust slightly down the duration of fire clouds to 6-12 turns and poison
-  clouds to 4-8 turns.
+  clouds to 5-8 turns. Adjust duration of Poison inflicted by clouds down to 3
+  (experimental).
 * Using “sprint” or “jump” abilities while imbalanced may now sometimes lead to
   a dazing fall.
 * Space-distorting attacks now *swap clouds* too. While getting swapped into a
