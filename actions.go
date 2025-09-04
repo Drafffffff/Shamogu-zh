@@ -1657,7 +1657,7 @@ Try to always get the @Mfirst hit@N against monsters. In particular, avoid movin
 
 Try to learn the characteristics of each kind of monster.
 
-Some ranged monsters, like fire lamas or lashing frogs, are more dangerous ranged than in melee. You may sometimes want to force melee even if you’re ranged too!
+Some ranged monsters, like fire llamas or lashing frogs, are more dangerous ranged than in melee. You may sometimes want to force melee even if you’re ranged too!
 
 Some monsters have special attacks, like acid mounds ignoring defense, or venomous vipers poisoning you.
 
