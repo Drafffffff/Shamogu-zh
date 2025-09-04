@@ -866,7 +866,9 @@ func (eff EffectFireMenhir) Apply(g *Game) bool {
 		g.FireCloudAt(n.P)
 	}
 	// Reveal foliage.
-	g.UpdateFOV() // update just FOV (it strictly becomes smaller)
+	// Extra FOV update first to avoid info leak during animation. Just FOV
+	// is enough, because it becomes strictly smaller.
+	g.UpdateFOV()
 	g.revealFoliage()
 	return true
 }
