@@ -514,7 +514,7 @@ func (g *Game) genMonsters(mg *MapGen) {
 		if g.IntN(4) == 0 {
 			// Occasionally make golems guard a random non-player
 			// vault.
-			_, p = mg.RandomVaultsPlace(mg.npvaults, PlaceStatic)
+			_, p = mg.RandomVaultsPlace(mg.npvaults, PlaceWaypoint)
 		}
 		g.genMonsterGuardian(BlazingGolem, p)
 		g.genMonsterGuardian(BlazingGolem, p)
