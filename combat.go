@@ -539,8 +539,7 @@ func (g *Game) push(i, j ID, ai, aj *Actor, dmg int, ap AttackKind, bonus int) {
 	g.BumpMoveActor(i, ai, pj)
 }
 
-// catch handles extra catching effects for actors with PatternCatch trait.  It
-// should be called only on pairs of adjacent actors.
+// catch handles extra catching effects for actors with PatternCatch trait.
 func (g *Game) catch(i, j ID, ai, aj *Actor, dmg int) {
 	ei, ej := g.Entity(i), g.Entity(j)
 	dir := toDir(ej.P.Sub(ei.P))
@@ -557,8 +556,7 @@ func (g *Game) catch(i, j ID, ai, aj *Actor, dmg int) {
 }
 
 // swapSpaceDistortion handles extra swapping effects for actors with
-// PatternSwap trait, after inflicting damage on target.  It should be called
-// only on pairs of adjacent actors.
+// PatternSwap trait, after inflicting damage on target.
 func (g *Game) swapSpaceDistortion(i, j ID, ai, aj *Actor, dmg int, dazed bool) {
 	pj := g.Entity(j).P
 	g.SwapClouds(g.Entity(i).P, pj)
