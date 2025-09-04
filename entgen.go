@@ -398,7 +398,7 @@ const (
 	EarthDragon
 	ExplodingNadre
 	FearsomeLich
-	FireLama
+	FireLlama
 	FourHeadedHydra
 	HungryRat
 	LashingFrog
@@ -430,7 +430,7 @@ var MonsData = []monsterInfo{
 	EarthDragon:      {"earth dragon", 'D', 4, 2, 6, PushingUnbalance | MonsDig | MonsImmunityFear | MonsHeavyFootsteps | MonsNotable},
 	ExplodingNadre:   {"exploding nadre", 'n', 2, 2, 1, MonsExplodingDeath},
 	FearsomeLich:     {"fearsome lich", 'L', 2, 2, 5, PatternRanged | MonsFear | MonsIgnoreDefense | MonsImmunityPoison | MonsNotable},
-	FireLama:         {"fire lama", 'l', 2, 0, 4, PatternRanged | MonsSpitFire},
+	FireLlama:        {"fire llama", 'l', 2, 0, 4, PatternRanged | MonsSpitFire},
 	FourHeadedHydra:  {"four-headed hydra", 'H', 2, 0, 6, PatternFourDirs | MonsFourHeaded | MonsHeavyFootsteps | MonsNotable},
 	HungryRat:        {"hungry rat", 'r', 2, 0, 3, MonsHungry | MonsLightFootsteps},
 	NoisyImp:         {"noisy imp", 'I', 2, 2, 4, MonsMusic | MonsLightFootsteps | MonsNotable},
@@ -463,7 +463,7 @@ var monsMid = []monsterKind{
 	BarkingHound,
 	BlinkButterfly,
 	ExplodingNadre,
-	FireLama,
+	FireLlama,
 	LashingFrog,
 	RampagingBoar,
 	TemporalCat,
