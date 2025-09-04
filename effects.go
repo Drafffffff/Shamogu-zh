@@ -11,8 +11,8 @@ import (
 const (
 	DurationBerserk                = 8
 	DurationBerserkTotem           = 5
-	DurationConfusionHit           = 7
 	DurationConfusionAmbrosia      = 7
+	DurationConfusionHit           = 7
 	DurationConfusionSkunk         = 6
 	DurationConfusionToxins        = 4
 	DurationDazeFall               = 2
