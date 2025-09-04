@@ -29,14 +29,14 @@ const NLayouts = 3
 
 // MapGen gathers all terrain and vault information for generating a new map.
 type MapGen struct {
-	terrain rl.Grid         // map terrain
-	vaults  []*vault        // list of special vaults
-	tunnel  CacheGrid[bool] // in tunnel
-	xtunnel []gruid.Point   // points belonging to extra tunnels
-	vault   CacheGrid[bool] // in vault
-	pi      int             // player's vault
-	PR      *paths.PathRange
-	rand    *rand.Rand
+	terrain  rl.Grid         // map terrain
+	vaults   []*vault        // list of special vaults
+	tunnel   CacheGrid[bool] // in tunnel
+	xtunnel  []gruid.Point   // points belonging to extra tunnels
+	vault    CacheGrid[bool] // in vault
+	npvaults []*vault        // non-player vaults
+	PR       *paths.PathRange
+	rand     *rand.Rand
 }
 
 // GenerateMap produces a new map level using the given map layout as base

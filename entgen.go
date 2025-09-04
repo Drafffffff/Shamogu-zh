@@ -40,13 +40,15 @@ func (g *Game) GenEntities(mg *MapGen) {
 	// Generate new items and actors.
 	g.genPlayerOnNewLevel(mg)
 	g.genItems(mg)
-	g.genMonsters()
+	g.genMonsters(mg)
 }
 
 // genPlayerOnNewLevel places the player in the map with replenished charges and HP.
 func (g *Game) genPlayerOnNewLevel(mg *MapGen) {
 	p := g.PlayerEntity()
-	mg.pi, p.P = mg.RandomVaultsPlace(mg.vaults[:len(mg.vaults)/3], PlaceWaypoint)
+	var pi int // player's vault
+	pi, p.P = mg.RandomVaultsPlace(mg.vaults[:len(mg.vaults)/3], PlaceWaypoint)
+	mg.npvaults = slices.Delete(slices.Clone(mg.vaults), pi, pi+1)
 	if p.P == InvalidPos {
 		panic("invalid player position")
 	}
@@ -276,17 +278,16 @@ func (g *Game) genItems(mg *MapGen) {
 		g.AddEntity(me)
 	}
 	// Totemic spirit.
-	totemVaults := slices.Delete(slices.Clone(mg.vaults), mg.pi, mg.pi+1)
 	if spiritIndex := g.ProcInfo.Spirits[g.Map.Level-1]; spiritIndex >= 0 {
 		sp := spiritEntity(secondarySpirits[spiritIndex])
 		spr := sp.Role.(*Spirit)
 		spr.Charges = spr.MaxCharges[spr.Level]
 		sp.Rune = '!'
-		_, sp.P = mg.RandomVaultsPlace(totemVaults, PlaceItem)
+		_, sp.P = mg.RandomVaultsPlace(mg.npvaults, PlaceItem)
 		g.Map.Totem = sp.P
 		g.AddEntity(sp)
 	} else if g.Map.Level < MapLevels {
-		_, p := mg.RandomVaultsPlace(totemVaults, PlaceItem)
+		_, p := mg.RandomVaultsPlace(mg.npvaults, PlaceItem)
 		g.Map.Totem = p
 		g.genEmptyTotemAt(p)
 	}
@@ -480,7 +481,7 @@ var monsLate = []monsterKind{
 }
 
 // genMonsters generates monster entities for the current level.
-func (g *Game) genMonsters() {
+func (g *Game) genMonsters(mg *MapGen) {
 	if g.Map.Orb != InvalidPos {
 		g.genMonsterGuardian(FearsomeLich, g.Map.Orb)
 		g.genMonsterGuardian(UndeadKnight, g.Map.Orb)
@@ -509,8 +510,14 @@ func (g *Game) genMonsters() {
 	if g.ProcInfo.GuardianPortal1 == g.Map.Level {
 		nE--
 		nM--
-		g.genMonsterGuardian(BlazingGolem, g.Map.Portal)
-		g.genMonsterGuardian(BlazingGolem, g.Map.Portal)
+		p := g.Map.Portal
+		if g.IntN(4) == 0 {
+			// Occasionally make golems guard a random non-player
+			// vault.
+			_, p = mg.RandomVaultsPlace(mg.npvaults, PlaceStatic)
+		}
+		g.genMonsterGuardian(BlazingGolem, p)
+		g.genMonsterGuardian(BlazingGolem, p)
 	}
 	switch g.Map.Level {
 	case g.ProcInfo.MonsEarly:
