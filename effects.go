@@ -13,6 +13,7 @@ const (
 	DurationBerserkTotem           = 5
 	DurationConfusion              = 7
 	DurationConfusionAmbrosia      = 7
+	DurationConfusionSkunk         = 6
 	DurationConfusionToxins        = 4
 	DurationDazeFall               = 2
 	DurationDazeJump               = 4
@@ -515,7 +516,7 @@ type EffectNoxiousSmell struct{}
 func (eff EffectNoxiousSmell) Apply(g *Game) bool {
 	const maxdist = MaxFOVRange
 	g.Log("You emit a confusing noxious smell.")
-	g.confusingSmell(PlayerID, maxdist, DurationConfusion)
+	g.confusingSmell(PlayerID, maxdist, DurationConfusionSkunk)
 	return true
 }
 
@@ -541,7 +542,7 @@ func (eff EffectNoxiousSmell) Name() string {
 
 func (eff EffectNoxiousSmell) Desc() string {
 	return fmt.Sprintf("Confuse monsters in a %d-radius distance for %d turns.",
-		MaxFOVRange, DurationConfusion)
+		MaxFOVRange, DurationConfusionSkunk)
 }
 
 type EffectLignify struct{}
