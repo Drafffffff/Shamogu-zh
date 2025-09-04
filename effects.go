@@ -13,7 +13,7 @@ const (
 	DurationBerserkTotem           = 5
 	DurationConfusion              = 7
 	DurationConfusionAmbrosia      = 7
-	DurationConfusionToxins        = 5
+	DurationConfusionToxins        = 4
 	DurationDazeFall               = 2
 	DurationDazeJump               = 4
 	DurationDazeLightning          = 3
