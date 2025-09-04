@@ -22,7 +22,7 @@ New content:
   It may be sent by the dungeon to investigate and protect the portal after you
   use a warping menhir.
 * New portal guardian monster: **blazing golem**. A sturdy magical golem that
-  explodes on death.
+  explodes on death. May occasionally guard non-portal vaults, too.
 * New totem guardian monster: **totem wasp**. Rampaging and venomous wasps that
   like to use totems as their nest.
 * New kind of item: **runic trap**. They represent *visible* traps that are
@@ -100,8 +100,10 @@ Reworked and improved content:
   while still restricting safe movements in a similar but less extreme way, and
   providing similar defense from ranged monsters.
 * Adjust slightly down the duration of fire clouds to 6-12 turns and poison
-  clouds to 5-8 turns. Adjust duration of Poison inflicted by clouds down to 3
-  (experimental).
+  clouds to 5-8 turns. Adjust duration of Poison inflicted by clouds down to 3,
+  and slightly reduce confusion duration from 5 to 4 to compensate. Also reduce
+  the Skunk's “noxious smell” confusion duration from 7 to 6, because it was a
+  bit too strong.
 * Using “sprint” or “jump” abilities while imbalanced may now sometimes lead to
   a dazing fall.
 * Space-distorting attacks now *swap clouds* too. While getting swapped into a
