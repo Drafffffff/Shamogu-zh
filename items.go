@@ -182,12 +182,13 @@ func (c *Comestible) Use(g *Game, i ID) bool {
 	g.Entities[i] = emptySlot()
 	g.Stats.EatenComestibles++
 	g.Stats.MapEatenComestibles[g.Map.Level-1]++
-	if pp == g.PP() {
-		// We didn't teleport.
-		for i, ai := range g.Monsters() {
-			if ai.DoesAny(MonsHungry) && g.InFOV(g.Entity(i).P) {
-				g.PutStatus(i, ai, StatusBerserk, DurationBerserk)
-			}
+	for i, ai := range g.Monsters() {
+		if ai.DoesAny(MonsHungry) && g.InFOV(g.Entity(i).P) {
+			g.PutStatus(i, ai, StatusBerserk, DurationBerserk)
+			// Make monster hunt in case it was still wandering
+			// (with no extra log message).
+			ai.Behavior.State = Hunting
+			ai.Behavior.Target = pp
 		}
 	}
 	return true
