@@ -339,13 +339,13 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int)
 			}
 		}
 	case ai.DoesAll(MonsFear) && g.IntN(5-dmg) < 2:
-		if g.PutStatus(j, aj, StatusFear, DurationFearMons) {
-			if ai.Has(StatusConfusion) && g.PutStatus(i, ai, StatusFear, DurationFearMons) && g.InFOV(ei.P) {
+		if g.PutStatus(j, aj, StatusFear, DurationFearUndead) {
+			if ai.Has(StatusConfusion) && g.PutStatus(i, ai, StatusFear, DurationFearUndead) && g.InFOV(ei.P) {
 				g.Logf("The confused %s frightened itself too!", ei.Name)
 			}
 		}
 	case ai.DoesAny(MonsConfusion) && g.IntN(6-dmg) < 2:
-		if g.PutStatus(j, aj, StatusConfusion, DurationConfusion) {
+		if g.PutStatus(j, aj, StatusConfusion, DurationConfusionHit) {
 			g.monsConfusionPenalty(i, ai)
 		}
 	case ai.DoesAny(MonsLignify) && g.IntN(6-dmg) < 2:
