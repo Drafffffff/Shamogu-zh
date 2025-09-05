@@ -205,6 +205,7 @@ Fixes:
   duplicated “Saw *monster*” entries in timeline.
 * Fix healing amount in description of foggy-skin onion.
 * Fix application of Imbalance when jumping with the Sprinting Gazelle's sprint.
+* Fix vipers biting themselves too even when not confused (issue #1).
 * Some confused monster actions that happened outside of view incorrectly
   appeared in the game logs.
 * Improve/fix the page-down and scrolling instructions when details of all
