@@ -640,7 +640,7 @@ func (eff EffectSprint) Name() string {
 }
 
 func (eff EffectSprint) Desc() string {
-	return fmt.Sprintf("@BSprint@N for %d turns. %s @GInstant@N. Canceled by waiting.",
+	return fmt.Sprintf("@BSprint@N for %d turns. %s @GInstant@N.",
 		DurationSprint, statusDesc[StatusSprint])
 }
 
