@@ -8,11 +8,11 @@ New content:
   new spirit also confers +1 attack and a chance of burning foes on hit (like
   phoenixes do) and the upgraded version confers fire resistance (half duration
   of Fire effects).  As a drawback, it inflicts bad hearing on the player,
-  making it harder to hear footsteps and impossible to hear creeping and
-  wing-flapping noises. If the Fire Salamander is combined with the Barking
-  Hound spirit, hearing becomes normal again (neither good nor bad). Fire
-  Salamander is hence a spirit that offers very good offense capabilities and
-  some mobility, but it can significantly impair stealth tactics.
+  making it impossible to hear creep and wing-flapping noises. If the Fire
+  Salamander is combined with the Barking Hound spirit, hearing becomes normal
+  again (neither good nor bad). Fire Salamander is hence a spirit that offers
+  very good offense capabilities and some mobility, but it can significantly
+  impair stealth tactics.
 * New unique monster: **walking mushroom**. It's less sturdy than a walking
   tree but releases lignifying spores on sight from afar, affecting other
   monsters too. Also, its melee hits are confusing.
@@ -102,7 +102,7 @@ Reworked and improved content:
 * Adjust slightly down the duration of fire clouds to 6-12 turns and poison
   clouds to 5-8 turns. Adjust duration of Poison inflicted by clouds down to 3,
   and slightly reduce confusion duration from 5 to 4 to compensate. Also reduce
-  the Skunk's “noxious smell” confusion duration from 7 to 6, because it was a
+  the Skunk's “noxious smell” confusion duration from 7 to 5, because it was a
   bit too strong.
 * Using “sprint” or “jump” abilities while imbalanced may now sometimes lead to
   a dazing fall.
@@ -124,7 +124,9 @@ Reworked and improved content:
   (in particular not on foliage ones).
 * The Jumping Frog spirit now has one extra jump charge initially (so 3
   initially and then still 4 when upgraded), but the jump's daze duration on
-  monsters is decreased by one.
+  monsters is decreased by one from 5 to 4.
+* The Thunder Porcupine's lightning has its daze duration increased from 3 to
+  4, now on the same level as the Jumping Frog's “dazing jump”.
 * The “sprint” and “focus” abilities now cancel each other. It's never really
   useful nor thematic to have both at the same time, so hydra players have now
   an instant sprint cancellation option (at the cost of a spirit charge).

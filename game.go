@@ -246,11 +246,6 @@ func (g *Game) ComputeNoise() {
 			// hear.
 			dist += 2
 		}
-		if badhearing {
-			// Bad hearing reduces the distance at which light
-			// footsteps and normal footsteps can be heard.
-			dist += 2
-		}
 		if ei.Noise = goodhearing && dist <= MaxFOVRange+2 || dist <= MaxFOVRange; !ei.Noise {
 			continue
 		}
