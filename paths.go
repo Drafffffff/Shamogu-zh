@@ -2,7 +2,6 @@ package main
 
 import (
 	"math/rand/v2"
-	"slices"
 
 	"codeberg.org/anaseto/gruid"
 	"codeberg.org/anaseto/gruid/paths"
@@ -98,11 +97,8 @@ type MonPath struct {
 
 func (aip *MonPath) Neighbors(p gruid.Point) []gruid.Point {
 	nbs := aip.nbs.Cardinal(p, aip.passable)
-	// Some cheap shuffling so that monster movement is not unnaturally
-	// predictable.
-	if aip.rand.IntN(2) == 0 {
-		slices.Reverse(nbs)
-	}
+	// Shuffle so that monster movement is not unnaturally predictable.
+	aip.rand.Shuffle(len(nbs), func(i, j int) { nbs[i], nbs[j] = nbs[j], nbs[i] })
 	return nbs
 }
 
