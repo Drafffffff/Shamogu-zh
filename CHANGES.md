@@ -90,7 +90,8 @@ Reworked and improved content:
   clouds on foliage tiles instead of dissipating them.
 * Also, as discussed in issue #1 about Wind Fox balance, make “pushing gale”
   always do 1 damage (instead of 1-2 damage), and make 2-tile “recoil” in melee
-  produce some wind noise.
+  produce some wind noise. Also, make “recoil” only happen within a 4-tile
+  range.
 * Make “recoil” active even with the non-upgraded Wind Fox (pushing is active
   on the non-upgraded Rampaging Boar, so having recoil only on upgraded Wind
   Fox seemed a bit strange).

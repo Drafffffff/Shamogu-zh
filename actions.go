@@ -1587,7 +1587,7 @@ In Shamogu, both the player and the monsters may use one of several attack patte
 
 @CCatching@N attacks are ranged attacks that catch foes @Mon successful hits@N and move them next to you. When catching a foe from afar, there is a bonus of 1 to attack.
 
-@CRecoil@N is an extra attack effect that happens for wind fox monsters, as well as Wind Fox spirit players. After an attack, they may move backwards one tile when ranged, or two cells with extra wind noise when in melee.
+@CRecoil@N is an extra attack effect for wind fox monsters, as well as Wind Fox spirit players. After an attack from within a 4-tile range, they may move backwards one tile when ranged, or two cells with extra wind noise when in melee.
 
 @CSpace-Distorting@N attacks are ranged attacks that @Mswap positions@N on successful hits, but result in normal movement on misses. Any foes adjacent to the landing hit position are blinked away. Also, note that such attacks reverse your current direction.
 

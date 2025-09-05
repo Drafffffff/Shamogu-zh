@@ -586,10 +586,17 @@ func (g *Game) swapSpaceDistortion(i, j ID, ai, aj *Actor, dmg int, dazed bool) 
 	}
 }
 
+// RecoilRange represents the maximum distance at which recoil can happen.
+const RecoilRange = 4
+
 // recoil handles extra recoil effects for actors with the PatternRangedRecoil
 // trait.
 func (g *Game) recoil(i, j ID, ai *Actor) bool {
 	ei, ej := g.Entity(i), g.Entity(j)
+	if paths.DistanceManhattan(ei.P, ej.P) > RecoilRange {
+		// Disable recoil for long distances.
+		return false
+	}
 	dir := toDir(ei.P.Sub(ej.P))
 	npi := ei.P.Add(dir)
 	if !g.Map.Passable(npi) {
