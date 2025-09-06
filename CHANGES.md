@@ -59,6 +59,22 @@ Reworked and improved content:
   into a “hungry rat” with a new “hunt by smell” trait that makes rats able to
   track you by smell from out of view and, as an extra trait, become berserk if
   they see you eat a comestible.
+* Reworked Lignification and Foggy-Skin (see discussion in issue #1).
+  + Lignification now only grants +2 defense, but caps attack damage at 1.
+    This cap affects Hydra attacks, but not the extra effective damage bonuses
+    from Dig or Berserk. And while monsters that ignore-defense will bypass the
+    +2 defense bonus, the damage cap applies to them (so they will have a high
+    hit chance, but will do 1 damage). Monster walking trees have their defense
+    reduced from 4 to 2, but get a “permanently lignified” trait that grants
+    them the attack damage cap of Lignification permanently. Overall, the
+    change implies less misses and more predictability against lignified foes,
+    but somewhat lower average damage.
+  + Foggy-Skin has been reworked to play better with Lignification: the healing
+    now applies after removing Lignification's bonus and it's been made into +3
+    HP (ensuring 4 HP after Lignification). To compensate, Foggy-Skin doesn't
+    provide anymore a +1 defense bonus (which did not feel good even if
+    actually not bad for such a long duration), and it doesn't protect against
+    defense-ignoring attacks anymore.
 * Remove most eating restrictions. For example, a “berserking flower” can now
   be eaten even if already Berserk: it will end Berserk early and apply it
   again. That means you can use it to safely prolong Berserk when only one turn

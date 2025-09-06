@@ -38,7 +38,7 @@ const (
 	HealAmbrosia         = 8
 	HealClarityLeaves    = 4
 	HealFirebreathPepper = 2
-	HealFoggySkinOnion   = 2
+	HealFoggySkinOnion   = 3
 
 	DurationDig      = 6
 	DurationFocus    = 3
@@ -156,8 +156,8 @@ type EffectFoggySkinOnion struct{ Beam bool }
 func (eff EffectFoggySkinOnion) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	g.eatMsg("foggy-skin onion", HealFoggySkinOnion)
-	g.AdjustHP(PlayerID, pa, HealFoggySkinOnion)
 	g.PutStatus(PlayerID, pa, StatusFoggySkin, DurationFoggySkin)
+	g.AdjustHP(PlayerID, pa, HealFoggySkinOnion)
 	return true
 }
 

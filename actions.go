@@ -1513,7 +1513,7 @@ On the map, monster color may change depending on active status effects.  By def
 		case StatusBerserk:
 			details = "HP never falls below 1 on expiration."
 		case StatusLignification:
-			details = "HP never falls below 1 on expiration. Cancels @BSprint@N."
+			details = "HP never falls below 1 on expiration. Cancels @BSprint@N. Players with “woody legs” can move while @Blignified@N at the cost of reducing the duration by an extra turn."
 		case StatusConfusion:
 			details = "Confused monsters will attack other monsters too when adjacent. Some monsters may even hurt or affect themselves when performing special actions like digging, spitting fire, barking, or pushing."
 		case StatusFear:
@@ -1562,10 +1562,9 @@ Shamogu is a turn-based game. Each actor acts once per turn: the player acts fir
 
 Combat damage is affected by attack (A) and defense (D). Maximum damage is the minimum of attack A and 3. Higher values of A increase chances of higher damage when attacking, while higher values of D decrease that chance when defending. Zero damage represents a miss.
 
-Players under the @BFocus@N status effect and four-headed hydras perform four
-damage-rolls per attack, doing four times as much damage.
+Players under the @BFocus@N status effect and four-headed hydras perform four damage-rolls per attack, doing four times as much damage.
 
-Special effects like @BBerserk@N or @BDig@N may then increase effective total attack damage by one, bypassing defense and the maximum damage limit.
+Special effects like @BBerserk@N or @BDig@N may then increase effective total attack damage by one, bypassing defense and any maximum damage caps.
 
 @YCURRENT DIRECTION@N
 

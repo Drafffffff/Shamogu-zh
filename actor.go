@@ -228,7 +228,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, MonsFourHeaded, "attacks with all four heads")
 	desc = traitDesc(desc, t, MonsHungry, "hunts you with smell, becomes berserk if you eat in view")
 	desc = traitDesc(desc, t, MonsIgnoreDefense, "attack ignores defense")
-	desc = traitDesc(desc, t, MonsLignify, "hits may @Blignify@N you briefly, resists forced movement")
+	desc = traitDesc(desc, t, MonsLignify, "hits may @Blignify@N you briefly, woody legs, permanently @Blignified@N")
 	desc = traitDesc(desc, t, MonsMusic, "plays guitar for you, avoids fights")
 	desc = traitDesc(desc, t, MonsSpitFire, "spites @OFire@N from afar")
 	desc = traitDesc(desc, t, MonsSpores, "releases @Blignifying@N spores on sight")
@@ -354,11 +354,10 @@ var statusDesc = []string{
 	StatusFear:      "Forbids attacking and walking toward foes.",
 	StatusFire:      fmt.Sprintf("Remaining in place or moving into a cloud of fire will burn you for %d damage.", FireDamage),
 	StatusFocus:     "Attack frontally with all four heads.",
-	StatusFoggySkin: fmt.Sprintf("Gives %+d Defense. Exudes fog on the sides and behind. Protects from @OFire@N, @BLignification@N and defense-ignoring attacks.",
-		FoggySkinDefenseBonus),
+	StatusFoggySkin: "Exudes fog on the sides and behind. Protects from @OFire@N and @BLignification@N.",
 	StatusImbalance: fmt.Sprintf("Halves attack. When also confused, gives %+d Defense.", ConfusedImbalanceDefenseBonus),
 	StatusLignification: fmt.Sprintf(
-		"Gives %+d Defense. Provides temporary HP bonus. Protects from @OPoison@N and @OImbalance@N. Prevents movement. Doubles @OFire@N duration. Followed by @OImbalance@N on expiration for %d turns.",
+		"Gives %+d Defense and caps incoming attack damage at 1. Provides temporary HP bonus. Protects from @OPoison@N and @OImbalance@N. Prevents movement. Doubles @OFire@N duration. Followed by @OImbalance@N on expiration for %d turns.",
 		LignificationDefenseBonus, DurationImbalanceLignification),
 	StatusPoison: fmt.Sprintf("Walking will hurt you for %d damage. Stinky toxins are exuded on expiration, confusing other creatures for %d turns.",
 		PoisonDamage, DurationConfusionToxins),

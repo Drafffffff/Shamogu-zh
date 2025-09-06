@@ -31,9 +31,8 @@ const (
 	MaxAttackDamage = 3
 
 	BerserkAttackBonus            = 2
-	FoggySkinDefenseBonus         = 1
 	ConfusedImbalanceDefenseBonus = 2
-	LignificationDefenseBonus     = 4
+	LignificationDefenseBonus     = 2
 )
 
 // GetAttack returns the actor's current attack with modifiers.
@@ -53,9 +52,6 @@ func (a *Actor) GetDefense() int {
 	defense := a.Defense
 	if a.Has(StatusLignification) {
 		defense += LignificationDefenseBonus
-	}
-	if a.Has(StatusFoggySkin) {
-		defense += FoggySkinDefenseBonus
 	}
 	if a.Has(StatusImbalance) && a.Has(StatusConfusion) {
 		defense += ConfusedImbalanceDefenseBonus
@@ -414,7 +410,7 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 		// Ensure at least 1 offense.
 		attack = 1
 	}
-	if ai.DoesAny(MonsIgnoreDefense) && !aj.Has(StatusFoggySkin) {
+	if ai.DoesAny(MonsIgnoreDefense) {
 		defense = 0
 	}
 	n := 1 // default number of attacks
@@ -425,6 +421,10 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 	for range n {
 		// Damage per attack.
 		dmg += g.computeDamage(attack, defense)
+	}
+	if aj.Has(StatusLignification) || aj.DoesAny(MonsLignify) {
+		// Lignification caps attack damage at 1.
+		dmg = max(1, dmg)
 	}
 	if ap == AttackCharge && ai.Has(StatusDig) {
 		// Dig status gives extra *effective* damage on charge.
