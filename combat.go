@@ -427,7 +427,9 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 	}
 	if aj.Has(StatusLignification) || aj.DoesAny(MonsLignify) {
 		// Lignification caps attack damage at 1.
-		dmg = max(1, min(1, dmg))
+		if dmg > 1 {
+			dmg = 1
+		}
 	}
 	if ap == AttackCharge && ai.Has(StatusDig) {
 		// Dig status gives extra *effective* damage on charge.
