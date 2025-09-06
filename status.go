@@ -68,7 +68,7 @@ func (md *model) updateStatus() {
 
 	// HP
 	pa := g.PlayerActor()
-	hps := fmtHP(pa.HP, pa.GetMaxHP())
+	hps := pa.fmtHP()
 	entries = append(entries, ui.MenuEntry{
 		Text:     stt.WithTextf("HP:%s ", hps),
 		Disabled: true})
@@ -158,12 +158,31 @@ func statusHPColor(hp, hpmax int) rune {
 	}
 }
 
-func fmtHP(hp, hpmax int) string {
-	hpColor := statusHPColor(hp, hpmax)
+func (a *Actor) fmtHP() string {
+	hp := a.HP
 	if hp < 0 {
 		hp = 0
 	}
-	return fmt.Sprintf("@%c%d/%d@N", hpColor, hp, hpmax)
+	debt := 0
+	if a.Has(StatusLignification) {
+		debt += a.HPBonus()
+	}
+	if a.Has(StatusBerserk) {
+		debt += a.HPBonus()
+	}
+	hpmax := a.MaxHP + debt
+	if debt == 0 || hp == 0 {
+		hpColor := statusHPColor(hp, hpmax)
+		return fmt.Sprintf("@%c%d/%d@N", hpColor, hp, hpmax)
+	}
+	base := hp - debt // HP after expiration
+	if base < 1 {
+		base = 1
+	}
+	bonus := hp - base // bonus HP
+	returnHPColor := statusHPColor(base, a.MaxHP)
+	hpColor := statusHPColor(bonus, debt)
+	return fmt.Sprintf("@%c%d@%c+%d/%d@N", returnHPColor, base, hpColor, bonus, hpmax)
 }
 
 func fmtAD(val, def int) string {

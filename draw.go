@@ -467,7 +467,7 @@ func (md *model) drawTargInfo() {
 		case *Actor:
 			if info.sees {
 				fmt.Fprintf(&sb, "HP:%s A:%s D:%s",
-					fmtHP(r.HP, r.GetMaxHP()),
+					r.fmtHP(),
 					fmtAD(r.GetAttack(), r.Attack), fmtAD(r.GetDefense(), r.Defense))
 				for i, turns := range r.Statuses {
 					if turns <= 0 {

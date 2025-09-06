@@ -62,7 +62,10 @@ func (a *Actor) GetDefense() int {
 // GetMaxHP returns the actor's current max HP with modifiers.
 func (a *Actor) GetMaxHP() int {
 	hp := a.MaxHP
-	if a.Has(StatusBerserk) || a.Has(StatusLignification) {
+	if a.Has(StatusBerserk) {
+		hp += a.HPBonus()
+	}
+	if a.Has(StatusLignification) {
 		hp += a.HPBonus()
 	}
 	return hp

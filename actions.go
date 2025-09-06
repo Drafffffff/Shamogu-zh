@@ -1511,9 +1511,9 @@ On the map, monster color may change depending on active status effects.  By def
 		var details string
 		switch st {
 		case StatusBerserk:
-			details = "HP never falls below 1 on expiration."
+			details = "Bonus HP is consumed last. HP never falls below 1 on expiration."
 		case StatusLignification:
-			details = "HP never falls below 1 on expiration. Cancels @BSprint@N. Players with “woody legs” can move while @Blignified@N at the cost of reducing the duration by an extra turn."
+			details = "Bonus HP is consumed last. HP never falls below 1 on expiration. Cancels @BSprint@N. Players with “woody legs” can move while @Blignified@N at the cost of reducing the duration by an extra turn."
 		case StatusConfusion:
 			details = "Confused monsters will attack other monsters too when adjacent. Some monsters may even hurt or affect themselves when performing special actions like digging, spitting fire, barking, or pushing."
 		case StatusFear:
