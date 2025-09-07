@@ -673,7 +673,6 @@ loop:
 // and that is not occuppied by an actor or trap.
 func (g *Game) randomFreeNearby(at gruid.Point, maxdist int) gruid.Point {
 	n := 0
-loop:
 	for {
 		if n > 1000 {
 			return g.randomFreeFloor()
@@ -681,7 +680,7 @@ loop:
 		p := g.RandomPassableWithin(at, maxdist)
 		if i, _ := g.ActorAt(p); i >= 0 || !g.NoTrapAt(p) {
 			n++
-			continue loop
+			continue
 		}
 		return p
 	}
@@ -743,9 +742,7 @@ func (g *Game) genRunicTrapInTunnel(mg *MapGen) (ID, *Entity) {
 	if len(mg.xtunnel) == 0 {
 		return g.genRunicTrap(mg)
 	}
-	// We shuffle extra tunnel tiles. XXX: We maybe should keep track of
-	// tunnels separately instead, to give equal chance to each tunnel
-	// whether it's long or short.
+	// We shuffle extra tunnel tiles.
 	g.rand.Shuffle(len(mg.xtunnel), func(i, j int) {
 		mg.xtunnel[i], mg.xtunnel[j] = mg.xtunnel[j], mg.xtunnel[i]
 	})
@@ -754,11 +751,6 @@ loop:
 		if i, _ := g.ItemAt(p); i >= 0 {
 			continue loop
 		}
-		// n, nfree := g.pointInfo(p)
-		// if nfree != 2 {
-		// 	// Not really a tunnel.
-		// 	continue
-		// }
 		if !g.suitableTrapLocation(p) {
 			continue
 		}
