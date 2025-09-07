@@ -508,7 +508,6 @@ func (g *Game) genMonsters(mg *MapGen) {
 		g.genMonsterGuardian(TotemWasp, g.Map.Totem)
 	}
 	if g.ProcInfo.GuardianPortal1 == g.Map.Level {
-		nE--
 		nM--
 		p := g.Map.Portal
 		if g.IntN(4) == 0 {
