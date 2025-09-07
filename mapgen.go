@@ -194,11 +194,10 @@ func (mg *MapGen) genTreeCaveMap(gd rl.Grid) {
 	maxCells := sz.Y * w
 	cells := 1
 	block := make([]gruid.Point, 0, 64)
-loop:
 	for cells < maxCells {
 		block = mg.digBlock(gd, block)
 		if len(block) == 0 {
-			continue loop
+			continue
 		}
 		for _, p := range block {
 			if gd.At(p) != Floor {

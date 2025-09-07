@@ -333,16 +333,15 @@ func (g *Game) genItems(mg *MapGen) {
 // randomFreeItemFloor returns a random map floor position that is not occupied by
 // an item.
 func (g *Game) randomFreeItemFloor() gruid.Point {
-loop:
 	for {
 		p := g.RandomPassableBiased()
 		if i, _ := g.ItemAt(p); i >= 0 {
-			continue loop
+			continue
 		}
 		if p == g.PP() {
 			// Avoid putting a comestible on the player's starting
 			// position, for clarity.
-			continue loop
+			continue
 		}
 		// We replace foliage or rubble with floor for putting the
 		// item. We could allow items on non-floor cells, but for
@@ -659,11 +658,10 @@ func monster(mi monsterInfo) *Entity {
 // randomFreeFloor returns a random map floor position that is not occuppied by
 // an actor or a trap.
 func (g *Game) randomFreeFloor() gruid.Point {
-loop:
 	for {
 		p := g.RandomPassableWithoutTrap()
 		if i, _ := g.ActorAt(p); i >= 0 {
-			continue loop
+			continue
 		}
 		return p
 	}
@@ -746,10 +744,9 @@ func (g *Game) genRunicTrapInTunnel(mg *MapGen) (ID, *Entity) {
 	g.rand.Shuffle(len(mg.xtunnel), func(i, j int) {
 		mg.xtunnel[i], mg.xtunnel[j] = mg.xtunnel[j], mg.xtunnel[i]
 	})
-loop:
 	for _, p := range mg.xtunnel {
 		if i, _ := g.ItemAt(p); i >= 0 {
-			continue loop
+			continue
 		}
 		if !g.suitableTrapLocation(p) {
 			continue
