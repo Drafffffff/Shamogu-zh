@@ -273,7 +273,7 @@ func (g *Game) HungryHunt(from gruid.Point) bool {
 // path distance maxdist from the given point, with some bias toward the origin
 // point.
 func (g *Game) RandomPassableWithin(from gruid.Point, maxdist int) gruid.Point {
-	dij := &MapPath{passable: g.Map.Passable}
+	dij := &MapPath{passable: g.Map.PassableWithoutTraps}
 	nodes := g.PR.BreadthFirstMap(dij, []gruid.Point{from}, maxdist)
 	if len(nodes) == 0 {
 		// Should not happen.
@@ -301,11 +301,11 @@ func (g *Game) RandomPassableNearbyTarget(from gruid.Point) gruid.Point {
 // RandomPassableTarget provides a suitable next target position for wandering
 // monsters, somewhat biased toward vault waypoints.
 func (g *Game) RandomPassableTarget() gruid.Point {
-	if g.rand.IntN(2) == 0 && len(g.Map.WayPoints) > 0 {
-		p := g.Map.WayPoints[g.IntN(len(g.Map.WayPoints))]
+	if g.rand.IntN(2) == 0 && len(g.Map.Waypoints) > 0 {
+		p := g.Map.Waypoints[g.IntN(len(g.Map.Waypoints))]
 		return g.RandomPassableWithin(p, 5)
 	}
-	return g.RandomPassable()
+	return g.RandomPassableWithoutTrap()
 }
 
 // CallToCommonTarget makes a few nearby monsters chose the same target.  The

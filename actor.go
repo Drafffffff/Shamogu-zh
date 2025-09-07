@@ -703,11 +703,12 @@ func (g *Game) TeleportActor(i ID, ai *Actor) bool {
 
 // TeleportPoint returns a suitable teleport destination for the current given
 // position. In particular, it ensures that the destination is floor, rubble or
-// foliage, unoccupied by any other actor, and not too close to the origin.
+// foliage, unoccupied by any other actor or trap, and not too close to the
+// origin.
 func (g *Game) TeleportPoint(from gruid.Point) gruid.Point {
 	const mindist = 2 * MaxFOVRange
 	for {
-		p := g.RandomPassable()
+		p := g.RandomPassableWithoutTrap()
 		if paths.DistanceManhattan(from, p) < mindist {
 			continue
 		}

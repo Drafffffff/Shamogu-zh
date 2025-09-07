@@ -115,14 +115,16 @@ func (m *Map) PassableNeighbor(p gruid.Point) bool {
 	return false
 }
 
-// RandomPassable returns a random floor, rubble or foliage cell in the map. It
-// assumes that such a cell exists (otherwise the function does not end).
-func (g *Game) RandomPassable() gruid.Point {
+// RandomPassableWithoutTrap returns a random floor, rubble or foliage cell in
+// the map without any traps. It assumes that such a cell exists (otherwise the
+// function does not end).
+func (g *Game) RandomPassableWithoutTrap() gruid.Point {
+	passable := g.Map.PassableWithoutTraps
 	m := g.Map.Terrain
 	size := m.Size()
 	for {
 		p := gruid.Point{g.rand.IntN(size.X), g.rand.IntN(size.Y)}
-		if t := m.At(p); Passable(t) {
+		if passable(p) {
 			return p
 		}
 	}

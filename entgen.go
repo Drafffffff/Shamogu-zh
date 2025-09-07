@@ -662,8 +662,8 @@ func monster(mi monsterInfo) *Entity {
 func (g *Game) randomFreeFloor() gruid.Point {
 loop:
 	for {
-		p := g.RandomPassable()
-		if i, _ := g.ActorAt(p); i >= 0 || !g.NoTrapAt(p) {
+		p := g.RandomPassableWithoutTrap()
+		if i, _ := g.ActorAt(p); i >= 0 {
 			continue loop
 		}
 		return p
@@ -701,22 +701,30 @@ func runicTrap(mr MagicRune) *Entity {
 // genRunicTrap generates a runic trap at a position that doesn't truly block
 // passage, somewhat biased toward vaults.
 func (g *Game) genRunicTrap(mg *MapGen) (ID, *Entity) {
-loop:
 	for {
-		p := g.RandomPassable()
+		p := g.RandomPassableWithoutTrap()
 		inVault := mg.vault.At(p)
-		if !inVault && g.IntN(4) > 0 {
+		if !inVault && g.IntN(6) > 0 {
 			// Make vault cells more likely candidates.
 			continue
 		}
 		if i, _ := g.ItemAt(p); i >= 0 {
-			continue loop
+			continue
+		}
+		if inVault && slices.Contains(g.Map.Waypoints, p) {
+			// Waypoints should be free of traps, because monsters
+			// may chose nearby locations reachable from them
+			// without passing traps.
+			continue
 		}
 		if p == g.PP() {
 			// Don't put a trap on the player's starting position.
-			continue loop
+			continue
 		}
 		n, nfree := g.neighborInfo(p)
+		if inVault && nfree >= 2 && nfree < 4 && g.suitableTrapLocation(p) {
+			return g.genRunicTrapAt(p)
+		}
 		if n > 2 || nfree < 2 {
 			// Not connex or not connex enough or not enough free
 			// space.
@@ -748,28 +756,38 @@ loop:
 			continue loop
 		}
 		// n, nfree := g.pointInfo(p)
-		// if n != 4 || nfree != 2 {
+		// if nfree != 2 {
 		// 	// Not really a tunnel.
 		// 	continue
 		// }
-		passable := func(q gruid.Point) bool {
-			return g.Map.Passable(q) && g.NoTrapAt(q) && q != p
-		}
-		var dir, q gruid.Point
-		for _, d := range Directions {
-			q = p.Add(d)
-			dir = d
-			if passable(q) {
-				break
-			}
-		}
-		path := g.PR.JPSPath(nil, q, p.Sub(dir), passable, false)
-		if path == nil {
+		if !g.suitableTrapLocation(p) {
 			continue
 		}
 		return g.genRunicTrapAt(p)
 	}
 	return g.genRunicTrap(mg)
+}
+
+// suitableTrapLocation reports whether p's neighborhood makes it suitable for
+// a new trap location.
+func (g *Game) suitableTrapLocation(p gruid.Point) bool {
+	var nbs paths.Neighbors
+	ps := nbs.Cardinal(p, g.Map.PassableWithoutTraps)
+	if len(ps) <= 1 {
+		// Not an interesting trap location.
+		return false
+	}
+	passable := func(q gruid.Point) bool {
+		return g.Map.Passable(q) && g.NoTrapAt(q) && q != p
+	}
+	for i := range len(ps) - 1 {
+		path := g.PR.JPSPath(nil, ps[i], ps[i+1], passable, false)
+		if len(path) == 0 {
+			// No alternative path.
+			return false
+		}
+	}
+	return true
 }
 
 // genRunicTrapAt adds a new runic trap entity at the given position. It

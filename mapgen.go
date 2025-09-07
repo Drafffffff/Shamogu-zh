@@ -608,11 +608,11 @@ func (g *Game) earthquake() {
 
 // computeWaypoints computes the list of vault patrol points.
 func (g *Game) computeWaypoints(mg *MapGen) {
-	g.Map.WayPoints = g.Map.WayPoints[:0]
+	g.Map.Waypoints = g.Map.Waypoints[:0]
 	for _, vi := range mg.vaults {
 		for _, pl := range vi.places {
 			if pl.kind == PlaceWaypoint && g.Map.Passable(pl.p) {
-				g.Map.WayPoints = append(g.Map.WayPoints, pl.p)
+				g.Map.Waypoints = append(g.Map.Waypoints, pl.p)
 			}
 		}
 	}

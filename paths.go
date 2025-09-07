@@ -120,9 +120,7 @@ func (g *Game) MonPath(i ID, ai *Actor, from, to gruid.Point) []gruid.Point {
 	beh := ei.Role.(*Actor).Behavior
 	passable := g.Map.Passable
 	if beh.State != Hunting {
-		passable = func(p gruid.Point) bool {
-			return g.Map.Passable(p) && g.NoTrapAt(p)
-		}
+		passable = g.Map.PassableWithoutTraps
 	}
 	aip := &MonPath{
 		actorAt:  g.Map.BoolCache.At,
