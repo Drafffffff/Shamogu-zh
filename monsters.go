@@ -148,7 +148,7 @@ func (g *Game) releaseSpores(i ID) {
 		if g.PR.BreadthFirstMapAt(ej.P) > maxdist {
 			continue
 		}
-		g.PutStatus(j, aj, StatusLignification, DurationLignification/2)
+		g.PutStatus(j, aj, StatusLignification, DurationLignificationSpores)
 	}
 }
 

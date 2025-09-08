@@ -10,28 +10,36 @@ import (
 // The following constants are used for various effects and statuses.
 const (
 	DurationBerserk                = 8
+	DurationBerserkAfraid          = 4
+	DurationBerserkHit             = 4
 	DurationBerserkTotem           = 5
-	DurationConfusionAmbrosia      = 7
-	DurationConfusionHit           = 7
+	DurationBerserkTrap            = 4
+	DurationConfusionAmbrosia      = 6
+	DurationConfusionHit           = 6
 	DurationConfusionSkunk         = 5
 	DurationConfusionToxins        = 4
-	DurationDazeFall               = 2
+	DurationDazeFall               = 1
 	DurationDazeJump               = 4
 	DurationDazeLightning          = 4
-	DurationDazeSpines             = 3
+	DurationDazeSpines             = 2
 	DurationDazeTeleport           = 4
 	DurationFearAmbrosia           = 4
 	DurationFearBark               = 4
+	DurationFearFakePortal         = 6
 	DurationFearUndead             = 3
 	DurationFire                   = 3
 	DurationFirePepper             = 4
-	DurationFoggySkin              = 12
+	DurationFoggySkin              = 10
 	DurationImbalanceGale          = 5
-	DurationImbalanceLignification = 6
+	DurationImbalanceLignification = 5
 	DurationImbalanceSprint        = 5
-	DurationImbalanceTeleport      = 6
+	DurationImbalanceTeleport      = 5
 	DurationLignification          = 12
-	DurationPoisonBerserk          = 6
+	DurationLignificationHit       = 6
+	DurationLignificationRoots     = 6
+	DurationLignificationSpores    = 6
+	DurationLignificationTrap      = 6
+	DurationPoisonBerserk          = 5
 	DurationPoisonBite             = 4
 	DurationPoisonCloud            = 3
 
@@ -67,9 +75,9 @@ func (eff EffectAmbrosiaBerries) Apply(g *Game) bool {
 	g.eatMsg("ambrosia berries", HealAmbrosia)
 	g.AdjustHP(PlayerID, pa, HealAmbrosia)
 	if g.IntN(2) == 0 {
-		g.PutStatus(PlayerID, pa, StatusConfusion, DurationConfusionAmbrosia)
+		g.PutStatus1(PlayerID, pa, StatusConfusion, DurationConfusionAmbrosia)
 	} else {
-		g.PutStatus(PlayerID, pa, StatusFear, DurationFearAmbrosia)
+		g.PutStatus1(PlayerID, pa, StatusFear, DurationFearAmbrosia)
 	}
 	return true
 }
@@ -89,9 +97,9 @@ func (eff EffectBerserkingFlower) Apply(g *Game) bool {
 		// duration, but you'll still get the Poison debuff.
 		pa.Statuses[StatusBerserk] = 0
 		g.AdjustHP(PlayerID, pa, -pa.HPBonus())
-		g.PutStatus(PlayerID, pa, StatusPoison, DurationPoisonBerserk)
+		g.PutStatus1(PlayerID, pa, StatusPoison, DurationPoisonBerserk)
 	}
-	g.PutStatus(PlayerID, pa, StatusBerserk, DurationBerserk)
+	g.PutStatus1(PlayerID, pa, StatusBerserk, DurationBerserk)
 	return true
 }
 
@@ -120,7 +128,7 @@ func (eff EffectLignificationFruit) Apply(g *Game) bool {
 		pa.Statuses[StatusLignification] = 0
 		g.AdjustHP(PlayerID, pa, -pa.HPBonus())
 	}
-	g.PutStatus(PlayerID, pa, StatusLignification, DurationLignification)
+	g.PutStatus1(PlayerID, pa, StatusLignification, DurationLignification)
 	return true
 }
 
@@ -135,7 +143,7 @@ func (eff EffectClarityLeaves) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	g.eatMsg("clarity leaves", HealClarityLeaves)
 	g.AdjustHP(PlayerID, pa, HealClarityLeaves)
-	g.RemoveStatus(PlayerID, pa, StatusConfusion)
+	g.RemoveStatus(PlayerID, pa, StatusConfusion, true)
 	pp := g.PP()
 	for i := range g.Monsters() {
 		ei := g.Entity(i)
@@ -156,7 +164,7 @@ type EffectFoggySkinOnion struct{ Beam bool }
 func (eff EffectFoggySkinOnion) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	g.eatMsg("foggy-skin onion", HealFoggySkinOnion)
-	g.PutStatus(PlayerID, pa, StatusFoggySkin, DurationFoggySkin)
+	g.PutStatus1(PlayerID, pa, StatusFoggySkin, DurationFoggySkin)
 	g.AdjustHP(PlayerID, pa, HealFoggySkinOnion)
 	return true
 }
@@ -213,7 +221,7 @@ func (eff EffectTeleportMushroom) Apply(g *Game) bool {
 		}
 	}
 	g.eatMsg("teleport mushroom", 0)
-	if !g.TeleportActor(PlayerID, pa) {
+	if !g.TeleportActor(PlayerID, pa, true) {
 		g.Log("You resist teleport while lignified.")
 	}
 	if j >= 0 {
@@ -223,11 +231,11 @@ func (eff EffectTeleportMushroom) Apply(g *Game) bool {
 	return true
 }
 
-func (g *Game) teleportStatuses(i ID, ai *Actor) {
+func (g *Game) teleportStatuses(i ID, ai *Actor, self bool) {
 	if g.IntN(2) == 0 {
-		g.PutStatus(i, ai, StatusDaze, DurationDazeTeleport)
+		g.PutStatusN(i, ai, StatusDaze, DurationDazeTeleport, self)
 	} else {
-		g.PutStatus(i, ai, StatusImbalance, DurationImbalanceTeleport)
+		g.PutStatusN(i, ai, StatusImbalance, DurationImbalanceTeleport, self)
 	}
 }
 
@@ -326,7 +334,7 @@ func (eff EffectJump) Apply(g *Game) bool {
 	}
 	if pa.Has(StatusImbalance) && g.IntN(2) == 0 {
 		g.Log("You fall due to imbalance.")
-		g.PutStatus(PlayerID, pa, StatusDaze, DurationDazeFall)
+		g.PutStatus1(PlayerID, pa, StatusDaze, DurationDazeFall)
 	}
 	return true
 }
@@ -564,7 +572,7 @@ func (eff EffectLignify) Apply(g *Game) bool {
 			g.Log("Growing roots lignify your foes.")
 			done = true
 		}
-		g.PutStatus(i, ai, StatusLignification, DurationLignification/2)
+		g.PutStatus(i, ai, StatusLignification, DurationLignificationRoots)
 	}
 	if done {
 		mp := &MapPath{passable: inMap}
@@ -582,7 +590,7 @@ func (eff EffectLignify) Name() string {
 
 func (eff EffectLignify) Desc() string {
 	return fmt.Sprintf("Lignify monsters in view for %d turns.",
-		DurationLignification/2)
+		DurationLignificationRoots)
 }
 
 type EffectPoisonCloud struct{}
@@ -788,7 +796,7 @@ func (eff EffectWarpingMenhir) Apply(g *Game) bool {
 			continue
 		}
 		if i, ai := g.ActorAt(n.P); i > 0 {
-			g.TeleportActor(i, ai)
+			g.TeleportActor(i, ai, false)
 		}
 	}
 	// Reveal portal or orb of corruption.

@@ -306,7 +306,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int)
 		g.catch(i, j, ai, aj, dmg)
 	case ai.DoesAny(PatternRangedRecoil) && ap != AttackCharge && ai.CanMove() && g.IntN(5-dmg) < 2:
 		if g.recoil(i, j, ai) && i != PlayerID &&
-			ai.Has(StatusConfusion) && g.PutStatus(i, ai, StatusImbalance, 1+dmg) && g.InFOV(ei.P) {
+			ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusImbalance, 1+dmg) && g.InFOV(ei.P) {
 			g.Logf("The confused %s lost balance due to recoil!", ei.Name)
 		}
 	}
@@ -339,7 +339,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int)
 		}
 	case ai.DoesAll(MonsFear) && g.IntN(5-dmg) < 2:
 		if g.PutStatus(j, aj, StatusFear, DurationFearUndead) {
-			if ai.Has(StatusConfusion) && g.PutStatus(i, ai, StatusFear, DurationFearUndead) && g.InFOV(ei.P) {
+			if ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusFear, DurationFearUndead) && g.InFOV(ei.P) {
 				g.Logf("The confused %s frightened itself too!", ei.Name)
 			}
 		}
@@ -348,11 +348,11 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int)
 			g.monsConfusionPenalty(i, ai)
 		}
 	case ai.DoesAny(MonsLignify) && g.IntN(6-dmg) < 2:
-		if g.PutStatus(j, aj, StatusLignification, DurationLignification/2) {
+		if g.PutStatus(j, aj, StatusLignification, DurationLignificationHit) {
 			g.monsConfusionPenalty(i, ai)
 		}
 	case ai.DoesAny(MonsBerserking) && g.IntN(6-dmg) < 2:
-		if g.PutStatus(j, aj, StatusBerserk, DurationBerserk/2) {
+		if g.PutStatus(j, aj, StatusBerserk, DurationBerserkHit) {
 			g.monsConfusionPenalty(i, ai)
 		}
 	case ai.DoesAny(MonsBlink) && aj.IsAlive():
@@ -363,15 +363,15 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int)
 		} else {
 			g.Logf("The confused %s teleports the %s away!", ei.Name, ej.Name)
 		}
-		g.TeleportActor(j, aj)
+		g.TeleportActor(j, aj, false)
 		if ai.Has(StatusConfusion) {
-			g.TeleportActor(i, ai)
+			g.TeleportActor(i, ai, true)
 		}
 	}
 	// Extra defense effects.
 	switch {
 	case aj.DoesAny(DazingSpines) && (ap != AttackRanged || g.AdjacentEntities(i, j)) && g.IntN(5-dmg) == 0:
-		g.PutStatus(i, ai, StatusDaze, DurationDazeSpines)
+		g.PutStatus1(i, ai, StatusDaze, DurationDazeSpines)
 	}
 }
 
@@ -505,7 +505,7 @@ func (g *Game) push(i, j ID, ai, aj *Actor, dmg int, ap AttackKind, bonus int) {
 	npj := pj.Add(delta)
 	if ai.DoesAny(PushingUnbalance) {
 		if g.PutStatus(j, aj, StatusImbalance, 2+dmg/3) && i != PlayerID &&
-			ai.Has(StatusConfusion) && g.PutStatus(i, ai, StatusImbalance, dmg) && g.InFOV(ei.P) {
+			ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusImbalance, dmg) && g.InFOV(ei.P) {
 			g.Logf("The confused %s lost balance while pushing too!", ei.Name)
 		}
 	}
@@ -552,7 +552,7 @@ func (g *Game) catch(i, j ID, ai, aj *Actor, dmg int) {
 	g.md.MoveAnimation(from, to)
 	if ai.DoesAny(PatternCatchUnbalance) && g.IntN(8-dmg) < 5 {
 		if g.PutStatus(j, aj, StatusImbalance, 1+dmg) && i != PlayerID &&
-			ai.Has(StatusConfusion) && g.PutStatus(i, ai, StatusImbalance, 1+dmg) {
+			ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusImbalance, 1+dmg) {
 			g.Logf("The confused %s lost balance too!", ei.Name)
 		}
 	}
@@ -567,7 +567,7 @@ func (g *Game) swapSpaceDistortion(i, j ID, ai, aj *Actor, dmg int, dazed bool) 
 	if !dazed && ai.DoesAny(PatternSwapDaze) && g.IntN(6-dmg) < 2 {
 		duration := 2 + dmg/2
 		if g.PutStatus(j, aj, StatusDaze, duration) && i != PlayerID &&
-			ai.Has(StatusConfusion) && g.PutStatus(i, ai, StatusDaze, duration) && g.InFOV(pj) {
+			ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusDaze, duration) && g.InFOV(pj) {
 			g.LogfStyled("The confused %s dazed itself too!",
 				logHurtMons, g.Entity(i).Name)
 		}

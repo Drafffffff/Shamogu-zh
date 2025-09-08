@@ -339,7 +339,7 @@ func (g *Game) useFakePortal() {
 	for i, ai := range g.Monsters() {
 		ei := g.Entity(i)
 		if g.PR.BreadthFirstMapAt(ei.P) <= maxdist {
-			g.PutStatus(i, ai, StatusFear, DurationFearBark+2)
+			g.PutStatus(i, ai, StatusFear, DurationFearFakePortal)
 		}
 	}
 }

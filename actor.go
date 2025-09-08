@@ -386,8 +386,21 @@ func (sts Statuses) Has(st Status) bool {
 	return sts[st] > 0
 }
 
-// PutStatus adds a status on an actor for a given number of turns.
+// PutStatus1 is PutStatusN(..., true).
+func (g *Game) PutStatus1(i ID, ai *Actor, st Status, turns int) bool {
+	return g.PutStatusN(i, ai, st, turns, true)
+}
+
+// PutStatus is PutStatusN(..., false).
 func (g *Game) PutStatus(i ID, ai *Actor, st Status, turns int) bool {
+	return g.PutStatusN(i, ai, st, turns, false)
+}
+
+// PutStatusN adds a status on an actor for a given number of turns. If self is
+// true it increases duration of turns by one: meant for statuses that are
+// acquired during the actor's current turn and don't have any effect until
+// after the end of the turn.
+func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, self bool) bool {
 	if ai.IsDead() {
 		return false
 	}
@@ -464,6 +477,9 @@ func (g *Game) PutStatus(i ID, ai *Actor, st Status, turns int) bool {
 	if turns <= 0 {
 		return false
 	}
+	if self {
+		turns++
+	}
 	if !ai.Statuses.Put(st, turns) {
 		return false
 	}
@@ -471,36 +487,36 @@ func (g *Game) PutStatus(i ID, ai *Actor, st Status, turns int) bool {
 		g.Stats.Statuses[st]++
 		style := logNotable
 		if st.Bad() {
-			g.StoryLogf("Got %s (%d %s)", st, turns, Countable("turn", turns))
+			g.StoryLogf("Got %s (%s)", st, fmtTurns(turns, self))
 			style = logHurtPlayer
 			if GameConfig.WarnFirePoison && (st == StatusFire || st == StatusPoison) {
 				g.md.mode = modeCritical
 			}
 		} else if st == StatusLignification || st == StatusBerserk || st == StatusFoggySkin {
-			g.StoryLogf("Became %s (%d %s)", st, turns, Countable("turn", turns))
+			g.StoryLogf("Became %s (%s)", st, fmtTurns(turns, self))
 		}
-		g.LogfStyled("You’re %s (%d %s).", style, st, turns, Countable("turn", turns))
+		g.LogfStyled("You’re %s (%s).", style, st, fmtTurns(turns, self))
 		g.md.auto.mode = noAuto
 	} else if ei := g.Entity(i); g.InFOV(ei.P) {
-		g.Logf("The %s is %s (%d %s).", ei.Name, st, turns, Countable("turn", turns))
+		g.Logf("The %s is %s (%s).", ei.Name, st, fmtTurns(turns, self))
 	}
 	switch st {
 	case StatusBerserk:
 		g.AdjustHP(i, ai, ai.HPBonus())
-		g.RemoveStatus(i, ai, StatusFear)
+		g.RemoveStatus(i, ai, StatusFear, self)
 	case StatusLignification:
 		g.AdjustHP(i, ai, ai.HPBonus())
-		g.RemoveStatus(i, ai, StatusPoison)
-		g.RemoveStatus(i, ai, StatusFoggySkin)
-		g.RemoveStatus(i, ai, StatusImbalance)
-		g.RemoveStatus(i, ai, StatusSprint)
+		g.RemoveStatus(i, ai, StatusPoison, self)
+		g.RemoveStatus(i, ai, StatusFoggySkin, self)
+		g.RemoveStatus(i, ai, StatusImbalance, self)
+		g.RemoveStatus(i, ai, StatusSprint, self)
 	case StatusFoggySkin:
-		g.RemoveStatus(i, ai, StatusLignification)
-		g.RemoveStatus(i, ai, StatusFire)
+		g.RemoveStatus(i, ai, StatusLignification, self)
+		g.RemoveStatus(i, ai, StatusFire, self)
 	case StatusSprint:
-		g.RemoveStatus(i, ai, StatusFocus)
+		g.RemoveStatus(i, ai, StatusFocus, self)
 	case StatusFocus:
-		g.RemoveStatus(i, ai, StatusSprint)
+		g.RemoveStatus(i, ai, StatusSprint, self)
 	}
 	if i == PlayerID && !active {
 		// Alert the player with a short animation when a new status
@@ -514,6 +530,14 @@ func (g *Game) PutStatus(i ID, ai *Actor, st Status, turns int) bool {
 	return true
 }
 
+func fmtTurns(turns int, self bool) string {
+	if self {
+		// One of the turns is going to go down.
+		turns--
+	}
+	return fmt.Sprintf("%d %s", turns, Countable("turn", turns))
+}
+
 // HPBonus returns the amount of HP for berserk or lignification.
 func (a *Actor) HPBonus() int {
 	bonus := (2 * a.MaxHP) / 3
@@ -523,8 +547,9 @@ func (a *Actor) HPBonus() int {
 	return bonus
 }
 
-// RemoveStatus removes a status on an actor.
-func (g *Game) RemoveStatus(i ID, ai *Actor, st Status) {
+// RemoveStatus removes a status on an actor. The self boolean is passed to
+// PutStatusN for any new debuff statuses.
+func (g *Game) RemoveStatus(i ID, ai *Actor, st Status, self bool) {
 	if ai.IsDead() {
 		return
 	}
@@ -547,11 +572,11 @@ func (g *Game) RemoveStatus(i ID, ai *Actor, st Status) {
 		g.confusingSmell(i, dist, DurationConfusionToxins)
 	case StatusBerserk:
 		g.AdjustHP(i, ai, -ai.HPBonus())
-		g.PutStatus(i, ai, StatusPoison, DurationPoisonBerserk)
+		g.PutStatusN(i, ai, StatusPoison, DurationPoisonBerserk, self)
 	case StatusLignification:
 		g.AdjustHP(i, ai, -ai.HPBonus())
 		if !ai.DoesAny(WoodyLegs) {
-			g.PutStatus(i, ai, StatusImbalance, DurationImbalanceLignification)
+			g.PutStatusN(i, ai, StatusImbalance, DurationImbalanceLignification, self)
 		}
 	}
 }
@@ -559,7 +584,7 @@ func (g *Game) RemoveStatus(i ID, ai *Actor, st Status) {
 // ProgressStatus reduces the number of remaining turns for a status by one.
 func (g *Game) ProgressStatus(i ID, ai *Actor, st Status) {
 	if ai.Statuses[st] <= 1 {
-		g.RemoveStatus(i, ai, st)
+		g.RemoveStatus(i, ai, st, true)
 	} else {
 		ai.Statuses[st]--
 	}
@@ -621,13 +646,35 @@ func (g *Game) HandleActorTurn(i ID, ai *Actor) {
 		// monster, as it would have happened earlier for the player).
 		return
 	}
-	for st := range ai.Statuses {
-		g.ProgressStatus(i, ai, Status(st))
-	}
 	if ai.Has(StatusFoggySkin) {
 		g.exudeFog(i)
 	}
 	g.handleCornered(i, ai)
+	for _, st := range sortedStatuses {
+		g.ProgressStatus(i, ai, st)
+	}
+}
+
+// sortedStatuses contains statuses sorted for progression dependencies,
+// so that it's easier to get durations right in a consistent way. NOTE: it
+// allows Poison to expire before being applied again too (which may or may not
+// make more sense than just prolonging it, though it's a quite rare
+// edge-case).
+var sortedStatuses = []Status{
+	StatusConfusion,
+	StatusDaze,
+	StatusDig,
+	StatusFear,
+	StatusFire,
+	StatusFocus,
+	StatusFoggySkin,
+	StatusImbalance,
+	StatusPoison,
+	StatusSprint,
+	StatusTimeStop,
+
+	StatusBerserk,       // after Poison
+	StatusLignification, // after Imbalance & Berserk
 }
 
 // exudeFog implements the FoggySkin status effect.
@@ -683,11 +730,11 @@ func (g *Game) handleCornered(i ID, ai *Actor) {
 	} else if g.InFOV(from) {
 		g.LogfStyled("The afraid %s feels cornered.", logSpecial, ei.Name)
 	}
-	g.PutStatus(i, ai, StatusBerserk, DurationBerserk/2)
+	g.PutStatus1(i, ai, StatusBerserk, DurationBerserkAfraid)
 }
 
 // TeleportActor teleports the given actor.
-func (g *Game) TeleportActor(i ID, ai *Actor) bool {
+func (g *Game) TeleportActor(i ID, ai *Actor, self bool) bool {
 	if ai.ResistsMove() {
 		return false
 	}
@@ -697,7 +744,7 @@ func (g *Game) TeleportActor(i ID, ai *Actor) bool {
 		g.md.TeleportAnimation(from, to, i == PlayerID || g.InFOV(to))
 	}
 	g.MoveActor(i, ai, to)
-	g.teleportStatuses(i, ai)
+	g.teleportStatuses(i, ai, self)
 	return true
 }
 
