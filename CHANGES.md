@@ -108,10 +108,9 @@ Reworked and improved content:
   dissipating source which, due to “recoil”, can be quite useful for Wind Fox
   players. Also, as a special interaction, “pushing gale” propagates fire
   clouds on foliage tiles instead of dissipating them.
-* Also, as discussed in issue #1 about Wind Fox balance, make “pushing gale”
-  always do 1 damage (instead of 1-2 damage), and make 2-tile “recoil” in melee
-  produce some wind noise. Also, make “recoil” only happen within a 4-tile
-  range.
+* As discussed in issue #1 about Wind Fox balance, make “pushing gale”
+  always do 1 damage (instead of 1-2 damage). And make “recoil” produce some
+  wind noise in melee and generally only happen within a 4-tile range.
 * Make “recoil” active even with the non-upgraded Wind Fox (pushing is active
   on the non-upgraded Rampaging Boar, so having recoil only on upgraded Wind
   Fox seemed a bit strange).
@@ -146,7 +145,9 @@ Reworked and improved content:
 * The Jumping Frog spirit now has one extra jump charge initially (so 3
   initially and then still 4 when upgraded), but the jump's daze duration on
   monsters is decreased by one from 5 to 4.
-* HP of earth dragons has been decreased from 6 to 5.
+* HP of earth dragons has been decreased from 6 to 5, but along with vipers and
+  nadres, they now have “scales” that provide extra +1 defense against ranged
+  attacks.
 * The Thunder Porcupine's lightning has its daze duration increased from 3 to
   4, now on the same level as the Jumping Frog's “dazing jump”.
 * The “sprint” and “focus” abilities now cancel each other. It's never really
