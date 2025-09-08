@@ -60,18 +60,19 @@ Reworked and improved content:
   track you by smell from out of view and, as an extra trait, become berserk if
   they see you eat a comestible.
 * Reworked Lignification and Foggy-Skin (see discussion in issue #1).
-  + Lignification now only grants +2 defense, but caps attack damage at 1.
-    This cap affects Hydra attacks, but not the extra effective damage bonuses
-    from Dig or Berserk. And while monsters that ignore-defense will bypass the
-    +2 defense bonus, the damage cap applies to them (so they will have a high
-    hit chance, but will do 1 damage). Monster walking trees have their defense
-    reduced from 4 to 2, but get a “permanently lignified” trait that grants
-    them the attack damage cap of Lignification permanently. Overall, the
-    change implies less misses and more predictability against lignified foes,
-    but somewhat lower average damage. Also, HP now never falls below 3 on
-    bonus expiration, making Lignification partially preserve HP bonus in
-    semi-critical situations and work as a +2 HP or +1 HP heal when under 3 HP.
-    The Imbalance debuff duration was adjusted from 6 to 5, too.
+  + Lignification now only grants +2 defense (and an extra +1 against ranged
+    attacks), but caps attack damage at 1.  This cap affects Hydra attacks, but
+    not the extra effective damage bonuses from Dig or Berserk. And while
+    monsters that ignore-defense will bypass the +2 defense bonus, the damage
+    cap applies to them (so they will have a high hit chance, but will do 1
+    damage). Monster walking trees have their defense reduced from 4 to 2, but
+    get a “permanently lignified” trait that grants them the attack damage cap
+    of Lignification permanently. Overall, the change implies less misses and
+    more predictability against lignified foes, but somewhat lower average
+    damage. Also, HP now never falls below 3 on bonus expiration, making
+    Lignification partially preserve HP bonus in semi-critical situations and
+    work as a +2 HP or +1 HP heal when under 3 HP.  The Imbalance debuff
+    duration was adjusted from 6 to 5, too.
   + Foggy-Skin has been reworked to play better with Lignification: the healing
     now applies after removing Lignification's bonus and it's been made into +3
     HP (ensuring 4 HP after Lignification). To compensate, Foggy-Skin doesn't
@@ -145,6 +146,7 @@ Reworked and improved content:
 * The Jumping Frog spirit now has one extra jump charge initially (so 3
   initially and then still 4 when upgraded), but the jump's daze duration on
   monsters is decreased by one from 5 to 4.
+* HP of earth dragons has been decreased from 6 to 5.
 * The Thunder Porcupine's lightning has its daze duration increased from 3 to
   4, now on the same level as the Jumping Frog's “dazing jump”.
 * The “sprint” and “focus” abilities now cancel each other. It's never really

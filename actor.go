@@ -367,7 +367,7 @@ var statusDesc = []string{
 	StatusFoggySkin: "Exudes fog on the sides and behind. Protects from @OFire@N and @BLignification@N.",
 	StatusImbalance: fmt.Sprintf("Halves attack. When also confused, gives %+d Defense.", ConfusedImbalanceDefenseBonus),
 	StatusLignification: fmt.Sprintf(
-		"Gives %+d Defense and caps incoming attack damage at 1. Provides temporary HP bonus. Protects from @OPoison@N and @OImbalance@N. Prevents movement. Doubles @OFire@N duration. Followed by @OImbalance@N on expiration for %d turns.",
+		"Gives %+d Defense with an extra +1 against ranged attacks. Caps incoming attack damage at 1. Provides temporary HP bonus. Protects from @OPoison@N and @OImbalance@N. Prevents movement. Doubles @OFire@N duration. Followed by @OImbalance@N on expiration for %d turns.",
 		LignificationDefenseBonus, DurationImbalanceLignification),
 	StatusPoison: fmt.Sprintf("Walking will hurt you for %d damage. Stinky toxins are exuded on expiration, confusing other creatures for %d turns.",
 		PoisonDamage, DurationConfusionToxins),
