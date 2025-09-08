@@ -143,7 +143,7 @@ func (eff EffectClarityLeaves) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	g.eatMsg("clarity leaves", HealClarityLeaves)
 	g.AdjustHP(PlayerID, pa, HealClarityLeaves)
-	g.RemoveStatus(PlayerID, pa, StatusConfusion, true)
+	g.RemoveStatus(PlayerID, pa, StatusConfusion)
 	pp := g.PP()
 	for i := range g.Monsters() {
 		ei := g.Entity(i)
@@ -221,7 +221,7 @@ func (eff EffectTeleportMushroom) Apply(g *Game) bool {
 		}
 	}
 	g.eatMsg("teleport mushroom", 0)
-	if !g.TeleportActor(PlayerID, pa, true) {
+	if !g.TeleportActor(PlayerID, pa, 1) {
 		g.Log("You resist teleport while lignified.")
 	}
 	if j >= 0 {
@@ -231,11 +231,11 @@ func (eff EffectTeleportMushroom) Apply(g *Game) bool {
 	return true
 }
 
-func (g *Game) teleportStatuses(i ID, ai *Actor, self bool) {
+func (g *Game) teleportStatuses(i ID, ai *Actor, n int) {
 	if g.IntN(2) == 0 {
-		g.PutStatusN(i, ai, StatusDaze, DurationDazeTeleport, self)
+		g.PutStatusN(i, ai, StatusDaze, DurationDazeTeleport, n)
 	} else {
-		g.PutStatusN(i, ai, StatusImbalance, DurationImbalanceTeleport, self)
+		g.PutStatusN(i, ai, StatusImbalance, DurationImbalanceTeleport, n)
 	}
 }
 
@@ -796,7 +796,7 @@ func (eff EffectWarpingMenhir) Apply(g *Game) bool {
 			continue
 		}
 		if i, ai := g.ActorAt(n.P); i > 0 {
-			g.TeleportActor(i, ai, false)
+			g.TeleportActor(i, ai, 0)
 		}
 	}
 	// Reveal portal or orb of corruption.

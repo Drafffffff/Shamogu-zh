@@ -363,9 +363,9 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int)
 		} else {
 			g.Logf("The confused %s teleports the %s away!", ei.Name, ej.Name)
 		}
-		g.TeleportActor(j, aj, false)
+		g.TeleportActor(j, aj, 0)
 		if ai.Has(StatusConfusion) {
-			g.TeleportActor(i, ai, true)
+			g.TeleportActor(i, ai, 1)
 		}
 	}
 	// Extra defense effects.

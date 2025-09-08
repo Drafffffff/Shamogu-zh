@@ -164,22 +164,24 @@ func (a *Actor) fmtHP() string {
 		hp = 0
 	}
 	debt := 0
+	m := 1 // minimum return HP after bonus expiration (if above)
 	if a.Has(StatusLignification) {
 		debt += a.HPBonus()
+		m = 3
 	}
 	if a.Has(StatusBerserk) {
 		debt += a.HPBonus()
 	}
 	hpmax := a.MaxHP + debt
-	if debt == 0 || hp == 0 {
+	base := hp - debt // HP without bonus
+	if base < m {
+		base = min(hp, m)
+	}
+	bonus := hp - base // HP bonus
+	if base == 0 || bonus == 0 {
 		hpColor := statusHPColor(hp, hpmax)
-		return fmt.Sprintf("@%c%d/%d@N", hpColor, hp, hpmax)
+		return fmt.Sprintf("@%c%d/%d@N", hpColor, base, hpmax)
 	}
-	base := hp - debt // HP after expiration
-	if base < 1 {
-		base = 1
-	}
-	bonus := hp - base // bonus HP
 	returnHPColor := statusHPColor(base, a.MaxHP)
 	hpColor := statusHPColor(bonus, debt)
 	return fmt.Sprintf("@%c%d@%c+%d/%d@N", returnHPColor, base, hpColor, bonus, hpmax)

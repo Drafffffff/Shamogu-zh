@@ -138,7 +138,7 @@ func (g *Game) TriggerTrapAt(p gruid.Point) {
 		g.PoisonCloudAt(p)
 	case RuneWarp:
 		if i, ai := g.ActorAt(p); i >= 0 {
-			g.TeleportActor(i, ai, true)
+			g.TeleportActor(i, ai, 1)
 		}
 	}
 	rt.Used = true

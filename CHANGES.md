@@ -68,7 +68,10 @@ Reworked and improved content:
     reduced from 4 to 2, but get a “permanently lignified” trait that grants
     them the attack damage cap of Lignification permanently. Overall, the
     change implies less misses and more predictability against lignified foes,
-    but somewhat lower average damage.
+    but somewhat lower average damage. Also, HP now never falls below 3 on
+    bonus expiration, making Lignification partially preserve HP bonus in
+    semi-critical situations and work as a +2 HP or +1 HP heal when under 3 HP.
+    The Imbalance debuff duration was adjusted from 6 to 5, too.
   + Foggy-Skin has been reworked to play better with Lignification: the healing
     now applies after removing Lignification's bonus and it's been made into +3
     HP (ensuring 4 HP after Lignification). To compensate, Foggy-Skin doesn't
