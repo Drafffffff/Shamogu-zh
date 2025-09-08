@@ -85,10 +85,14 @@ func (g *Game) AdjustHP(i ID, a *Actor, amount int) {
 }
 
 // AdjustHPWithMin heals an actor by a given amount (or hurts if negative). The
-// result is guaranteed to be in [m,a.MaxHP].
+// result is guaranteed to be in [min(m, a.HP),a.MaxHP].
 func (g *Game) AdjustHPWithMin(i ID, a *Actor, amount int, m int) {
 	if a.IsDead() {
 		// Should not happen: dead monsters remain dead.
+		return
+	}
+	if amount < 0 && a.HP < m {
+		// Leave HP as-is.
 		return
 	}
 	ohp := a.HP
