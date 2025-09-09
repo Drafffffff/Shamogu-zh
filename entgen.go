@@ -538,8 +538,8 @@ func (g *Game) genMonsters(mg *MapGen) {
 		nM = 2 // two remaining
 	case g.ProcInfo.MonsLate:
 		// Special level with many late monsters of same kind.
-		nE -= 2
-		nM -= 2
+		nE--
+		nM -= 3
 		nL += 3
 		mk := monsLate[g.IntN(len(monsLate))]
 		for range nL - 2 {
