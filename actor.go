@@ -241,8 +241,8 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, MonsIgnoreDefense, "attack ignores defense")
 	desc = traitDesc(desc, t, MonsLignify, "hits may @Blignify@N you briefly, woody legs, permanently @Blignified@N")
 	desc = traitDesc(desc, t, MonsMusic, "plays guitar for you, avoids fights")
-	desc = traitDesc(desc, t, MonsScales, "scales (defense bonus against ranged attacks)")
-	desc = traitDesc(desc, t, MonsSpitFire, "spites @OFire@N from afar")
+	desc = traitDesc(desc, t, MonsScales, "scales (+1 Defense against ranged attacks)")
+	desc = traitDesc(desc, t, MonsSpitFire, "spites @Ofire@N from afar")
 	desc = traitDesc(desc, t, MonsSpores, "releases @Blignifying@N spores on sight")
 
 	desc = traitDesc(desc, t, MonsImmunityConfusion, "immune to @OConfusion@N")
@@ -251,7 +251,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, MonsImmunityFire, "@OFire@N immunity")
 	desc = traitDesc(desc, t, MonsImmunityImbalance, "@OImbalance@N immunity")
 	desc = traitDesc(desc, t, MonsImmunityLignification, "@BLignification@N immunity")
-	desc = traitDesc(desc, t, MonsImmunityPoison, "@Opoison@N immunity")
+	desc = traitDesc(desc, t, MonsImmunityPoison, "@OPoison@N immunity")
 
 	return strings.Join(desc, ", ")
 }
