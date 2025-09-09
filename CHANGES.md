@@ -207,13 +207,13 @@ UI, graphics, QoL:
   casual players might consider using it as an *adventure mode*. Enabling
   Wizard Mode *once* with `W` only enables non-permadeath mode (each
   resurrection by the wizard will be recorded in the timeline). Extra cheats
-  are enabled by pressing `W` again one or more times.
+  and visibility modes are enabled by pressing `W` again one or more times.
 * Refine drawing of tiles with both a cloud and an item: clouds are now drawn
   over items, but if the cloud is not dangerous, the color of the item is used
   (which never conflicts with the color of dangerous clouds).
 * A few improvements in game statistic's dump: ASCII map now shows monster
   noise too, the number of last messages was increased a bit.
-* A few help improvements.
+* Various help improvements.
 
 Fixes:
 
