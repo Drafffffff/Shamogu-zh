@@ -145,9 +145,9 @@ Reworked and improved content:
 * The Jumping Frog spirit now has one extra jump charge initially (so 3
   initially and then still 4 when upgraded), but the jump's daze duration on
   monsters is decreased by one from 5 to 4.
-* HP of earth dragons has been decreased from 6 to 5, but along with vipers and
-  nadres, they now have “scales” that provide extra +1 defense against ranged
-  attacks.
+* HP of earth dragons has been decreased from 6 to 5, but along with vipers,
+  nadres and hydras, they now have “scales” that provide extra +1 defense
+  against ranged attacks.
 * The Thunder Porcupine's lightning has its daze duration increased from 3 to
   4, now on the same level as the Jumping Frog's “dazing jump”.
 * The “sprint” and “focus” abilities now cancel each other. It's never really
