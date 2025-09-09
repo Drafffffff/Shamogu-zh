@@ -1656,7 +1656,7 @@ Combat and some other actions produce noise, as shown with onomatopoeias in the 
 
 Shamogu also shows visually the sound made by monsters out of view: @Rfootsteps@N, @Olight footsteps@N, @Gcreep noise@N, @Cflapping of wings@N, and @Mheavy footsteps@N. Note that monsters cannot hear your footsteps or, at the very least, they don’t care about such small noises!
 
-Players and monsters with the “good hearing” trait may hear sounds farther than usual. Players with “bad hearing” cannot hear @Gcreep noises@N nor @Cflapping of wings@N, but they hear others sounds normally.
+Players and monsters with the “good hearing” trait may hear sounds farther than usual. Players with “bad hearing” cannot hear @Gcreep noises@N nor @Cflapping of wings@N well, but they hear others sounds normally.
 `)
 }
 

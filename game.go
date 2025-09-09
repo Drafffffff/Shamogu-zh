@@ -214,39 +214,38 @@ func (g *Game) ComputeNoise() {
 			continue
 		}
 		dist := g.PRnoise.BreadthFirstMapAt(ei.P)
-		if dist > maxdist || dist > MaxFOVRange && !ai.DoesAny(MonsHeavyFootsteps) {
+		if dist > maxdist {
 			continue
 		}
-		if ai.DoesAny(MonsSilent) {
-			if goodhearing && dist <= MaxFOVRange-2 {
-				// Good hearing allows to hear almost silent
-				// monsters like spiders when nearby.
-				ei.Noise = true
-				a = ai
-				nheard++
-			}
-			continue
-		}
-		if ai.DoesAny(MonsHeavyFootsteps) && (goodhearing || dist <= MaxFOVRange+2) {
-			// Good hearing allows to hear heavy footsteps from far
-			// away. However, bad hearing (ground vibration-based)
-			// allows to hear heavy footsteps in a normal way.
-			ei.Noise = true
-			a = ai
-			nheard++
-			continue
-		}
-		if badhearing && ai.DoesAny(MonsCreep|MonsWingFlap) {
-			// Wing flapping and creeping can't be heard with
+		switch {
+		case goodhearing:
+			// Good hearing generally increases noise hearing range by 2.
+			dist -= 2
+		case badhearing && ai.DoesAny(MonsCreep|MonsWingFlap):
+			// Wing flapping and creeping can't be heard well with
 			// bad (mostly ground vibration-based) hearing.
-			continue
+			// Maximal range: 3 (wing flapping), 2 (creep noise).
+			dist = 1 + 2*dist
 		}
-		if ai.DoesAny(MonsLightFootsteps | MonsCreep) {
+		switch {
+		case ai.DoesAny(MonsSilent):
+			if !goodhearing {
+				// Silent monsters like spiders cannot be
+				// heared without good hearing.
+				continue
+			}
+			// Good hearing allows to hear almost silent
+			// monsters like spiders, but not too far.
+			dist += 4
+		case ai.DoesAny(MonsHeavyFootsteps):
+			// Heavy footsteps can be heared from a greater distance.
+			dist -= 3
+		case ai.DoesAny(MonsLightFootsteps | MonsCreep):
 			// Light footsteps and creeping are slightly harder to
 			// hear.
 			dist += 2
 		}
-		if ei.Noise = goodhearing && dist <= MaxFOVRange+2 || dist <= MaxFOVRange; !ei.Noise {
+		if ei.Noise = dist <= MaxFOVRange; !ei.Noise {
 			continue
 		}
 		a = ai

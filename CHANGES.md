@@ -8,11 +8,11 @@ New content:
   new spirit also confers +1 attack and a chance of burning foes on hit (like
   phoenixes do) and the upgraded version confers fire resistance (half duration
   of Fire effects).  As a drawback, it inflicts bad hearing on the player,
-  making it impossible to hear creep and wing-flapping noises. If the Fire
+  making it difficult to hear creep and wing-flapping noises. If the Fire
   Salamander is combined with the Barking Hound spirit, hearing becomes normal
   again (neither good nor bad). Fire Salamander is hence a spirit that offers
-  very good offense capabilities and some mobility, but it can significantly
-  impair stealth tactics.
+  very good offense capabilities and some mobility, but it can impair stealth
+  tactics.
 * New unique monster: **walking mushroom**. It's less sturdy than a walking
   tree but releases lignifying spores on sight from afar, affecting other
   monsters too. Also, its melee hits are confusing.
