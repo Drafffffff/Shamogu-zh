@@ -284,6 +284,12 @@ func (md *model) drawMapWizardRevealTerrain(gd gruid.Grid) {
 		}
 		it.SetCell(c)
 	}
+	// Target highlighting.
+	if p := md.targ.p; p != InvalidPos {
+		c := gd.At(p)
+		c.Style.Attrs |= AttrReverse
+		gd.Set(p, c)
+	}
 }
 
 func (g *Game) drawTerrainRuneAt(gd gruid.Grid, r rune, p gruid.Point) {

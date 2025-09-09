@@ -1268,11 +1268,14 @@ func (a ActionWizard) Handle(md *model) (gruid.Effect, bool) {
 			md.mode = modeWizardConfirmation
 		} else {
 			md.g.Wizard.Mode = WizardReveal
+			md.targ.CancelExamine()
 		}
 	case WizardReveal:
 		md.g.Wizard.Mode = WizardRevealTerrain
+		md.targ.CancelExamine()
 	case WizardRevealTerrain:
 		md.g.Wizard.Mode = WizardNormal
+		md.targ.CancelExamine()
 	}
 	return nil, false
 }
@@ -1296,6 +1299,7 @@ func (a ActionWizardConfirm) Handle(md *model) (gruid.Effect, bool) {
 		} else {
 			md.g.Wizard.Extra = true
 			md.g.Wizard.Mode = WizardReveal
+			md.targ.CancelExamine()
 			md.g.LogStyled("Extra cheats enabled.", logSpecial)
 			md.g.StoryLog("Enabled extra Wizard Mode cheats!")
 		}
