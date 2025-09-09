@@ -17,7 +17,6 @@ type targInfo struct {
 	entities []ID      // entities at target position
 	cloud    CloudKind // cloud information (if any)
 
-	lighted bool // target is lighted
 	sees    bool // player sees target currently
 	unknown bool // target is unknown
 }
@@ -75,15 +74,24 @@ func (md *model) updateTargInfo() {
 	if g.Map.KnownTerrain.At(p) == Unknown {
 		pi.unknown = true
 	}
-	if i, a := g.SensedActorAt(p); a != nil {
-		pi.entities = append(pi.entities, i)
+	if g.Wizard.Mode.Reveal() {
+		if i, a := g.ActorAt(p); a != nil {
+			pi.entities = append(pi.entities, i)
+		}
+		if i, _ := g.ItemAt(p); i >= 0 {
+			pi.entities = append(pi.entities, i)
+		}
+	} else {
+		if i, a := g.SensedActorAt(p); a != nil {
+			pi.entities = append(pi.entities, i)
+		}
+		if i, _ := g.KnownItemAt(p); i >= 0 {
+			pi.entities = append(pi.entities, i)
+		}
 	}
-	if i, _ := g.KnownItemAt(p); i >= 0 {
-		pi.entities = append(pi.entities, i)
+	pi.sees = g.InFOV(p)
+	if pi.sees || g.Wizard.Mode.Reveal() {
+		pi.cloud = g.Map.Clouds.At(p).Kind
 	}
-	if g.InFOV(p) {
-		pi.sees = true
-	}
-	pi.cloud = g.Map.Clouds.At(p).Kind
 	md.targ.info = pi
 }

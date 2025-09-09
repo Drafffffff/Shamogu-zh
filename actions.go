@@ -263,29 +263,64 @@ type ActionNextMonster struct{}
 
 func (a ActionNextMonster) Handle(md *model) (gruid.Effect, bool) {
 	g := md.g
-	var me []ID
-	for i := range g.Monsters() {
-		if g.Entity(i).KnownP != InvalidPos {
-			me = append(me, i)
-		}
+	if g.Wizard.Mode == WizardRevealTerrain {
+		return nil, false
 	}
+	me := g.getMonsterTargIDs()
 	if len(me) == 0 {
 		return nil, false
 	}
-	pp := g.PP()
-	slices.SortFunc(me, func(i, j ID) int {
-		pi, pj := g.Entity(i).KnownP, g.Entity(j).KnownP
-		return cmp.Compare(paths.DistanceManhattan(pp, pi), paths.DistanceManhattan(pp, pj))
-	})
-	i := -1
-	if id, _ := g.KnownActorAt(g.md.targ.p); id >= 0 {
-		i = slices.Index(me, id)
-	}
+	g.sortEntityTargIDs(me)
+	i := g.getMonsterTargIDIndex(me)
 	i = (i + 1) % len(me)
-	p := g.Entity(me[i]).KnownP
+	var p gruid.Point
+	if g.Wizard.Mode == WizardReveal {
+		p = g.Entity(me[i]).P
+	} else {
+		p = g.Entity(me[i]).KnownP
+	}
 	md.targ.kb = true
 	md.Examine(p)
 	return nil, false
+}
+
+// getMonsterTargIDs returns the ids of monsters that can be examined.
+func (g *Game) getMonsterTargIDs() []ID {
+	var me []ID
+	for i := range g.Monsters() {
+		if g.Entity(i).KnownP != InvalidPos || g.Wizard.Mode == WizardReveal {
+			me = append(me, i)
+		}
+	}
+	return me
+}
+
+// sortEntityTargIDs sorts the ids of monsters that can be examined by
+// distance to the player.
+func (g *Game) sortEntityTargIDs(me []ID) {
+	pp := g.PP()
+	slices.SortFunc(me, func(i, j ID) int {
+		pi, pj := g.Entity(i).KnownP, g.Entity(j).KnownP
+		if g.Wizard.Mode.Reveal() {
+			pi, pj = g.Entity(i).P, g.Entity(j).P
+		}
+		return cmp.Compare(paths.DistanceManhattan(pp, pi), paths.DistanceManhattan(pp, pj))
+	})
+}
+
+// getMonsterTargIDIndex returns the id of any monster currently being
+// examined, or -1 if none.
+func (g *Game) getMonsterTargIDIndex(me []ID) int {
+	if g.Wizard.Mode == WizardReveal {
+		if id, _ := g.ActorAt(g.md.targ.p); id >= 0 {
+			return slices.Index(me, id)
+		}
+		return -1
+	}
+	if id, _ := g.KnownActorAt(g.md.targ.p); id >= 0 {
+		return slices.Index(me, id)
+	}
+	return -1
 }
 
 func (a ActionNextMonster) String() string {
@@ -298,32 +333,28 @@ type ActionPreviousMonster struct{}
 
 func (a ActionPreviousMonster) Handle(md *model) (gruid.Effect, bool) {
 	g := md.g
-	var me []ID
-	for i := range g.Monsters() {
-		if g.Entity(i).KnownP != InvalidPos {
-			me = append(me, i)
-		}
+	if g.Wizard.Mode == WizardRevealTerrain {
+		return nil, false
 	}
+	me := g.getMonsterTargIDs()
 	if len(me) == 0 {
 		return nil, false
 	}
-	pp := g.PP()
-	slices.SortFunc(me, func(i, j ID) int {
-		pi, pj := g.Entity(i).KnownP, g.Entity(j).KnownP
-		return cmp.Compare(paths.DistanceManhattan(pp, pi), paths.DistanceManhattan(pp, pj))
-	})
-	i := 0
-	if id, _ := g.KnownActorAt(g.md.targ.p); id >= 0 {
-		i = slices.Index(me, id)
-		if i == -1 {
-			i = 0
-		}
+	g.sortEntityTargIDs(me)
+	i := g.getMonsterTargIDIndex(me)
+	if i == -1 {
+		i = 0
 	}
 	i--
 	if i < 0 {
 		i += len(me)
 	}
-	p := g.Entity(me[i]).KnownP
+	var p gruid.Point
+	if g.Wizard.Mode == WizardReveal {
+		p = g.Entity(me[i]).P
+	} else {
+		p = g.Entity(me[i]).KnownP
+	}
 	md.targ.kb = true
 	md.Examine(p)
 	return nil, false
@@ -370,37 +401,58 @@ func item2type(it Item) itemType {
 
 func (a ActionNextItem) Handle(md *model) (gruid.Effect, bool) {
 	g := md.g
-	var items []ID
-	for i, it := range g.ItemEntities() {
-		if item2type(it) != a.Type {
-			continue
-		}
-		if g.Entity(i).KnownP != InvalidPos {
-			items = append(items, i)
-		}
-	}
+	items := g.getItemTargIDs(a.Type)
 	if len(items) == 0 {
 		return nil, false
 	}
-	pp := g.PP()
-	slices.SortFunc(items, func(i, j ID) int {
-		pi, pj := g.Entity(i).KnownP, g.Entity(j).KnownP
-		return cmp.Compare(paths.DistanceManhattan(pp, pi), paths.DistanceManhattan(pp, pj))
-	})
-	i := -1
-	if id, it := g.ItemAt(g.md.targ.p); id >= 0 {
-		if item2type(it) == a.Type {
-			i = slices.Index(items, id)
-		}
-	}
+	g.sortEntityTargIDs(items)
+	i := g.getItemTargIDIndex(items, a.Type)
 	i = (i + 1) % len(items)
-	p := g.Entity(items[i]).KnownP
+	var p gruid.Point
+	if g.Wizard.Mode.Reveal() {
+		p = g.Entity(items[i]).P
+	} else {
+		p = g.Entity(items[i]).KnownP
+	}
 	if p == InvalidPos {
 		return nil, false
 	}
 	md.targ.kb = true
 	md.Examine(p)
 	return nil, false
+}
+
+// getItemTargIDs returns the ids of items that can be examined.
+func (g *Game) getItemTargIDs(ty itemType) []ID {
+	var items []ID
+	for i, it := range g.ItemEntities() {
+		if item2type(it) != ty {
+			continue
+		}
+		if g.Entity(i).KnownP != InvalidPos || g.Wizard.Mode.Reveal() {
+			items = append(items, i)
+		}
+	}
+	return items
+}
+
+// getItemTargIDIndex returns the id of any monster currently being
+// examined, or -1 if none.
+func (g *Game) getItemTargIDIndex(items []ID, ty itemType) int {
+	if g.Wizard.Mode.Reveal() {
+		if id, it := g.ItemAt(g.md.targ.p); id >= 0 {
+			if item2type(it) == ty {
+				return slices.Index(items, id)
+			}
+		}
+		return -1
+	}
+	if id, it := g.KnownItemAt(g.md.targ.p); id >= 0 {
+		if item2type(it) == ty {
+			return slices.Index(items, id)
+		}
+	}
+	return -1
 }
 
 func (a ActionNextItem) String() string {
@@ -1195,6 +1247,10 @@ const (
 	WizardReveal                   // reveal map and monsters
 	WizardRevealTerrain            // reveal map (without monsters)
 )
+
+func (wm WizardMode) Reveal() bool {
+	return wm == WizardReveal || wm == WizardRevealTerrain
+}
 
 // ActionWizard enters wizard-mode confirmation. When already in wizard mode,
 // cycle to next wizard visibility mode. The first wizard mode is just a

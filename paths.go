@@ -37,21 +37,30 @@ func (mp *MappingPath) Neighbors(p gruid.Point) []gruid.Point {
 
 // PlayerPath returns a player path between two map positions.
 func (g *Game) PlayerPath(from, to gruid.Point) []gruid.Point {
+	var ppassNT, ppass func(gruid.Point) bool
+	switch g.Wizard.Mode {
+	case WizardRevealTerrain:
+		return nil
+	case WizardReveal:
+		ppassNT, ppass = g.WizardPlayerPassableNoTrapsFunc(), g.WizardPlayerPassableFunc()
+	default:
+		ppassNT, ppass = g.PlayerPassableNoTrapsFunc(), g.PlayerPassableFunc()
+	}
 	var path []gruid.Point
 	if g.NoTrapAt(to) {
-		path = g.PR.JPSPath(path, from, to, g.PlayerPassableNoTrapsFunc(), false)
+		path = g.PR.JPSPath(path, from, to, ppassNT, false)
 	}
 	if len(path) == 0 {
 		// If there is a trap in the destination or there's no other
 		// available known path, we don't avoid traps, as that's what
 		// the player is asking for.
-		path = g.PR.JPSPath(path, from, to, g.PlayerPassableFunc(), false)
+		path = g.PR.JPSPath(path, from, to, ppass, false)
 	}
 	return path
 }
 
-// PlayerPassableNoTrapsFunc returns a passability function suited for computing a
-// player path. It considers tiles containing traps.
+// PlayerPassableNoTrapsFunc returns a passability function suited for
+// computing a player path. It considers tiles containing traps.
 func (g *Game) PlayerPassableNoTrapsFunc() func(gruid.Point) bool {
 	knownAt := g.Map.KnownTerrain.At
 	if g.PlayerActor().Statuses.Has(StatusDig) {
@@ -65,8 +74,8 @@ func (g *Game) PlayerPassableNoTrapsFunc() func(gruid.Point) bool {
 	}
 }
 
-// PlayerPassableFunc returns a passability function suited for
-// computing a player path. It considers tiles containing traps as passable.
+// PlayerPassableFunc returns a passability function suited for computing a
+// player path. It considers tiles containing traps as passable.
 func (g *Game) PlayerPassableFunc() func(gruid.Point) bool {
 	knownAt := g.Map.KnownTerrain.At
 	if g.PlayerActor().Statuses.Has(StatusDig) {
@@ -83,6 +92,26 @@ func (g *Game) PlayerPassableFunc() func(gruid.Point) bool {
 // PlayerPassableNoTraps reports whether a given position is passable for the player.
 func (g *Game) PlayerPassableNoTraps(p gruid.Point) bool {
 	return g.PlayerPassableNoTrapsFunc()(p)
+}
+
+// WizardPlayerPassableNoTrapsFunc returns a passability function suited for
+// computing a wizard player path. It considers tiles containing traps.
+func (g *Game) WizardPlayerPassableNoTrapsFunc() func(gruid.Point) bool {
+	if g.PlayerActor().Statuses.Has(StatusDig) {
+		return func(p gruid.Point) bool { return inMap(p) && g.NoTrapAt(p) }
+	}
+	passable := g.Map.Passable
+	return func(p gruid.Point) bool { return passable(p) && g.NoTrapAt(p) }
+}
+
+// WizardPlayerPassableFunc returns a passability function suited for computing
+// a wizard player path. It considers tiles containing traps as passable.
+func (g *Game) WizardPlayerPassableFunc() func(gruid.Point) bool {
+	if g.PlayerActor().Statuses.Has(StatusDig) {
+		return func(p gruid.Point) bool { return inMap(p) }
+	}
+	passable := g.Map.Passable
+	return func(p gruid.Point) bool { return passable(p) }
 }
 
 // MonPath implements paths.Astar for monster movement.

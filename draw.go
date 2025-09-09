@@ -387,17 +387,19 @@ func (md *model) drawTargInfo() {
 	}
 
 	features := []string{}
-	if !info.unknown {
+	switch {
+	case g.Wizard.Mode.Reveal():
+		features = append(features, TerrainName(g.Map.Terrain.At(md.targ.p)))
+	case !info.unknown:
 		features = append(features, TerrainName(g.Map.KnownTerrain.At(md.targ.p)))
-		if info.cloud != NoCloud {
-			clstr := info.cloud.String()
-			features = append(features, fmt.Sprintf("@%c%s@N", info.cloud.ColorRune(), clstr))
+	default:
+		if info.unknown {
+			features = append(features, "unknown")
 		}
-		if info.lighted && info.sees {
-			features = append(features, "lighted")
-		}
-	} else {
-		features = append(features, "unknown")
+	}
+	if info.cloud != NoCloud {
+		clstr := info.cloud.String()
+		features = append(features, fmt.Sprintf("@%c%s@N", info.cloud.ColorRune(), clstr))
 	}
 	if !info.sees && !info.unknown {
 		features = append(features, "seen")
@@ -410,13 +412,16 @@ func (md *model) drawTargInfo() {
 	}
 	var fg gruid.Color
 	desc := ""
-	if info.unknown {
+	switch {
+	case g.Wizard.Mode.Reveal():
+		desc = TerrainDesc(g.Map.Terrain.At(md.targ.p))
+	case info.unknown:
 		desc = "You do not know what is in there."
-	} else {
+	default:
 		desc = TerrainDesc(g.Map.KnownTerrain.At(md.targ.p))
-		if info.cloud != NoCloud {
-			desc += "\n" + info.cloud.Desc()
-		}
+	}
+	if info.cloud != NoCloud {
+		desc += "\n" + info.cloud.Desc()
 	}
 	if noise, ok := g.Map.Noise[md.targ.p]; ok && !g.InFOV(md.targ.p) && !md.targ.scroll {
 		msg := "noise"
@@ -450,7 +455,7 @@ func (md *model) drawTargInfo() {
 			continue
 		}
 		e := g.Entity(id)
-		if !info.sees && e.Noise && e.P == md.targ.p {
+		if !info.sees && e.Noise && e.P == md.targ.p && !g.Wizard.Mode.Reveal() {
 			noise := "footsteps"
 			if a, ok := e.Role.(*Actor); ok {
 				noise = monsterNoiseStringStyled(a)
@@ -458,14 +463,17 @@ func (md *model) drawTargInfo() {
 			formatBox("monster noise", fmt.Sprintf("You heard %s around there.", noise), ColorForeground)
 			continue
 		}
-		if e.KnownP == InvalidPos {
+		if e.KnownP == InvalidPos && !g.Wizard.Mode.Reveal() {
 			continue
 		}
 		var sb strings.Builder
 		name := e.Name
 		switch r := e.Role.(type) {
 		case *Actor:
-			if info.sees {
+			switch {
+			case g.Wizard.Mode == WizardRevealTerrain:
+				continue
+			case info.sees || g.Wizard.Mode == WizardReveal:
 				fmt.Fprintf(&sb, "HP:%s A:%s D:%s",
 					r.fmtHP(),
 					fmtAD(r.GetAttack(), r.Attack), fmtAD(r.GetDefense(), r.Defense))
@@ -476,7 +484,7 @@ func (md *model) drawTargInfo() {
 					st := Status(i)
 					fmt.Fprintf(&sb, " @%c%s(%d)@N ", statusColor(st, turns), st.Abbr(), turns)
 				}
-			} else {
+			default:
 				fmt.Fprintf(&sb, "HP:?/%d A:%d D:%d", r.MaxHP, r.Attack, r.Defense)
 			}
 			if s := r.MindStateString(); s != "" {
@@ -493,7 +501,7 @@ func (md *model) drawTargInfo() {
 			}
 		case *RunicTrap:
 			sb.WriteString(r.Desc())
-			if r.KnownUsed {
+			if r.KnownUsed || r.Used && g.Wizard.Mode.Reveal() {
 				name += " (inert)"
 			}
 		case Item:
