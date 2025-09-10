@@ -8,7 +8,6 @@
 </head>
 <body>
 <script src="wasm_exec.js"></script>
-<!-- <script src="screenfull.min.js"></script> -->
 <div id="gamediv">
 <canvas id="gamecanvas">
 Game Screen
@@ -27,9 +26,8 @@ function hasLocalStorage() {
 	} catch(e) {
 		return false;
 	}
-
 }
-function downloadReplay() {
+function saveReplay() {
 	if (!hasLocalStorage()) {
 		var t = document.getElementById("shamoguinfo");
 		t.innerHTML = 'Feature not available in your browser.';
@@ -53,7 +51,7 @@ function downloadReplay() {
 		a.click();
 	}
 }
-function uploadReplay(files) {
+function loadReplay(files) {
 	if (!hasLocalStorage()) {
 		var t = document.getElementById("shamoguinfo");
 		t.innerHTML = 'Feature not available in your browser.';
@@ -71,11 +69,11 @@ function uploadReplay(files) {
 </script>
 <div>
 <span class="centered">
-Upload replay: <input type="file" value="Upload replay" onchange="uploadReplay(this.files)"> -
-<input type="button" value="Download replay" onclick="downloadReplay()">
+Load replay: <input type="file" value="Load replay" onchange="loadReplay(this.files)"> -
+<input type="button" value="Save replay" onclick="saveReplay()">
 <em id="shamoguinfo"></em>
 <small>Keys: press ? for help</small>
-<!-- <button id="goFS">Go Fullscreen</button> -->
+<button id="goFS">Go Fullscreen</button>
 <button id="clearcfgsave">Clear config/saves</button>
 </span>
 </div>
@@ -91,11 +89,11 @@ var canvas = document.getElementById("gamecanvas");
 var gamediv = document.getElementById("gamediv");
 var ctx = canvas.getContext("2d");
 var loadingImg = document.getElementById("loading");
-// document.getElementById('goFS').addEventListener('click', () => {
-// 	if (screenfull.enabled) {
-// 		screenfull.request(gamediv);
-// 	}
-// });
+document.getElementById('goFS').addEventListener('click', () => {
+	if (gamediv.requestFullscreen) {
+		gamediv.requestFullscreen();
+	}
+});
 document.getElementById('clearcfgsave').addEventListener('click', () => {
 	if (hasLocalStorage()) {
 		localStorage.removeItem("shamogusave")
