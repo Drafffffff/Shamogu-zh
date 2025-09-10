@@ -4,6 +4,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"flag"
 	"fmt"
 	"io"
@@ -145,7 +146,18 @@ func RunReplay(file string) {
 	defer replay.Close()
 	fd, err := gruid.NewFrameDecoder(replay)
 	if err != nil {
-		log.Printf("frame decoder: %v", err)
+		// Attempt again assuming base64-encoded replay (from web version).
+		replay, err := os.Open(file)
+		if err != nil {
+			log.Fatalf("loading replay file: %v", err)
+		}
+		defer replay.Close()
+		b64replay := base64.NewDecoder(base64.StdEncoding, replay)
+		var errb64 error
+		fd, errb64 = gruid.NewFrameDecoder(b64replay)
+		if errb64 != nil {
+			log.Fatalf("frame decoder: %v", err)
+		}
 	}
 	gd := gruid.NewGrid(UIWidth, UIHeight)
 	rep := ui.NewReplay(ui.ReplayConfig{
