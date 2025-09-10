@@ -40,6 +40,7 @@ my %names = (
     "/" => "slash",
     ":" => "colon",
     ";" => "semicolon",
+    "<" => "less",
     "?" => "interrogation",
     "@" => "player",
     "[" => "lbracket",

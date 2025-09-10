@@ -178,6 +178,7 @@ var LetterNames = map[rune]string{
 	'/':  "slash",
 	':':  "colon",
 	';':  "semicolon",
+	'<':  "less",
 	'=':  "rune",
 	'>':  "portal",
 	'?':  "interrogation",
