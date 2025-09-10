@@ -143,6 +143,7 @@ func (eff EffectClarityLeaves) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	g.eatMsg("clarity leaves", HealClarityLeaves)
 	g.AdjustHP(PlayerID, pa, HealClarityLeaves)
+	pa.Statuses[StatusDaze] = 0
 	g.RemoveStatus(PlayerID, pa, StatusConfusion)
 	pp := g.PP()
 	for i := range g.Monsters() {
@@ -155,7 +156,7 @@ func (eff EffectClarityLeaves) Apply(g *Game) bool {
 }
 
 func (eff EffectClarityLeaves) Desc() string {
-	return fmt.Sprintf("Removes @OConfusion@N and makes you sense nearby monsters (3x view range). Restores %+d HP.",
+	return fmt.Sprintf("Removes @OConfusion@N and @ODaze@N. Makes you sense nearby monsters (3x view range). Restores %+d HP.",
 		HealClarityLeaves)
 }
 
@@ -183,7 +184,6 @@ func (eff EffectFirebreathPepper) Apply(g *Game) bool {
 	g.MakeNoise(pp, NoiseRoar)
 	g.AdjustHP(PlayerID, pa, HealFirebreathPepper)
 	g.md.FirebreathAnimation(pp.Add(g.Dir), g.Dir)
-	pa.Statuses[StatusDaze] = 0
 	p := pp
 	for range MaxFOVRange {
 		p = p.Add(g.Dir)
@@ -206,7 +206,7 @@ func (eff EffectFirebreathPepper) Apply(g *Game) bool {
 }
 
 func (eff EffectFirebreathPepper) Desc() string {
-	return fmt.Sprintf("Makes you breathe a confusing fire beam in the current direction inflicting @OConfusion@N for %d turns and @OFire@N for %d turns. Burns foliage, producing fire clouds lasting 6-12 turns. Makes walls explode. Removes @ODaze@N. Restores %+d HP.",
+	return fmt.Sprintf("Makes you breathe a confusing fire beam in the current direction inflicting @OConfusion@N for %d turns and @OFire@N for %d turns. Burns foliage, producing fire clouds lasting 6-12 turns. Makes walls explode. Restores %+d HP.",
 		DurationConfusionPepperBreath, DurationFire, HealFirebreathPepper)
 }
 
