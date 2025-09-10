@@ -15,6 +15,7 @@ const (
 	DurationBerserkTotem           = 5
 	DurationBerserkTrap            = 4
 	DurationConfusionAmbrosia      = 6
+	DurationConfusionPepperBreath  = 2
 	DurationConfusionHit           = 6
 	DurationConfusionSkunk         = 5
 	DurationConfusionToxins        = 4
@@ -28,7 +29,6 @@ const (
 	DurationFearFakePortal         = 6
 	DurationFearUndead             = 3
 	DurationFire                   = 3
-	DurationFirePepper             = 4
 	DurationFoggySkin              = 10
 	DurationImbalanceGale          = 5
 	DurationImbalanceLignification = 5
@@ -196,7 +196,8 @@ func (eff EffectFirebreathPepper) Apply(g *Game) bool {
 			g.FireCloudAt(p)
 		}
 		if j, aj := g.ActorAt(p); j >= 0 {
-			g.PutStatus(j, aj, StatusFire, DurationFirePepper)
+			g.PutStatus(j, aj, StatusConfusion, DurationConfusionPepperBreath)
+			g.PutStatus(j, aj, StatusFire, DurationFire)
 		}
 	}
 	// Leave cloud at the last tile if passable.
@@ -205,8 +206,8 @@ func (eff EffectFirebreathPepper) Apply(g *Game) bool {
 }
 
 func (eff EffectFirebreathPepper) Desc() string {
-	return fmt.Sprintf("Makes you breathe a fire beam in the current direction doing %d damage and inflicting @OFire@N for %d turns. Burns foliage, producing fire clouds lasting 6-12 turns. Makes walls explode. Removes @ODaze@N. Restores %+d HP.",
-		FireDamage, DurationFirePepper, HealFirebreathPepper)
+	return fmt.Sprintf("Makes you breathe a confusing fire beam in the current direction inflicting @OConfusion@N for %d turns and @OFire@N for %d turns. Burns foliage, producing fire clouds lasting 6-12 turns. Makes walls explode. Removes @ODaze@N. Restores %+d HP.",
+		DurationConfusionPepperBreath, DurationFire, HealFirebreathPepper)
 }
 
 type EffectTeleportMushroom struct{}

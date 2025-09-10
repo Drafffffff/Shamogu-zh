@@ -94,8 +94,8 @@ Reworked and improved content:
   50% chance).
 * Make “firebreath pepper” produce a nadre-like explosion when reaching a wall,
   providing a limited means of wall destruction for non-Boar players. Make
-  explosions produce dust or smoke clouds. Also, slightly increase Fire
-  duration from firebreath pepper.
+  explosions produce dust or smoke clouds. Also, make the breath's smell inflict a very
+  brief (2 turns) Confusion effect, increasing the possible tactical usages.
 * New clouds can replace existing clouds of different types. If the type is the
   same, the duration is still the maximum of the old and new ones, like before.
 * Unlike plain clouds of fog, dust or smoke, dangerous clouds of fire and
