@@ -52,7 +52,7 @@ const (
 	DurationDig      = 6
 	DurationFocus    = 3
 	DurationSprint   = 6
-	DurationTimeStop = 4
+	DurationTimeStop = 5
 )
 
 func newHP(a *Actor, hp int) int {

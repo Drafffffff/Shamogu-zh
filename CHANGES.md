@@ -147,6 +147,11 @@ Reworked and improved content:
 * The Jumping Frog spirit now has one extra jump charge initially (so 3
   initially and then still 4 when upgraded), but the jump's daze duration on
   monsters is decreased by one from 5 to 4.
+* The Temporal Cat spirit now has one less “stop time” charge, but the duration
+  is increased from 4 to 5 (see discussion in #1). Also, to compensate having
+  only 1 charge initially and to make the upgrade feel less strong with respect
+  to other spirits, the “dazing attack” effect is now active since the
+  non-upgraded spirit.
 * HP of earth dragons has been decreased from 6 to 5, but along with vipers,
   nadres and hydras, they now have “scales” that provide extra +1 defense
   against ranged attacks.

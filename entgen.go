@@ -101,9 +101,9 @@ var primarySpirits = []spiritInfo{
 		BonusTraits: [2]Traits{PatternRangedRecoil, PatternRangedRecoil}},
 	{
 		Name:        "Temporal Cat",
-		MaxCharges:  [2]int{2, 3},
+		MaxCharges:  [2]int{1, 2},
 		Ability:     [2]Ability{EffectTimeStop{}, EffectTimeStop{}},
-		BonusTraits: [2]Traits{PatternSwap, PatternSwapDaze}},
+		BonusTraits: [2]Traits{PatternSwapDaze, PatternSwapDaze}},
 }
 
 // secondarySpirits represents the various kinds of secondary spirit totems
