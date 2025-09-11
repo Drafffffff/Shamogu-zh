@@ -97,8 +97,14 @@ Reworked and improved content:
   explosions produce dust or smoke clouds. Also, make the breath's smell inflict a very
   brief (2 turns) Confusion effect, increasing the possible tactical usages.
   The Daze removing effect has been moved into the “clarity leaves”.
-* New clouds can replace existing clouds of different types. If the type is the
-  same, the duration is still the maximum of the old and new ones, like before.
+* New rules for clouds replacing existing clouds of different types. If the
+  type is the same, the duration is still the maximum of the old and new ones,
+  like before. Fire clouds now take priority over other clouds: the heat
+  expands the air and dissipates other kinds of clouds. This makes Foggy-Skin
+  usable for protection during a foliage fire but without removing the fires
+  (which has a visibility impact too). For other kinds of clouds, like poison
+  ones or normal smoke/dust/fog, there is no special priorities: the new one
+  replaces the old one.
 * Unlike plain clouds of fog, dust or smoke, dangerous clouds of fire and
   poison are now only difficult to see through, like foliage (suggested by
   @mlochbaum in issue #1). This should make menhir usage obstruct vision less,

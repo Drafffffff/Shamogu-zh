@@ -141,8 +141,18 @@ func (g *Game) AddCloud(cl Cloud) {
 	i := point2idx(p)
 	if j := cg.Grid[i]; j >= 0 {
 		cj := cg.Clouds[j]
-		if cl.Kind == cj.Kind {
+		switch {
+		case cl.Kind == cj.Kind:
+			// If the cloud type is the same, we use the maximum
+			// duration.
 			cl.Duration = max(cl.Duration, cj.Duration)
+		case cj.Kind == CloudFire:
+			// Fire clouds take priority over other clouds: the
+			// heat expands the air and dissipates others kinds of
+			// clouds. This allows for protective usage of
+			// foggy-skin onion in foliage without removing the
+			// fires.
+			return
 		}
 		cg.Clouds[j] = cl
 		return
