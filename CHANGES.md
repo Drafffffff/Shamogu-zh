@@ -103,7 +103,7 @@ Reworked and improved content:
   expands the air and dissipates other kinds of clouds. This makes Foggy-Skin
   usable for protection during a foliage fire but without removing the fires
   (which has a visibility impact too). For other kinds of clouds, like poison
-  ones or normal smoke/dust/fog, there is no special priorities: the new one
+  ones or normal smoke/dust/fog, there are no special priorities: the new one
   replaces the old one.
 * Unlike plain clouds of fog, dust or smoke, dangerous clouds of fire and
   poison are now only difficult to see through, like foliage (suggested by
