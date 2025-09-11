@@ -203,7 +203,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, PatternRanged, "ranged attack")
 	desc = traitDesc(desc, t, PatternRangedRecoil, "ranged attack with recoil")
 	desc = traitDesc(desc, t, PatternSwap, "ranged space-distorting attack")
-	desc = traitDesc(desc, t, PatternSwapDaze, "ranged space-distorting attack that may @Odaze@N foes")
+	desc = traitDesc(desc, t, PatternSwapDaze, "ranged space-distorting silent attack that may @Odaze@N foes")
 
 	desc = traitDesc(desc, t, Pushing, "hits may push foes")
 	desc = traitDesc(desc, t, PushingUnbalance, "hits may push and @Ounbalance@N foes")
