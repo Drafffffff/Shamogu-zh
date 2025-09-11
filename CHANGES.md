@@ -130,6 +130,8 @@ Reworked and improved content:
   and slightly reduce confusion duration from 5 to 4 to compensate. Also reduce
   the Skunk's “noxious smell” confusion duration from 7 to 5, because it was a
   bit too strong.
+* Make “fire vulnerability” and Lignification increase Fire duration by 2
+  instead of 3.
 * Using “sprint” or “jump” abilities while imbalanced may now sometimes lead to
   a dazing fall.
 * Space-distorting attacks now *swap clouds* too. While getting swapped into a

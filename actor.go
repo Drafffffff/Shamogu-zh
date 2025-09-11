@@ -145,7 +145,7 @@ const (
 	VenomousMelee    // (non-ranged) attacks may poison foes
 	WoodyLegs        // can move while lignified
 
-	VulnerabilityFire // doubles duration of fire status
+	VulnerabilityFire // increases duration of fire status
 
 	ResistanceConfusion // halves duration of confusion status
 	ResistanceDaze      // halves duration of daze status
@@ -220,7 +220,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, TrailingCloud, "movement leaves dust behind")
 	desc = traitDesc(desc, t, WoodyLegs, "woody legs (can move while lignified)")
 
-	desc = traitDesc(desc, t, VulnerabilityFire, "@OFire@N vulnerability (double duration)")
+	desc = traitDesc(desc, t, VulnerabilityFire, "@OFire@N vulnerability (longer duration)")
 
 	desc = traitDesc(desc, t, ResistanceConfusion, "@OConfusion@N resistance (half duration)")
 	desc = traitDesc(desc, t, ResistanceDaze, "@ODaze@N resistance (half duration)")
@@ -369,7 +369,7 @@ var statusDesc = []string{
 	StatusFoggySkin: "Exudes fog on the sides and behind. Protects from @OFire@N and @BLignification@N.",
 	StatusImbalance: fmt.Sprintf("Halves attack. When also confused, gives %+d Defense.", ConfusedImbalanceDefenseBonus),
 	StatusLignification: fmt.Sprintf(
-		"Gives %+d Defense with an extra +1 against ranged attacks. Caps incoming attack damage at 1. Provides temporary HP bonus. Protects from @OPoison@N and @OImbalance@N. Prevents movement. Doubles @OFire@N duration. Followed by @OImbalance@N on expiration for %d turns.",
+		"Gives %+d Defense with an extra +1 against ranged attacks. Caps incoming attack damage at 1. Provides temporary HP bonus. Protects from @OPoison@N and @OImbalance@N. Prevents movement. Increases @OFire@N duration by 2. Followed by @OImbalance@N on expiration for %d turns.",
 		LignificationDefenseBonus, DurationImbalanceLignification),
 	StatusPoison: fmt.Sprintf("Walking will hurt you for %d damage. Stinky toxins are exuded on expiration, confusing other creatures for %d turns.",
 		PoisonDamage, DurationConfusionToxins),
@@ -427,7 +427,7 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 			return false
 		}
 		if ai.DoesAny(VulnerabilityFire) || ai.Has(StatusLignification) {
-			turns *= 2
+			turns += 2
 		}
 		if active {
 			// Fire is already active: skip extra damage at onset.
