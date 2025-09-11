@@ -15,8 +15,9 @@ const (
 	DurationBerserkTotem           = 5
 	DurationBerserkTrap            = 4
 	DurationConfusionAmbrosia      = 6
-	DurationConfusionPepperBreath  = 2
+	DurationConfusionFireTrap      = 3
 	DurationConfusionHit           = 6
+	DurationConfusionPepperBreath  = 2
 	DurationConfusionSkunk         = 5
 	DurationConfusionToxins        = 4
 	DurationDazeFall               = 1
@@ -50,7 +51,7 @@ const (
 
 	DurationDig      = 6
 	DurationFocus    = 3
-	DurationSprint   = 7
+	DurationSprint   = 6
 	DurationTimeStop = 4
 )
 
@@ -624,7 +625,7 @@ func (eff EffectPoisonCloud) Name() string {
 }
 
 func (eff EffectPoisonCloud) Desc() string {
-	return "Spit poisonous clouds on the sides and in front of you up to two free tiles away, lasting 5-8 turns."
+	return "Spit poisonous clouds on the sides and in front of you up to two free tiles away, lasting 6-9 turns."
 }
 
 type EffectSprint struct{}

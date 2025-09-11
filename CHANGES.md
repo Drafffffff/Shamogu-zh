@@ -121,7 +121,7 @@ Reworked and improved content:
   while still restricting safe movements in a similar but less extreme way, and
   providing similar defense from ranged monsters.
 * Adjust slightly down the duration of fire clouds to 6-12 turns and poison
-  clouds to 5-8 turns. Adjust duration of Poison inflicted by clouds down to 3,
+  clouds to 6-9 turns. Adjust duration of Poison inflicted by clouds down to 3,
   and slightly reduce confusion duration from 5 to 4 to compensate. Also reduce
   the Skunk's “noxious smell” confusion duration from 7 to 5, because it was a
   bit too strong.
@@ -142,7 +142,8 @@ Reworked and improved content:
   dangerous clouds after pushing, because they're enraged and corrupted, so not
   as smart!
 * Players with the Sprinting Gazelle now leave dust behind only on floor tiles
-  (in particular not on foliage ones).
+  (in particular not on foliage ones). Also, Sprint's duration has been
+  adjusted down from 7 to 6.
 * The Jumping Frog spirit now has one extra jump charge initially (so 3
   initially and then still 4 when upgraded), but the jump's daze duration on
   monsters is decreased by one from 5 to 4.

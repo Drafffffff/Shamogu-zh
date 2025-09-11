@@ -222,7 +222,7 @@ func (g *Game) fireCloudDuration() int {
 
 // poisonCloudDuration returns the typical duration of a poisonous cloud.
 func (g *Game) poisonCloudDuration() int {
-	return 5 + g.IntN(4)
+	return 6 + g.IntN(4)
 }
 
 // UpdateClouds reduces the duration of all clouds by one, and removes any

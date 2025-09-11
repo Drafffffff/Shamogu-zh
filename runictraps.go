@@ -77,11 +77,12 @@ func (rt RunicTrap) Desc() string {
 	case RuneBerserk:
 		return fmt.Sprintf("Applies @BBerserk@N status for %d turns when stepped on.", DurationBerserkTrap)
 	case RuneFire:
-		return "Spawns a fire cloud lasting 6-12 turns when stepped on."
+		return fmt.Sprintf("Inflicts @OConfusion@N for %d turns and spawns a fire cloud lasting 6-12 turns when stepped on.",
+			DurationConfusionFireTrap)
 	case RuneLignification:
 		return fmt.Sprintf("Applies @BLignification@N status for %d turns when stepped on.", DurationLignificationTrap)
 	case RunePoison:
-		return "Spawns a poison cloud lasting 5-8 turns when stepped on."
+		return "Spawns a poison cloud lasting 6-9 turns when stepped on."
 	case RuneWarp:
 		return "Teleports away any actor that steps on it."
 	default:
@@ -129,6 +130,9 @@ func (g *Game) TriggerTrapAt(p gruid.Point) {
 			g.PutStatus1(i, ai, StatusBerserk, DurationBerserkTrap)
 		}
 	case RuneFire:
+		if i, ai := g.ActorAt(p); i >= 0 {
+			g.PutStatus1(i, ai, StatusConfusion, DurationConfusionFireTrap)
+		}
 		g.FireCloudAt(p)
 	case RuneLignification:
 		if i, ai := g.ActorAt(p); i >= 0 {
