@@ -147,11 +147,7 @@ func RunReplay(file string) {
 	fd, err := gruid.NewFrameDecoder(replay)
 	if err != nil {
 		// Attempt again assuming base64-encoded replay (from web version).
-		replay, err := os.Open(file)
-		if err != nil {
-			log.Fatalf("loading replay file: %v", err)
-		}
-		defer replay.Close()
+		replay.Seek(0, io.SeekStart)
 		b64replay := base64.NewDecoder(base64.StdEncoding, replay)
 		var errb64 error
 		fd, errb64 = gruid.NewFrameDecoder(b64replay)
