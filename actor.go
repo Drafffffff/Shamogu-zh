@@ -225,7 +225,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, ResistanceConfusion, "@OConfusion@N resistance (half duration)")
 	desc = traitDesc(desc, t, ResistanceDaze, "@ODaze@N resistance (half duration)")
 	desc = traitDesc(desc, t, ResistanceFear, "@OFear@N resistance (half duration)")
-	desc = traitDesc(desc, t, ResistanceFire, "@OFire@N resistance (half duration)")
+	desc = traitDesc(desc, t, ResistanceFire, "@OFire@N resistance (delayed burning)")
 	desc = traitDesc(desc, t, ResistanceImbalance, "@OImbalance@N resistance (half duration)")
 	desc = traitDesc(desc, t, ResistancePoison, "@OPoison@N resistance (half duration)")
 
@@ -426,17 +426,23 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 		if ai.Has(StatusFoggySkin) || ai.DoesAny(MonsImmunityFire) {
 			return false
 		}
-		if !active {
+		if ai.DoesAny(VulnerabilityFire) || ai.Has(StatusLignification) {
+			turns *= 2
+		}
+		if active {
+			// Fire is already active: skip extra damage at onset.
+			break
+		}
+		switch {
+		case ai.DoesAny(ResistanceFire):
+			// Fire resistance delays the burning: extra turn, but
+			// no immediate damage at onset.
+			turns++
+		default:
 			g.InflictFireDamage(i, ai)
 			if ai.IsDead() {
 				return false
 			}
-		}
-		if ai.DoesAny(ResistanceFire) {
-			turns = (turns + 1) / 2
-		}
-		if ai.DoesAny(VulnerabilityFire) || ai.Has(StatusLignification) {
-			turns *= 2
 		}
 	case st == StatusFear:
 		if ai.Has(StatusBerserk) || ai.DoesAny(MonsImmunityFear) {

@@ -221,11 +221,10 @@ func (g *Game) ComputeNoise() {
 		case goodhearing:
 			// Good hearing generally increases noise hearing range by 2.
 			dist -= 2
-		case badhearing && ai.DoesAny(MonsCreep|MonsWingFlap):
+		case badhearing && ai.DoesAny(MonsCreep|MonsWingFlap) && dist > 2:
 			// Wing flapping and creeping can't be heard well with
 			// bad (mostly ground vibration-based) hearing.
-			// Maximal range: 3 (wing flapping), 2 (creep noise).
-			dist = 1 + 2*dist
+			continue
 		}
 		switch {
 		case ai.DoesAny(MonsSilent):
