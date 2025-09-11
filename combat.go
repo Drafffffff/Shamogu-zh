@@ -91,7 +91,7 @@ func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKi
 	switch {
 	case i >= 0 && ai != nil:
 		g.logBumpDamage(i, j, ai, aj, dmg, ap)
-		if !ai.DoesAny(PatternSwapDaze) && g.IntN(dmg) > 0 {
+		if !ai.DoesAny(PatternSwap|PatternSwapDaze) && g.IntN(dmg) > 0 {
 			g.MakeNoise(ej.P, NoiseCombat)
 		}
 	case !g.InFOV(ej.P):
