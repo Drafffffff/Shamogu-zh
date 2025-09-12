@@ -442,12 +442,34 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 	}
 	dmg = min(dmg, aj.HP)
 	if j == PlayerID {
-		if dmg == aj.HP && (dmg >= 2 && g.IntN(2+dmg) > 0 || dmg == 1 && g.IntN(2) == 0) {
-			// Lucky roll adjustment for increased game tension and
-			// more newbie-friendliness.
+		if dmg == aj.HP &&
+			(dmg >= 2 && g.IntN(2+dmg) > 0 || dmg == 1 && !ai.Has(StatusBerserk) && g.IntN(2) == 0) {
+			// Lucky roll adjustment for increased game tension
+			// before death and more newbie-friendliness.
 			dmg--
 		}
-		if min(5, attack*n) >= aj.HP && dmg < aj.HP {
+		// Compute reasonable maximum expected damage for “times lucky”
+		// purposes. We don't take everything into account (like fire
+		// from phoenix or lama). More than 5 damage, even from hydra,
+		// is always considered unexpected.
+		maxdmg := 5
+		switch {
+		case aj.Has(StatusLignification):
+			maxdmg = 1
+		case defense > 3:
+			// If the player has 4 or more defense, more than 3
+			// damage even from a hydra is unlikely.
+			maxdmg = 3
+		case defense == 3:
+			// If the player has 3 defense, more than 4 damage from
+			// a hydra is unlikely.
+			maxdmg = 4
+		}
+		m := min(maxdmg, min(attack, 3)*n)
+		if ai.Has(StatusBerserk) {
+			m++
+		}
+		if m >= aj.HP && dmg < aj.HP {
 			// We avoided death with a lucky roll.
 			g.Stats.Lucky++
 		}
