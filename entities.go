@@ -167,6 +167,9 @@ func (g *Game) MoveActor(i ID, ai *Actor, to gruid.Point) {
 			ai.Behavior.Path = ai.Behavior.Path[1:]
 		}
 	}
+	if i != PlayerID && g.InFOV(ei.P) {
+		g.SenseEntity(ei, "see")
+	}
 	g.TriggerTrapAt(to)
 }
 

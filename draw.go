@@ -108,16 +108,12 @@ func (md *model) drawAnimationFrame() gruid.Grid {
 	if !md.anims.draw {
 		return md.gd.Slice(gruid.Range{})
 	}
-	gdlog := md.gd.Slice(md.gd.Range().Lines(0, 2))
-	gdlog.Fill(gruid.Cell{Rune: ' '})
-	md.log.Content = md.DrawLog()
-	md.log.Draw(gdlog)
-	gd := md.gd.Slice(md.gd.Range().Shift(0, 2, 0, -1))
+	gd := md.gd
 	for _, fc := range md.anims.frames[0].Cells {
 		gd.Set(fc.P, fc.Cell)
 	}
 	md.anims.frames = md.anims.frames[1:]
-	return md.gd
+	return gd
 }
 
 func (md *model) drawWin(gd gruid.Grid) {

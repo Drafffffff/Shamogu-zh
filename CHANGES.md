@@ -214,7 +214,9 @@ UI, graphics, QoL:
   whether there's fog, an item, or a special kind of terrain under the player.
 * Animation improvements and fixes. Monster deaths are now always animated when
   in view, independently of the cause. Hits between confused monsters are now
-  animated too, making it clearer what's happening. Other minor enhancements.
+  animated too, making it clearer what's happening. Status bar and logs are now
+  progressively updated during chained animations, instead of only at the end
+  of the sequence.  Other minor enhancements.
 * Improve various tiles (footsteps, translucent walls, food…).
 * Wizard mode improvements: intended for development purposes, but now cheat
   usage is recorded in a more fine-grained way in statistics, so any frustrated

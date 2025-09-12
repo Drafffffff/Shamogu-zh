@@ -22,6 +22,7 @@ const (
 type Animations struct {
 	frames []AnimFrame // frame queue
 	grid   gruid.Grid  // drawing grid
+	mgrid  gruid.Grid  // map grid (slice of grid)
 	pgrid  gruid.Grid  // previous drawing grid
 	idx    int         // animation sequence counter
 	draw   bool        // whether to draw an animation frame or not
@@ -46,44 +47,44 @@ func (a *Animations) Done() bool {
 
 // Draw sets a given rune and foreground color at a given position.
 func (a *Animations) Draw(p gruid.Point, r rune, fg gruid.Color) {
-	c := a.grid.At(p)
+	c := a.mgrid.At(p)
 	c.Rune = r
 	c.Style.Fg = fg
-	a.grid.Set(p, c)
+	a.mgrid.Set(p, c)
 }
 
 // DrawWith sets a given rune and foreground and background color and
 // attributes at a given position.
 func (a *Animations) DrawWith(p gruid.Point, r rune, fg, bg gruid.Color, attrs gruid.AttrMask) {
-	c := a.grid.At(p)
+	c := a.mgrid.At(p)
 	c.Rune = r
 	c.Style.Fg = fg
 	c.Style.Bg = bg
 	c.Style.Attrs = attrs
-	a.grid.Set(p, c)
+	a.mgrid.Set(p, c)
 }
 
 // DrawRune sets a given rune at a given position.
 func (a *Animations) DrawRune(p gruid.Point, r rune) {
-	c := a.grid.At(p)
+	c := a.mgrid.At(p)
 	c.Rune = r
-	a.grid.Set(p, c)
+	a.mgrid.Set(p, c)
 }
 
 // DrawColor sets a given color at a given position.
 func (a *Animations) DrawColor(p gruid.Point, fg gruid.Color) {
-	c := a.grid.At(p)
+	c := a.mgrid.At(p)
 	c.Style.Fg = fg
-	a.grid.Set(p, c)
+	a.mgrid.Set(p, c)
 }
 
 // DrawReverse sets a given rune and foreground color with reverse attribute.
 func (a *Animations) DrawReverse(p gruid.Point, r rune, fg gruid.Color) {
-	c := a.grid.At(p)
+	c := a.mgrid.At(p)
 	c.Rune = r
 	c.Style.Fg = fg
 	c.Style.Attrs |= AttrReverse
-	a.grid.Set(p, c)
+	a.mgrid.Set(p, c)
 }
 
 // Frame emits a new animation frame with given duration.
@@ -106,12 +107,12 @@ type msgAnim int
 
 // InitAnimations initializes drawing grids for animations.
 func (md *model) InitAnimations() {
-	gd := md.gd.Slice(md.gd.Range().Shift(0, 2, 0, -1))
-	max := gd.Size()
-	md.anims.grid = gruid.NewGrid(max.X, max.Y)
-	md.anims.pgrid = gruid.NewGrid(max.X, max.Y)
-	md.anims.grid.Copy(gd)
-	md.anims.pgrid.Copy(gd)
+	sz := md.gd.Size()
+	md.anims.grid = gruid.NewGrid(sz.X, sz.Y)
+	md.anims.mgrid = md.anims.grid.Slice(md.anims.grid.Range().Shift(0, 2, 0, -1))
+	md.anims.pgrid = gruid.NewGrid(sz.X, sz.Y)
+	md.anims.grid.Copy(md.gd)
+	md.anims.pgrid.Copy(md.gd)
 }
 
 // AnimNext returns a ticker command appropriately timed for the next frame.
@@ -142,15 +143,23 @@ func (md *model) AnimCmd() gruid.Cmd {
 // a freshly drawn map representing the current state.
 func (md *model) startAnimSeq() {
 	if md.anims.Done() {
-		md.resetAnimations()
+		// Compute new frame with respect to last drawn grid.
+		md.anims.pgrid.Copy(md.gd)
 	}
-	md.drawMap(md.anims.grid)
-}
-
-func (md *model) resetAnimations() {
-	gd := md.gd.Slice(md.gd.Range().Shift(0, 2, 0, -1))
-	md.anims.grid.Copy(gd)
-	md.anims.pgrid.Copy(gd)
+	agrid := md.anims.grid
+	rg := agrid.Range()
+	// Draw log.
+	gdlog := agrid.Slice(rg.Lines(0, 2))
+	gdlog.Fill(gruid.Cell{Rune: ' '})
+	md.log.Content = md.DrawLog()
+	md.log.Draw(gdlog)
+	// Draw map.
+	md.drawMap(md.anims.mgrid)
+	// Draw status.
+	md.updateStatus()
+	gdstatus := agrid.Slice(rg.Line(UIHeight - 1))
+	gdstatus.Fill(gruid.Cell{Rune: ' '})
+	gdstatus.Copy(md.status.menu.Draw())
 }
 
 // AnimationFrame updates the map and waits briefly.
@@ -239,7 +248,7 @@ func (md *model) RangedAttackAnimation(a *Actor, from, to gruid.Point) {
 	done := false
 	delta := to.Sub(from)
 	delta = delta.Div(max(delta.X, -delta.X, delta.Y, -delta.Y))
-	for p := from; p != to; p = p.Add(delta) {
+	for p := from.Add(delta); p != to; p = p.Add(delta) {
 		if md.g.InFOV(p) {
 			if !done {
 				done = true
@@ -258,10 +267,9 @@ func (md *model) PlayerAnimation(c gruid.Color, d time.Duration) {
 	if DisableAnimations {
 		return
 	}
-	g := md.g
 	md.startAnimSeq()
-	md.anims.DrawColor(g.PP(), c)
-	md.anims.Frame(AnimDurLong)
+	md.anims.DrawColor(md.g.PP(), c)
+	md.anims.Frame(d)
 }
 
 // WoundedAnimations briefly alerts the player when they're hurt.
