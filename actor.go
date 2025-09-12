@@ -429,19 +429,14 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 		if ai.DoesAny(VulnerabilityFire) || ai.Has(StatusLignification) {
 			turns += 2
 		}
-		if active {
-			// Fire is already active: skip extra damage at onset.
+		if active || ai.DoesAny(ResistanceFire) {
+			// If Fire is already active or we have fire
+			// resistance, we skip extra damage at onset.
 			break
 		}
-		switch {
-		case ai.DoesAny(ResistanceFire):
-			// Fire resistance delays the burning: no immediate
-			// damage at onset.
-		default:
-			g.InflictFireDamage(i, ai)
-			if ai.IsDead() {
-				return false
-			}
+		g.InflictFireDamage(i, ai)
+		if ai.IsDead() {
+			return false
 		}
 	case st == StatusFear:
 		if ai.Has(StatusBerserk) || ai.DoesAny(MonsImmunityFear) {
