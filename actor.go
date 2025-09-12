@@ -369,7 +369,7 @@ var statusDesc = []string{
 	StatusDaze:      "Forbids all actions except waiting or eating until you’re hurt or it expires.",
 	StatusDig:       "Allows walking into walls. Gives +1 effective damage when charging and guarantees pushing.",
 	StatusFear:      "Forbids attacking and walking toward foes.",
-	StatusFire:      fmt.Sprintf("Remaining in place or moving into a cloud of fire will burn you for %d damage.", FireDamage),
+	StatusFire:      fmt.Sprintf("Remaining in place or moving into a cloud of fire will burn you for %d damage. When first catching @OFire@N, you also get burned once immediately.", FireDamage),
 	StatusFocus:     "Attack frontally with all four heads.",
 	StatusFoggySkin: "Exudes fog on the sides and behind. Protects from @OFire@N and @BLignification@N.",
 	StatusImbalance: fmt.Sprintf("Halves attack. When also confused, gives %+d Defense.", ConfusedImbalanceDefenseBonus),

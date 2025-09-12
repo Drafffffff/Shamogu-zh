@@ -1580,6 +1580,8 @@ On the map, monster color may change depending on active status effects.  By def
 			details = "Confused monsters will attack other monsters too when adjacent. Some monsters may even hurt or affect themselves when performing special actions like digging, spitting fire, barking, or pushing."
 		case StatusFear:
 			details = "Monsters will flee when facing you. Ambushing charges against unseen foes can still happen. At the end of a turn, a cornered and afraid actor with no possible escape will become berserk. "
+		case StatusFire:
+			details = "Players with “fire resistance” from the upgraded Fire Salamander don’t take that extra immediate damage."
 		case StatusImbalance:
 			details = "Sprinting or jumping while imbalanced may sometimes lead to a @Odazing@N fall."
 		case StatusPoison:
