@@ -435,9 +435,8 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 		}
 		switch {
 		case ai.DoesAny(ResistanceFire):
-			// Fire resistance delays the burning: extra turn, but
-			// no immediate damage at onset.
-			turns++
+			// Fire resistance delays the burning: no immediate
+			// damage at onset.
 		default:
 			g.InflictFireDamage(i, ai)
 			if ai.IsDead() {
