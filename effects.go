@@ -14,6 +14,7 @@ const (
 	DurationBerserkHit             = 4
 	DurationBerserkTotem           = 5
 	DurationBerserkTrap            = 4
+	DurationClarity                = 5
 	DurationConfusionAmbrosia      = 6
 	DurationConfusionFireTrap      = 3
 	DurationConfusionHit           = 6
@@ -55,15 +56,14 @@ const (
 	DurationTimeStop = 5
 )
 
-func newHP(a *Actor, hp int) int {
-	return max(0, min(a.GetMaxHP(), a.HP+hp))
+func newHP(a *Actor, hp int) string {
+	return fmt.Sprintf("%d/%d", max(0, min(a.GetMaxHP(), a.HP+hp)), a.GetMaxHP())
 }
 
-func (g *Game) eatMsg(name string, hp int) {
+func (g *Game) eatMsg(name string, hpstr string) {
 	g.Logf("You eat the %s.", name)
-	pa := g.PlayerActor()
-	if hp != 0 {
-		g.StoryLogf("Ate %s (HP: %d/%d)", One(name), newHP(pa, hp), pa.GetMaxHP())
+	if hpstr != "" {
+		g.StoryLogf("Ate %s (HP: %s)", One(name), hpstr)
 	} else {
 		g.StoryLogf("Ate %s", One(name))
 	}
@@ -73,7 +73,7 @@ type EffectAmbrosiaBerries struct{}
 
 func (eff EffectAmbrosiaBerries) Apply(g *Game) bool {
 	pa := g.PlayerActor()
-	g.eatMsg("ambrosia berries", HealAmbrosia)
+	g.eatMsg("ambrosia berries", newHP(pa, HealAmbrosia))
 	g.AdjustHP(PlayerID, pa, HealAmbrosia)
 	if g.IntN(2) == 0 {
 		g.PutStatus1(PlayerID, pa, StatusConfusion, DurationConfusionAmbrosia)
@@ -92,7 +92,14 @@ type EffectBerserkingFlower struct{}
 
 func (eff EffectBerserkingFlower) Apply(g *Game) bool {
 	pa := g.PlayerActor()
-	g.eatMsg("berserking flower", 0)
+	d := DurationBerserk
+	if pa.Has(StatusClarity) {
+		// Eating a berserking flower while clear-minded works but
+		// reduces the duration by half.
+		g.RemoveStatus(PlayerID, pa, StatusClarity)
+		d /= 2
+	}
+	g.eatMsg("berserking flower", "")
 	if pa.Has(StatusBerserk) {
 		// The berserking flower can be used to prolong berserk
 		// duration, but you'll still get the Poison debuff.
@@ -100,7 +107,7 @@ func (eff EffectBerserkingFlower) Apply(g *Game) bool {
 		g.AdjustHP(PlayerID, pa, -pa.HPBonus())
 		g.PutStatus1(PlayerID, pa, StatusPoison, DurationPoisonBerserk)
 	}
-	g.PutStatus1(PlayerID, pa, StatusBerserk, DurationBerserk)
+	g.PutStatus1(PlayerID, pa, StatusBerserk, d)
 	return true
 }
 
@@ -113,23 +120,20 @@ type EffectLignificationFruit struct{}
 
 func (eff EffectLignificationFruit) Apply(g *Game) bool {
 	pa := g.PlayerActor()
+	d := DurationLignification
 	if pa.Has(StatusFoggySkin) {
-		// NOTE: not being able to eat a lignification fruit while
-		// foggy is the only eating restriction currently. The
-		// restriction should maybe be removed, but it might be
-		// disappointing if nothing happens and, at the same time, it
-		// feels that you shouldn't be able to cancel foggy skin, so
-		// I'm not sure what the effect would be.
-		g.Log("You cannot lignify yourself while foggy.")
-		return false
+		// Eating a lignification fruit while foggy works but reduces
+		// the duration by half.
+		g.RemoveStatus(PlayerID, pa, StatusFoggySkin)
+		d /= 2
 	}
-	g.eatMsg("lignification fruit", 0)
+	g.eatMsg("lignification fruit", "")
 	if pa.Has(StatusLignification) {
 		// If already lignified, cancel previous effects.
 		pa.Statuses[StatusLignification] = 0
 		g.AdjustHP(PlayerID, pa, -pa.HPBonus())
 	}
-	g.PutStatus1(PlayerID, pa, StatusLignification, DurationLignification)
+	g.PutStatus1(PlayerID, pa, StatusLignification, d)
 	return true
 }
 
@@ -142,10 +146,15 @@ type EffectClarityLeaves struct{}
 
 func (eff EffectClarityLeaves) Apply(g *Game) bool {
 	pa := g.PlayerActor()
-	g.eatMsg("clarity leaves", HealClarityLeaves)
+	var hpstr string
+	if pa.Has(StatusBerserk) {
+		hpstr = newHPWithoutBonus(pa, 1, HealClarityLeaves)
+	} else {
+		hpstr = newHP(pa, HealClarityLeaves)
+	}
+	g.eatMsg("clarity leaves", hpstr)
+	g.PutStatus1(PlayerID, pa, StatusClarity, DurationClarity)
 	g.AdjustHP(PlayerID, pa, HealClarityLeaves)
-	pa.Statuses[StatusDaze] = 0
-	g.RemoveStatus(PlayerID, pa, StatusConfusion)
 	pp := g.PP()
 	for i := range g.Monsters() {
 		ei := g.Entity(i)
@@ -156,23 +165,40 @@ func (eff EffectClarityLeaves) Apply(g *Game) bool {
 	return true
 }
 
+func newHPWithoutBonus(a *Actor, m, hp int) string {
+	hpbonus := a.HPBonus()
+	var nhp int
+	if a.HP < m {
+		nhp = a.HP
+	} else {
+		nhp = max(m, a.HP-hpbonus)
+	}
+	return fmt.Sprintf("%d/%d", nhp+hp, a.GetMaxHP()-hpbonus)
+}
+
 func (eff EffectClarityLeaves) Desc() string {
-	return fmt.Sprintf("Removes @OConfusion@N and @ODaze@N. Makes you sense nearby monsters (3x view range). Restores %+d HP.",
-		HealClarityLeaves)
+	return fmt.Sprintf("Gives @BClarity@N for %d turns. %s Makes you sense nearby monsters (3x view range). Restores %+d HP.",
+		DurationClarity, statusDesc[StatusClarity], HealClarityLeaves)
 }
 
 type EffectFoggySkinOnion struct{ Beam bool }
 
 func (eff EffectFoggySkinOnion) Apply(g *Game) bool {
 	pa := g.PlayerActor()
-	g.eatMsg("foggy-skin onion", HealFoggySkinOnion)
+	var hpstr string
+	if pa.Has(StatusLignification) {
+		hpstr = newHPWithoutBonus(pa, 3, HealFoggySkinOnion)
+	} else {
+		hpstr = newHP(pa, HealFoggySkinOnion)
+	}
+	g.eatMsg("foggy-skin onion", hpstr)
 	g.PutStatus1(PlayerID, pa, StatusFoggySkin, DurationFoggySkin)
 	g.AdjustHP(PlayerID, pa, HealFoggySkinOnion)
 	return true
 }
 
 func (eff EffectFoggySkinOnion) Desc() string {
-	return fmt.Sprintf("Get @BFoggy-Skin@N for %d turns. %s Restores %+d HP.",
+	return fmt.Sprintf("Gives @BFoggy-Skin@N for %d turns. %s Restores %+d HP.",
 		DurationFoggySkin, statusDesc[StatusFoggySkin], HealFoggySkinOnion)
 }
 
@@ -181,7 +207,7 @@ type EffectFirebreathPepper struct{ Beam bool }
 func (eff EffectFirebreathPepper) Apply(g *Game) bool {
 	pp := g.PP()
 	pa := g.PlayerActor()
-	g.eatMsg("firebreath pepper", HealFirebreathPepper)
+	g.eatMsg("firebreath pepper", newHP(pa, HealFirebreathPepper))
 	g.MakeNoise(pp, NoiseRoar)
 	g.AdjustHP(PlayerID, pa, HealFirebreathPepper)
 	g.md.FirebreathAnimation(pp.Add(g.Dir), g.Dir)
@@ -222,7 +248,7 @@ func (eff EffectTeleportMushroom) Apply(g *Game) bool {
 			return false
 		}
 	}
-	g.eatMsg("teleport mushroom", 0)
+	g.eatMsg("teleport mushroom", "")
 	if !g.TeleportActor(PlayerID, pa, 1) {
 		g.Log("You resist teleport while lignified.")
 	}

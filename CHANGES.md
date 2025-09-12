@@ -33,6 +33,9 @@ New content:
   purpose is to make it so the player doesn't feel the need to explore all the
   map corners on those maps (feature suggested by @mlochbaum in issue #1).
   Normal totems now become empty totems once you've picked their spirit.
+* New Clarity status effect, provided by “clarity leaves”. It protects against
+  Confusion, Daze, and unvoluntary Berserk. It can now be used as a way to exit
+  Berserk early with extra HP (healing applied after bonus is removed).
 
 Reworked and improved content:
 
@@ -78,13 +81,13 @@ Reworked and improved content:
     provide anymore a +1 defense bonus (which did not feel good even if
     actually not bad for such a long duration), and it doesn't protect against
     defense-ignoring attacks anymore.
-* Remove most eating restrictions. For example, a “berserking flower” can now
-  be eaten even if already Berserk: it will end Berserk early and apply it
-  again. That means you can use it to safely prolong Berserk when only one turn
-  is left, but you still get the Poison debuff. The only remaining restriction
-  is that you cannot eat a “lignification fruit” while you have the Foggy-Skin
-  status (the restriction may be removed in the future if I find some
-  interesting interaction).
+* Remove all eating restrictions. For example, a “berserking flower” can now be
+  eaten even if already Berserk: it will end Berserk early and apply it again.
+  That means you can use it to safely prolong Berserk when only one turn is
+  left, but you still get the Poison debuff.  Eating a “lignification fruit”
+  while you have Foggy-Skin or eating a “berserking flower” while you have
+  Clarity works, but it results in half Lignification or Berserk duration
+  respectively.
 * Make “ambrosia berries” either confuse you (existing behavior) or make you
   afraid. The idea, like for the “teleport mushroom”, is to provide some kind
   of surprise and require adaptability (a bit like identification systems do in

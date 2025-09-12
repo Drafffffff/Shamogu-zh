@@ -84,7 +84,7 @@ func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKi
 		return 0
 	}
 	dmg = min(dmg, aj.HP)
-	aj.Statuses[StatusDaze] = 0
+	aj.Statuses[StatusDaze] = 0 // no logging as it's already clear from the damage
 	aj.HP -= dmg
 	// Logging.
 	ej := g.Entity(j)

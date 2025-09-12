@@ -268,6 +268,7 @@ type Status int
 
 const (
 	StatusBerserk Status = iota
+	StatusClarity
 	StatusConfusion
 	StatusDaze
 	StatusDig
@@ -298,6 +299,7 @@ const NStatuses = StatusTimeStop + 1
 
 var statusAbbrevation = []string{
 	StatusBerserk:       "Ber",
+	StatusClarity:       "Cla",
 	StatusConfusion:     "Con",
 	StatusDaze:          "Daz",
 	StatusDig:           "Dig",
@@ -318,6 +320,7 @@ func (st Status) Abbr() string {
 
 var statusName = []string{
 	StatusBerserk:       "Berserk",
+	StatusClarity:       "Clarity",
 	StatusConfusion:     "Confusion",
 	StatusDaze:          "Daze",
 	StatusDig:           "Dig",
@@ -338,6 +341,7 @@ func (st Status) Name() string {
 
 var statusAdjective = []string{
 	StatusBerserk:       "berserk",
+	StatusClarity:       "clear-minded",
 	StatusConfusion:     "confused",
 	StatusDaze:          "dazed",
 	StatusDig:           "digging",
@@ -360,6 +364,7 @@ var statusDesc = []string{
 	StatusBerserk: fmt.Sprintf(
 		"Gives %+d Attack and +1 effective damage. Provides temporary HP bonus. Protects from @OFear@N. Followed by @OPoison@N on expiration for %d turns.",
 		BerserkAttackBonus, DurationPoisonBerserk),
+	StatusClarity:   "Protects from @OConfusion@N, @ODaze@N, and @BBerserk@N.",
 	StatusConfusion: "Using spirit abilities will hurt you for 1 damage. Doubles duration of new @OImbalance@N, @ODaze@N and @OFear@N effects.",
 	StatusDaze:      "Forbids all actions except waiting or eating until you’re hurt or it expires.",
 	StatusDig:       "Allows walking into walls. Gives +1 effective damage when charging and guarantees pushing.",
@@ -419,7 +424,7 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 	active := ai.Has(st) // whether the status is already active
 	switch {
 	case st == StatusBerserk:
-		if active {
+		if active || ai.Has(StatusClarity) {
 			return false
 		}
 	case st == StatusFire:
@@ -449,7 +454,7 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 			turns *= 2
 		}
 	case st == StatusDaze:
-		if ai.DoesAny(MonsImmunityDaze) {
+		if ai.Has(StatusClarity) || ai.DoesAny(MonsImmunityDaze) {
 			return false
 		}
 		if ai.DoesAny(ResistanceDaze) {
@@ -459,7 +464,7 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 			turns *= 2
 		}
 	case st == StatusConfusion:
-		if ai.DoesAny(MonsImmunityConfusion) {
+		if ai.Has(StatusClarity) || ai.DoesAny(MonsImmunityConfusion) {
 			return false
 		}
 		if ai.DoesAny(ResistanceConfusion) {
@@ -475,9 +480,10 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 		if ai.Has(StatusConfusion) {
 			turns *= 2
 		}
-	case st == StatusLignification &&
-		(ai.DoesAny(MonsImmunityLignification) || active || ai.Has(StatusFoggySkin)):
-		return false
+	case st == StatusLignification:
+		if ai.DoesAny(MonsImmunityLignification) || active || ai.Has(StatusFoggySkin) {
+			return false
+		}
 	case st == StatusPoison:
 		if ai.Has(StatusLignification) || ai.DoesAny(MonsImmunityPoison) {
 			return false
@@ -514,6 +520,10 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 	case StatusBerserk:
 		g.AdjustHP(i, ai, ai.HPBonus())
 		g.RemoveStatus(i, ai, StatusFear)
+	case StatusClarity:
+		g.RemoveStatus(i, ai, StatusConfusion)
+		g.RemoveStatus(i, ai, StatusDaze)
+		g.RemoveStatus(i, ai, StatusBerserk)
 	case StatusLignification:
 		g.AdjustHP(i, ai, ai.HPBonus())
 		g.RemoveStatus(i, ai, StatusPoison)
@@ -675,6 +685,7 @@ func (g *Game) HandleActorTurn(i ID, ai *Actor) {
 // make more sense than just prolonging it, though it's a quite rare
 // edge-case).
 var sortedStatuses = []Status{
+	StatusClarity,
 	StatusConfusion,
 	StatusDaze,
 	StatusDig,
@@ -707,7 +718,7 @@ func (g *Game) exudeFog(i ID) {
 
 // handleCornered makes cornered and afraid actors become berserk.
 func (g *Game) handleCornered(i ID, ai *Actor) {
-	if !ai.Has(StatusFear) && !ai.DoesAny(MonsMusic) {
+	if !ai.Has(StatusFear) && !ai.DoesAny(MonsMusic) || ai.Has(StatusClarity) {
 		return
 	}
 	ei := g.Entity(i)

@@ -1572,6 +1572,8 @@ On the map, monster color may change depending on active status effects.  By def
 		switch st {
 		case StatusBerserk:
 			details = "HP never falls below 1 after losing bonus HP."
+		case StatusClarity:
+			details = "Player-only effect obtainable by eating clarity leaves. May be removed by eating a berserking flower for half the @BBerserk@N duration."
 		case StatusLignification:
 			details = "HP never falls below 3 after losing bonus HP. Cancels @BSprint@N. Players with “woody legs” can move while @Blignified@N at the cost of reducing the duration by an extra turn."
 		case StatusConfusion:
@@ -1583,7 +1585,7 @@ On the map, monster color may change depending on active status effects.  By def
 		case StatusPoison:
 			details = "Watch out for confusion if any monsters survive poisoning!"
 		case StatusFoggySkin:
-			details = "Player-only effect obtainable by eating a foggy-skin onion."
+			details = "Player-only effect obtainable by eating a foggy-skin onion. May be removed by eating a lignification fruit for half the @BLignification@N duration."
 		case StatusSprint:
 			details = "Disables normal attack. Player-only effect obtainable with the Sprinting Gazelle spirit."
 		case StatusTimeStop:
