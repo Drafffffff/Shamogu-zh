@@ -159,7 +159,7 @@ func (m *Map) RuneAt(p gruid.Point) rune {
 		return MapRune(t)
 	}
 	for q := range m.PassableNeighbors(p) {
-		if tq := m.KnownTerrain.At(q); tq != Unknown && Passable(tq) {
+		if tq := m.KnownTerrain.At(q); IsKnown(tq) && Passable(tq) {
 			return '¤'
 		}
 	}

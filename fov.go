@@ -82,6 +82,7 @@ func (g *Game) SenseEntity(e *Entity, verb string) {
 	}
 	if !e.Seen {
 		e.Seen = true
+		g.SensePassable(e.P)
 		g.md.auto.mode = noAuto
 		switch r := e.Role.(type) {
 		case *Actor:

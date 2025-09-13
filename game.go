@@ -419,8 +419,7 @@ func (g *Game) SmellFood() {
 			// NOTE: using path-distance would leak information
 			// about walls (if the player goes through the tedious
 			// task of doing some math).
-			ei.KnownP = ei.P
-			g.Logf("You smell %s.", One(ei.Name))
+			g.SenseEntity(ei, "smell")
 		}
 	}
 }
