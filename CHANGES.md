@@ -38,6 +38,13 @@ New content:
   Berserk early with extra HP (healing applied after bonus is removed). Also,
   Clarity makes you sense monsters now for several turns, but in a shorter
   range (2 times view range, instead of 3).
+* New kind of player's knowledge about terrain: “unknown passable terrain”.
+  Hearing footsteps and Clarity provide clues about terrain passability, so
+  optimal play could encourage boringly memorizing (or even writing down) that
+  information. Revealing the terrain and anything it contains would have solved
+  the issue, but it would have been unintuitive from an immersion perspective.
+  The new “unknown passable terrain”, shown as uncolored footsteps, solves the
+  issue without having to leak any extra information.
 
 Reworked and improved content:
 
