@@ -40,7 +40,7 @@ func (g *Game) UpdateKnowledge() {
 	g.SeeEntities()
 }
 
-// SeeTerrain handles knowledge changes about a given position during an FOV
+// SeeTerrain handles knowledge changes about a given position during a FOV
 // update.
 func (g *Game) SeeTerrain(p gruid.Point) {
 	t := g.Map.Terrain.At(p)
@@ -127,6 +127,7 @@ func (g *Game) senseMonsters() {
 		ei := g.Entity(i)
 		if paths.DistanceManhattan(ei.P, pp) <= 2*MaxFOVRange {
 			g.SenseEntity(ei, "sense")
+			g.SeeTerrain(ei.P)
 		}
 	}
 }
