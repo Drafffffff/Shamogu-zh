@@ -131,13 +131,6 @@ func (g *Game) senseMonsters() {
 			g.SeeTerrain(ei.P)
 		}
 	}
-	// Sense any items on newly sensed terrain, too. Otherwise auto-explore
-	// wouldn't know if the map still contains unexplored items.
-	for _, e := range g.NPMapEntities() {
-		if !e.Seen && g.Map.KnownTerrain.At(e.P) != Unknown {
-			g.SenseEntity(e, "sense")
-		}
-	}
 }
 
 // ResetKnowledge initializes player's knowledge of map terrain.

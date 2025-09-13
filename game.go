@@ -252,6 +252,10 @@ func (g *Game) ComputeNoise() {
 		if ei.Noise = dist <= MaxFOVRange; !ei.Noise {
 			continue
 		}
+		// NOTE: Showing terrain like for Clarity would avoid the
+		// temptation of memorizing which cells were passable, but it
+		// would break immersion a bit.
+		// g.SeeTerrain(ei.P)
 		a = ai
 		nheard++
 	}
@@ -420,6 +424,18 @@ func (g *Game) SmellFood() {
 			// task of doing some math).
 			ei.KnownP = ei.P
 			g.Logf("You smell %s.", One(ei.Name))
+		}
+	}
+}
+
+// SenseItemsOnRevealedTerrain performs sensing of items that are on terrain
+// that's been revealed through other means (like clarity leaves).
+func (g *Game) SenseItemsOnRevealedTerrain() {
+	// Sense any items on newly sensed terrain, too. Otherwise auto-explore
+	// wouldn't know if the map still contains unexplored items.
+	for _, e := range g.NPMapEntities() {
+		if !e.Seen && g.Map.KnownTerrain.At(e.P) != Unknown {
+			g.SenseEntity(e, "sense")
 		}
 	}
 }

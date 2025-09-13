@@ -338,6 +338,9 @@ func (md *model) endTurn() {
 	if pa.DoesAny(GoodSmell) {
 		g.SmellFood()
 	}
+	if pa.Has(StatusClarity) {
+		g.SenseItemsOnRevealedTerrain()
+	}
 	//g.TurnStats()
 	hp := pa.HP
 	if hp <= 0 {
