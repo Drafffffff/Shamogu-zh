@@ -200,8 +200,13 @@ func (g *Game) endTurnEarly() bool {
 
 // ComputeNoise generates footstep noise information.
 func (g *Game) ComputeNoise() {
-	dij := &MapPath{passable: g.Map.Passable}
 	pa := g.PlayerActor()
+	if pa.Has(StatusClarity) {
+		// When you have clarity, you have senses with strictly better
+		// range.
+		return
+	}
+	dij := &MapPath{passable: g.Map.Passable}
 	goodhearing := pa.DoesAny(GoodHearing) && !pa.DoesAny(BadHearing)
 	badhearing := !pa.DoesAny(GoodHearing) && pa.DoesAny(BadHearing)
 	const maxdist = MaxFOVRange + 5

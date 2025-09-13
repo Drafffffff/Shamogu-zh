@@ -364,7 +364,7 @@ var statusDesc = []string{
 	StatusBerserk: fmt.Sprintf(
 		"Gives %+d Attack and +1 effective damage. Provides temporary HP bonus. Protects from @OFear@N. Followed by @OPoison@N on expiration for %d turns.",
 		BerserkAttackBonus, DurationPoisonBerserk),
-	StatusClarity:   "Protects from @OConfusion@N, @ODaze@N, and @BBerserk@N.",
+	StatusClarity:   "Protects from @OConfusion@N, @ODaze@N, and @BBerserk@N. Makes you sense nearby monsters (2× view range).",
 	StatusConfusion: "Using spirit abilities will hurt you for 1 damage. Doubles duration of new @OImbalance@N, @ODaze@N and @OFear@N effects.",
 	StatusDaze:      "Forbids all actions except waiting or eating until you’re hurt or it expires.",
 	StatusDig:       "Allows walking into walls. Gives +1 effective damage when charging and guarantees pushing.",
@@ -663,7 +663,7 @@ func (g *Game) HandleActorTurn(i ID, ai *Actor) {
 		return
 	}
 	if ai.Has(StatusFoggySkin) {
-		g.exudeFog(i)
+		g.exudeFog()
 	}
 	g.handleCornered(i, ai)
 	// NOTE: We make statuses progress at the end of the turn. That means
@@ -702,11 +702,11 @@ var sortedStatuses = []Status{
 	StatusLignification, // after Imbalance & Berserk
 }
 
-// exudeFog implements the FoggySkin status effect.
-func (g *Game) exudeFog(i ID) {
-	p := g.Entity(i).P
-	for q := range g.Map.PassableNeighbors(p) {
-		if q == p.Add(g.Dir) {
+// exudeFog implements the fog for the player-only status effect Foggy-Skin.
+func (g *Game) exudeFog() {
+	pp := g.PP()
+	for q := range g.Map.PassableNeighbors(pp) {
+		if q == pp.Add(g.Dir) {
 			// NOTE: this assumes exudeFog is only called for the
 			// player for now (currently foggy skin status is
 			// player-only).

@@ -60,6 +60,9 @@ func (g *Game) SeeEntities() {
 			e.KnownP = InvalidPos
 		}
 	}
+	if g.PlayerActor().Has(StatusClarity) {
+		g.senseMonsters()
+	}
 }
 
 // SenseEntity updates known position of an entity to its real one. The given
@@ -114,6 +117,18 @@ func (g *Game) SenseEntity(e *Entity, verb string) {
 
 func (g *Game) ppDist(p gruid.Point) int {
 	return paths.DistanceManhattan(g.PP(), p)
+}
+
+// senseMonsters implements the monster-sensing of the player-only status
+// effect Clarity.
+func (g *Game) senseMonsters() {
+	pp := g.PP()
+	for i := range g.Monsters() {
+		ei := g.Entity(i)
+		if paths.DistanceManhattan(ei.P, pp) <= 2*MaxFOVRange {
+			g.SenseEntity(ei, "sense")
+		}
+	}
 }
 
 // ResetKnowledge initializes player's knowledge of map terrain.

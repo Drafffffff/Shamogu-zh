@@ -155,13 +155,6 @@ func (eff EffectClarityLeaves) Apply(g *Game) bool {
 	g.eatMsg("clarity leaves", hpstr)
 	g.PutStatus1(PlayerID, pa, StatusClarity, DurationClarity)
 	g.AdjustHP(PlayerID, pa, HealClarityLeaves)
-	pp := g.PP()
-	for i := range g.Monsters() {
-		ei := g.Entity(i)
-		if paths.DistanceManhattan(ei.P, pp) <= 3*MaxFOVRange {
-			g.SenseEntity(ei, "sense")
-		}
-	}
 	return true
 }
 
@@ -177,7 +170,7 @@ func newHPWithoutBonus(a *Actor, m, hp int) string {
 }
 
 func (eff EffectClarityLeaves) Desc() string {
-	return fmt.Sprintf("Gives @BClarity@N for %d turns. %s Makes you sense nearby monsters (3x view range). Restores %+d HP.",
+	return fmt.Sprintf("Gives @BClarity@N for %d turns. %s Restores %+d HP.",
 		DurationClarity, statusDesc[StatusClarity], HealClarityLeaves)
 }
 
