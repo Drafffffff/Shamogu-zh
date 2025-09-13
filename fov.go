@@ -123,11 +123,19 @@ func (g *Game) ppDist(p gruid.Point) int {
 // effect Clarity.
 func (g *Game) senseMonsters() {
 	pp := g.PP()
+	// Sense monsters and terrain under them.
 	for i := range g.Monsters() {
 		ei := g.Entity(i)
 		if paths.DistanceManhattan(ei.P, pp) <= 2*MaxFOVRange {
 			g.SenseEntity(ei, "sense")
 			g.SeeTerrain(ei.P)
+		}
+	}
+	// Sense any items on newly sensed terrain, too. Otherwise auto-explore
+	// wouldn't know if the map still contains unexplored items.
+	for _, e := range g.NPMapEntities() {
+		if !e.Seen && g.Map.KnownTerrain.At(e.P) != Unknown {
+			g.SenseEntity(e, "sense")
 		}
 	}
 }
