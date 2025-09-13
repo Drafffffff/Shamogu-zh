@@ -71,9 +71,7 @@ func (md *model) updateTargInfo() {
 	g := md.g
 	pi := targInfo{}
 	p := md.targ.p
-	if g.Map.KnownTerrain.At(p) == Unknown {
-		pi.unknown = true
-	}
+	pi.unknown = !IsKnown(g.Map.KnownTerrain.At(p))
 	if g.Wizard.Mode.Reveal() {
 		if i, a := g.ActorAt(p); a != nil {
 			pi.entities = append(pi.entities, i)

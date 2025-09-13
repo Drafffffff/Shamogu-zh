@@ -392,12 +392,8 @@ func (md *model) drawTargInfo() {
 	switch {
 	case g.Wizard.Mode.Reveal():
 		features = append(features, TerrainName(g.Map.Terrain.At(md.targ.p)))
-	case !info.unknown:
-		features = append(features, TerrainName(g.Map.KnownTerrain.At(md.targ.p)))
 	default:
-		if info.unknown {
-			features = append(features, "unknown")
-		}
+		features = append(features, TerrainName(g.Map.KnownTerrain.At(md.targ.p)))
 	}
 	if info.cloud != NoCloud {
 		clstr := info.cloud.String()
@@ -417,8 +413,6 @@ func (md *model) drawTargInfo() {
 	switch {
 	case g.Wizard.Mode.Reveal():
 		desc = TerrainDesc(g.Map.Terrain.At(md.targ.p))
-	case info.unknown:
-		desc = "You do not know what is in there."
 	default:
 		desc = TerrainDesc(g.Map.KnownTerrain.At(md.targ.p))
 	}

@@ -62,7 +62,7 @@ func (g *Game) LevelStats() {
 			continue
 		}
 		total++
-		if t != Unknown {
+		if IsKnown(t) {
 			n++
 		}
 	}

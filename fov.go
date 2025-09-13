@@ -50,6 +50,15 @@ func (g *Game) SeeTerrain(p gruid.Point) {
 	}
 }
 
+// SensePassable handles knowledge changes about an unknown terrain's
+// passability.
+func (g *Game) SensePassable(p gruid.Point) {
+	if g.Map.KnownTerrain.At(p) == Unknown {
+		g.md.auto.aemRebuild = true
+		g.Map.KnownTerrain.Set(p, UnknownPassable)
+	}
+}
+
 // SeeEntities handles knowledge changes about the last known position of
 // map entities that are in the field of view.
 func (g *Game) SeeEntities() {
@@ -128,7 +137,7 @@ func (g *Game) senseMonsters() {
 		ei := g.Entity(i)
 		if paths.DistanceManhattan(ei.P, pp) <= 2*MaxFOVRange {
 			g.SenseEntity(ei, "sense")
-			g.SeeTerrain(ei.P)
+			g.SensePassable(ei.P)
 		}
 	}
 }

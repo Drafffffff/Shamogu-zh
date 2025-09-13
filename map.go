@@ -15,7 +15,8 @@ const (
 	Rubble                         // passable, but blocks vision like walls
 	TranslucentWall                // obstructing, but does not block vision, contains poison gas
 
-	Unknown // cell is unknown (for KnownTerrain field of Map)
+	UnknownPassable // cell is known to be passable (for KnownTerrain field of Map)
+	Unknown         // cell is unknown (for KnownTerrain field of Map)
 )
 
 func TerrainName(t rl.Cell) string {
@@ -30,8 +31,10 @@ func TerrainName(t rl.Cell) string {
 		return "rubble"
 	case TranslucentWall:
 		return "translucent wall"
+	case UnknownPassable:
+		return "passable terrain"
 	default:
-		return "unknown place"
+		return "unknown terrain"
 	}
 }
 
@@ -47,9 +50,16 @@ func TerrainDesc(t rl.Cell) string {
 		return "A collection of rocks broken into smaller ones. Passable, but blocks vision."
 	case TranslucentWall:
 		return "An obstructing pile of translucent rocks. Contains poison gas."
+	case UnknownPassable:
+		return "Passable terrain of unknown nature."
 	default:
-		return "unknown place"
+		return "Terrain of unknown nature."
 	}
+}
+
+// IsKnown reports whether the terrain is known.
+func IsKnown(t rl.Cell) bool {
+	return t != Unknown && t != UnknownPassable
 }
 
 // Map represents the rectangular map of the game's level.
@@ -134,6 +144,8 @@ func MapRune(t rl.Cell) (r rune) {
 		r = '^'
 	case TranslucentWall:
 		r = '◊'
+	case UnknownPassable:
+		r = '♫'
 	default:
 		r = '?'
 	}
@@ -147,7 +159,7 @@ func (m *Map) RuneAt(p gruid.Point) rune {
 		return MapRune(t)
 	}
 	for q := range m.PassableNeighbors(p) {
-		if tq := m.KnownTerrain.At(q); tq != Unknown && tq != Wall && tq != TranslucentWall {
+		if tq := m.KnownTerrain.At(q); tq != Unknown && Passable(tq) {
 			return '¤'
 		}
 	}

@@ -65,12 +65,12 @@ func (g *Game) PlayerPassableNoTrapsFunc() func(gruid.Point) bool {
 	knownAt := g.Map.KnownTerrain.At
 	if g.PlayerActor().Statuses.Has(StatusDig) {
 		return func(p gruid.Point) bool {
-			return inMap(p) && knownAt(p) != Unknown && g.NoTrapAt(p)
+			return inMap(p) && IsKnown(knownAt(p)) && g.NoTrapAt(p)
 		}
 	}
 	passable := g.Map.Passable
 	return func(p gruid.Point) bool {
-		return passable(p) && knownAt(p) != Unknown && g.NoTrapAt(p)
+		return passable(p) && IsKnown(knownAt(p)) && g.NoTrapAt(p)
 	}
 }
 

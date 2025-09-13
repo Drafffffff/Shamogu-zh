@@ -176,7 +176,7 @@ func (g *Game) allExplored() bool {
 				continue
 			}
 		}
-		if t == Unknown {
+		if !IsKnown(t) {
 			return false
 		}
 	}
@@ -193,7 +193,7 @@ func (md *model) autoExploreSources() []gruid.Point {
 				continue
 			}
 		}
-		if t == Unknown {
+		if !IsKnown(t) {
 			md.auto.sources = append(md.auto.sources, p)
 		}
 
