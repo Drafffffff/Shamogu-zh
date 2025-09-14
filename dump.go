@@ -201,6 +201,9 @@ func (g *Game) dumpDungeon(sb *strings.Builder) {
 			}
 		}
 		r := g.Map.RuneAt(p)
+		if r == '♫' {
+			r = ' '
+		}
 		if !g.InFOV(p) {
 			if i := noise.At(p); i > 0 {
 				r = '♫'
