@@ -155,6 +155,15 @@ Reworked and improved content:
   limitation could be solved for the tiles version with image layers,
   introducing that kind of visual clutter doesn't fit the simplicity of the
   game.
+* The attack bonus for Four-Headed Hydra's four-directional attacks has been
+  increased by one: that means fighting 2, 3 or 4 foes gives a +2, +3, or +4
+  attack bonus now. Fighting a single foe remains the same as before, without
+  bonus. The bonus was a bit small before, as fighting 2 monsters is the most
+  common bonus case, either because there are only two, or because the third
+  already died so, attack-wise, a boar fighting two foes separately was the
+  same as a Hydra fighting two of them in the open, but with an initial charge
+  bonus, and Hydra became weaker again if one of the foes died before the
+  other.
 * Players with the Rampaging Boar spirit don't move into poison or fire clouds
   after pushing anymore. While sometimes funny, it had similar issues as
   swapping into unexpected clouds. Monster boars and dragons still move into

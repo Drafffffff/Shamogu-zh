@@ -266,12 +266,16 @@ func (g *Game) FourDirectionalAttack(i ID, ai *Actor, ap AttackKind) bool {
 			ids = append(ids, j)
 		}
 	}
+	// Shuffle foes so that attack order is not predictable in an
+	// artificial way.
 	g.rand.Shuffle(len(actors), func(i, j int) {
 		actors[i], actors[j] = actors[j], actors[i]
 		ids[i], ids[j] = ids[j], ids[i]
 	})
-	bonus := len(actors) - 1
-	if bonus < 0 {
+	bonus := len(actors)
+	if bonus <= 1 {
+		// We only give +2, +3, +4 bonuses when there's at least two
+		// adjacent foes or more.
 		bonus = 0
 	}
 	for k, j := range ids {
