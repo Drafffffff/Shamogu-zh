@@ -678,11 +678,11 @@ func (g *Game) AdjacentEntities(i, j ID) bool {
 
 // Dig attempts to make an actor dig at a given position. It reports true on
 // success.
-func (g *Game) Dig(i ID, a *Actor, at gruid.Point) bool {
+func (g *Game) Dig(i ID, ai *Actor, at gruid.Point) bool {
 	if !inMap(at) {
 		return false
 	}
-	if !a.Has(StatusDig) {
+	if !ai.Has(StatusDig) {
 		return false
 	}
 	g.dig(at)
