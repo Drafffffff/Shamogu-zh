@@ -147,7 +147,7 @@ func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKi
 		}
 		g.md.auto.mode = noAuto
 	case aj.IsDead():
-		g.monsterDeath(j, aj)
+		g.monsterDeath(i, j, aj)
 	}
 	return dmg
 }
@@ -195,22 +195,24 @@ func (g *Game) logBumpDamage(i, j ID, _, aj *Actor, dmg int, ap AttackKind) {
 }
 
 // monsterDeath handles extra effects on monster death (like for exploding
-// nadres).
-func (g *Game) monsterDeath(i ID, ai *Actor) {
-	ei := g.Entity(i)
-	g.Stats.Death(ei.Name)
-	g.md.DeathAnimation(ei.P)
-	if !ai.DoesAny(MonsExplodingDeath) {
+// nadres). The first optional id is the id of the actor that was acting when
+// the death happened.
+func (g *Game) monsterDeath(i, j ID, aj *Actor) {
+	ej := g.Entity(j)
+	g.Stats.Death(ej.Name)
+	g.md.DeathAnimation(ej.P)
+	if !aj.DoesAny(MonsExplodingDeath) {
 		return
 	}
-	if g.InFOV(ei.P) {
-		g.Logf("The %s explodes.", ei.Name)
+	if g.InFOV(ej.P) {
+		g.Logf("The %s explodes.", ej.Name)
 	}
-	g.ExplosionAt(ei.P)
+	g.ExplosionAt(i, ej.P)
 }
 
-// ExplosionAt makes a fire explosion at the given position.
-func (g *Game) ExplosionAt(at gruid.Point) {
+// ExplosionAt makes a fire explosion at the given position. The optional id
+// is the id of the actor that was acting when the explosion was triggered.
+func (g *Game) ExplosionAt(i ID, at gruid.Point) {
 	g.MakeNoise(at, NoiseExplosion)
 	var nbs paths.Neighbors
 	ps := append(nbs.Cardinal(at, inMap), at)
@@ -223,7 +225,11 @@ func (g *Game) ExplosionAt(at gruid.Point) {
 			g.NormalCloudAt(q, 2+g.IntN(3))
 		}
 		if j, aj := g.ActorAt(q); j >= 0 {
-			g.PutStatus(j, aj, StatusFire, DurationFire)
+			if j == i {
+				g.PutStatus1(j, aj, StatusFire, DurationFire)
+			} else {
+				g.PutStatus(j, aj, StatusFire, DurationFire)
+			}
 		}
 	}
 }

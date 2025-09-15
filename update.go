@@ -112,7 +112,7 @@ func (md *model) update(msg gruid.Msg) gruid.Effect {
 			md.dump(md.g.WriteDump())
 		}
 	}
-	md.g.Prev = md.g.PP()
+	md.g.UpdateFirePos(PlayerID, md.g.PlayerActor())
 	eff, done := md.action.Handle(md)
 	if done {
 		md.endTurn()

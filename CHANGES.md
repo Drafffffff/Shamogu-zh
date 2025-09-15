@@ -266,6 +266,8 @@ Fixes:
 * Fix healing amount in description of foggy-skin onion.
 * Fix application of Imbalance when jumping with the Sprinting Gazelle's sprint.
 * Fix vipers biting themselves too even when not confused (issue #1).
+* When killing a nadre, make the explosion burn you just once even if you
+  didn't move in that turn (see issue #1).
 * Some confused monster actions that happened outside of view incorrectly
   appeared in the game logs.
 * Improve/fix the page-down and scrolling instructions when details of all

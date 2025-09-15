@@ -10,13 +10,14 @@ import (
 
 // Actor holds data relevant to any kind of actor (player or monster).
 type Actor struct {
-	HP       int       // health points
-	MaxHP    int       // maximum health points
-	Defense  int       // defense (defensive potential)
-	Attack   int       // attack (offensive potential)
-	Statuses Statuses  // statuses (confused, etc.)
-	Traits   Traits    // passives traits
-	Behavior *Behavior // behavior component (monsters only)
+	HP       int         // health points
+	MaxHP    int         // maximum health points
+	Defense  int         // defense (defensive potential)
+	Attack   int         // attack (offensive potential)
+	FirePos  gruid.Point // position at start of turn while on Fire
+	Statuses Statuses    // statuses (confused, etc.)
+	Traits   Traits      // passives traits
+	Behavior *Behavior   // behavior component (monsters only)
 }
 
 // NewActor returns a new actor with the given combat stats and traits.
@@ -105,6 +106,15 @@ func (g *Game) AdjustHPWithMin(i ID, a *Actor, amount int, m int) {
 		} else if amount >= 0 {
 			g.Log("You feel no change (+0 HP).")
 		}
+	}
+}
+
+// UpdateFirePos updates the FirePos field of the given actor.
+func (g *Game) UpdateFirePos(i ID, ai *Actor) {
+	if ai.Has(StatusFire) {
+		ai.FirePos = g.Entity(i).P
+	} else {
+		ai.FirePos = InvalidPos
 	}
 }
 
@@ -650,11 +660,11 @@ func (g *Game) HandleActorTurn(i ID, ai *Actor) {
 	ei := g.Entity(i)
 	p := ei.P
 	if ai.Behavior != nil {
+		g.UpdateFirePos(i, ai)
 		ei.Noise = false
 		g.HandleMonsterTurn(i, ai)
 	}
-	if ai.Has(StatusFire) &&
-		(i == PlayerID && g.Prev == p || i != PlayerID && ei.P == p || g.FireAt(ei.P)) {
+	if ai.Has(StatusFire) && (p == ai.FirePos || ai.FirePos != InvalidPos && g.FireAt(ei.P)) {
 		g.InflictFireDamage(i, ai)
 	}
 	if ai.IsDead() {

@@ -209,7 +209,7 @@ func (eff EffectFirebreathPepper) Apply(g *Game) bool {
 		p = p.Add(g.Dir)
 		t := g.Map.Terrain.At(p)
 		if !Passable(t) {
-			g.ExplosionAt(p)
+			g.ExplosionAt(PlayerID, p)
 			return true
 		}
 		if t == Foliage {
