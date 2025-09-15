@@ -553,7 +553,8 @@ func (g *Game) push(i, j ID, ai, aj *Actor, dmg int, ap AttackKind, bonus int) {
 		}
 	}
 	if k, ak := g.ActorAt(npj); ak != nil {
-		// There's another actor behind: extra piercing attack.
+		// There's another actor behind: extra piercing attack (without
+		// extra effects, but inheriting any charge attack bonuses).
 		g.AttackDamage(i, k, ai, ak, ap, bonus)
 		return
 	}
