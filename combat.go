@@ -603,7 +603,7 @@ func (g *Game) catch(i, j ID, ai, aj *Actor, dmg int) {
 	g.BumpMoveActor(j, aj, to)
 	g.md.MoveAnimation(from, to)
 	if ai.DoesAny(PatternCatch) && g.IntN(8-dmg) < 5 {
-		if g.PutStatus(j, aj, StatusImbalance, 1+dmg) && i != PlayerID &&
+		if g.PutStatus(j, aj, StatusImbalance, 3+dmg/3) && i != PlayerID &&
 			ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusImbalance, 1+dmg) {
 			g.Logf("The confused %s lost balance too!", ei.Name)
 		}
