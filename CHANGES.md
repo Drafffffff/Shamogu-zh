@@ -24,12 +24,12 @@ New content:
   explodes on death. May occasionally guard non-portal vaults, too.
 * New totem guardian monster: **totem wasp**. Rampaging and venomous wasps that
   like to use totems as their nest.
-* New kind of item: **runic trap**. They represent *visible* traps that are
-  triggered when stepped on by the player or a monster. Wandering monsters
+* New kind of static item: **runic trap**. They represent *visible* traps that
+  are triggered when stepped on by the player or a monster. Wandering monsters
   avoid traps, but hunting ones do not. Effects depend on the kind of rune.
   Placement is designed so that there's always at least one path that avoids
   traps.
-* New **empty totem** static item on map levels without a regular totem. Its
+* New static **empty totem** item on map levels without a regular totem. Its
   purpose is to make it so the player doesn't feel the need to explore all the
   map corners on those maps (feature suggested by @mlochbaum in issue #1).
   Normal totems now become empty totems once you've picked their spirit.
@@ -105,9 +105,16 @@ Reworked and improved content:
   50% chance).
 * Make “firebreath pepper” produce a nadre-like explosion when reaching a wall,
   providing a limited means of wall destruction for non-Boar players. Make
-  explosions produce dust or smoke clouds. Also, make the breath's smell inflict a very
-  brief (2 turns) Confusion effect, increasing the possible tactical usages.
-  The Daze removing effect has been moved into the “clarity leaves”.
+  explosions produce dust or smoke clouds. Also, make the breath's smell
+  inflict a very brief (2 turns) Confusion effect, increasing the possible
+  tactical usages.  The Daze removing effect has been moved into the “clarity
+  leaves”.
+* Unlike plain clouds of fog, dust or smoke, dangerous clouds of fire and
+  poison are now only difficult to see through, like foliage (suggested by
+  @mlochbaum in issue #1). This should make menhir usage obstruct vision less,
+  as well as allow for things like jumping over a fire tile with the Frog or
+  Gazelle spirits. It also allows ranged attacks to reach just behind a fire
+  or poison cloud (which is both good and bad for different reasons).
 * New rules for clouds replacing existing clouds of different types. If the
   type is the same, the duration is still the maximum of the old and new ones,
   like before. Fire clouds now take priority over other clouds: the heat
@@ -116,46 +123,36 @@ Reworked and improved content:
   (which has a visibility impact too). For other kinds of clouds, like poison
   ones or normal smoke/dust/fog, there are no special priorities: the new one
   replaces the old one.
-* Unlike plain clouds of fog, dust or smoke, dangerous clouds of fire and
-  poison are now only difficult to see through, like foliage (suggested by
-  @mlochbaum in issue #1). This should make menhir usage obstruct vision less,
-  as well as allow for things like jumping over a fire tile with the Frog or
-  Gazelle spirits. It also allows ranged attacks to reach just behind a fire
-  or poison cloud (which is both good and bad for different reasons).
-* Make “pushing gale” dissipate clouds, providing the first cloud
-  dissipating source which, due to “recoil”, can be quite useful for Wind Fox
-  players. Also, as a special interaction, “pushing gale” propagates fire
-  clouds on foliage tiles instead of dissipating them.
-* As discussed in issue #1 about Wind Fox balance, make “pushing gale”
-  always do 1 damage (instead of 1-2 damage). And make “recoil” produce some
-  wind noise in melee and generally only happen within a 4-tile range.
-* Make “recoil” active even with the non-upgraded Wind Fox (pushing is active
-  on the non-upgraded Rampaging Boar, so having recoil only on upgraded Wind
-  Fox seemed a bit strange).
-* Improve “poison cloud” ability of the Venomous Viper spirit so that the
-  poison clouds are created *up to two free tiles away* (before a monster or
-  obstacle). This creates more varied possibilities for tactical movement,
-  while still restricting safe movements in a similar but less extreme way, and
-  providing similar defense from ranged monsters.
 * Adjust slightly down the duration of fire clouds to 6-12 turns and poison
   clouds to 6-9 turns. Adjust duration of Poison inflicted by clouds down to 3,
   and slightly reduce confusion duration from 5 to 4 to compensate. Also reduce
   the Skunk's “noxious smell” confusion duration from 7 to 5, because it was a
   bit too strong.
-* Make “fire vulnerability” and Lignification increase Fire duration by 2
-  instead of 3.
-* Using “sprint” or “jump” abilities while imbalanced may now sometimes lead to
-  a dazing fall.
-* Space-distorting attacks now *swap clouds* too. While getting swapped into a
-  cloud of fire or poison by foes was (very occasionally) fun, Temporal Cat
-  players not being able to safely attack monsters on dangerous clouds was more
-  annoying than fun. And in both cases, it could result in unexpected dangerous
-  situations that would've required explicit examination to be avoided: when a
-  monster is on a tile with a cloud, only the monster is drawn, and while that
-  limitation could be solved for the tiles version with image layers,
-  introducing that kind of visual clutter doesn't fit the simplicity of the
-  game.
-* The attack bonus for Four-Headed Hydra's four-directional attacks has been
+* Temporal Cat's space-distorting attacks now *swap clouds* too. While getting
+  swapped into a cloud of fire or poison by foes was (very occasionally) fun,
+  Temporal Cat players not being able to safely attack monsters on dangerous
+  clouds was more annoying than fun. And in both cases, it could result in
+  unexpected dangerous situations that would've required explicit examination
+  to be avoided: when a monster is on a tile with a cloud, only the monster is
+  drawn, and while that limitation could be solved for the tiles version with
+  image layers, introducing that kind of visual clutter doesn't fit the
+  simplicity of the game.
+* Temporal Cat now has one less “stop time” charge, but the duration is
+  increased from 4 to 5 (see discussion in #1). Also, to compensate having only
+  1 charge initially and to make the upgrade feel less strong with respect to
+  other spirits, the “dazing attack” effect is now active since the
+  non-upgraded spirit.
+* Wind Fox's “pushing gale” now dissipates clouds, providing the first cloud
+  dissipating source which, due to “recoil”, can be quite useful for Wind Fox
+  players. Also, as a special interaction, “pushing gale” propagates fire
+  clouds on foliage tiles instead of dissipating them. Also, as discussed in
+  issue #1 about Wind Fox balance, make “pushing gale” always do 1 damage
+  (instead of 1-2 damage). And make “recoil” produce some wind noise in melee
+  and generally only happen within a 4-tile range.
+* Wind Fox's “recoil” is now active even with the non-upgraded Wind Fox
+  (pushing is active on the non-upgraded Rampaging Boar, so having recoil only
+  on upgraded Wind Fox seemed a bit strange).
+* Four-Headed Hydra's attack bonus for four-directional attacks has been
   increased by one: that means fighting 2, 3 or 4 foes gives a +2, +3, or +4
   attack bonus now. Fighting a single foe remains the same as before, without
   bonus. The bonus was a bit small before, as fighting 2 monsters is the most
@@ -164,40 +161,43 @@ Reworked and improved content:
   same as a Hydra fighting two of them in the open, but with an initial charge
   bonus, and Hydra became weaker again if one of the foes died before the
   other.
-* Players with the Rampaging Boar spirit don't move into poison or fire clouds
-  after pushing anymore. While sometimes funny, it had similar issues as
-  swapping into unexpected clouds. Monster boars and dragons still move into
-  dangerous clouds after pushing, because they're enraged and corrupted, so not
-  as smart!
-* The Rampaging Boar's “dig” ability now also guarantees pushing will happen,
+* Rampaging Boar players don't move into poison or fire clouds after pushing
+  anymore. While sometimes funny, it had similar issues as swapping into
+  unexpected clouds. Monster boars and dragons still move into dangerous clouds
+  after pushing, because they're enraged and corrupted, so not as smart!
+* Rampaging Boar's “dig” ability now also guarantees pushing will happen,
   including the unbalancing effect for the upgraded spirit. Also, the +1 Attack
   base bonus and “unbalancing” upgrade bonus have been swapped to provide the
   more qualitative attack effect first (like for other spirits).
-* The Jumping Frog spirit now has one extra jump charge initially (so 3
-  initially and then still 4 when upgraded), but the jump's daze duration on
-  monsters is decreased by one from 5 to 4. The +1 Defense base bonus and
-  “unbalancing” upgrade bonus have been swapped to provide the more qualitative
-  attack effect first (like for other spirits).
-* The Temporal Cat spirit now has one less “stop time” charge, but the duration
-  is increased from 4 to 5 (see discussion in #1). Also, to compensate having
-  only 1 charge initially and to make the upgrade feel less strong with respect
-  to other spirits, the “dazing attack” effect is now active since the
-  non-upgraded spirit.
-* The Thunder Porcupine's lightning has its daze duration increased from 3 to
-  4, now on the same level as the Jumping Frog's “dazing jump”.
-* The Walking Tree's “woody legs” has been moved on the non-upgraded spirit, so
+* Jumping Frog now has one extra jump charge initially (so 3 initially and then
+  still 4 when upgraded), but the jump's daze duration on monsters is decreased
+  by one from 5 to 4. The +1 Defense base bonus and “unbalancing” upgrade bonus
+  have been swapped to provide the more qualitative attack effect first (like
+  for other spirits).
+* Venomous Viper's “poison cloud” ability now creates poison clouds *up to two
+  free tiles away* (before a monster or obstacle). This creates more varied
+  possibilities for tactical movement, while still restricting safe movements
+  in a similar but less extreme way, and providing similar defense from ranged
+  monsters.
+* Thunder Porcupine's lightning has its daze duration increased from 3 to 4,
+  now on the same level as the Jumping Frog's “dazing jump”.
+* Walking Tree's “woody legs” has been moved on the non-upgraded spirit, so
   that the non-upgraded spirit has a positive trait that makes you prefer
   lignification from early on. To compensate, the +2 Defense bonus has been
   divided into two +1 bonuses: one initially and another one for the upgrade.
-* Players with the Sprinting Gazelle now leave dust behind only on floor tiles
-  (in particular not on foliage ones). Also, Sprint's duration has been
-  adjusted down from 7 to 6.
+* Walking Tree's “fire vulnerability” and Lignification increase Fire duration
+  by 2 instead of 3.
+* Sprinting Gazelle now leaves dust behind only on floor tiles (in particular
+  not on foliage ones). Also, Sprint's duration has been adjusted down from 7
+  to 6.
+* Using Sprinting Gazelle's “sprint” or Jumping Frog's “jump” abilities while
+  imbalanced may now sometimes lead to a dazing fall.
 * The “sprint” and “focus” abilities now cancel each other. It's never really
   useful nor thematic to have both at the same time, so hydra players have now
   an instant sprint cancellation option (at the cost of a spirit charge).
-* While sprinting, the frog's “jump” ability now unbalances foes without
-  hurting them, but still dazes them, effectively combining the effects of the
-  two kinds of jumps in a sensible way.
+* While sprinting, the Jumping Frog's “jump” ability now unbalances foes
+  without hurting them, but still dazes them, effectively combining the effects
+  of the two kinds of jumps in a sensible way.
 * HP of earth dragons has been decreased from 6 to 5, but along with vipers,
   nadres and hydras, they now have “scales” that provide extra +1 defense
   against ranged attacks.
