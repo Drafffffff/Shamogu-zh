@@ -135,25 +135,23 @@ func (t Traits) All(of Traits) bool {
 const (
 	Player Traits = 1 << iota
 
-	PatternCatch          // frog tongue-lash (player only)
-	PatternCatchUnbalance // frog tongue-lash (unbalancing)
-	PatternFourDirs       // four-headed hydra-like attack in 4 dirs
-	PatternRampage        // rampaging (player only)
-	PatternRanged         // ranged attack
-	PatternRangedRecoil   // ranged attack with recoil (wind fox)
-	PatternSwap           // temporal cat swapping-attack
-	PatternSwapDaze       // temporal cat dazing swapping-attack
+	PatternCatch        // frog tongue-lash unbalancing and catching attack
+	PatternFourDirs     // four-headed hydra-like attack in 4 dirs
+	PatternRampage      // rampaging (player only)
+	PatternRanged       // ranged attack
+	PatternRangedRecoil // ranged attack with recoil (wind fox)
+	PatternSwap         // crazy druid's swapping-attack
+	PatternSwapDaze     // temporal cat dazing swapping-attack
 
-	BadHearing       // worse hearing of noise (footsteps)
-	BurningHits      // hits may burn
-	DazingSpines     // body covered in dazing spines (porcupine)
-	GoodHearing      // better hearing of noise (footsteps)
-	GoodSmell        // smell food from a distance
-	Pushing          // pushing without unbalancing
-	PushingUnbalance // unbalancing pushing (like boar and earth-dragon)
-	TrailingCloud    // leave dust behind after moving (on floor tiles)
-	VenomousMelee    // (non-ranged) attacks may poison foes
-	WoodyLegs        // can move while lignified
+	BadHearing    // worse hearing of noise (footsteps)
+	BurningHits   // hits may burn
+	DazingSpines  // body covered in dazing spines (porcupine)
+	GoodHearing   // better hearing of noise (footsteps)
+	GoodSmell     // smell food from a distance
+	Pushing       // unbalancing pushing (like boar and earth-dragon)
+	TrailingCloud // leave dust behind after moving (on floor tiles)
+	VenomousMelee // (non-ranged) attacks may poison foes
+	WoodyLegs     // can move while lignified
 
 	VulnerabilityFire // increases duration of fire status
 
@@ -207,16 +205,14 @@ const (
 func (t Traits) String() string {
 	desc := []string{}
 	desc = traitDesc(desc, t, PatternFourDirs, "four-directional attack with attack bonus per extra foe")
-	desc = traitDesc(desc, t, PatternCatch, "ranged catching attack")
-	desc = traitDesc(desc, t, PatternCatchUnbalance, "ranged catching attack that may @Ounbalance@N foes")
+	desc = traitDesc(desc, t, PatternCatch, "ranged catching attack that may @Ounbalance@N foes")
 	desc = traitDesc(desc, t, PatternRampage, "rampaging charge")
 	desc = traitDesc(desc, t, PatternRanged, "ranged attack")
 	desc = traitDesc(desc, t, PatternRangedRecoil, "ranged attack with recoil")
 	desc = traitDesc(desc, t, PatternSwap, "ranged space-distorting silent attack")
 	desc = traitDesc(desc, t, PatternSwapDaze, "ranged space-distorting silent attack that may @Odaze@N foes")
 
-	desc = traitDesc(desc, t, Pushing, "hits may push foes")
-	desc = traitDesc(desc, t, PushingUnbalance, "hits may push and @Ounbalance@N foes")
+	desc = traitDesc(desc, t, Pushing, "hits may push and @Ounbalance@N foes")
 	desc = traitDesc(desc, t, BurningHits, "hits may @Oburn@N foes")
 	desc = traitDesc(desc, t, VenomousMelee, "@Ovenomous@N melee attack")
 	desc = traitDesc(desc, t, DazingSpines, "spines may @Odaze@N foes in melee")

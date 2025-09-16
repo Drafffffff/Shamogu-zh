@@ -34,7 +34,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 		}
 		switch {
 		case pa.DoesAny(PatternRanged|PatternRangedRecoil) ||
-			pa.DoesAny(PatternCatch|PatternCatchUnbalance) && !aj.ResistsMove():
+			pa.DoesAny(PatternCatch) && !aj.ResistsMove():
 			g.Dir = dir
 			g.md.RangedAttackAnimation(pa, pl.P, ej.P)
 			g.BumpAttackActor(PlayerID, j, pa, aj, AttackRanged, 0)

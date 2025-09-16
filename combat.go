@@ -307,13 +307,13 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int)
 	}
 	// Extra effects by attack pattern.
 	switch {
-	case ai.DoesAny(Pushing|PushingUnbalance) && ai.CanMove() &&
+	case ai.DoesAny(Pushing) && ai.CanMove() &&
 		(ap == AttackCharge || !ai.Has(StatusPoison)) &&
 		!aj.ResistsMove() && (ai.Has(StatusDig) || g.IntN(5-dmg) < 2):
 		g.push(i, j, ai, aj, dmg, ap, bonus)
 	case ai.DoesAny(PatternSwap|PatternSwapDaze) && ap != AttackCharge && ai.CanMove() && !aj.ResistsMove():
 		g.swapSpaceDistortion(i, j, ai, aj, dmg, dazed)
-	case ai.DoesAny(PatternCatch|PatternCatchUnbalance) && ap == AttackRanged && !aj.ResistsMove():
+	case ai.DoesAny(PatternCatch) && ap == AttackRanged && !aj.ResistsMove():
 		g.catch(i, j, ai, aj, dmg)
 	case ai.DoesAny(PatternRangedRecoil) && ap != AttackCharge && ai.CanMove() && g.IntN(5-dmg) < 2:
 		if g.recoil(i, j, ai) && i != PlayerID &&
@@ -423,7 +423,7 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 		// Rampage has an attack bonus when charging, except against
 		// walking trees and lignified oponents.
 		bonus++
-	case ap == AttackRanged && ai.DoesAny(PatternCatch|PatternCatchUnbalance):
+	case ap == AttackRanged && ai.DoesAny(PatternCatch):
 		// Catching ranged attacks get an attack bonus.
 		bonus++
 	}
@@ -548,7 +548,7 @@ func (g *Game) push(i, j ID, ai, aj *Actor, dmg int, ap AttackKind, bonus int) {
 	pi, pj := ei.P, ej.P
 	delta := pj.Sub(pi)
 	npj := pj.Add(delta)
-	if ai.DoesAny(PushingUnbalance) {
+	if ai.DoesAny(Pushing) {
 		if g.PutStatus(j, aj, StatusImbalance, 2+dmg/3) && i != PlayerID &&
 			ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusImbalance, dmg) && g.InFOV(ei.P) {
 			g.Logf("The confused %s lost balance while pushing too!", ei.Name)
@@ -602,7 +602,7 @@ func (g *Game) catch(i, j ID, ai, aj *Actor, dmg int) {
 	from := ej.P
 	g.BumpMoveActor(j, aj, to)
 	g.md.MoveAnimation(from, to)
-	if ai.DoesAny(PatternCatchUnbalance) && g.IntN(8-dmg) < 5 {
+	if ai.DoesAny(PatternCatch) && g.IntN(8-dmg) < 5 {
 		if g.PutStatus(j, aj, StatusImbalance, 1+dmg) && i != PlayerID &&
 			ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusImbalance, 1+dmg) {
 			g.Logf("The confused %s lost balance too!", ei.Name)

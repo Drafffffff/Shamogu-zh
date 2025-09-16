@@ -170,7 +170,7 @@ func (g *Game) monsterBumpTo(i ID, ai *Actor, to gruid.Point) {
 		pa := g.PlayerActor()
 		switch {
 		case ai.DoesAny(PatternRanged|PatternRangedRecoil) ||
-			ai.DoesAny(PatternCatch|PatternCatchUnbalance) && !pa.ResistsMove():
+			ai.DoesAny(PatternCatch) && !pa.ResistsMove():
 			g.md.RangedAttackAnimation(ai, ei.P, pl.P)
 			g.BumpAttackActor(i, PlayerID, ai, pa, AttackRanged, 0)
 			return
