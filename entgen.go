@@ -427,7 +427,7 @@ var MonsData = []monsterInfo{
 	ConfusingEye:     {"confusing eye", 'e', 2, 0, 2, PatternRanged | MonsConfusion | MonsImmunityConfusion | MonsLightFootsteps},
 	CrazyDruid:       {"crazy druid", 'C', 3, 1, 4, PatternSwap | BurningHits | MonsBerserking | MonsNotable},
 	EarthDragon:      {"earth dragon", 'D', 4, 2, 5, PushingUnbalance | MonsDig | MonsImmunityFear | MonsScales | MonsHeavyFootsteps | MonsNotable},
-	ExplodingNadre:   {"exploding nadre", 'n', 2, 2, 1, MonsExplodingDeath | MonsScales},
+	ExplodingNadre:   {"exploding nadre", 'n', 2, 3, 1, MonsExplodingDeath | MonsScales},
 	FearsomeLich:     {"fearsome lich", 'L', 2, 2, 5, PatternRanged | MonsFear | MonsIgnoreDefense | MonsImmunityPoison | MonsNotable},
 	FireLlama:        {"fire llama", 'l', 2, 0, 4, PatternRanged | MonsSpitFire},
 	FourHeadedHydra:  {"four-headed hydra", 'H', 2, 0, 6, PatternFourDirs | MonsScales | MonsFourHeaded | MonsHeavyFootsteps | MonsNotable},

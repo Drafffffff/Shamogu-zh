@@ -399,7 +399,7 @@ func (g *Game) computeDamage(a, d int) int {
 	// frog with the most defensive spirits), but we add some extra values
 	// in case those limits go up.
 	probA := [...]int{0, 37, 45, 52, 58, 64, 70, 76, 81, 86, 91, 96, 100}
-	probD := [...]int{0, 24, 36, 47, 56, 63, 70, 76, 81, 86, 91, 96, 100}
+	probD := [...]int{0, 28, 40, 51, 61, 70, 78, 85, 91, 96, 100}
 	// Attack-based damage dealing rolls.
 	for range 3 {
 		if g.IntN(100) < probA[a] {
@@ -407,7 +407,7 @@ func (g *Game) computeDamage(a, d int) int {
 		}
 	}
 	// Defense-based damage absorption rolls.
-	for range 2 {
+	for range min(2, dmg) {
 		if g.IntN(100) < probD[d] {
 			dmg--
 		}
