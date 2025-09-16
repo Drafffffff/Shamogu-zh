@@ -97,7 +97,7 @@ func (g *Game) AdjustHPWithMin(i ID, ai *Actor, amount int, m int) {
 		return
 	}
 	ohp := ai.HP
-	ai.HP = max(m, min(ai.HP+amount, ai.GetMaxHP()))
+	ai.HP = min(max(m, ai.HP+amount), ai.GetMaxHP())
 	if ai.IsPlayer() {
 		if ai.HP > ohp {
 			g.Logf("You feel better (+%d HP).", ai.HP-ohp)
