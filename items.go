@@ -95,6 +95,7 @@ func (sp *Spirit) UpgradeDesc() string {
 	}
 	sb.WriteString("@MThe spirit essence can be used to upgrade this spirit.@N\n")
 	if len(bonuses) > 0 {
+		sb.WriteString("Gives ")
 		for i, bonus := range bonuses {
 			sb.WriteString(bonus)
 			if i < len(bonuses)-1 {
