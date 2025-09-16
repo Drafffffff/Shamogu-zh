@@ -377,7 +377,7 @@ var statusDesc = []string{
 	StatusClarity:   "Protects from @OConfusion@N, @ODaze@N, and @BBerserk@N. Makes you sense nearby monsters (2× view range).",
 	StatusConfusion: "Using spirit abilities will hurt you for 1 damage. Doubles duration of new @OImbalance@N, @ODaze@N and @OFear@N effects.",
 	StatusDaze:      "Forbids all actions except waiting or eating until you’re hurt or it expires.",
-	StatusDig:       "Allows walking into walls. Gives +1 effective damage when charging and guarantees pushing.",
+	StatusDig:       "Allows walking into walls. Gives +1 effective damage when charging and guarantees pushing hits.",
 	StatusFear:      "Forbids attacking and walking toward foes.",
 	StatusFire:      fmt.Sprintf("Remaining in place or moving into a cloud of fire will burn you for %d damage. When first catching @OFire@N, you also get burned once immediately.", FireDamage),
 	StatusFocus:     "Attack frontally with all four heads.",

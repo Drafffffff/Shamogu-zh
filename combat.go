@@ -451,8 +451,9 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 		// Lignification caps attack damage at 1.
 		dmg = min(1, dmg)
 	}
-	if ap == AttackCharge && ai.Has(StatusDig) {
-		// Dig status gives extra *effective* damage on charge.
+	if ai.Has(StatusDig) && (ap == AttackCharge || dmg == 0) {
+		// Dig status gives extra *effective* damage on charge and
+		// ensures at least 1 damage.
 		dmg++
 	}
 	if ai.Has(StatusBerserk) {

@@ -50,7 +50,7 @@ const (
 	HealFirebreathPepper = 2
 	HealFoggySkinOnion   = 3
 
-	DurationDig      = 6
+	DurationDig      = 5
 	DurationFocus    = 3
 	DurationSprint   = 6
 	DurationTimeStop = 5
