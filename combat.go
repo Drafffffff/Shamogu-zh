@@ -393,7 +393,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int)
 // frog with the most defensive spirits), but we add some extra values
 // in case those limits go up.
 var probA = [12]int{0, 37, 45, 52, 59, 66, 73, 79, 85, 91, 96, 100}
-var probD = [10]int{0, 28, 40, 51, 61, 70, 78, 86, 93, 100}
+var probD = [10]int{0, 29, 41, 52, 62, 71, 79, 87, 94, 100}
 
 // computeDamage computes a damage roll with given attack and defense values.
 func (g *Game) computeDamage(a, d int) int {
