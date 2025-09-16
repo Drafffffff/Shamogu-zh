@@ -181,10 +181,6 @@ Reworked and improved content:
   monsters.
 * Thunder Porcupine's lightning has its daze duration increased from 3 to 4,
   now on the same level as the Jumping Frog's “dazing jump”.
-* Walking Tree's “woody legs” has been moved on the non-upgraded spirit, so
-  that the non-upgraded spirit has a positive trait that makes you prefer
-  lignification from early on. To compensate, the +2 Defense bonus has been
-  divided into two +1 bonuses: one initially and another one for the upgrade.
 * Walking Tree's “fire vulnerability” and Lignification increase Fire duration
   by 2 instead of 3.
 * Sprinting Gazelle now leaves dust behind only on floor tiles (in particular

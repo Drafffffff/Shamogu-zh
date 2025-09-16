@@ -131,8 +131,8 @@ var secondarySpirits = []spiritInfo{
 		Name:         "Walking Tree",
 		MaxCharges:   [2]int{2, 3},
 		Ability:      [2]Ability{EffectLignify{}, EffectLignify{}},
-		BonusDefense: [2]int{1, 2},
-		BonusTraits:  [2]Traits{VulnerabilityFire | WoodyLegs, VulnerabilityFire | WoodyLegs}},
+		BonusDefense: [2]int{2, 2},
+		BonusTraits:  [2]Traits{VulnerabilityFire, VulnerabilityFire | WoodyLegs}},
 	{
 		Name:         "Venomous Viper",
 		MaxCharges:   [2]int{2, 3},
