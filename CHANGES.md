@@ -169,30 +169,38 @@ Reworked and improved content:
   swapping into unexpected clouds. Monster boars and dragons still move into
   dangerous clouds after pushing, because they're enraged and corrupted, so not
   as smart!
-* Players with the Sprinting Gazelle now leave dust behind only on floor tiles
-  (in particular not on foliage ones). Also, Sprint's duration has been
-  adjusted down from 7 to 6.
+* The Rampaging Boar's “dig” ability now also guarantees pushing will happen,
+  including the unbalancing effect for the upgraded spirit. Also, the +1 Attack
+  base bonus and “unbalancing” upgrade bonus have been swapped to provide the
+  more qualitative attack effect first (like for other spirits).
 * The Jumping Frog spirit now has one extra jump charge initially (so 3
   initially and then still 4 when upgraded), but the jump's daze duration on
-  monsters is decreased by one from 5 to 4.
+  monsters is decreased by one from 5 to 4. The +1 Defense base bonus and
+  “unbalancing” upgrade bonus have been swapped to provide the more qualitative
+  attack effect first (like for other spirits).
 * The Temporal Cat spirit now has one less “stop time” charge, but the duration
   is increased from 4 to 5 (see discussion in #1). Also, to compensate having
   only 1 charge initially and to make the upgrade feel less strong with respect
   to other spirits, the “dazing attack” effect is now active since the
   non-upgraded spirit.
-* HP of earth dragons has been decreased from 6 to 5, but along with vipers,
-  nadres and hydras, they now have “scales” that provide extra +1 defense
-  against ranged attacks.
 * The Thunder Porcupine's lightning has its daze duration increased from 3 to
   4, now on the same level as the Jumping Frog's “dazing jump”.
+* The Walking Tree's “woody legs” has been moved on the non-upgraded spirit, so
+  that the non-upgraded spirit has a positive trait that makes you prefer
+  lignification from early on. To compensate, the +2 Defense bonus has been
+  divided into two +1 bonuses: one initially and another one for the upgrade.
+* Players with the Sprinting Gazelle now leave dust behind only on floor tiles
+  (in particular not on foliage ones). Also, Sprint's duration has been
+  adjusted down from 7 to 6.
 * The “sprint” and “focus” abilities now cancel each other. It's never really
   useful nor thematic to have both at the same time, so hydra players have now
   an instant sprint cancellation option (at the cost of a spirit charge).
 * While sprinting, the frog's “jump” ability now unbalances foes without
   hurting them, but still dazes them, effectively combining the effects of the
   two kinds of jumps in a sensible way.
-* The “dig” ability now also guarantees pushing will happen, including the
-  unbalancing effect for the upgraded spirit.
+* HP of earth dragons has been decreased from 6 to 5, but along with vipers,
+  nadres and hydras, they now have “scales” that provide extra +1 defense
+  against ranged attacks.
 * Add simple boredom clock: if you spend too much time on a single level (more
   than necessary with normal play), the dungeon core will detect your presence
   and mark you until you go through a portal.
