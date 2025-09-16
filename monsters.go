@@ -198,7 +198,7 @@ func (g *Game) monsterBumpTo(i ID, ai *Actor, to gruid.Point) {
 		delta := to.Sub(ei.P)
 		nto := to.Add(delta)
 		g.BumpMoveActor(i, ai, to)
-		if ai.DoesAny(PatternFourDirs) {
+		if ai.DoesAny(PatternFourDirsMons) {
 			g.FourDirectionalAttack(i, ai, AttackCharge)
 		} else if j, aj := g.ActorAt(nto); j == PlayerID {
 			g.BumpAttackActor(i, j, ai, aj, AttackCharge, 0)

@@ -433,7 +433,7 @@ func (eff EffectPushingGale) Name() string {
 }
 
 func (eff EffectPushingGale) Desc() string {
-	return fmt.Sprintf("Hurt foes in the four cardinal directions for 1 damage, pushing them away and leaving them @Ounbalanced@N for %d turns. Dissipates clouds.",
+	return fmt.Sprintf("Hurt foes in the four cardinal directions for 1 damage, pushing them away and @Ounbalancing@N them for %d turns. Dissipates clouds except foliage fires that propagate instead.",
 		DurationImbalanceGale)
 }
 

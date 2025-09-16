@@ -135,13 +135,14 @@ func (t Traits) All(of Traits) bool {
 const (
 	Player Traits = 1 << iota
 
-	PatternCatch        // frog tongue-lash unbalancing and catching attack
-	PatternFourDirs     // four-headed hydra-like attack in 4 dirs
-	PatternRampage      // rampaging (player only)
-	PatternRanged       // ranged attack
+	PatternCatch        // unbalancing and catching attack (frog, octopode)
+	PatternFourDirs     // four-directional attack in 4 dirs (hydra players)
+	PatternFourDirsMons // four-directional attack (four-headed hydra, undead knight)
+	PatternRampage      // rampaging (boar, phoenix)
+	PatternRanged       // ranged attack (eye, llama, lich)
 	PatternRangedRecoil // ranged attack with recoil (wind fox)
-	PatternSwap         // crazy druid's swapping-attack
-	PatternSwapDaze     // temporal cat dazing swapping-attack
+	PatternSwap         // swapping-attack (crazy druid)
+	PatternSwapDaze     // dazing swapping-attack (temporal cat)
 
 	BadHearing    // worse hearing of noise (footsteps)
 	BurningHits   // hits may burn
@@ -205,6 +206,7 @@ const (
 func (t Traits) String() string {
 	desc := []string{}
 	desc = traitDesc(desc, t, PatternFourDirs, "four-directional attack with attack bonus per extra foe")
+	desc = traitDesc(desc, t, PatternFourDirsMons, "four-directional attack")
 	desc = traitDesc(desc, t, PatternCatch, "ranged catching attack that may @Ounbalance@N foes")
 	desc = traitDesc(desc, t, PatternRampage, "rampaging charge")
 	desc = traitDesc(desc, t, PatternRanged, "ranged attack")

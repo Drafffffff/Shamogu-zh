@@ -257,8 +257,9 @@ func (g *Game) ActorInRange(from, at gruid.Point) ID {
 }
 
 // FourDirectionalAttack handles extra attacks behind and on the sides for
-// actors with PatternFourDirs trait. Those kinds of attacks can be performed
-// even while afraid as long as they're done laterally while moving.
+// actors with PatternFourDirs or PatternFourDirsMons trait. Those kinds of
+// attacks can be performed even while afraid as long as they're done laterally
+// while moving.
 func (g *Game) FourDirectionalAttack(i ID, ai *Actor, ap AttackKind) bool {
 	ei := g.Entity(i)
 	var actors []*Actor

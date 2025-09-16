@@ -1640,7 +1640,7 @@ In Shamogu, both the player and the monsters may use one of several attack patte
 
 @CPlain@N attacks are the simplest kind of attack performed by some monsters. Such monsters attack when they are adjacent to you or when they perform a @Mfrontal charge@N from an adjacent position.
 
-@CFour-directional@N attacks affect all four adjacent foes. When fighting more than one foe at once, the attack attribute is increased by the number of foes. When charging, it affects foes adjacent to the new position. That means walking laterally does not save you from the charge of an adjacent monster with four-directional attacks!
+@CFour-directional@N attacks affect all four adjacent foes. When charging, it affects foes adjacent to the new position. That means walking laterally does not save you from the charge of an adjacent monster with four-directional attacks! When fighting more than one foe at once, Four-Headed Hydra players’ attack attribute is increased by the number of foes.
 
 @CRampaging@N attacks allow to charge from as far as you can see. When charging, there is a bonus of 1 to attack, except against lignified foes that resist forced movement.
 
