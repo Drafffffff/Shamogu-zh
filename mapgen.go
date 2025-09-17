@@ -590,18 +590,24 @@ func (mg *MapGen) connectVaultPair(v1, v2 *vault, extra bool) bool {
 
 // earthquake produces extra rubble.
 func (g *Game) earthquake() {
-	mp := &MapPath{passable: g.Map.Passable}
+	n := g.Map.Terrain.Count(Wall)
+	walls := make([]gruid.Point, 0, n)
 	it := g.Map.Terrain.Iterator()
 	for it.Next() {
-		p := it.P()
-		if !g.Map.Passable(p) {
-			if len(mp.Neighbors(p)) == 0 {
-				continue
-			}
-			if g.IntN(5) == 0 {
-				it.SetCell(Rubble)
-			}
+		if it.Cell() == Wall {
+			walls = append(walls, it.P())
 		}
+	}
+	for range len(walls)/6 + g.IntN(len(walls)/15) {
+		i := g.IntN(len(walls))
+		p := walls[i]
+		for !g.Map.PassableNeighbor(p) {
+			i = g.IntN(len(walls))
+			p = walls[i]
+		}
+		walls[i], walls[len(walls)-1] = walls[len(walls)-1], walls[i]
+		walls = walls[:len(walls)-1]
+		g.Map.Terrain.Set(p, Rubble)
 	}
 }
 
