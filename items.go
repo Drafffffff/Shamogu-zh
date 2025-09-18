@@ -180,6 +180,7 @@ func (c *Comestible) Use(g *Game, i ID) bool {
 	if !done {
 		return false
 	}
+	g.Stats.Comestibles[g.Entity(i).Name]++
 	g.Entities[i] = emptySlot()
 	g.Stats.EatenComestibles++
 	g.Stats.MapEatenComestibles[g.Map.Level-1]++

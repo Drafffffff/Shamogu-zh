@@ -22,6 +22,7 @@ type Stats struct {
 	FireClouds          int            // number of spawn fire clouds
 	PoisonClouds        int            // number of spawn poison clouds
 	SpiritUses          int            // number of ability uses
+	Comestibles         map[string]int // number of eaten comestibles (per type)
 	EatenComestibles    int            // number of eaten comestibles
 	ActivatedMenhirs    int            // number of activated menhirs
 	MonsterTrapTriggers int            // number of triggered traps by the monsters
@@ -40,8 +41,9 @@ type Stats struct {
 // newStats returns newly initialized structure for statistics.
 func newStats() *Stats {
 	return &Stats{
-		Deaths:   map[string]int{},
-		Statuses: make([]int, NStatuses),
+		Deaths:      map[string]int{},
+		Comestibles: map[string]int{},
+		Statuses:    make([]int, NStatuses),
 	}
 }
 
@@ -130,6 +132,10 @@ func (g *Game) Dump() string {
 	if g.Stats.NDeaths > 0 {
 		sb.WriteString("\nMonster deaths:\n")
 		g.dumpKilledMonsters(&sb)
+	}
+	if g.Stats.EatenComestibles > 0 {
+		sb.WriteString("\nEaten comestibles:\n")
+		g.dumpEatenComestibles(&sb)
 	}
 	sb.WriteString("\nStatistics:\n")
 	g.dumpStatistics(&sb)
@@ -228,6 +234,13 @@ func (g *Game) dumpKilledMonsters(sb *strings.Builder) {
 	monsters := slices.Sorted(maps.Keys(g.Stats.Deaths))
 	for _, mons := range monsters {
 		fmt.Fprintf(sb, "- %s: %d\n", mons, g.Stats.Deaths[mons])
+	}
+}
+
+func (g *Game) dumpEatenComestibles(sb *strings.Builder) {
+	comestibles := slices.Sorted(maps.Keys(g.Stats.Comestibles))
+	for _, co := range comestibles {
+		fmt.Fprintf(sb, "- %s: %d\n", co, g.Stats.Comestibles[co])
 	}
 }
 
