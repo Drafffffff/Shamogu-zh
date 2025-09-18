@@ -183,7 +183,7 @@ func setLogOutput() *os.File {
 		log.Print(err)
 		return nil
 	}
-	logFile := filepath.Join(dataDir, "logs")
+	logFile := filepath.Join(dataDir, "logs.txt")
 	f, err := os.Create(logFile)
 	if err != nil {
 		log.Print(err)

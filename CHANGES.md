@@ -255,6 +255,9 @@ UI, graphics, QoL:
 * A few improvements in game statistic's dump: ASCII map now shows monster
   noise too, the number of last messages was increased a bit.
 * Various help improvements.
+* In native builds, rename game statistic's dump and logs files to `dump.txt`
+  and `logs.txt`, so that it's clearer that those files are text, unlike the
+  other ones.
 
 Fixes:
 
