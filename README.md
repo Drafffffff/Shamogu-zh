@@ -16,9 +16,12 @@ Website
 
 ![Shamogu introduction screen](https://anaseto.codeberg.page/games/shamogu/intro-screen-tiles.png)
 
-You can visit the [game's
-website](https://anaseto.codeberg.page/games/shamogu)
-for more information and tips about the game.
+You can visit the [project's development
+website](https://anaseto.codeberg.page/games/shamogu) for more information and
+tips about the game. The game can be played on the browser [on
+itch.io](https://anaseto.itch.io/shamogu), too. You may also want to read the
+[Shamogu: design
+ramblings](https://anaseto.codeberg.page/games/shamogu/design.html) article.
 
 Install from Sources
 --------------------
