@@ -4,6 +4,7 @@
   it's clearer that it doesn't necessarily represent their current location
   (similar change suggested on r/roguelikes by u/femto42). However, monsters
   sensed with Clarity are shown with their true color.
+* Don't leak mindstate information of previously seen out of view monsters.
 
 # v1.0.0 2025-09-18
 

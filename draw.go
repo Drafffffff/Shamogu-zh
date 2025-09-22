@@ -465,6 +465,7 @@ func (md *model) drawTargInfo() {
 		}
 		var sb strings.Builder
 		name := e.Name
+		cl := e.Color()
 		switch r := e.Role.(type) {
 		case *Actor:
 			switch {
@@ -483,11 +484,12 @@ func (md *model) drawTargInfo() {
 					st := Status(i)
 					fmt.Fprintf(&sb, " @%c%s(%d)@N ", statusColor(st, turns), st.Abbr(), turns)
 				}
+				if s := r.MindStateString(); s != "" {
+					name += fmt.Sprintf(" (%s)", s)
+				}
 			default:
+				cl = ColorForeground
 				fmt.Fprintf(&sb, "HP:?/%d A:%d D:%d", r.MaxHP, r.Attack, r.Defense)
-			}
-			if s := r.MindStateString(); s != "" {
-				name += fmt.Sprintf(" (%s)", s)
 			}
 			sb.WriteByte('\n')
 			fmt.Fprintf(&sb, "@CTraits:@N %s.", r.Traits)
@@ -506,7 +508,7 @@ func (md *model) drawTargInfo() {
 		case Item:
 			sb.WriteString(r.Desc())
 		}
-		formatBox(name, sb.String(), e.Color())
+		formatBox(name, sb.String(), cl)
 	}
 }
 
