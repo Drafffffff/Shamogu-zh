@@ -324,10 +324,11 @@ func (md *model) drawTravelPath(gd gruid.Grid) {
 func (g *Game) drawEntityAt(gd gruid.Grid, e *Entity, p gruid.Point) {
 	c := gd.At(p)
 	c.Rune = e.Rune
-	if !g.InFOV(p) && e.IsActor() {
-		c.Style.Fg = ColorOrange
-	} else {
+	if !e.IsActor() || g.InFOV(p) ||
+		g.PlayerActor().Has(StatusClarity) && clarityRange(g.PP(), p) || g.Wizard.Mode.Reveal() {
 		c.Style.Fg = e.Color()
+	} else {
+		c.Style.Fg = ColorForeground
 	}
 	gd.Set(p, c)
 }
@@ -469,7 +470,9 @@ func (md *model) drawTargInfo() {
 			switch {
 			case g.Wizard.Mode == WizardRevealTerrain:
 				continue
-			case info.sees || g.Wizard.Mode == WizardReveal:
+			case info.sees ||
+				g.PlayerActor().Has(StatusClarity) && clarityRange(g.PP(), e.P) ||
+				g.Wizard.Mode == WizardReveal:
 				fmt.Fprintf(&sb, "HP:%s A:%s D:%s",
 					r.fmtHP(),
 					fmtAD(r.GetAttack(), r.Attack), fmtAD(r.GetDefense(), r.Defense))

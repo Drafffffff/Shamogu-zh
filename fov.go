@@ -136,11 +136,17 @@ func (g *Game) senseMonsters() {
 	// Sense monsters and terrain under them.
 	for i := range g.Monsters() {
 		ei := g.Entity(i)
-		if paths.DistanceManhattan(ei.P, pp) <= 2*MaxFOVRange {
+		if clarityRange(pp, ei.P) {
 			g.SenseEntity(ei, "sense")
 			g.SensePassable(ei.P)
 		}
 	}
+}
+
+// clarityRange reports whether p and q are within Clarity's range from each
+// other.
+func clarityRange(p, q gruid.Point) bool {
+	return paths.DistanceManhattan(p, q) <= 2*MaxFOVRange
 }
 
 // ResetKnowledge initializes player's knowledge of map terrain.

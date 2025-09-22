@@ -1,3 +1,9 @@
+# v? ?
+
+* Change color of monster's out of view location memory to light grey, so that
+  it's clearer that it doesn't necessarily represent their current location.
+  However, monsters sensed with Clarity are shown with their true color.
+
 # v1.0.0 2025-09-18
 
 New content:
