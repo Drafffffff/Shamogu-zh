@@ -327,7 +327,7 @@ func (md *model) TeleportAnimation(from, to gruid.Point, showto bool) {
 		return
 	}
 	md.startAnimSeq()
-	c := md.anims.grid.At(from)
+	c := md.anims.mgrid.At(from)
 	md.anims.Draw(from, 'Φ', c.Style.Fg)
 	if showto {
 		md.anims.Draw(to, 'Φ', c.Style.Fg)
@@ -436,10 +436,10 @@ func (md *model) OrbDestructionAnimation() {
 		for p := range g.Map.Terrain.Points() {
 			switch g.rand.IntN(4) {
 			case 0:
-				md.anims.grid.Set(p, c)
+				md.anims.mgrid.Set(p, c)
 			case 1:
 				if k >= 4 {
-					md.anims.grid.Set(p, c)
+					md.anims.mgrid.Set(p, c)
 				}
 			}
 		}
