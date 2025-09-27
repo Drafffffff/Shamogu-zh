@@ -241,6 +241,11 @@ func (g *Game) monsterFlee(i ID, ai *Actor) bool {
 		// approach (false).
 		return paths.DistanceManhattan(ei.P, pl.P) == 2
 	}
+	if !ai.CanMove() {
+		// The monster wants to flee but cannot move: lose a turn doing
+		// nothing.
+		return true
+	}
 	var nbs paths.Neighbors
 	ps := nbs.Cardinal(ei.P, func(p gruid.Point) bool {
 		if j, _ := g.ActorAt(p); j >= 0 || !g.Map.Passable(p) {

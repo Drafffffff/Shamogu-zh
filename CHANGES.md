@@ -6,6 +6,7 @@
   sensed with Clarity are shown with their true color.
 * Don't leak mindstate information of previously seen out of view monsters.
 * Fix a minor regression in a couple of animations (incorrect y-axis position).
+* Fix: afraid monsters could ignore lignification when escaping (see issue #2).
 
 # v1.0.0 2025-09-18
 
