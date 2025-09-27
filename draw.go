@@ -28,7 +28,7 @@ const (
 // RenderOrder returns the rendering priority of an entity.
 func (g *Game) RenderOrder(i ID) (ro RenderOrder) {
 	e := g.Entity(i)
-	if i == PlayerID || e.IsAlive() {
+	if i == PlayerID || e.IsActor() && !e.KnownDead {
 		return ROActor
 	}
 	if e.IsItem() && i >= FirstMapID {
@@ -232,7 +232,12 @@ func (md *model) drawMapWizardReveal(gd gruid.Grid) {
 			continue
 		}
 		e := md.g.Entity(i)
-		if o == ROItem && g.CloudAt(e.P) {
+		switch {
+		case o == ROActor:
+			if e.Actor().IsDead() {
+				continue
+			}
+		case o == ROItem && g.CloudAt(e.P):
 			// Favor clouds over items, but in case of normal
 			// clouds, show the color of the item.
 			if g.Map.Clouds.At(e.P).Kind == CloudNormal {

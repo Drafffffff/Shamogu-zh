@@ -7,6 +7,8 @@
 * Don't leak mindstate information of previously seen out of view monsters.
 * Fix a minor regression in a couple of animations (incorrect y-axis position).
 * Fix: afraid monsters could ignore lignification when escaping (see issue #2).
+* Fix information leak: monster last-seen marker disappeared if it died out of
+  view (see issue #2).
 
 # v1.0.0 2025-09-18
 

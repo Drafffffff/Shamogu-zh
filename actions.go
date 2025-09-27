@@ -287,8 +287,18 @@ func (a ActionNextMonster) Handle(md *model) (gruid.Effect, bool) {
 // getMonsterTargIDs returns the ids of monsters that can be examined.
 func (g *Game) getMonsterTargIDs() []ID {
 	var me []ID
-	for i := range g.Monsters() {
-		if g.Entity(i).KnownP != InvalidPos || g.Wizard.Mode == WizardReveal {
+	for i, ei := range g.NPMapEntities() {
+		if !ei.IsActor() {
+			continue
+		}
+		var b bool // whether monster is examinable
+		switch {
+		case g.Wizard.Mode == WizardReveal:
+			b = ei.IsAlive()
+		default:
+			b = ei.KnownP != InvalidPos && !ei.KnownDead
+		}
+		if b {
 			me = append(me, i)
 		}
 	}
