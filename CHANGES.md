@@ -9,6 +9,8 @@
 * Fix: afraid monsters could ignore lignification when escaping (see issue #2).
 * Fix information leak: monster last-seen marker disappeared if it died out of
   view (see issue #2).
+* When lignifying a poisoned monster, make induced confusion not hurt you for
+  having used “lignify” if you weren't already confused (see issue #3).
 
 # v1.0.0 2025-09-18
 

@@ -124,7 +124,8 @@ func (sp *Spirit) Use(g *Game, i ID) bool {
 		g.Log("You cannot invoke a spirit while dazed.")
 		return false
 	}
-	if pa.Has(StatusConfusion) && pa.HP <= 2 {
+	confused := pa.Has(StatusConfusion)
+	if confused && pa.HP <= 2 {
 		g.Log("You cannot invoke a spirit while confused and almost dead (HP < 3).")
 		return false
 	}
@@ -138,7 +139,7 @@ func (sp *Spirit) Use(g *Game, i ID) bool {
 	g.Stats.SpiritUses++
 	g.Stats.MapSpiritUses[g.Map.Level-1]++
 	name := sp.Ability[sp.Level].Name()
-	if pa.Has(StatusConfusion) {
+	if confused {
 		g.LogfStyled("Invoking the spirit while confused hurts you (%d dmg).", logHurtPlayer, ConfusionDamage)
 		g.InflictDamage(PlayerID, pa, ConfusionDamage, AttackOther)
 		g.StoryLogf("Used the “%s” ability while confused (HP: %d/%d)",
