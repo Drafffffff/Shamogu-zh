@@ -5,7 +5,7 @@ Shamogu is a coffee-break roguelike game with a focus on tactical movement and
 careful timing of totemic spirit invocation and comestible consumption.
 Visibility and noise stealth mechanics also play an important role.
 
-*“All life in your mountain is being corrupted. Beasts are losing their mind
+*“All life in your mountain is being corrupted. Beasts are losing their minds
 and becoming aggressive. These disturbing events started to happen after a
 dungeon portal suddenly appeared at the top of the mountain. As the guardian,
 you decide to explore that dungeon in order to find and destroy the source of

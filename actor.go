@@ -354,7 +354,7 @@ var statusAdjective = []string{
 	StatusDaze:          "dazed",
 	StatusDig:           "digging",
 	StatusFear:          "afraid",
-	StatusFire:          "on flame",
+	StatusFire:          "on fire",
 	StatusFocus:         "focusing",
 	StatusFoggySkin:     "foggy",
 	StatusImbalance:     "imbalanced",

@@ -526,7 +526,7 @@ func (md *model) drawSpiritSelection() {
 	md.desc.Draw(gdslice.Slice(gdslice.Range().Columns(UIWidth/2, UIWidth)))
 	ui.Textf("Shamanic Mountain Guardian - Shamogu %s", Version).WithStyle(gruid.Style{}.WithFg(ColorMagenta)).
 		Draw(md.gd.Slice(gruid.NewRange(-25+UIWidth/2, 3, UIWidth, UIHeight)))
-	ui.Text(`All life in your mountain is being corrupted. Beasts are losing their mind and ` +
+	ui.Text(`All life in your mountain is being corrupted. Beasts are losing their minds and ` +
 		`becoming aggressive. These disturbing events started to happen after a dungeon portal suddenly ` +
 		`appeared at the top of the mountain. As the guardian, you decide to explore ` +
 		`that dungeon in order to find and destroy the source of corruption… ` +
