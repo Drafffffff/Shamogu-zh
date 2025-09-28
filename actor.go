@@ -447,7 +447,7 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 			// resistance, we skip extra damage at onset.
 			break
 		}
-		g.InflictFireDamage(i, ai)
+		g.InflictDamage(i, ai, FireDamage, AttackCatchFire)
 		if ai.IsDead() {
 			return false
 		}
@@ -662,7 +662,7 @@ func (g *Game) HandleActorTurn(i ID, ai *Actor) {
 		g.HandleMonsterTurn(i, ai)
 	}
 	if ai.Has(StatusFire) && (ei.P == ai.FirePos || ai.FirePos != InvalidPos && g.FireAt(ei.P)) {
-		g.InflictFireDamage(i, ai)
+		g.InflictDamage(i, ai, FireDamage, AttackFire)
 	}
 	if ai.IsDead() {
 		// The actor died due to fire or poison (the latter only for a

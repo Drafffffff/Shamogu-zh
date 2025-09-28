@@ -18,6 +18,7 @@ const (
 	AttackGale      // pushing gale damage
 	AttackLightning // lightning damage
 	AttackFire      // fire damage
+	AttackCatchFire // catching fire damage
 	AttackPoison    // poison damage
 	AttackOther     // other damage sources (not logged by InflictDamage)
 )
@@ -116,6 +117,15 @@ func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKi
 		}
 		if aj.IsDead() {
 			g.LogfStyled("The fire kills the %s.", logHurtMons, ej.Name)
+		}
+	case ap == AttackCatchFire:
+		if j == PlayerID {
+			g.LogfStyled("Catching fire burns you (%d dmg).", logHurtPlayer, FireDamage)
+			g.StoryLogf("Caught fire (HP: %d/%d)", aj.HP, aj.GetMaxHP())
+			break
+		}
+		if aj.IsDead() {
+			g.LogfStyled("Catching fire kills the %s.", logHurtMons, ej.Name)
 		}
 	case ap == AttackPoison:
 		if j == PlayerID {

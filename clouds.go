@@ -291,8 +291,3 @@ func (g *Game) FireAt(p gruid.Point) bool {
 func (g *Game) CloudAt(p gruid.Point) bool {
 	return g.Map.Clouds.At(p).Kind != NoCloud
 }
-
-// InflictFireDamage inflicts fire damage to an actor.
-func (g *Game) InflictFireDamage(i ID, ai *Actor) {
-	g.InflictDamage(i, ai, FireDamage, AttackFire)
-}
