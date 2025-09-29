@@ -566,20 +566,19 @@ func (g *Game) push(i, j ID, ai, aj *Actor, dmg int, ap AttackKind, bonus int) {
 			g.Logf("The confused %s lost balance while pushing too!", ei.Name)
 		}
 	}
-	if k, ak := g.ActorAt(npj); ak != nil {
+	k, ak := g.ActorAt(npj)
+	if ak != nil {
 		// There's another actor behind: extra piercing attack (without
 		// extra effects, but inheriting any charge attack bonuses).
 		g.AttackDamage(i, k, ai, ak, ap, bonus)
-		return
 	}
-	// No actor behind: try pushing.
-	if !g.Map.Passable(npj) {
-		if aj.IsDead() {
-			g.BumpMoveActor(i, ai, pj)
-		}
-		return
-	}
-	if aj.IsAlive() {
+	move := true // whether to move pushing actor to pj
+	switch {
+	case !g.Map.Passable(npj) || ak != nil && ak.IsAlive():
+		// No room for pushing, so move only if the foe is dead.
+		move = aj.IsDead()
+	case aj.IsAlive():
+		// Push.
 		if j != PlayerID && (i == PlayerID || g.InFOV(pj)) {
 			g.Logf("The %v is pushed away.", ej.Name)
 		} else {
@@ -592,10 +591,13 @@ func (g *Game) push(i, j ID, ai, aj *Actor, dmg int, ap AttackKind, bonus int) {
 	if i == PlayerID {
 		switch g.Map.Clouds.At(pj).Kind {
 		case CloudFire, CloudPoison:
-			// Player is smarter than corrupted monsters: we push
-			// but don't move when foe is on a dangerous cloud.
-			return
+			// Player is smarter than corrupted monsters: we don't
+			// move when foe is on a dangerous cloud.
+			move = false
 		}
+	}
+	if !move || ai.IsDead() {
+		return
 	}
 	if ap == AttackCharge {
 		// Already bump-moved, so extra movement effects were processed

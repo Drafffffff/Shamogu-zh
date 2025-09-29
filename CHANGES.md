@@ -5,6 +5,9 @@
   (similar change suggested on r/roguelikes by u/femto42). However, monsters
   sensed with Clarity are shown with their true color.
 * Don't leak mindstate information of previously seen out of view monsters.
+* Improve pushing behavior in edge-cases when attacking a monster that has a
+  monster behind: pushing can now happen if the monster behind dies, and if the
+  monster in front dies, you can at least move to its position.
 * Fix a minor regression in a couple of animations (incorrect y-axis position).
 * Fix: afraid monsters could ignore lignification when escaping (see issue #2).
 * Fix information leak: monster last-seen marker disappeared if it died out of
