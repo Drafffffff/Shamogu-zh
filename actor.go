@@ -447,7 +447,7 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 			// resistance, we skip extra damage at onset.
 			break
 		}
-		g.InflictDamage(i, ai, FireDamage, AttackCatchFire)
+		g.InflictDamage(i, ai, FireDamage, AttackFireCatch)
 		if ai.IsDead() {
 			return false
 		}
