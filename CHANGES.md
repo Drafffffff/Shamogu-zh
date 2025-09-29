@@ -11,6 +11,8 @@
   view (see issue #2).
 * When lignifying a poisoned monster, make induced confusion not hurt you for
   having used “lignify” if you weren't already confused (see issue #3).
+* Catching a poisoned monster from afar no longer inflicts extra poison damage
+  on it (as it's forced movement, like for pushing).
 
 # v1.0.0 2025-09-18
 

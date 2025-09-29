@@ -612,7 +612,7 @@ func (g *Game) catch(i, j ID, ai, aj *Actor, dmg int) {
 	dir := toDir(ej.P.Sub(ei.P))
 	to := ei.P.Add(dir)
 	from := ej.P
-	g.BumpMoveActor(j, aj, to)
+	g.MoveActor(j, aj, to)
 	g.md.MoveAnimation(from, to)
 	if ai.DoesAny(PatternCatch) && g.IntN(8-dmg) < 5 {
 		if g.PutStatus(j, aj, StatusImbalance, 3+dmg/3) && i != PlayerID &&
