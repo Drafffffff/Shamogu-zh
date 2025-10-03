@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cmp"
 	"slices"
 
 	"codeberg.org/anaseto/gruid"
@@ -46,9 +47,21 @@ func (g *Game) GenEntities(mg *MapGen) {
 // genPlayerOnNewLevel places the player in the map with replenished charges and HP.
 func (g *Game) genPlayerOnNewLevel(mg *MapGen) {
 	p := g.PlayerEntity()
-	var pi int // player's vault
-	pi, p.P = mg.RandomVaultsPlace(mg.vaults[:len(mg.vaults)/3], PlaceWaypoint)
-	mg.npvaults = slices.Delete(slices.Clone(mg.vaults), pi, pi+1)
+	// Sort vaults by distance to center.
+	center := gruid.Point{MapWidth / 2, MapHeight / 2}
+	slices.SortFunc(mg.vaults, func(vi, vj *vault) int {
+		pi := vi.p.Add(gruid.Point{vi.w / 2, vi.h / 2})
+		pj := vj.p.Add(gruid.Point{vj.w / 2, vj.h / 2})
+		return cmp.Compare(paths.DistanceManhattan(center, pi), paths.DistanceManhattan(center, pj))
+	})
+	// Chose player's vault.
+	var pvi int // player's vault index
+	pvi, p.P = mg.RandomVaultsPlaceWithFunc(mg.vaults, PlaceWaypoint, g.IntNBiasedDown)
+	pv := mg.vaults[pvi]
+	// Sort vaults by distance to the chosen player's vault.
+	slices.SortFunc(mg.vaults, func(vi, vj *vault) int {
+		return cmp.Compare(vaultDistance(pv, vi), vaultDistance(pv, vj))
+	})
 	if p.P == InvalidPos {
 		panic("invalid player position")
 	}
@@ -231,25 +244,26 @@ func menhirEntity(ci itemInfo) *Entity {
 func (g *Game) genItems(mg *MapGen) {
 	// Portal.
 	portalIdxs := []int{}
+	npvaults := mg.vaults[1:] // non-player vaults
 	if g.Map.Level < MapLevels {
 		var i int
 		portal := &Entity{Name: "magic portal", Rune: '>', Role: &Portal{}}
-		i, portal.P = mg.RandomVaultsPlace(mg.vaults[len(mg.vaults)/2:], PlaceStatic)
-		portalIdxs = append(portalIdxs, i)
+		i, portal.P = mg.RandomVaultsPlaceWithFunc(npvaults[len(npvaults)/3:], PlaceStatic, g.IntNBiasedUp)
+		portalIdxs = append(portalIdxs, i+1)
 		g.Map.Portal = portal.P
 		g.AddEntity(portal)
 		if g.ProcInfo.FakePortal[g.Map.Level-1] {
 			portal := &Entity{Name: "magic portal", Rune: '>', Role: &Portal{Fake: true}}
-			i, portal.P = mg.RandomVaultsPlace(mg.vaults[len(mg.vaults)/2:], PlaceStatic)
-			portalIdxs = append(portalIdxs, i)
+			i, portal.P = mg.RandomVaultsPlaceWithFunc(npvaults[len(npvaults)/3:], PlaceStatic, g.IntNBiasedUp)
+			portalIdxs = append(portalIdxs, i+1)
 			g.AddEntity(portal)
 		}
 	} else {
 		var i int
 		orb := &Entity{Name: "Orb of Corruption", Rune: '☼', Role: &CorruptionOrb{}}
-		i, orb.P = mg.RandomVaultsPlace(mg.vaults[(2*len(mg.vaults))/3:], PlaceStatic)
+		i, orb.P = mg.RandomVaultsPlaceWithFunc(npvaults[len(npvaults)/2:], PlaceStatic, g.IntNBiasedUp)
 		g.Map.Orb = orb.P
-		portalIdxs = append(portalIdxs, i)
+		portalIdxs = append(portalIdxs, i+1)
 		g.AddEntity(orb)
 	}
 	// Menhirs.
@@ -283,11 +297,11 @@ func (g *Game) genItems(mg *MapGen) {
 		spr := sp.Role.(*Spirit)
 		spr.Charges = spr.MaxCharges[spr.Level]
 		sp.Rune = '!'
-		_, sp.P = mg.RandomVaultsPlace(mg.npvaults, PlaceItem)
+		_, sp.P = mg.RandomVaultsPlace(npvaults, PlaceItem)
 		g.Map.Totem = sp.P
 		g.AddEntity(sp)
 	} else if g.Map.Level < MapLevels {
-		_, p := mg.RandomVaultsPlace(mg.npvaults, PlaceItem)
+		_, p := mg.RandomVaultsPlace(npvaults, PlaceItem)
 		g.Map.Totem = p
 		g.genEmptyTotemAt(p)
 	}
@@ -512,7 +526,7 @@ func (g *Game) genMonsters(mg *MapGen) {
 		if g.IntN(4) == 0 {
 			// Occasionally make golems guard a random non-player
 			// vault.
-			_, p = mg.RandomVaultsPlace(mg.npvaults, PlaceWaypoint)
+			_, p = mg.RandomVaultsPlace(mg.vaults[1:], PlaceWaypoint)
 		}
 		g.genMonsterGuardian(BlazingGolem, p)
 		g.genMonsterGuardian(BlazingGolem, p)

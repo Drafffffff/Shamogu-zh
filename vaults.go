@@ -201,6 +201,12 @@ func (mg *MapGen) RandomPlace(kind placeKind) gruid.Point {
 // RandomVaultsPlace returns a random free place of the given kind among given
 // vaults.
 func (mg *MapGen) RandomVaultsPlace(vs []*vault, kind placeKind) (int, gruid.Point) {
+	return mg.RandomVaultsPlaceWithFunc(vs, kind, mg.rand.IntN)
+}
+
+// RandomVaultsPlaceWithFunc returns a random free place of the given kind
+// among given vaults using the given custom IntN-like rand function.
+func (mg *MapGen) RandomVaultsPlaceWithFunc(vs []*vault, kind placeKind, rf func(n int) int) (int, gruid.Point) {
 	// We assume len(vs) > 0 and that there are remaining free places of
 	// that kind.
 	const maxIterations = 10000
@@ -210,7 +216,7 @@ func (mg *MapGen) RandomVaultsPlace(vs []*vault, kind placeKind) (int, gruid.Poi
 		if count > maxIterations {
 			panic("infinite loop")
 		}
-		i := mg.rand.IntN(len(vs))
+		i := rf(len(vs))
 		p := mg.RandomVaultPlace(vs[i], kind)
 		if p != InvalidPos {
 			return i, p

@@ -137,3 +137,15 @@ func (g *Game) IntN(n int) int {
 	}
 	return g.rand.IntN(n)
 }
+
+// IntNBiaseDown is a rand.IntN-like wrapper biased toward lower values.
+func (g *Game) IntNBiasedDown(n int) int {
+	m, n := g.IntN(n), g.IntN(n)
+	return min(m, n)
+}
+
+// IntNBiaseUp is a rand.IntN-like wrapper biased toward high values.
+func (g *Game) IntNBiasedUp(n int) int {
+	m, n := g.IntN(n), g.IntN(n)
+	return max(m, n)
+}

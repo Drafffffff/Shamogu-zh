@@ -8,6 +8,11 @@
 * Improve pushing behavior in edge-cases when attacking a monster that has a
   monster behind: pushing can now happen if the monster behind dies, and if the
   monster in front dies, you can at least move to its position.
+* Improve portal placement so that it's less predictable: vaults are now more
+  likely to contain a portal when they're far from the player's starting
+  position, but the minimum distance is now lower. In particular, it's now not
+  always as clear whether the portal will be on the left or on the right, and
+  if there are two, they may appear on opposite sides.
 * Fix a minor regression in a couple of animations (incorrect y-axis position).
 * Fix: afraid monsters could ignore lignification when escaping (see issue #2).
 * Fix information leak: monster last-seen marker disappeared if it died out of

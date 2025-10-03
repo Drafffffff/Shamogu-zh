@@ -29,14 +29,13 @@ const NLayouts = 3
 
 // MapGen gathers all terrain and vault information for generating a new map.
 type MapGen struct {
-	terrain  rl.Grid         // map terrain
-	vaults   []*vault        // list of special vaults
-	tunnel   CacheGrid[bool] // in tunnel
-	xtunnel  []gruid.Point   // points belonging to extra tunnels
-	vault    CacheGrid[bool] // in vault
-	npvaults []*vault        // non-player vaults
-	PR       *paths.PathRange
-	rand     *rand.Rand
+	terrain rl.Grid         // map terrain
+	vaults  []*vault        // list of special vaults
+	tunnel  CacheGrid[bool] // in tunnel
+	xtunnel []gruid.Point   // points belonging to extra tunnels
+	vault   CacheGrid[bool] // in vault
+	PR      *paths.PathRange
+	rand    *rand.Rand
 }
 
 // GenerateMap produces a new map level using the given map layout as base
@@ -529,13 +528,6 @@ func (mg *MapGen) connectAllVaults() {
 			count++
 			mg.connectVaultPair(vi, mg.nearVault(vi), true)
 		}
-	}
-	// Sort rooms by X position.
-	slices.SortFunc(mg.vaults, func(vi, vj *vault) int {
-		return cmp.Compare(vi.p.X, vj.p.X)
-	})
-	if mg.rand.IntN(2) == 0 {
-		slices.Reverse(mg.vaults)
 	}
 }
 
