@@ -15,6 +15,7 @@
   if there are two, they may appear on opposite sides.
 * Lignification now unbalances adjacent actors on expiration, too, due to
   short-range ground vibrations induced by the withering roots.
+* The lich is now immune to Confusion, and the undead knight is immune to Daze.
 * Fix a minor regression in a couple of animations (incorrect y-axis position).
 * Fix: afraid monsters could ignore lignification when escaping (see issue #2).
 * Fix information leak: monster last-seen marker disappeared if it died out of
