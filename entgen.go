@@ -56,8 +56,7 @@ func (g *Game) genPlayerOnNewLevel(mg *MapGen) {
 	})
 	// Chose player's vault.
 	var pvi int // player's vault index
-	pvi, p.P = mg.RandomVaultsPlace(mg.vaults[1:], PlaceWaypoint)
-	pvi++
+	pvi, p.P = mg.RandomVaultsPlace(mg.vaults, PlaceWaypoint)
 	pv := mg.vaults[pvi]
 	// Sort vaults by distance to the chosen player's vault.
 	slices.SortFunc(mg.vaults, func(vi, vj *vault) int {
