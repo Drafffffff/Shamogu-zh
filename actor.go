@@ -382,7 +382,7 @@ var statusDesc = []string{
 	StatusFoggySkin: "Exudes fog on the sides and behind. Protects from @OFire@N and @BLignification@N.",
 	StatusImbalance: fmt.Sprintf("Halves attack. When also confused, gives %+d Defense.", ConfusedImbalanceDefenseBonus),
 	StatusLignification: fmt.Sprintf(
-		"Gives %+d Defense with an extra +1 against ranged attacks. Caps incoming attack damage at 1. Provides temporary HP bonus. Protects from @OPoison@N and @OImbalance@N. Prevents movement. Increases @OFire@N duration by 2. Followed by @OImbalance@N on expiration for %d turns.",
+		"Gives %+d Defense with an extra +1 against ranged attacks. Caps incoming attack damage at 1. Provides temporary HP bonus. Protects from @OPoison@N and @OImbalance@N. Prevents movement. Increases @OFire@N duration by 2. Followed by @OImbalance@N for you and any adjacent actors on expiration for %d turns.",
 		LignificationDefenseBonus, DurationImbalanceLignification),
 	StatusPoison: fmt.Sprintf("Walking will hurt you for %d damage. Stinky toxins are exuded on expiration, confusing other creatures for %d turns.",
 		PoisonDamage, DurationConfusionToxins),
@@ -601,6 +601,12 @@ func (g *Game) RemoveStatus(i ID, ai *Actor, st Status) {
 		g.AdjustHPWithMin(i, ai, -ai.HPBonus(), 3)
 		if !ai.DoesAny(WoodyLegs) {
 			g.PutStatus(i, ai, StatusImbalance, DurationImbalanceLignification)
+		}
+		p := g.Entity(i).P
+		for j, aj := range g.AdjacentActors(p) {
+			if !ai.DoesAny(WoodyLegs) {
+				g.PutStatus(j, aj, StatusImbalance, DurationImbalanceLignification)
+			}
 		}
 	}
 }

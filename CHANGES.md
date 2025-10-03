@@ -13,6 +13,8 @@
   position, but the minimum distance is now lower. In particular, it's now not
   always as clear whether the portal will be on the left or on the right, and
   if there are two, they may appear on opposite sides.
+* Lignification now unbalances adjacent actors on expiration, too, due to
+  short-range ground vibrations induced by the withering roots.
 * Fix a minor regression in a couple of animations (incorrect y-axis position).
 * Fix: afraid monsters could ignore lignification when escaping (see issue #2).
 * Fix information leak: monster last-seen marker disappeared if it died out of
