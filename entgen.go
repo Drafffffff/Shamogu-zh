@@ -48,12 +48,12 @@ func (g *Game) GenEntities(mg *MapGen) {
 func (g *Game) genPlayerOnNewLevel(mg *MapGen) {
 	p := g.PlayerEntity()
 	// Sort vaults by distance to center.
-	center := gruid.Point{MapWidth / 2, MapHeight / 2}
-	slices.SortFunc(mg.vaults, func(vi, vj *vault) int {
-		pi := vi.p.Add(gruid.Point{vi.w / 2, vi.h / 2})
-		pj := vj.p.Add(gruid.Point{vj.w / 2, vj.h / 2})
-		return cmp.Compare(paths.DistanceManhattan(center, pi), paths.DistanceManhattan(center, pj))
-	})
+	// center := gruid.Point{MapWidth / 2, MapHeight / 2}
+	// slices.SortFunc(mg.vaults, func(vi, vj *vault) int {
+	// 	pi := vi.p.Add(gruid.Point{vi.w / 2, vi.h / 2})
+	// 	pj := vj.p.Add(gruid.Point{vj.w / 2, vj.h / 2})
+	// 	return cmp.Compare(paths.DistanceManhattan(center, pi), paths.DistanceManhattan(center, pj))
+	// })
 	// Chose player's vault.
 	var pvi int // player's vault index
 	pvi, p.P = mg.RandomVaultsPlace(mg.vaults, PlaceWaypoint)
