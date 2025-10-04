@@ -134,8 +134,10 @@ func (g *Game) ppDist(p gruid.Point) int {
 func (g *Game) senseMonsters() {
 	pp := g.PP()
 	// Sense monsters and terrain under them.
-	for i := range g.Monsters() {
-		ei := g.Entity(i)
+	for _, ei := range g.NPMapEntities() {
+		if !ei.IsActor() {
+			continue
+		}
 		if clarityRange(pp, ei.P) {
 			g.SenseEntity(ei, "sense")
 			g.SensePassable(ei.P)

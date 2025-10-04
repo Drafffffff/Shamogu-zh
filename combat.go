@@ -211,6 +211,11 @@ func (g *Game) monsterDeath(i, j ID, aj *Actor) {
 	ej := g.Entity(j)
 	g.Stats.Death(ej.Name)
 	g.md.DeathAnimation(ej.P)
+	if g.InFOV(ej.P) {
+		// Mark as known dead here, because due to clouds the player
+		// might not see it later otherwise.
+		ej.KnownDead = true
+	}
 	if !aj.DoesAny(MonsExplodingDeath) {
 		return
 	}
