@@ -15,6 +15,8 @@
   it's clearer that it doesn't necessarily represent their current location
   (similar change suggested on r/roguelikes by u/femto42). However, monsters
   sensed with Clarity are shown with their true color.
+* Adjust poison cloud duration from 6-9 to 7-11, making it have same average
+  duration as fire clouds but with slightly smaller variability.
 * Don't leak mindstate information of previously seen out of view monsters.
 * Fix a minor regression in a couple of animations (incorrect y-axis position).
 * Fix: afraid monsters could ignore lignification when escaping (see issue #2).
