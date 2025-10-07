@@ -664,7 +664,6 @@ func (g *Game) HandleActorTurn(i ID, ai *Actor) {
 	ei := g.Entity(i)
 	if ai.Behavior != nil {
 		g.UpdateFirePos(i, ai)
-		ei.Noise = false
 		g.HandleMonsterTurn(i, ai)
 	}
 	if ai.Has(StatusFire) && (ei.P == ai.FirePos || ai.FirePos != InvalidPos && g.FireAt(ei.P)) {

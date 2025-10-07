@@ -26,6 +26,7 @@
   sees the explosion but because of the cloud you didn't see the death), and
   make clarity leaves properly update information about dead monsters (instead
   of showing in some cases a monster with 0 HP); see issue #5.
+* Fix case of ghost footsteps (see issue #5).
 * When lignifying a poisoned monster, make induced confusion not hurt you for
   having used “lignify” if you weren't already confused (see issue #3).
 * Catching a poisoned monster from afar no longer inflicts extra poison damage

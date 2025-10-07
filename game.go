@@ -216,9 +216,13 @@ func (g *Game) ComputeNoise() {
 	g.PRnoise.BreadthFirstMap(dij, []gruid.Point{g.PP()}, maxdist)
 	nheard := 0  // number of heard monsters
 	var a *Actor // actor corresponding to heard monster (when there's only one)
-	for i, ai := range g.Monsters() {
-		ei := g.Entity(i)
-		if g.InFOV(ei.P) {
+	for _, ei := range g.NPMapEntities() {
+		ai, ok := ei.Role.(*Actor)
+		if !ok {
+			continue
+		}
+		ei.Noise = false
+		if ai.IsDead() || g.InFOV(ei.P) {
 			continue
 		}
 		dist := g.PRnoise.BreadthFirstMapAt(ei.P)
