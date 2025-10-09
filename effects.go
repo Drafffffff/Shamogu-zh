@@ -13,7 +13,7 @@ const (
 	DurationBerserkAfraid          = 4
 	DurationBerserkHit             = 4
 	DurationBerserkTotem           = 5
-	DurationBerserkTrap            = 4
+	DurationBerserkTrap            = 5
 	DurationClarity                = 5
 	DurationConfusionAmbrosia      = 6
 	DurationConfusionFireTrap      = 3
@@ -40,7 +40,7 @@ const (
 	DurationLignificationHit       = 6
 	DurationLignificationRoots     = 6
 	DurationLignificationSpores    = 6
-	DurationLignificationTrap      = 6
+	DurationLignificationTrap      = 8
 	DurationPoisonBerserk          = 5
 	DurationPoisonBite             = 4
 	DurationPoisonCloud            = 3
