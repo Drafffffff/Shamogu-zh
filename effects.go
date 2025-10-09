@@ -644,7 +644,7 @@ func (eff EffectPoisonCloud) Name() string {
 }
 
 func (eff EffectPoisonCloud) Desc() string {
-	return "Spit poisonous clouds on the sides and in front of you up to two free tiles away, lasting 6-9 turns."
+	return "Spit poisonous clouds on the sides and in front of you up to two free tiles away, lasting 7-11 turns."
 }
 
 type EffectSprint struct{}

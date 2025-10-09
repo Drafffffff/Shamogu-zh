@@ -82,7 +82,7 @@ func (rt RunicTrap) Desc() string {
 	case RuneLignification:
 		return fmt.Sprintf("Applies @BLignification@N status for %d turns when stepped on.", DurationLignificationTrap)
 	case RunePoison:
-		return "Spawns a poison cloud lasting 6-9 turns when stepped on."
+		return "Spawns a poison cloud lasting 7-11 turns when stepped on."
 	case RuneWarp:
 		return "Teleports away any actor that steps on it."
 	default:
