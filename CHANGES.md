@@ -17,6 +17,8 @@
   sensed with Clarity are shown with their true color.
 * Adjust poison cloud duration from 6-9 to 7-11, making it have same average
   duration as fire clouds but with slightly smaller variability.
+* Adjust duration of Berserk and Lignification from runic traps to 5 and 8
+  respectively (see issue #4).
 * Don't leak mindstate information of previously seen out of view monsters.
 * Fix a minor regression in a couple of animations (incorrect y-axis position).
 * Fix: afraid monsters could ignore lignification when escaping (see issue #2).
