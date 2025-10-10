@@ -23,7 +23,7 @@ func (g *Game) InitPlayer() {
 }
 
 func (g *Game) debugBuild() {
-	// g.Entities[PrimarySpiritID+1] = spiritEntity(secondarySpirits[6])
+	// g.Entities[PrimarySpiritID+1] = spiritEntity(secondarySpirits[0])
 	// g.Entities[PrimarySpiritID+3] = comestibleEntity(ComestibleData[4])
 }
 

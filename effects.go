@@ -269,6 +269,10 @@ type EffectFocus struct{}
 
 func (eff EffectFocus) Apply(g *Game) bool {
 	pa := g.PlayerActor()
+	if pa.Has(StatusDaze) {
+		g.Log("Using focus while dazed would be useless.")
+		return false
+	}
 	if pa.Has(StatusFocus) {
 		g.Log("You’re already focusing your heads.")
 		return false
@@ -294,6 +298,10 @@ type EffectDig struct{}
 
 func (eff EffectDig) Apply(g *Game) bool {
 	pa := g.PlayerActor()
+	if pa.Has(StatusDaze) {
+		g.Log("Using dig while dazed would be useless.")
+		return false
+	}
 	if pa.Has(StatusDig) {
 		g.Log("You’re already on a destructive charge.")
 		return false
@@ -651,6 +659,10 @@ type EffectSprint struct{}
 
 func (eff EffectSprint) Apply(g *Game) bool {
 	pa := g.PlayerActor()
+	if pa.Has(StatusDaze) {
+		g.Log("Using sprint while dazed would be useless.")
+		return false
+	}
 	if pa.Has(StatusSprint) {
 		g.Log("You’re already sprinting.")
 		return false

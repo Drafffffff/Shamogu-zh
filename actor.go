@@ -157,7 +157,7 @@ const (
 	VulnerabilityFire // increases duration of fire status
 
 	ResistanceConfusion // halves duration of confusion status
-	ResistanceDaze      // halves duration of daze status
+	ResistanceDaze      // allows spirit invocation while dazed
 	ResistanceFear      // halves duration of fear status
 	ResistanceFire      // halves duration of fire status
 	ResistanceImbalance // halves duration of imbalance status
@@ -231,7 +231,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, VulnerabilityFire, "@OFire@N vulnerability (longer duration)")
 
 	desc = traitDesc(desc, t, ResistanceConfusion, "@OConfusion@N resistance (half duration)")
-	desc = traitDesc(desc, t, ResistanceDaze, "@ODaze@N resistance (half duration)")
+	desc = traitDesc(desc, t, ResistanceDaze, "@ODaze@N resistance (can invoke spirits while dazed)")
 	desc = traitDesc(desc, t, ResistanceFear, "@OFear@N resistance (half duration)")
 	desc = traitDesc(desc, t, ResistanceFire, "@OFire@N resistance (delayed burning)")
 	desc = traitDesc(desc, t, ResistanceImbalance, "@OImbalance@N resistance (half duration)")
@@ -464,9 +464,6 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 	case st == StatusDaze:
 		if ai.Has(StatusClarity) || ai.DoesAny(MonsImmunityDaze) {
 			return false
-		}
-		if ai.DoesAny(ResistanceDaze) {
-			turns = (turns + 1) / 2
 		}
 		if ai.Has(StatusConfusion) {
 			turns *= 2

@@ -120,7 +120,7 @@ func (sp *Spirit) Use(g *Game, i ID) bool {
 		return false
 	}
 	pa := g.PlayerActor()
-	if pa.Has(StatusDaze) {
+	if pa.Has(StatusDaze) && !pa.DoesAny(ResistanceDaze) {
 		g.Log("You cannot invoke a spirit while dazed.")
 		return false
 	}

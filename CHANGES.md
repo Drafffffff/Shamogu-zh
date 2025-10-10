@@ -11,6 +11,8 @@
 * Lignification now unbalances adjacent actors on expiration, too, due to
   short-range ground vibrations induced by the withering roots.
 * The lich is now immune to Confusion, and the undead knight is immune to Daze.
+* Thunder Porcupine's “daze resistance” now allows spirit invocation while
+  dazed, instead of reducing the duration (see discussion in issue #4).
 * Change color of monster's out of view location memory to light grey, so that
   it's clearer that it doesn't necessarily represent their current location
   (similar change suggested on r/roguelikes by u/femto42). However, monsters
