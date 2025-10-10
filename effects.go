@@ -488,22 +488,28 @@ func (eff EffectLightning) Apply(g *Game) bool {
 	}}
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, maxdist)
 	done := false
+	lightning := func() {
+		g.md.LightningAnimation(nodes)
+		g.Logf("You emit a static discharge (-%d HP).", selfDmg)
+		g.MakeNoise(g.PP(), NoiseLightning)
+		g.InflictDamage(PlayerID, pa, selfDmg, AttackOther)
+		done = true
+	}
 	for _, n := range nodes {
 		i, ai := g.ActorAt(n.P)
 		if i < 0 || i == PlayerID {
 			continue
 		}
 		if !done {
-			g.md.LightningAnimation(nodes)
-			g.Logf("You emit a static discharge (-%d HP).", selfDmg)
-			g.MakeNoise(g.PP(), NoiseLightning)
-			g.InflictDamage(PlayerID, pa, selfDmg, AttackOther)
-			done = true
+			lightning()
 		}
 		dmg := maxdist + 1 - n.Cost
 		if g.InflictDamage(i, ai, dmg, AttackLightning) > 0 {
 			g.PutStatus(i, ai, StatusDaze, DurationDazeLightning)
 		}
+	}
+	if !done && pa.Has(StatusDaze) && pa.DoesAny(ResistanceDaze) {
+		lightning()
 	}
 	if !done {
 		g.Log("No suitable targets for lightning.")
