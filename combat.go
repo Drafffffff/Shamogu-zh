@@ -755,10 +755,10 @@ func (g *Game) blinkOther(i, j ID, ai, aj *Actor) {
 		if ai.Has(StatusConfusion) {
 			if to, ok := g.BlinkPos(ei.P); ok {
 				g.md.TeleportAnimation(ei.P, to, g.InFOV(to))
+				g.MoveActor(i, ai, to)
+				g.LogfStyled("The confused %s hurt and blinked itself too!", logHurtMons, ei.Name)
+				g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
 			}
-			g.MoveActor(i, ai, to)
-			g.LogfStyled("The confused %s hurt and blinked itself too!", logHurtMons, ei.Name)
-			g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
 		}
 	}
 }
