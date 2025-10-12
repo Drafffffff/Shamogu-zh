@@ -8,6 +8,14 @@
 * Improve pushing behavior in edge-cases when attacking a monster that has a
   monster behind: pushing can now happen if the monster behind dies, and if the
   monster in front dies, you can at least move to its position.
+* Experimental: rework pushing for rampaging boars: unlike dragons, they now
+  perform pushing only when charging, but always do so unless they miss. Also,
+  charging from beyond a 4-tile range results in longer Imbalance duration (3
+  instead of 2). For clarity and simplicity, frog's catching unbalancing effect
+  has been adjusted to match the boar's, so slightly shorter duration based on
+  distance but more deterministic. Note that earth dragons and boar player's
+  with Dig still perform pushing in melee as before. See discussion in issue #4
+  for some context around this change.
 * Lignification now unbalances adjacent actors on expiration, too, due to
   short-range ground vibrations induced by the withering roots.
 * The lich is now immune to Confusion, and the undead knight is immune to Daze.

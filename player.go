@@ -2,6 +2,7 @@ package main
 
 import (
 	"codeberg.org/anaseto/gruid"
+	"codeberg.org/anaseto/gruid/paths"
 )
 
 // PlayerBump performs a player bump action in the given direction. It returns
@@ -23,12 +24,13 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 			return false
 		}
 		ej := g.Entity(j)
-		if AdjacentPoints(pl.P, ej.P) {
+		dist := paths.DistanceManhattan(pl.P, ej.P)
+		if dist == 1 {
 			g.Dir = dir
 			if pa.DoesAny(PatternFourDirs) && !pa.Has(StatusFocus) {
-				g.FourDirectionalAttack(PlayerID, pa, AttackPlain)
+				g.FourDirectionalAttack(PlayerID, pa, AttackPlain, dist)
 			} else {
-				g.BumpAttackActor(PlayerID, j, pa, aj, AttackPlain, 0)
+				g.BumpAttackActor(PlayerID, j, pa, aj, AttackPlain, dist, 0)
 			}
 			return true
 		}
@@ -37,12 +39,12 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 			pa.DoesAny(PatternCatch) && !aj.ResistsMove():
 			g.Dir = dir
 			g.md.RangedAttackAnimation(pa, pl.P, ej.P)
-			g.BumpAttackActor(PlayerID, j, pa, aj, AttackRanged, 0)
+			g.BumpAttackActor(PlayerID, j, pa, aj, AttackRanged, dist, 0)
 			return true
 		case pa.DoesAny(PatternSwap|PatternSwapDaze) && pa.CanMove() && !aj.ResistsMove():
 			g.Dir = dir
 			g.md.RangedAttackAnimation(pa, pl.P, ej.P)
-			g.BumpAttackActor(PlayerID, j, pa, aj, AttackRanged, 0)
+			g.BumpAttackActor(PlayerID, j, pa, aj, AttackRanged, dist, 0)
 			return true
 		case pa.DoesAny(PatternRampage) && pa.CanMove() && (pa.HP > 1 || !pa.Has(StatusPoison)):
 			g.Dir = dir
@@ -50,7 +52,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 			from := pl.P
 			g.BumpMoveActor(PlayerID, pa, to)
 			g.md.MoveAnimation(from, to)
-			g.BumpAttackActor(PlayerID, j, pa, aj, AttackCharge, 0)
+			g.BumpAttackActor(PlayerID, j, pa, aj, AttackCharge, dist, 0)
 			return true
 		}
 	}
@@ -82,13 +84,13 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 	// Try charge.
 	nto := to.Add(dir)
 	if pa.DoesAny(PatternFourDirs) && !pa.Has(StatusFocus) {
-		g.FourDirectionalAttack(PlayerID, pa, AttackCharge)
+		g.FourDirectionalAttack(PlayerID, pa, AttackCharge, 2)
 		return true
 	}
 	if j, aj := g.ActorAt(nto); j >= 0 {
 		// Charge against actor at nto. An ambushing charge outside FOV
 		// can happen and is allowed even while afraid.
-		g.BumpAttackActor(PlayerID, j, pa, aj, AttackCharge, 0)
+		g.BumpAttackActor(PlayerID, j, pa, aj, AttackCharge, 2, 0)
 	}
 	return true
 }

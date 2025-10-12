@@ -355,7 +355,7 @@ func (eff EffectJump) Apply(g *Game) bool {
 				if pa.Has(StatusSprint) {
 					g.PutStatus(i, ai, StatusImbalance, DurationImbalanceSprint)
 				} else {
-					g.BumpAttackActor(PlayerID, i, pa, ai, AttackPlain, 1)
+					g.BumpAttackActor(PlayerID, i, pa, ai, AttackPlain, 1, 1)
 				}
 			}
 			g.PutStatus(i, ai, StatusDaze, DurationDazeJump)

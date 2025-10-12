@@ -275,7 +275,7 @@ func (g *Game) ActorInRange(from, at gruid.Point) ID {
 // actors with PatternFourDirs or PatternFourDirsMons trait. Those kinds of
 // attacks can be performed even while afraid as long as they're done laterally
 // while moving.
-func (g *Game) FourDirectionalAttack(i ID, ai *Actor, ap AttackKind) bool {
+func (g *Game) FourDirectionalAttack(i ID, ai *Actor, ap AttackKind, dist int) bool {
 	ei := g.Entity(i)
 	var actors []*Actor
 	var ids []ID
@@ -301,21 +301,21 @@ func (g *Game) FourDirectionalAttack(i ID, ai *Actor, ap AttackKind) bool {
 		bonus = 0
 	}
 	for k, j := range ids {
-		g.BumpAttackActor(i, j, ai, actors[k], ap, bonus)
+		g.BumpAttackActor(i, j, ai, actors[k], ap, dist, bonus)
 	}
 	return len(actors) > 0
 }
 
 // BumpAttackActor does an attack against an actor at a given position.
 // It returns the damage done.
-func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) {
+func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonus int) {
 	dazed := aj.Has(StatusDaze)
 	ei, ej := g.Entity(i), g.Entity(j)
 	dmg := g.AttackDamage(i, j, ai, aj, ap, bonus)
 	if dmg <= 0 {
 		if ai.DoesAny(PatternSwap|PatternSwapDaze) && ai.CanMove() {
 			pi, pj := ei.P, ej.P
-			if !AdjacentPoints(pi, pj) {
+			if dist > 1 {
 				g.BumpMoveActor(i, ai, pi.Add(toDir(pj.Sub(pi))))
 			}
 		}
@@ -323,14 +323,16 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, bonus int)
 	}
 	// Extra effects by attack pattern.
 	switch {
-	case ai.DoesAny(Pushing) && ai.CanMove() &&
-		(ap == AttackCharge || !ai.Has(StatusPoison)) &&
-		!aj.ResistsMove() && (ai.Has(StatusDig) || g.IntN(5-dmg) < 2):
-		g.push(i, j, ai, aj, dmg, ap, bonus)
+	case ai.DoesAny(Pushing|PushingCharge) && ai.CanMove() && !aj.ResistsMove() &&
+		(ap == AttackCharge || !ai.Has(StatusPoison)):
+		if ai.Has(StatusDig) || ai.DoesAny(PushingCharge) && ap == AttackCharge ||
+			ai.DoesAny(Pushing) && g.IntN(5-dmg) < 2 {
+			g.push(i, j, ai, aj, ap, dist, bonus)
+		}
 	case ai.DoesAny(PatternSwap|PatternSwapDaze) && ap != AttackCharge && ai.CanMove() && !aj.ResistsMove():
 		g.swapSpaceDistortion(i, j, ai, aj, dmg, dazed)
 	case ai.DoesAny(PatternCatch) && ap == AttackRanged && !aj.ResistsMove():
-		g.catch(i, j, ai, aj, dmg)
+		g.catch(i, j, ai, aj, dist)
 	case ai.DoesAny(PatternRangedRecoil) && ap != AttackCharge && ai.CanMove() && g.IntN(5-dmg) < 2:
 		if g.recoil(i, j, ai) && i != PlayerID &&
 			ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusImbalance, 1+dmg) && g.InFOV(ei.P) {
@@ -560,16 +562,15 @@ func (g *Game) monsConfusionPenalty(i ID, ai *Actor) {
 
 // push handles extra penetrating and pushing effects for actors with
 // Pushing trait.  It should be called only on pairs of adjacent actors.
-func (g *Game) push(i, j ID, ai, aj *Actor, dmg int, ap AttackKind, bonus int) {
+func (g *Game) push(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonus int) {
 	ei, ej := g.Entity(i), g.Entity(j)
 	pi, pj := ei.P, ej.P
 	delta := pj.Sub(pi)
 	npj := pj.Add(delta)
-	if ai.DoesAny(Pushing) {
-		if g.PutStatus(j, aj, StatusImbalance, 2+dmg/3) && i != PlayerID &&
-			ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusImbalance, dmg) && g.InFOV(ei.P) {
-			g.Logf("The confused %s lost balance while pushing too!", ei.Name)
-		}
+	d := 2 + dist/5 // imbalance duration (3 for dist > 4)
+	if g.PutStatus(j, aj, StatusImbalance, d) && i != PlayerID &&
+		ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusImbalance, d) && g.InFOV(ei.P) {
+		g.Logf("The confused %s lost balance while pushing too!", ei.Name)
 	}
 	k, ak := g.ActorAt(npj)
 	if ak != nil {
@@ -614,18 +615,17 @@ func (g *Game) push(i, j ID, ai, aj *Actor, dmg int, ap AttackKind, bonus int) {
 }
 
 // catch handles extra catching effects for actors with PatternCatch trait.
-func (g *Game) catch(i, j ID, ai, aj *Actor, dmg int) {
+func (g *Game) catch(i, j ID, ai, aj *Actor, dist int) {
 	ei, ej := g.Entity(i), g.Entity(j)
 	dir := toDir(ej.P.Sub(ei.P))
 	to := ei.P.Add(dir)
 	from := ej.P
 	g.MoveActor(j, aj, to)
 	g.md.MoveAnimation(from, to)
-	if ai.DoesAny(PatternCatch) && g.IntN(8-dmg) < 5 {
-		if g.PutStatus(j, aj, StatusImbalance, 3+dmg/3) && i != PlayerID &&
-			ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusImbalance, 1+dmg) {
-			g.Logf("The confused %s lost balance too!", ei.Name)
-		}
+	d := 2 + dist/5 // imbalance duration (3 for dist > 4)
+	if g.PutStatus(j, aj, StatusImbalance, d) && i != PlayerID &&
+		ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusImbalance, d) {
+		g.Logf("The confused %s lost balance too!", ei.Name)
 	}
 }
 
@@ -692,11 +692,6 @@ func (g *Game) recoil(i, j ID, ai *Actor) bool {
 	g.MoveActor(i, ai, npi)
 	g.md.MoveAnimation(pi, npi)
 	return true
-}
-
-// AdjacentPoints reports whether positions p and q are adjacent.
-func AdjacentPoints(p, q gruid.Point) bool {
-	return paths.DistanceManhattan(p, q) == 1
 }
 
 // AdjacentEntities reports whether two entities are adjacent.

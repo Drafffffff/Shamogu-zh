@@ -88,7 +88,7 @@ func (g *Game) monsterDiscord(i ID, ai *Actor) bool {
 		return false
 	}
 	k := g.IntN(len(ids))
-	g.BumpAttackActor(i, ids[k], ai, actors[k], AttackPlain, 0)
+	g.BumpAttackActor(i, ids[k], ai, actors[k], AttackPlain, 1, 0)
 	return true
 }
 
@@ -161,9 +161,10 @@ func (g *Game) monsterBumpTo(i ID, ai *Actor, to gruid.Point) {
 	}
 	ei := g.Entity(i)
 	pl := g.PlayerEntity()
-	if AdjacentPoints(ei.P, pl.P) {
+	dist := paths.DistanceManhattan(ei.P, pl.P)
+	if dist == 1 {
 		// Attack player.
-		g.BumpAttackActor(i, PlayerID, ai, pl.Actor(), AttackPlain, 0)
+		g.BumpAttackActor(i, PlayerID, ai, pl.Actor(), AttackPlain, dist, 0)
 		return
 	}
 	if g.InFOV(ei.P) && g.ActorInRange(ei.P, pl.P) == PlayerID {
@@ -172,11 +173,11 @@ func (g *Game) monsterBumpTo(i ID, ai *Actor, to gruid.Point) {
 		case ai.DoesAny(PatternRanged|PatternRangedRecoil) ||
 			ai.DoesAny(PatternCatch) && !pa.ResistsMove():
 			g.md.RangedAttackAnimation(ai, ei.P, pl.P)
-			g.BumpAttackActor(i, PlayerID, ai, pa, AttackRanged, 0)
+			g.BumpAttackActor(i, PlayerID, ai, pa, AttackRanged, dist, 0)
 			return
 		case ai.DoesAny(PatternSwap|PatternSwapDaze) && ai.CanMove() && !pa.ResistsMove():
 			g.md.RangedAttackAnimation(ai, pl.P, pl.P)
-			g.BumpAttackActor(i, PlayerID, ai, pa, AttackRanged, 0)
+			g.BumpAttackActor(i, PlayerID, ai, pa, AttackRanged, dist, 0)
 			return
 		case ai.DoesAny(PatternRampage) && ai.CanMove():
 			dir := toDir(pl.P.Sub(ei.P))
@@ -184,7 +185,7 @@ func (g *Game) monsterBumpTo(i ID, ai *Actor, to gruid.Point) {
 			from := ei.P
 			g.BumpMoveActor(i, ai, to)
 			g.md.MoveAnimation(from, to)
-			g.BumpAttackActor(i, PlayerID, ai, pa, AttackCharge, 0)
+			g.BumpAttackActor(i, PlayerID, ai, pa, AttackCharge, dist, 0)
 			return
 		}
 	}
@@ -199,9 +200,9 @@ func (g *Game) monsterBumpTo(i ID, ai *Actor, to gruid.Point) {
 		nto := to.Add(delta)
 		g.BumpMoveActor(i, ai, to)
 		if ai.DoesAny(PatternFourDirsMons) {
-			g.FourDirectionalAttack(i, ai, AttackCharge)
+			g.FourDirectionalAttack(i, ai, AttackCharge, 2)
 		} else if j, aj := g.ActorAt(nto); j == PlayerID {
-			g.BumpAttackActor(i, j, ai, aj, AttackCharge, 0)
+			g.BumpAttackActor(i, j, ai, aj, AttackCharge, 2, 0)
 		}
 		return
 	}
