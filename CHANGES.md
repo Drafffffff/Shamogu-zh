@@ -13,9 +13,9 @@
   charging from beyond a 4-tile range results in longer Imbalance duration (3
   instead of 2). For clarity and simplicity, frog's catching unbalancing effect
   has been adjusted to match the boar's, so slightly shorter duration based on
-  distance but more deterministic. Note that earth dragons and boar player's
-  with Dig still perform pushing in melee as before. See discussion in issue #4
-  for some context around this change.
+  distance but more deterministic. Note that earth dragons and Rampaging Boar
+  players with Dig still perform pushing in melee as before. See discussion in
+  issue #4 for some context around this change.
 * Lignification now unbalances adjacent actors on expiration, too, due to
   short-range ground vibrations induced by the withering roots.
 * The lich is now immune to Confusion, and the undead knight is immune to Daze.
