@@ -567,7 +567,7 @@ func (g *Game) push(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonus int) {
 	pi, pj := ei.P, ej.P
 	delta := pj.Sub(pi)
 	npj := pj.Add(delta)
-	d := 2 + 2*dist/5 // imbalance duration (2 for dist 2-4, 4 for dist 5-8)
+	d := 2 + 2*(dist/5) // imbalance duration (2 for dist 2-4, 4 for dist 5-8)
 	if g.PutStatus(j, aj, StatusImbalance, d) && i != PlayerID &&
 		ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusImbalance, d) && g.InFOV(ei.P) {
 		g.Logf("The confused %s lost balance while pushing too!", ei.Name)
@@ -622,7 +622,7 @@ func (g *Game) catch(i, j ID, ai, aj *Actor, dist int) {
 	from := ej.P
 	g.MoveActor(j, aj, to)
 	g.md.MoveAnimation(from, to)
-	d := 2 + 2*dist/5 // imbalance duration (2 for dist 2-4, 4 for dist 5-8)
+	d := 2 + 2*(dist/5) // imbalance duration (2 for dist 2-4, 4 for dist 5-8)
 	if g.PutStatus(j, aj, StatusImbalance, d) && i != PlayerID &&
 		ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusImbalance, d) {
 		g.Logf("The confused %s lost balance too!", ei.Name)
