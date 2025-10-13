@@ -1654,11 +1654,11 @@ In Shamogu, both the player and the monsters may use one of several attack patte
 
 @CRampaging@N attacks allow to charge from as far as you can see. When charging, there is a bonus of 1 to attack, except against lignified foes that resist forced movement.
 
-@CPushing@N attacks push foes one tile away, unbalancing them. When there’s another foe just behind, you perform an extra attack on them instead. Rampaging boars, as well as Rampaging Boar spirit players, perform pushing when charging, and distances beyond a 4-tile range result in longer @OImbalance@N duration. Earth dragons and players with @BDig@N may push with melee attacks, too. @OPoison@N prevents pushing in melee.
+@CPushing@N attacks push foes one tile away, unbalancing them. When there’s another foe just behind, you perform an extra attack on them instead. Rampaging boars, as well as Rampaging Boar spirit players, perform pushing when charging, and distances beyond a 4-tile range result in double @OImbalance@N duration. Earth dragons and players with @BDig@N may push with melee attacks, too. @OPoison@N prevents pushing in melee.
 
 @CRanged@N attacks are performed without moving from as far as you can see.
 
-@CCatching@N attacks are ranged attacks that catch foes @Mon successful hits@N and move them next to you, unbalancing them. When catching a foe from afar, there is a bonus of 1 to attack. Catching from beyond a 4-tile range results in longer @OImbalance@N duration.
+@CCatching@N attacks are ranged attacks that catch foes @Mon successful hits@N and move them next to you, unbalancing them. When catching a foe from afar, there is a bonus of 1 to attack. Catching from beyond a 4-tile range results in double @OImbalance@N duration.
 
 @CRecoil@N is an extra attack effect for wind fox monsters, as well as Wind Fox spirit players. After an attack from within a 4-tile range, they may move backwards one tile when ranged, or two cells with extra wind noise when in melee.
 
