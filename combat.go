@@ -325,7 +325,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 	switch {
 	case ai.DoesAny(Pushing|PushingCharge) && ai.CanMove() && !aj.ResistsMove() &&
 		(ap == AttackCharge || !ai.Has(StatusPoison)):
-		if ai.Has(StatusDig) || ai.DoesAny(PushingCharge) && ap == AttackCharge ||
+		if ai.Has(StatusDig) || ai.DoesAny(PushingCharge) && ap == AttackCharge && dist > 2 ||
 			ai.DoesAny(Pushing) && g.IntN(5-dmg) < 2 {
 			g.push(i, j, ai, aj, ap, dist, bonus)
 		}

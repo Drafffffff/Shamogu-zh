@@ -1654,7 +1654,7 @@ In Shamogu, both the player and the monsters may use one of several attack patte
 
 @CRampaging@N attacks allow to charge from as far as you can see. When charging, there is a bonus of 1 to attack, except against lignified foes that resist forced movement.
 
-@CPushing@N attacks push foes one tile away, unbalancing them. When there’s another foe just behind, you perform an extra attack on them instead. Rampaging boars, as well as Rampaging Boar spirit players, perform pushing when charging, and distances beyond a 4-tile range result in double @OImbalance@N duration. Earth dragons and players with @BDig@N may push with melee attacks, too. @OPoison@N prevents pushing in melee.
+@CPushing@N attacks push foes one tile away, unbalancing them. When there’s another foe just behind, you perform an extra attack on them instead. Rampaging boars, as well as Rampaging Boar spirit players, perform pushing when charging from beyond a 2-tile range, and distances beyond a 4-tile range result in double @OImbalance@N duration. Earth dragons and players with @BDig@N may push with melee attacks, too. @OPoison@N prevents pushing in melee.
 
 @CRanged@N attacks are performed without moving from as far as you can see.
 
