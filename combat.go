@@ -341,7 +341,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 	}
 	// Extra attack effects (shared by both player and monsters).
 	if ai.DoesAny(VenomousMelee) && (ap != AttackRanged || g.AdjacentEntities(i, j)) && g.IntN(6-dmg) < 2 {
-		if g.PutStatus(j, aj, StatusPoison, DurationPoisonBite) && i != PlayerID && ai.Has(StatusConfusion) {
+		if g.PutStatus(j, aj, StatusPoison, DurationPoisonBite) && i != PlayerID && ai.Has(StatusConfusion) && ai.IsAlive() {
 			if g.InFOV(ei.P) {
 				g.LogfStyled("The confused %s bites itself too!", logHurtMons, ei.Name)
 			}
@@ -393,7 +393,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 			g.Logf("The confused %s teleports the %s away!", ei.Name, ej.Name)
 		}
 		g.TeleportActor(j, aj, 0)
-		if ai.Has(StatusConfusion) {
+		if ai.Has(StatusConfusion) && ai.IsAlive() {
 			g.TeleportActor(i, ai, 1)
 		}
 	}
@@ -552,7 +552,7 @@ func (g *Game) logBumpMiss(i, j ID, ap AttackKind) {
 }
 
 func (g *Game) monsConfusionPenalty(i ID, ai *Actor) {
-	if ai.Has(StatusConfusion) {
+	if ai.Has(StatusConfusion) && ai.IsAlive() {
 		if g.InFOV(g.Entity(i).P) {
 			g.LogfStyled("The confused %s hurts itself too!", logHurtMons, g.Entity(i).Name)
 		}
