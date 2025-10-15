@@ -313,11 +313,9 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 	ei, ej := g.Entity(i), g.Entity(j)
 	dmg := g.AttackDamage(i, j, ai, aj, ap, bonus)
 	if dmg <= 0 {
-		if ai.DoesAny(PatternSwap|PatternSwapDaze) && ai.CanMove() {
+		if ai.DoesAny(PatternSwap|PatternSwapDaze) && ai.CanMove() && ap == AttackRanged {
 			pi, pj := ei.P, ej.P
-			if dist > 1 {
-				g.BumpMoveActor(i, ai, pi.Add(toDir(pj.Sub(pi))))
-			}
+			g.BumpMoveActor(i, ai, pi.Add(toDir(pj.Sub(pi))))
 		}
 		return
 	}
