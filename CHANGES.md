@@ -43,7 +43,6 @@
 * Fix confused butterfly self-blinking (see issue #4).
 * Fix a few cases of possible redundant confusion-related message when a
   confused charging monster dies of poison while doing so.
-* Fix cat charge against lignified foe swapping positions on miss (see issue #4).
 * When lignifying a poisoned monster, make induced confusion not hurt you for
   having used “lignify” if you weren't already confused (see issue #3).
 * Catching a poisoned monster from afar no longer inflicts extra poison damage
