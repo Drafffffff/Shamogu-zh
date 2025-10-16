@@ -86,23 +86,19 @@ func (g *Game) AdjustHP(i ID, ai *Actor, amount int) {
 }
 
 // AdjustHPWithMin heals an actor by a given amount (or hurts if negative). The
-// result is guaranteed to be in [min(m, a.HP),a.MaxHP].
+// result is guaranteed to be in [min(m,ai.HP), ai.MaxHP].
 func (g *Game) AdjustHPWithMin(i ID, ai *Actor, amount int, m int) {
 	if ai.IsDead() {
 		// Should not happen: dead monsters remain dead.
 		return
 	}
-	if amount < 0 && ai.HP < m {
-		// Leave HP as-is.
-		return
-	}
-	ohp := ai.HP
-	ai.HP = min(max(m, ai.HP+amount), ai.GetMaxHP())
+	hp, maxHP := ai.HP, ai.GetMaxHP()
+	ai.HP = min(maxHP, max(min(m, hp), hp+amount))
 	if ai.IsPlayer() {
-		if ai.HP > ohp {
-			g.Logf("You feel better (+%d HP).", ai.HP-ohp)
-		} else if ai.HP < ohp {
-			g.Logf("You feel weaker (-%d HP).", ohp-ai.HP)
+		if ai.HP > hp {
+			g.Logf("You feel better (+%d HP).", ai.HP-hp)
+		} else if ai.HP < hp {
+			g.Logf("You feel weaker (-%d HP).", hp-ai.HP)
 		} else if amount >= 0 {
 			g.Log("You feel no change (+0 HP).")
 		}
