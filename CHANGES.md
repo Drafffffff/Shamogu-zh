@@ -1,5 +1,7 @@
 # v? ?
 
+Reworked and improved content:
+
 * Improve portal placement so that it's less predictable: vaults are now more
   likely to contain a portal when they're far from the player's starting
   position, but the minimum distance is now lower. In particular, it's now not
@@ -8,42 +10,50 @@
 * Improve pushing behavior in edge-cases when attacking a monster that has a
   monster behind: pushing can now happen if the monster behind dies, and if the
   monster in front dies, you can at least move to its position.
-* Experimental: rework pushing for rampaging boars: unlike dragons, they now
-  perform pushing only when charging from beyond a 2-tile range, but always do
-  so unless they miss. Also, charging from beyond a 4-tile range results in
-  double Imbalance duration (4 instead of 2). For clarity and simplicity,
-  frog's catching unbalancing effect has been adjusted to match the boar's, so
-  slightly shorter duration based on distance but more deterministic. Note that
-  earth dragons and Rampaging Boar players with Dig still perform pushing in
-  melee as before. See discussion in issue #4 for some context around this
-  change.
+* Rework pushing for rampaging boars: unlike dragons, they now perform pushing
+  only when charging from beyond a 2-tile range, but always do so unless they
+  miss. Also, charging from beyond a 4-tile range results in double Imbalance
+  duration (4 instead of 2). For consistency and simplicity, frog's catching
+  unbalancing effect has been adjusted to match the boar's more closely: more
+  deterministic chance, lower Imbalance duration for short ranges (but
+  including 2-tile range), and double Imbalance duration beyond a 4-tile range.
+  Note that earth dragons and Rampaging Boar players with Dig still perform
+  pushing in melee as before. See discussion in issue #4 for some context
+  around this change.
 * Lignification now unbalances adjacent actors on expiration, too, due to
-  short-range ground vibrations induced by the withering roots.
+  withering roots messing with nearby ground.
 * The lich is now immune to Confusion, and the undead knight is immune to Daze.
 * Thunder Porcupine's “daze resistance” now allows spirit invocation while
   dazed, instead of reducing the duration (see discussion in issue #4).
-* Change color of monster's out of view location memory to light grey, so that
-  it's clearer that it doesn't necessarily represent their current location
-  (similar change suggested on r/roguelikes by u/femto42). However, monsters
-  sensed with Clarity are shown with their true color.
 * Adjust poison cloud duration from 6-9 to 7-11, making it have same average
   duration as fire clouds but with slightly smaller variability.
 * Adjust duration of Berserk and Lignification from runic traps to 5 and 8
   respectively (see issue #4).
+
+UI, graphics, QoL:
+
+* Change color of monster's out of view location memory to light grey, so that
+  it's clearer that it doesn't necessarily represent their current location
+  (similar change suggested on r/roguelikes by u/femto42). However, monsters
+  sensed with Clarity are shown with their true color.
+
+Fixes:
+
 * Don't leak mindstate information of previously seen out of view monsters.
 * Fix a minor regression in a couple of animations (incorrect y-axis position).
-* Fix: afraid monsters could ignore lignification when escaping (see issue #2).
-* Fix information leak: monster last-seen marker disappeared if it died out of
-  view (see issue #2).
+* Afraid monsters can no longer ignore lignification when escaping (see issue
+  #2).
+* Prevent information leak: monster last-seen marker disappeared if it died out
+  of view (see issue #2).
 * Fix case of nadre ghost after explosion due to obstructing cloud (the player
   sees the explosion but because of the cloud you didn't see the death), and
   make clarity leaves properly update information about dead monsters (instead
   of showing in some cases a monster with 0 HP); see issue #5.
 * Fix case of ghost footsteps (see issue #5).
 * Fix confused butterfly self-blinking (see issue #4).
-* Fix a few cases of possible redundant confusion-related message when a
-  confused charging monster dies of poison while doing so.
-* Fix edge-case where nadres could end up with 2/1 HP (see issue #4).
+* Prevent possible redundant confusion-related message when a confused charging
+  monster dies of poison while doing so.
+* Nadres can no longer end up with 2/1 HP after lignification (see issue #4).
 * When lignifying a poisoned monster, make induced confusion not hurt you for
   having used “lignify” if you weren't already confused (see issue #3).
 * Catching a poisoned monster from afar no longer inflicts extra poison damage
