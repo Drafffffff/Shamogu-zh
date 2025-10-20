@@ -288,15 +288,16 @@ func (a ActionNextMonster) Handle(md *model) (gruid.Effect, bool) {
 func (g *Game) getMonsterTargIDs() []ID {
 	var me []ID
 	for i, ei := range g.NPMapEntities() {
-		if !ei.IsActor() {
+		ai, ok := ei.Role.(*Actor)
+		if !ok {
 			continue
 		}
 		var b bool // whether monster is examinable
 		switch {
 		case g.Wizard.Mode == WizardReveal:
-			b = ei.IsAlive()
+			b = ai.IsAlive()
 		default:
-			b = ei.KnownP != InvalidPos && !ei.KnownDead
+			b = ei.KnownP != InvalidPos && !ai.KnownDead
 		}
 		if b {
 			me = append(me, i)

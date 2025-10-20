@@ -10,14 +10,15 @@ import (
 
 // Actor holds data relevant to any kind of actor (player or monster).
 type Actor struct {
-	HP       int         // health points
-	MaxHP    int         // maximum health points
-	Defense  int         // defense (defensive potential)
-	Attack   int         // attack (offensive potential)
-	FirePos  gruid.Point // position at start of turn while on Fire
-	Statuses Statuses    // statuses (confused, etc.)
-	Traits   Traits      // passives traits
-	Behavior *Behavior   // behavior component (monsters only)
+	HP        int         // health points
+	MaxHP     int         // maximum health points
+	Defense   int         // defense (defensive potential)
+	Attack    int         // attack (offensive potential)
+	FirePos   gruid.Point // position at start of turn while on Fire
+	KnownDead bool        // whether it's a monster known to be dead
+	Statuses  Statuses    // statuses (confused, etc.)
+	Traits    Traits      // passives traits
+	Behavior  *Behavior   // behavior component (monsters only)
 }
 
 // NewActor returns a new actor with the given combat stats and traits.

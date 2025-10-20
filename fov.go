@@ -116,7 +116,7 @@ func (g *Game) SenseEntity(e *Entity, verb string) {
 	switch r := e.Role.(type) {
 	case *Actor:
 		if r.IsDead() {
-			e.KnownDead = true
+			r.KnownDead = true
 		}
 	case *RunicTrap:
 		if r.Used {

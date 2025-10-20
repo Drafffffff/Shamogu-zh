@@ -13,14 +13,13 @@ import (
 // common components in various fields and uses the Role field for any extra
 // ones.
 type Entity struct {
-	Name      string      // name
-	Rune      rune        // default rune (for display)
-	P         gruid.Point // map position (invalidPos if none)
-	KnownP    gruid.Point // last known position
-	KnownDead bool        // whether it's a monster known to be dead
-	Seen      bool        // whether we already saw it once
-	Noise     bool        // whether it made noise reaching player (monsters only currently)
-	Role      any         // non-common role(s) for the entity
+	Name   string      // name
+	Rune   rune        // default rune (for display)
+	P      gruid.Point // map position (invalidPos if none)
+	KnownP gruid.Point // last known position
+	Seen   bool        // whether we already saw it once
+	Noise  bool        // whether it made noise reaching player (monsters only currently)
+	Role   any         // non-common role(s) for the entity
 }
 
 // String returns the name of the entity.
@@ -280,7 +279,7 @@ func (g *Game) KnownActorAt(p gruid.Point) (ID, *Actor) {
 		if e.KnownP != p {
 			continue
 		}
-		if a, ok := e.Role.(*Actor); ok && !e.KnownDead {
+		if a, ok := e.Role.(*Actor); ok && !a.KnownDead {
 			return ID(i + FirstMapID), a
 		}
 	}
@@ -294,7 +293,7 @@ func (g *Game) SensedActorAt(p gruid.Point) (ID, *Actor) {
 		if !(e.KnownP == p || e.P == p && e.Noise && !g.InFOV(p)) {
 			continue
 		}
-		if a, ok := e.Role.(*Actor); ok && !e.KnownDead {
+		if a, ok := e.Role.(*Actor); ok && !a.KnownDead {
 			return ID(i + FirstMapID), a
 		}
 	}

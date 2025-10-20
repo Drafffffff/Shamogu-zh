@@ -214,7 +214,7 @@ func (g *Game) monsterDeath(i, j ID, aj *Actor) {
 	if g.InFOV(ej.P) {
 		// Mark as known dead here, because due to clouds the player
 		// might not see it later otherwise.
-		ej.KnownDead = true
+		aj.KnownDead = true
 	}
 	if !aj.DoesAny(MonsExplodingDeath) {
 		return

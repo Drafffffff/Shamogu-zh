@@ -28,7 +28,10 @@ const (
 // RenderOrder returns the rendering priority of an entity.
 func (g *Game) RenderOrder(i ID) (ro RenderOrder) {
 	e := g.Entity(i)
-	if i == PlayerID || e.IsActor() && !e.KnownDead {
+	if i == PlayerID {
+		return ROActor
+	}
+	if a, ok := e.Role.(*Actor); ok && !a.KnownDead {
 		return ROActor
 	}
 	if e.IsItem() && i >= FirstMapID {
