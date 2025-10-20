@@ -204,6 +204,9 @@ func (g *Game) endTurnEarly() bool {
 // ComputeNoise generates footstep noise information.
 func (g *Game) ComputeNoise() {
 	pa := g.PlayerActor()
+	for _, ei := range g.NPMapEntities() {
+		ei.Noise = false
+	}
 	if pa.Has(StatusClarity) {
 		// When you have clarity, you have senses with strictly better
 		// range.
@@ -221,7 +224,6 @@ func (g *Game) ComputeNoise() {
 		if !ok {
 			continue
 		}
-		ei.Noise = false
 		if ai.IsDead() || g.InFOV(ei.P) {
 			continue
 		}
