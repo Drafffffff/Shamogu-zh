@@ -327,7 +327,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 			ai.DoesAny(Pushing) && g.IntN(5-dmg) < 2 {
 			g.push(i, j, ai, aj, ap, dist, bonus)
 		}
-	case ai.DoesAny(PatternSwap|PatternSwapDaze) && ap != AttackCharge && ai.CanMove() && !aj.ResistsMove():
+	case ai.DoesAny(PatternSwap|PatternSwapDaze) && ap != AttackCharge && !ai.Has(StatusLignification) && !aj.ResistsMove():
 		g.swapSpaceDistortion(i, j, ai, aj, dmg, dazed)
 	case ai.DoesAny(PatternCatch) && ap == AttackRanged && !aj.ResistsMove():
 		g.catch(i, j, ai, aj, dist)
@@ -745,7 +745,7 @@ func (g *Game) blinkOther(i, j ID, ai, aj *Actor) {
 			g.Logf("The %s’s attack made you blink away.", ei.Name)
 			g.StoryLogf("Blinked away by %s", ei.Name)
 		}
-		if ai.Has(StatusConfusion) {
+		if ai.Has(StatusConfusion) && !ai.ResistsMove() {
 			if to, ok := g.BlinkPos(ei.P); ok {
 				g.md.TeleportAnimation(ei.P, to, g.InFOV(to))
 				g.MoveActor(i, ai, to)
