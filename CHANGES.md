@@ -1,4 +1,7 @@
-# v? ?
+# v1.1.0 2025-10-27
+
+This release is a polishing one with some gameplay improvements and various
+fixes.
 
 Reworked and improved content:
 
@@ -20,6 +23,8 @@ Reworked and improved content:
   Note that earth dragons and Rampaging Boar players with Dig still perform
   pushing in melee as before. See discussion in issue #4 for some context
   around this change.
+* Disable Cat swapping while lignified even with woody legs, as it's more a
+  teleport-like kind of movement (see #4).
 * Lignification now unbalances adjacent actors on expiration, too, due to
   withering roots messing with nearby ground.
 * The lich is now immune to Confusion, and the undead knight is immune to Daze.
