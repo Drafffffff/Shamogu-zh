@@ -74,7 +74,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 			g.BumpMoveActor(PlayerID, pa, to)
 			g.md.MoveAnimation(from, to)
 			if dist <= 3 {
-				g.BumpAttackActor(PlayerID, j, pa, aj, AttackCharge, dist, 1)
+				g.BumpAttackActor(PlayerID, j, pa, aj, AttackCharge, dist, 2)
 			}
 			return true
 		}
