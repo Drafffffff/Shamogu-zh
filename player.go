@@ -34,6 +34,8 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 		if dist == 1 {
 			if !pa.DoesAny(PatternCrocodile) {
 				g.Dir = dir
+			} else if g.Dir == dir && g.CrocodileDragAttack(j, aj) {
+				return true
 			}
 			if pa.DoesAny(PatternFourDirs) && !pa.Has(StatusFocus) {
 				g.FourDirectionalAttack(PlayerID, pa, AttackPlain, dist)
@@ -124,6 +126,23 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 
 func (g *Game) logDaze() {
 	g.Log("You’re dazed: you need to wait (ENTER) or eat.")
+}
+
+// CrocodileDragAttack drags a foe backward.
+func (g *Game) CrocodileDragAttack(j ID, aj *Actor) bool {
+	pl, pa := g.Player()
+	dir := g.Dir
+	to := pl.P.Sub(dir)
+	if !g.IsFree(to) || !pa.CanMove() || pa.Has(StatusPoison) {
+		return false
+	}
+	pp, from := pl.P, g.Entity(j).P
+	g.BumpMoveActor(PlayerID, pa, to)
+	g.BumpMoveActor(j, aj, pp)
+	g.md.MoveAnimation(from, pp)
+	g.BumpAttackActor(PlayerID, j, pa, aj, AttackPlain, 1, 0)
+	g.PutStatus(j, aj, StatusImbalance, 2)
+	return true
 }
 
 // Sprint performs a sprinting bump-movement in the given direction.
