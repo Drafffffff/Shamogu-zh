@@ -133,7 +133,7 @@ func (g *Game) CrocodileDragAttack(j ID, aj *Actor) bool {
 	pl, pa := g.Player()
 	dir := g.Dir
 	to := pl.P.Sub(dir)
-	if !g.IsFree(to) || !pa.CanMove() || pa.Has(StatusPoison) {
+	if !g.IsFree(to) || !pa.CanMove() || pa.Has(StatusPoison) || aj.ResistsMove() {
 		return false
 	}
 	pp, from := pl.P, g.Entity(j).P
