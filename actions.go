@@ -1384,7 +1384,7 @@ func (a actionAuto) Handle(md *model) (gruid.Effect, bool) {
 			md.auto.mode = noAuto
 			return nil, false
 		}
-		next := md.auto.path[0]
+		next := md.auto.path[1]
 		bump := ActionBump{Delta: next.Sub(g.PP())}
 		eff, done := bump.Handle(md)
 		if !done {
