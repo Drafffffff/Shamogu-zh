@@ -62,6 +62,21 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 			g.md.MoveAnimation(from, to)
 			g.BumpAttackActor(PlayerID, j, pa, aj, AttackCharge, dist, 0)
 			return true
+		case pa.DoesAny(PatternCrocodile) && pa.CanMove() && (pa.HP > 1 || !pa.Has(StatusPoison)):
+			g.Dir = dir
+			var to gruid.Point
+			if dist == 2 {
+				to = pl.P.Add(dir)
+			} else {
+				to = pl.P.Add(dir.Mul(2))
+			}
+			from := pl.P
+			g.BumpMoveActor(PlayerID, pa, to)
+			g.md.MoveAnimation(from, to)
+			if dist <= 3 {
+				g.BumpAttackActor(PlayerID, j, pa, aj, AttackCharge, dist, 1)
+			}
+			return true
 		}
 	}
 	to := pl.P.Add(dir)
