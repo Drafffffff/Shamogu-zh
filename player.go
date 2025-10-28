@@ -17,11 +17,19 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 	if pa.Has(StatusSprint) && !pa.Has(StatusLignification) {
 		return g.Sprint(dir)
 	}
+	if pa.DoesAny(PatternCrocodile) && dir != g.Dir && g.Map.Passable(pl.P.Add(dir)) {
+		g.Dir = dir
+		return true
+	}
 	j, aj := g.RangedTargetInDir(pl.P, dir)
 	if j >= 0 {
 		if pa.Has(StatusFear) {
 			g.Log("You’re afraid to go in that direction.")
 			return false
+		}
+		if pa.DoesAny(PatternCrocodile) && dir != g.Dir {
+			g.Dir = dir
+			return true
 		}
 		ej := g.Entity(j)
 		dist := paths.DistanceManhattan(pl.P, ej.P)
@@ -56,6 +64,11 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 			return true
 		}
 	}
+	to := pl.P.Add(dir)
+	if pa.DoesAny(PatternCrocodile) && dir != g.Dir && g.Map.Passable(to) {
+		g.Dir = dir
+		return true
+	}
 	// We're not ranged and next position is not a monster: move.
 	if !pa.CanMove() {
 		g.Log("You cannot move while lignified.")
@@ -65,7 +78,6 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 		g.Log("You cannot move while poisoned and almost dead.")
 		return false
 	}
-	to := pl.P.Add(dir)
 	if !g.Map.Passable(to) {
 		if !inMap(to) {
 			g.Log("You cannot walk out of the map.")

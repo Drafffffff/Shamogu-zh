@@ -103,7 +103,7 @@ func (a ActionRun) Handle(md *model) (gruid.Effect, bool) {
 	}
 	md.UpdateRun(a.Delta)
 	md.targ.CancelExamine()
-	return gruid.Batch(eff, md.autoCmd()), done
+	return md.UpdateAutoMode(eff, autoRun), true
 }
 
 func (a ActionRun) String() string {
@@ -154,8 +154,7 @@ func (a ActionTravel) Handle(md *model) (gruid.Effect, bool) {
 		return eff, true
 	}
 	md.targ.CancelExamine()
-	md.auto.mode = autoTravel
-	return gruid.Batch(eff, md.autoCmd()), true
+	return md.UpdateAutoMode(eff, autoTravel), true
 }
 
 func (a ActionTravel) String() string {
@@ -186,8 +185,7 @@ func (a ActionAutoExplore) Handle(md *model) (gruid.Effect, bool) {
 		return eff, false
 	}
 	md.targ.CancelExamine()
-	md.auto.mode = autoExplore
-	return gruid.Batch(eff, md.autoCmd()), true
+	return md.UpdateAutoMode(eff, autoExplore), true
 }
 
 func (a ActionAutoExplore) String() string {
@@ -1360,7 +1358,8 @@ type actionAuto struct {
 type msgAuto int
 
 func (a actionAuto) Handle(md *model) (gruid.Effect, bool) {
-	if int(a.msg) != md.g.Turn {
+	g := md.g
+	if int(a.msg) != g.Turn {
 		return nil, false
 	}
 	switch md.auto.mode {
@@ -1369,29 +1368,34 @@ func (a actionAuto) Handle(md *model) (gruid.Effect, bool) {
 			md.auto.mode = noAuto
 			return nil, false
 		}
+		pp := g.PP()
 		bump := ActionBump{Delta: md.auto.delta}
 		eff, done := bump.Handle(md)
 		if !done {
 			md.auto.mode = noAuto
 			return eff, false
 		}
-		md.UpdateRun(md.auto.delta)
-		return gruid.Batch(eff, md.autoCmd()), true
+		if g.PP() != pp {
+			md.UpdateRun(md.auto.delta)
+		}
+		return md.UpdateAutoMode(eff, autoRun), true
 	case autoTravel:
-		next, ok := md.UpdateTravel()
-		if !ok {
+		if !md.KeepTraveling() {
 			md.auto.mode = noAuto
 			return nil, false
 		}
-		bump := ActionBump{Delta: next.Sub(md.g.PP())}
+		next := md.auto.path[0]
+		bump := ActionBump{Delta: next.Sub(g.PP())}
 		eff, done := bump.Handle(md)
 		if !done {
 			md.auto.mode = noAuto
 			return eff, false
 		}
-		return gruid.Batch(eff, md.autoCmd()), true
+		if g.PP() == next {
+			md.auto.path = md.auto.path[1:]
+		}
+		return md.UpdateAutoMode(eff, autoTravel), true
 	case autoExplore:
-		g := md.g
 		n, ok := md.UpdateAutoExplore()
 		if !ok {
 			md.auto.mode = noAuto
@@ -1403,7 +1407,7 @@ func (a actionAuto) Handle(md *model) (gruid.Effect, bool) {
 			md.auto.mode = noAuto
 			return eff, false
 		}
-		return gruid.Batch(eff, md.autoCmd()), true
+		return md.UpdateAutoMode(eff, autoExplore), true
 	}
 	return nil, false
 }

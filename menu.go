@@ -148,6 +148,16 @@ func (md *model) updateSpiritSelectionMenu(msg gruid.Msg) gruid.Effect {
 		msgmouse.P.Y -= spiritSelectionMargin
 		msg = msgmouse
 	}
+	if msgkey, ok := msg.(gruid.MsgKeyDown); ok && msgkey.Key == gruid.KeyTab {
+		var m mode
+		if md.mode == modeNewGame {
+			m = modeNewGameAdvanced
+		} else {
+			m = modeNewGame
+		}
+		md.openSpiritSelectionMenu(m)
+		return nil
+	}
 	md.menu.main.Update(msg)
 	g := md.g
 	switch act := md.menu.main.Action(); act {
@@ -158,7 +168,8 @@ func (md *model) updateSpiritSelectionMenu(msg gruid.Msg) gruid.Effect {
 		if idx < 0 {
 			break
 		}
-		e := spiritEntity(primarySpirits[idx])
+		spirits := getPrimarySpirits(md.mode)
+		e := spiritEntity(spirits[idx])
 		md.updateItemDesc(e)
 		if act != ui.MenuInvoke {
 			break
@@ -168,7 +179,11 @@ func (md *model) updateSpiritSelectionMenu(msg gruid.Msg) gruid.Effect {
 		md.g.InitLevel()
 		md.updateStatus()
 		g.LogStyled("Press SPACE for menu and ? for help. Good luck!", logSpecial)
+		// if md.mode == modeNewGameAdvanced {
+		// 	md.mode = modeNewGameMods
+		// } else {
 		md.mode = modeNormal
+		// }
 	}
 	return nil
 }

@@ -27,12 +27,22 @@ const (
 	autoExplore
 )
 
+// UpdateAutoMode updates auto mode if current player status allows it.
+func (md *model) UpdateAutoMode(eff gruid.Effect, m autoMode) gruid.Effect {
+	pa := md.g.PlayerActor()
+	if !pa.Has(StatusSprint) && !pa.Has(StatusDig) && !pa.Has(StatusLignification) && !pa.Has(StatusPoison) {
+		md.auto.mode = m
+		return gruid.Batch(eff, md.autoCmd())
+	}
+	md.auto.mode = noAuto
+	return eff
+}
+
 // UpdateRun updates auto dir movement info.
 func (md *model) UpdateRun(delta gruid.Point) {
 	g := md.g
 	a := md.auto
 	a.delta = delta
-	a.mode = autoRun
 	p := g.PP()
 	nbs := g.dirNeighbors(p, a.delta)
 	blocked := g.dirBlocked(p, a.delta)
@@ -105,18 +115,17 @@ func left(p gruid.Point, dir gruid.Point) gruid.Point {
 	return gruid.Point{p.X + dir.Y, p.Y - dir.X}
 }
 
-// UpdateTravel updates auto travel movement info, and returns the next
+// KeepTraveling updates auto travel movement info, and returns the next
 // position, if any.
-func (md *model) UpdateTravel() (next gruid.Point, ok bool) {
+func (md *model) KeepTraveling() bool {
 	g := md.g
 	if g.DangerInProximity() {
-		return next, false
+		return false
 	}
 	if len(md.auto.path) <= 1 {
-		return next, false
+		return false
 	}
-	md.auto.path = md.auto.path[1:]
-	return md.auto.path[0], true
+	return true
 }
 
 // UpdateAutoExplore updates auto exploration movement info, and returns next

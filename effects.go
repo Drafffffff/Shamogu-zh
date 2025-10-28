@@ -35,6 +35,7 @@ const (
 	DurationImbalanceGale          = 5
 	DurationImbalanceLignification = 5
 	DurationImbalanceSprint        = 5
+	DurationImbalanceTailSlap      = 5
 	DurationImbalanceTeleport      = 5
 	DurationLignification          = 12
 	DurationLignificationHit       = 6
@@ -465,6 +466,38 @@ func (eff EffectTimeStop) Name() string {
 func (eff EffectTimeStop) Desc() string {
 	return fmt.Sprintf("@BStop Time@N for %d turns. %s @GInstant@N.",
 		DurationTimeStop, statusDesc[StatusTimeStop])
+}
+
+type EffectTailSlap struct{}
+
+func (eff EffectTailSlap) Apply(g *Game) bool {
+	var actors []*Actor
+	var ids []ID
+	for j, aj := range g.AdjacentActors(g.PP()) {
+		actors = append(actors, aj)
+		ids = append(ids, j)
+	}
+	// Shuffle foes so that attack order is not predictable in an
+	// artificial way.
+	g.rand.Shuffle(len(actors), func(i, j int) {
+		actors[i], actors[j] = actors[j], actors[i]
+		ids[i], ids[j] = ids[j], ids[i]
+	})
+	g.Log("You spin around chasing your tail.")
+	for k, j := range ids {
+		g.BumpAttackActor(PlayerID, j, g.PlayerActor(), actors[k], AttackPlain, 1, 2)
+		g.PutStatus(j, actors[k], StatusImbalance, DurationImbalanceTailSlap)
+	}
+	g.Dir = g.Dir.Mul(-1)
+	return true
+}
+
+func (eff EffectTailSlap) Name() string {
+	return "tail slap"
+}
+
+func (eff EffectTailSlap) Desc() string {
+	return "Perform an unbalancing tail-slap with +2 attack on any adjacent foes while turning around."
 }
 
 type EffectLightning struct{}

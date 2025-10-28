@@ -134,6 +134,7 @@ const (
 	Player Traits = 1 << iota
 
 	PatternCatch        // unbalancing and catching attack (frog, octopode)
+	PatternCrocodile    // requires extra turn for changing directions (advanced)
 	PatternFourDirs     // four-directional attack in 4 dirs (hydra players)
 	PatternFourDirsMons // four-directional attack (four-headed hydra, undead knight)
 	PatternRampage      // rampaging (boar, phoenix)
@@ -207,6 +208,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, PatternFourDirs, "four-directional attack with attack bonus per extra foe")
 	desc = traitDesc(desc, t, PatternFourDirsMons, "four-directional attack")
 	desc = traitDesc(desc, t, PatternCatch, "ranged catching attack that may @Ounbalance@N foes")
+	desc = traitDesc(desc, t, PatternCrocodile, "slow rotation (needs turn to change directions)")
 	desc = traitDesc(desc, t, PatternRampage, "rampaging charge")
 	desc = traitDesc(desc, t, PatternRanged, "ranged attack")
 	desc = traitDesc(desc, t, PatternRangedRecoil, "ranged attack with recoil")

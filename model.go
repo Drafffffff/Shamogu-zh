@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/rand/v2"
 	"runtime"
+	"slices"
 
 	"codeberg.org/anaseto/gruid"
 	"codeberg.org/anaseto/gruid/paths"
@@ -46,6 +47,8 @@ type mode int
 const (
 	modeLoadGame           mode = iota // game load screen (load game)
 	modeNewGame                        // primary spirit selection (new game)
+	modeNewGameAdvanced                // primary spirit selection (advanced settings)
+	modeNewGameMods                    // mod selection (advanced settings)
 	modeNormal                         // map game mode
 	modeCritical                       // hp critical warning pause
 	modePager                          // pager (logs, help, lore)
@@ -91,7 +94,7 @@ func (md *model) init() gruid.Effect {
 	g.rand = rand.New(rand.NewPCG(rand.Uint64(), rand.Uint64()))
 	if !load {
 		g.Init()
-		md.openSpiritSelectionMenu()
+		md.openSpiritSelectionMenu(modeNewGame)
 	}
 	if err != nil {
 		g.LogStyled("Warning: could not load old saved game… starting new game.", logError)
@@ -246,12 +249,19 @@ func InitConfig() error {
 }
 
 var spiritKeys = []rune{'H', 'B', 'F', 'f', 'c'}
+var spiritKeysAdvanced = []rune{'C'}
 
-func (md *model) openSpiritSelectionMenu() {
+func (md *model) openSpiritSelectionMenu(m mode) {
 	hstyle := gruid.Style{Fg: ColorCyan}
 	entries := []ui.MenuEntry{}
-	for i, si := range primarySpirits {
-		r := spiritKeys[i]
+	spirits := getPrimarySpirits(m)
+	title := "New Game"
+	if m == modeNewGameAdvanced {
+		title = "New Game (advanced)"
+	}
+	keys := getPrimarySpiritKeys(m)
+	for i, si := range spirits {
+		r := keys[i]
 		switch r {
 		case 'H':
 			entries = append(entries, ui.MenuEntry{
@@ -265,10 +275,28 @@ func (md *model) openSpiritSelectionMenu() {
 		})
 	}
 	altBgEntries(entries)
-	md.menu.main.SetBox(&ui.Box{Title: ui.Text("New Game").WithStyle(gruid.Style{Fg: ColorYellow})})
+	md.menu.main.SetBox(&ui.Box{Title: ui.Text(title).WithStyle(gruid.Style{Fg: ColorYellow})})
 	md.menu.main.SetEntries(entries)
 	md.menu.main.SetActiveInvokable(0)
-	md.updateItemDesc(spiritEntity(primarySpirits[0]))
-	md.mode = modeNewGame
+	md.updateItemDesc(spiritEntity(spirits[0]))
+	md.mode = m
 	md.menu.mode = modeSelection // not really needed
+}
+
+// getPrimarySpirits returns the spirit info for primary spirits in the new
+// game menu.
+func getPrimarySpirits(m mode) []spiritInfo {
+	if m == modeNewGameAdvanced {
+		return append(slices.Clone(primarySpirits), primarySpiritsAdvanced...)
+	}
+	return primarySpirits
+}
+
+// getPrimarySpiritKeys returns the spirit info for primary spirits in the new
+// game menu.
+func getPrimarySpiritKeys(m mode) []rune {
+	if m == modeNewGameAdvanced {
+		return append(slices.Clone(spiritKeys), spiritKeysAdvanced...)
+	}
+	return spiritKeys
 }
