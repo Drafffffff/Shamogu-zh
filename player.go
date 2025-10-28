@@ -17,24 +17,24 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 	if pa.Has(StatusSprint) && !pa.Has(StatusLignification) {
 		return g.Sprint(dir)
 	}
-	if pa.DoesAny(PatternCrocodile) && dir != g.Dir && g.Map.Passable(pl.P.Add(dir)) {
-		g.Dir = dir
-		return true
-	}
 	j, aj := g.RangedTargetInDir(pl.P, dir)
 	if j >= 0 {
 		if pa.Has(StatusFear) {
 			g.Log("You’re afraid to go in that direction.")
 			return false
 		}
-		if pa.DoesAny(PatternCrocodile) && dir != g.Dir {
-			g.Dir = dir
-			return true
-		}
 		ej := g.Entity(j)
 		dist := paths.DistanceManhattan(pl.P, ej.P)
+		if pa.DoesAny(PatternCrocodile) && dir != g.Dir {
+			if dist > 1 || dir == g.Dir.Mul(-1) {
+				g.Dir = dir
+				return true
+			}
+		}
 		if dist == 1 {
-			g.Dir = dir
+			if !pa.DoesAny(PatternCrocodile) {
+				g.Dir = dir
+			}
 			if pa.DoesAny(PatternFourDirs) && !pa.Has(StatusFocus) {
 				g.FourDirectionalAttack(PlayerID, pa, AttackPlain, dist)
 			} else {
