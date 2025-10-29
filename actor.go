@@ -208,7 +208,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, PatternFourDirs, "four-directional attack with attack bonus per extra foe")
 	desc = traitDesc(desc, t, PatternFourDirsMons, "four-directional attack")
 	desc = traitDesc(desc, t, PatternCatch, "ranged catching attack that may @Ounbalance@N foes")
-	desc = traitDesc(desc, t, PatternCrocodile, "2-tile rampaging charge, slow rotation (needs turn to change directions), frontal attacks drag foes backwards and unbalance them")
+	desc = traitDesc(desc, t, PatternCrocodile, "confusing dragging attack, slow rotation (cannot turn and attack)")
 	desc = traitDesc(desc, t, PatternRampage, "rampaging charge")
 	desc = traitDesc(desc, t, PatternRanged, "ranged attack")
 	desc = traitDesc(desc, t, PatternRangedRecoil, "ranged attack with recoil")

@@ -123,11 +123,12 @@ var primarySpirits = []spiritInfo{
 // spirits.
 var primarySpiritsAdvanced = []spiritInfo{
 	{
-		Name:        "Spinning Crocodile",
-		MaxCharges:  [2]int{2, 4},
-		Ability:     [2]Ability{EffectTailSlap{}, EffectTailSlap{}},
-		BonusAttack: [2]int{2, 2},
-		BonusTraits: [2]Traits{PatternCrocodile, PatternCrocodile}},
+		Name:         "Spinning Crocodile",
+		MaxCharges:   [2]int{2, 4},
+		Ability:      [2]Ability{EffectTailSlap{}, EffectTailSlap{}},
+		BonusAttack:  [2]int{1, 1},
+		BonusDefense: [2]int{1, 1},
+		BonusTraits:  [2]Traits{PatternCrocodile, PatternCrocodile}},
 }
 
 // secondarySpirits represents the various kinds of secondary spirit totems

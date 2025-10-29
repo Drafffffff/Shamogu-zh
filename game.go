@@ -362,6 +362,7 @@ type NoiseType int
 const (
 	NoiseBark NoiseType = iota
 	NoiseCombat
+	NoiseChomp
 	NoiseDig
 	NoiseExplosion
 	NoiseEarthMenhir
@@ -375,7 +376,7 @@ const (
 // Noise returns the amount of noise associated with the given type of noise.
 func (nt NoiseType) Noise() int {
 	switch nt {
-	case NoiseCombat:
+	case NoiseCombat, NoiseChomp:
 		return 4
 	case NoiseExplosion, NoiseFakePortal:
 		return MaxFOVRange + 4
@@ -394,6 +395,8 @@ func (nt NoiseType) Msg() string {
 	case NoiseCombat:
 		// Lowercase for combat, because noise is not as strong.
 		return "Smash!"
+	case NoiseChomp:
+		return "Chomp!"
 	case NoiseDig:
 		return "CRACK!"
 	case NoiseExplosion:

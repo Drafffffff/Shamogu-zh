@@ -17,6 +17,14 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 	if pa.Has(StatusSprint) && !pa.Has(StatusLignification) {
 		return g.Sprint(dir)
 	}
+	dirChange := dir != g.Dir
+	to := pl.P.Add(dir)
+	if pa.DoesAny(PatternCrocodile) && dir == g.Dir.Mul(-1) && g.Map.Passable(to) {
+		// Crocodile needs to spend a turn turning before moving
+		// backwards.
+		g.Dir = dir
+		return true
+	}
 	j, aj := g.RangedTargetInDir(pl.P, dir)
 	if j >= 0 {
 		if pa.Has(StatusFear) {
@@ -25,21 +33,17 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 		}
 		ej := g.Entity(j)
 		dist := paths.DistanceManhattan(pl.P, ej.P)
-		if pa.DoesAny(PatternCrocodile) && dir != g.Dir {
-			if dist > 1 || dir == g.Dir.Mul(-1) {
-				g.Dir = dir
-				return true
-			}
-		}
 		if dist == 1 {
-			if !pa.DoesAny(PatternCrocodile) {
-				g.Dir = dir
-			} else if g.Dir == dir && g.CrocodileDragAttack(j, aj) {
-				return true
-			}
-			if pa.DoesAny(PatternFourDirs) && !pa.Has(StatusFocus) {
+			switch {
+			case pa.DoesAny(PatternCrocodile):
+				if dirChange {
+					g.Dir = dir
+					break
+				}
+				g.BumpAttackActor(PlayerID, j, pa, aj, AttackDrag, dist, 0)
+			case pa.DoesAny(PatternFourDirs) && !pa.Has(StatusFocus):
 				g.FourDirectionalAttack(PlayerID, pa, AttackPlain, dist)
-			} else {
+			default:
 				g.BumpAttackActor(PlayerID, j, pa, aj, AttackPlain, dist, 0)
 			}
 			return true
@@ -64,27 +68,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 			g.md.MoveAnimation(from, to)
 			g.BumpAttackActor(PlayerID, j, pa, aj, AttackCharge, dist, 0)
 			return true
-		case pa.DoesAny(PatternCrocodile) && pa.CanMove() && (pa.HP > 1 || !pa.Has(StatusPoison)):
-			g.Dir = dir
-			var to gruid.Point
-			if dist == 2 {
-				to = pl.P.Add(dir)
-			} else {
-				to = pl.P.Add(dir.Mul(2))
-			}
-			from := pl.P
-			g.BumpMoveActor(PlayerID, pa, to)
-			g.md.MoveAnimation(from, to)
-			if dist <= 3 {
-				g.BumpAttackActor(PlayerID, j, pa, aj, AttackCharge, dist, 2)
-			}
-			return true
 		}
-	}
-	to := pl.P.Add(dir)
-	if pa.DoesAny(PatternCrocodile) && dir != g.Dir && g.Map.Passable(to) {
-		g.Dir = dir
-		return true
 	}
 	// We're not ranged and next position is not a monster: move.
 	if !pa.CanMove() {
@@ -111,6 +95,9 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 	g.Dir = dir
 	g.BumpMoveActor(PlayerID, pa, to)
 	// Try charge.
+	if pa.DoesAny(PatternCrocodile) && dirChange {
+		return true
+	}
 	nto := to.Add(dir)
 	if pa.DoesAny(PatternFourDirs) && !pa.Has(StatusFocus) {
 		g.FourDirectionalAttack(PlayerID, pa, AttackCharge, 2)
@@ -126,23 +113,6 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 
 func (g *Game) logDaze() {
 	g.Log("You’re dazed: you need to wait (ENTER) or eat.")
-}
-
-// CrocodileDragAttack drags a foe backward.
-func (g *Game) CrocodileDragAttack(j ID, aj *Actor) bool {
-	pl, pa := g.Player()
-	dir := g.Dir
-	to := pl.P.Sub(dir)
-	if !g.IsFree(to) || !pa.CanMove() || pa.Has(StatusPoison) || aj.ResistsMove() {
-		return false
-	}
-	pp, from := pl.P, g.Entity(j).P
-	g.BumpMoveActor(PlayerID, pa, to)
-	g.BumpMoveActor(j, aj, pp)
-	g.md.MoveAnimation(from, pp)
-	g.BumpAttackActor(PlayerID, j, pa, aj, AttackPlain, 1, 0)
-	g.PutStatus(j, aj, StatusImbalance, 2)
-	return true
 }
 
 // Sprint performs a sprinting bump-movement in the given direction.

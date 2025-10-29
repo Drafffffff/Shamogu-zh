@@ -14,6 +14,8 @@ const (
 	AttackPlain  AttackKind = iota // Attack against adjacent foe without moving
 	AttackCharge                   // Attack against adjacent foe after moving
 	AttackRanged                   // Attack against non-adjacent foe without moving (swapping occurs after the attack)
+	AttackDrag                     // Attack against adjacent foe that may move backwards (crocodile)
+	AttackSlap                     // Attack against adjacent foes (crocodile's tail slap)
 
 	AttackGale      // pushing gale damage
 	AttackLightning // lightning damage
@@ -92,7 +94,13 @@ func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKi
 	switch {
 	case i >= 0 && ai != nil:
 		g.logBumpDamage(i, j, ai, aj, dmg, ap)
-		if !ai.DoesAny(PatternSwap|PatternSwapDaze) && g.IntN(dmg) > 0 {
+		if ai.DoesAny(PatternSwap|PatternSwapDaze) || g.IntN(dmg) == 0 {
+			break
+		}
+		switch {
+		case ap == AttackDrag:
+			g.MakeNoise(ej.P, NoiseChomp)
+		default:
 			g.MakeNoise(ej.P, NoiseCombat)
 		}
 	case !g.InFOV(ej.P):
@@ -336,6 +344,8 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 			ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusImbalance, 1+dmg) && g.InFOV(ei.P) {
 			g.Logf("The confused %s lost balance due to recoil!", ei.Name)
 		}
+	case ai.DoesAny(PatternCrocodile) && ai.CanMove() && !aj.ResistsMove() && ap == AttackDrag && !ai.Has(StatusPoison) && aj.IsAlive():
+		g.drag(i, j, ai, aj)
 	}
 	// Extra attack effects (shared by both player and monsters).
 	if ai.DoesAny(VenomousMelee) && (ap != AttackRanged || g.AdjacentEntities(i, j)) && g.IntN(6-dmg) < 2 {
@@ -468,7 +478,7 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 		// Lignification caps attack damage at 1.
 		dmg = min(1, dmg)
 	}
-	if ai.Has(StatusDig) && (ap == AttackCharge || dmg == 0) {
+	if ai.Has(StatusDig) && (ap == AttackCharge || dmg == 0) || ap == AttackSlap {
 		// Dig status gives extra *effective* damage on charge and
 		// ensures at least 1 damage.
 		dmg++
@@ -690,6 +700,31 @@ func (g *Game) recoil(i, j ID, ai *Actor) bool {
 	g.MoveActor(i, ai, npi)
 	g.md.MoveAnimation(pi, npi)
 	return true
+}
+
+// drag attemps to drag a foe backwards.
+func (g *Game) drag(i, j ID, ai, aj *Actor) {
+	ei, ej := g.Entity(i), g.Entity(j)
+	pi, pj := ei.P, ej.P
+	delta := pj.Sub(pi)
+	to := pi.Sub(delta)
+	if !g.IsFree(to) {
+		return
+	}
+	if i == PlayerID {
+		switch g.Map.Clouds.At(to).Kind {
+		case CloudFire, CloudPoison:
+			// Player is smarter than corrupted monsters: we don't
+			// move onto a dangerous cloud.
+			return
+		}
+	}
+	g.PutStatus(j, aj, StatusConfusion, DurationConfusionCrocoBreath)
+	// Move backwards.
+	g.BumpMoveActor(i, ai, to)
+	g.MoveActor(j, aj, pi)
+	g.md.MoveAnimation(pj, pi)
+	// Crocodiles confuse foes when bite-dragging them, due to bad breath.
 }
 
 // AdjacentEntities reports whether two entities are adjacent.

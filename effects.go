@@ -16,6 +16,7 @@ const (
 	DurationBerserkTrap            = 5
 	DurationClarity                = 5
 	DurationConfusionAmbrosia      = 6
+	DurationConfusionCrocoBreath   = 2
 	DurationConfusionFireTrap      = 3
 	DurationConfusionHit           = 6
 	DurationConfusionPepperBreath  = 2
@@ -485,7 +486,7 @@ func (eff EffectTailSlap) Apply(g *Game) bool {
 	})
 	g.Log("You spin around chasing your tail.")
 	for k, j := range ids {
-		g.BumpAttackActor(PlayerID, j, g.PlayerActor(), actors[k], AttackPlain, 1, 2)
+		g.BumpAttackActor(PlayerID, j, g.PlayerActor(), actors[k], AttackSlap, 1, 0)
 		g.PutStatus(j, actors[k], StatusImbalance, DurationImbalanceTailSlap)
 	}
 	g.Dir = g.Dir.Mul(-1)
@@ -497,7 +498,7 @@ func (eff EffectTailSlap) Name() string {
 }
 
 func (eff EffectTailSlap) Desc() string {
-	return "Perform an unbalancing tail-slap with +2 attack on any adjacent foes while turning around."
+	return "Perform an unbalancing tail-slap attack with +1 effective damage on any adjacent foes while turning around."
 }
 
 type EffectLightning struct{}
