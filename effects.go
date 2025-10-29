@@ -16,7 +16,6 @@ const (
 	DurationBerserkTrap            = 5
 	DurationClarity                = 5
 	DurationConfusionAmbrosia      = 6
-	DurationConfusionCrocoBreath   = 2
 	DurationConfusionFireTrap      = 3
 	DurationConfusionHit           = 6
 	DurationConfusionPepperBreath  = 2
@@ -33,10 +32,11 @@ const (
 	DurationFearUndead             = 3
 	DurationFire                   = 3
 	DurationFoggySkin              = 10
+	DurationImbalanceDragging      = 2
 	DurationImbalanceGale          = 5
 	DurationImbalanceLignification = 5
 	DurationImbalanceSprint        = 5
-	DurationImbalanceTailSlap      = 5
+	DurationImbalanceTailSlap      = 4
 	DurationImbalanceTeleport      = 5
 	DurationLignification          = 12
 	DurationLignificationHit       = 6
@@ -498,7 +498,8 @@ func (eff EffectTailSlap) Name() string {
 }
 
 func (eff EffectTailSlap) Desc() string {
-	return "Perform an unbalancing tail-slap attack with +1 effective damage on any adjacent foes while turning around."
+	return fmt.Sprintf("Perform a tail-slap attack with +1 effective damage on any adjacent foes while turning around, @Ounbalancing@N them for %d turns.",
+		DurationImbalanceTailSlap)
 }
 
 type EffectLightning struct{}

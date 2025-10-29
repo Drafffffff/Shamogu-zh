@@ -481,6 +481,7 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 	if ai.Has(StatusDig) && (ap == AttackCharge || dmg == 0) || ap == AttackSlap {
 		// Dig status gives extra *effective* damage on charge and
 		// ensures at least 1 damage.
+		// Crocodile's tail-slapping has extra effective damage, too.
 		dmg++
 	}
 	if ai.Has(StatusBerserk) {
@@ -719,12 +720,11 @@ func (g *Game) drag(i, j ID, ai, aj *Actor) {
 			return
 		}
 	}
-	g.PutStatus(j, aj, StatusConfusion, DurationConfusionCrocoBreath)
+	g.PutStatus(j, aj, StatusImbalance, DurationImbalanceDragging)
 	// Move backwards.
 	g.BumpMoveActor(i, ai, to)
 	g.MoveActor(j, aj, pi)
 	g.md.MoveAnimation(pj, pi)
-	// Crocodiles confuse foes when bite-dragging them, due to bad breath.
 }
 
 // AdjacentEntities reports whether two entities are adjacent.

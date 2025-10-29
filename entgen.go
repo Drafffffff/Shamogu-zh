@@ -124,10 +124,10 @@ var primarySpirits = []spiritInfo{
 var primarySpiritsAdvanced = []spiritInfo{
 	{
 		Name:         "Spinning Crocodile",
-		MaxCharges:   [2]int{2, 4},
+		MaxCharges:   [2]int{3, 4},
 		Ability:      [2]Ability{EffectTailSlap{}, EffectTailSlap{}},
 		BonusAttack:  [2]int{1, 1},
-		BonusDefense: [2]int{1, 1},
+		BonusDefense: [2]int{0, 1},
 		BonusTraits:  [2]Traits{PatternCrocodile, PatternCrocodile}},
 }
 

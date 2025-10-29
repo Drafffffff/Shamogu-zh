@@ -1669,6 +1669,8 @@ In Shamogu, both the player and the monsters may use one of several attack patte
 
 @CSpace-Distorting@N attacks are ranged attacks that @Mswap positions@N on successful hits, but result in normal movement on misses. Any foes adjacent to the landing hit position are blinked away. Also, note that such attacks reverse your current direction.
 
+@CDragging@N attacks are melee attacks that drag foes backwards, unbalancing them. They’re performed by Spinning Crocodile players (primary spirit available in the advanced new game settings opened with TAB).
+
 @YNOISE@N
 
 Combat and some other actions produce noise, as shown with onomatopoeias in the game logs. Some noises can be heard from a few tiles away only, while others may reach farther, up to two times the view range in the worst case. Possible noises include a gentle “Smash!”, a more serious “ROAR!” or “CRACK!”, a problematic “POP-BOOM!”, or an even more alarming “RING-RING!”. Beware that monsters will investigate the source of those noises.
