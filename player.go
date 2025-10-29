@@ -72,10 +72,18 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 	}
 	// We're not ranged and next position is not a monster: move.
 	if !pa.CanMove() {
+		if pa.DoesAny(PatternCrocodile) && dirChange && g.Map.Passable(to) {
+			g.Dir = dir
+			return true
+		}
 		g.Log("You cannot move while lignified.")
 		return false
 	}
 	if pa.HP == 1 && pa.Has(StatusPoison) {
+		if pa.DoesAny(PatternCrocodile) && dirChange && g.Map.Passable(to) {
+			g.Dir = dir
+			return true
+		}
 		g.Log("You cannot move while poisoned and almost dead.")
 		return false
 	}
