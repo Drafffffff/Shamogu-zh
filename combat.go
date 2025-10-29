@@ -98,7 +98,7 @@ func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKi
 			break
 		}
 		switch {
-		case ap == AttackDrag:
+		case ai.DoesAny(PatternCrocodile) && ap != AttackSlap:
 			g.MakeNoise(ej.P, NoiseChomp)
 		default:
 			g.MakeNoise(ej.P, NoiseCombat)
