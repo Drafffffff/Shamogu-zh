@@ -185,7 +185,7 @@ func (md *model) startNewGame() {
 func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
 	if msgkey, ok := msg.(gruid.MsgKeyDown); ok {
 		switch msgkey.Key {
-		case gruid.KeyTab, gruid.KeyEscape:
+		case gruid.KeyEscape:
 			md.openSpiritSelectionMenu(modeNewGame)
 			clear(md.g.Mods)
 			return nil
@@ -204,13 +204,24 @@ func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
 			break
 		}
 		g := md.g
-		if idx >= len(g.Mods) {
+		if idx == len(g.Mods) {
 			l := md.desc
 			l.Box = &ui.Box{Title: ui.Text("Save and return")}
 			l.Content = ui.Text("Save mod selection and continue to advanced primary spirit selection screen").
 				Format(UIWidth/2 - 1 - 2)
 			if act == ui.MenuInvoke {
 				md.openSpiritSelectionMenu(modeNewGameAdvanced)
+			}
+			break
+		}
+		if idx > len(g.Mods) {
+			l := md.desc
+			l.Box = &ui.Box{Title: ui.Text("Quit menu and disable mods")}
+			l.Content = ui.Text("Disable any mods and return to normal spirit selection menu.").
+				Format(UIWidth/2 - 1 - 2)
+			if act == ui.MenuInvoke {
+				md.openSpiritSelectionMenu(modeNewGame)
+				clear(md.g.Mods)
 			}
 			break
 		}
@@ -272,6 +283,10 @@ func (md *model) modSelectionMenu() {
 	entries = append(entries, ui.MenuEntry{
 		Text: ui.Text("s - Save and return"),
 		Keys: []gruid.Key{gruid.Key('s'), gruid.Key('S')},
+	})
+	entries = append(entries, ui.MenuEntry{
+		Text: ui.Text("q - Quit menu and disable mods"),
+		Keys: []gruid.Key{gruid.Key('q'), gruid.Key('Q')},
 	})
 	altBgEntries(entries)
 	md.menu.main.SetBox(&ui.Box{Title: ui.Text(title).WithStyle(gruid.Style{Fg: ColorYellow})})
