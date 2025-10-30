@@ -42,8 +42,10 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 				}
 				g.BumpAttackActor(PlayerID, j, pa, aj, AttackDrag, dist, 0)
 			case pa.DoesAny(PatternFourDirs) && !pa.Has(StatusFocus):
+				g.Dir = dir
 				g.FourDirectionalAttack(PlayerID, pa, AttackPlain, dist)
 			default:
+				g.Dir = dir
 				g.BumpAttackActor(PlayerID, j, pa, aj, AttackPlain, dist, 0)
 			}
 			return true
