@@ -47,6 +47,7 @@ type Game struct {
 	Turn int         // current game's turn
 
 	Logs     *Logs     // game log
+	Mods     []bool    // active game mods
 	ProcInfo *ProcInfo // information for procedural generation
 	Stats    *Stats    // game statistics
 	Version  string    // game's version
@@ -71,6 +72,7 @@ func (g *Game) Init() {
 	g.InitProcInfo()
 	g.Stats = newStats()
 	g.Logs = &Logs{}
+	g.Mods = make([]bool, NMods)
 	g.Entities = make([]*Entity, InventorySize+1)
 	g.Map = NewMap() // initialize empty map object
 	g.PR = paths.NewPathRange(gruid.NewRange(0, 0, MapWidth, MapHeight))
@@ -338,7 +340,7 @@ func (g *Game) MakeNoise(at gruid.Point, nt NoiseType) {
 	pa := g.PlayerActor()
 	goodhearing := pa.DoesAny(GoodHearing) && !pa.DoesAny(BadHearing)
 	d := g.PRnoise.BreadthFirstMapAt(pp)
-	if d <= maxdist && (goodhearing || d <= noise) {
+	if d <= maxdist && (goodhearing || d <= noise) && nt != NoiseHeavySteps {
 		if at != pp && g.Map.Noise != nil {
 			g.Map.Noise[at] = nt
 		}
@@ -371,12 +373,13 @@ const (
 	NoiseMusic
 	NoiseRoar
 	NoiseWind
+	NoiseHeavySteps
 )
 
 // Noise returns the amount of noise associated with the given type of noise.
 func (nt NoiseType) Noise() int {
 	switch nt {
-	case NoiseCombat, NoiseChomp:
+	case NoiseCombat, NoiseChomp, NoiseHeavySteps:
 		return 4
 	case NoiseExplosion, NoiseFakePortal:
 		return MaxFOVRange + 4
@@ -413,6 +416,9 @@ func (nt NoiseType) Msg() string {
 		return "ROAR!"
 	case NoiseWind:
 		return "WHIZ!"
+	case NoiseHeavySteps:
+		// Don't log heavy steps from mod, happens too often
+		return ""
 	default:
 		// should not happen.
 		return "NOISE!"
@@ -434,4 +440,13 @@ func (g *Game) SmellFood() {
 			g.SenseEntity(ei, "smell")
 		}
 	}
+}
+
+// Mod reports whether a given mod is enabled.
+func (g *Game) Mod(m Mod) bool {
+	if int(m) >= len(g.Mods) {
+		// Should not happen (except during mid-game development).
+		return false
+	}
+	return g.Mods[m]
 }

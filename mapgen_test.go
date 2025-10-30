@@ -76,7 +76,7 @@ func testGame(t *testing.T) {
 	g.md = md
 	g.rand = rand.New(rand.NewPCG(rand.Uint64(), rand.Uint64()))
 	g.Init()
-	g.Entities[PrimarySpiritID] = spiritEntity(primarySpirits[g.rand.IntN(len(primarySpirits))])
+	g.Entities[PrimarySpiritID] = g.spiritEntity(primarySpirits[g.rand.IntN(len(primarySpirits))])
 	g.ComputePlayerStats()
 	g.InitLevel()
 	if !connex(g.Map.Terrain, g.PR, g.rand) {

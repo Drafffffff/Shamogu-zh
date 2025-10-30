@@ -353,7 +353,7 @@ func (eff EffectJump) Apply(g *Game) bool {
 	g.md.MoveAnimation(from, to)
 	for p := from.Add(dir); p != to; p = p.Add(dir) {
 		if i, ai := g.ActorAt(p); i >= 0 {
-			if !pa.Has(StatusFear) && !pa.Has(StatusDaze) {
+			if !g.PlayerFears(i, ai) && !pa.Has(StatusDaze) {
 				if pa.Has(StatusSprint) {
 					g.PutStatus(i, ai, StatusImbalance, DurationImbalanceSprint)
 				} else {
@@ -486,6 +486,9 @@ func (eff EffectTailSlap) Apply(g *Game) bool {
 	})
 	g.Log("You spin around chasing your tail.")
 	for k, j := range ids {
+		// Tail-slap works even under fear, as it's not really
+		// directed. NOTE: we should maybe remove one direction under
+		// fear?
 		g.BumpAttackActor(PlayerID, j, g.PlayerActor(), actors[k], AttackSlap, 1, 0)
 		g.PutStatus(j, actors[k], StatusImbalance, DurationImbalanceTailSlap)
 	}

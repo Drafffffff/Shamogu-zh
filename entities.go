@@ -191,6 +191,9 @@ func (g *Game) BumpMoveActor(i ID, ai *Actor, to gruid.Point) {
 		g.dig(to)
 	}
 	g.MoveActor(i, ai, to)
+	if i == PlayerID && g.Mod(ModHeavySteps) {
+		g.MakeNoise(to, NoiseHeavySteps)
+	}
 	g.ApplyBumpMoveEffects(i, ai)
 }
 

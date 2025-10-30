@@ -149,13 +149,7 @@ func (md *model) updateSpiritSelectionMenu(msg gruid.Msg) gruid.Effect {
 		msg = msgmouse
 	}
 	if msgkey, ok := msg.(gruid.MsgKeyDown); ok && msgkey.Key == gruid.KeyTab {
-		var m mode
-		if md.mode == modeNewGame {
-			m = modeNewGameAdvanced
-		} else {
-			m = modeNewGame
-		}
-		md.openSpiritSelectionMenu(m)
+		md.modSelectionMenu()
 		return nil
 	}
 	md.menu.main.Update(msg)
@@ -169,21 +163,121 @@ func (md *model) updateSpiritSelectionMenu(msg gruid.Msg) gruid.Effect {
 			break
 		}
 		spirits := getPrimarySpirits(md.mode)
-		e := spiritEntity(spirits[idx])
+		e := g.spiritEntity(spirits[idx])
 		md.updateItemDesc(e)
 		if act != ui.MenuInvoke {
 			break
 		}
 		g.Entities[PrimarySpiritID] = e
 		g.ComputePlayerStats()
-		md.g.InitLevel()
-		md.updateStatus()
-		g.LogStyled("Press SPACE for menu and ? for help. Good luck!", logSpecial)
-		// if md.mode == modeNewGameAdvanced {
-		// 	md.mode = modeNewGameMods
-		// } else {
-		md.mode = modeNormal
-		// }
+		md.startNewGame()
 	}
 	return nil
+}
+
+func (md *model) startNewGame() {
+	md.g.InitLevel()
+	md.updateStatus()
+	md.g.LogStyled("Press SPACE for menu and ? for help. Good luck!", logSpecial)
+	md.mode = modeNormal
+}
+
+func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
+	if msgkey, ok := msg.(gruid.MsgKeyDown); ok {
+		switch msgkey.Key {
+		case gruid.KeyTab, gruid.KeyEscape:
+			md.openSpiritSelectionMenu(modeNewGame)
+			clear(md.g.Mods)
+			return nil
+		case gruid.KeySpace:
+			md.openSpiritSelectionMenu(modeNewGameAdvanced)
+			return nil
+		}
+	}
+	md.menu.main.Update(msg)
+	switch act := md.menu.main.Action(); act {
+	case ui.MenuQuit:
+		return gruid.End()
+	case ui.MenuMove, ui.MenuInvoke:
+		idx := md.menu.main.ActiveInvokable()
+		if idx < 0 {
+			break
+		}
+		g := md.g
+		if idx >= len(g.Mods) {
+			l := md.desc
+			l.Box = &ui.Box{Title: ui.Text("Save and return")}
+			l.Content = ui.Text("Save mod selection and continue to advanced primary spirit selection screen").
+				Format(UIWidth/2 - 1 - 2)
+			if act == ui.MenuInvoke {
+				md.openSpiritSelectionMenu(modeNewGameAdvanced)
+			}
+			break
+		}
+		m := gameMods[idx]
+		if act != ui.MenuInvoke {
+			md.updateModDesc(m)
+			break
+		}
+		g.Mods[m] = !g.Mods[m]
+		md.modSelectionMenu()
+		md.menu.main.SetActiveInvokable(idx)
+		md.updateModDesc(Mod(idx))
+	}
+	return nil
+}
+
+// updateItemDesc updates the description label with text for the given entity.
+func (md *model) updateModDesc(m Mod) {
+	l := md.desc
+	stt := ui.StyledText{}.WithMarkups(Markups)
+	enabled := ""
+	if md.g.Mods[m] {
+		enabled = "@CEnabled.@N\n"
+	}
+	l.Box = &ui.Box{Title: ui.Text(m.String())}
+	l.Content = stt.WithText(enabled + m.Desc()).Format(UIWidth/2 - 1 - 2)
+}
+
+func (md *model) modSelectionMenu() {
+	hstyle := gruid.Style{Fg: ColorCyan}
+	entries := []ui.MenuEntry{}
+	mods := gameMods
+	title := "Mod Selection"
+	r := 'a'
+	for i, m := range mods {
+		if i == 0 {
+			entries = append(entries, ui.MenuEntry{
+				Text:     ui.Text("Mods").WithStyle(hstyle),
+				Disabled: true,
+			})
+		}
+		s := "[ ]"
+		if md.g.Mods[Mod(i)] {
+			s = "[*]"
+		}
+		entries = append(entries, ui.MenuEntry{
+			Text: ui.Textf("%c - %-30s %s", r, m.String(), s),
+			Keys: []gruid.Key{gruid.Key(r)},
+		})
+		r++
+		if r == 's' {
+			r++
+		}
+	}
+	entries = append(entries, ui.MenuEntry{
+		Text:     ui.Text("Actions").WithStyle(hstyle),
+		Disabled: true,
+	})
+	entries = append(entries, ui.MenuEntry{
+		Text: ui.Text("s - Save and return"),
+		Keys: []gruid.Key{gruid.Key('s'), gruid.Key('S')},
+	})
+	altBgEntries(entries)
+	md.menu.main.SetBox(&ui.Box{Title: ui.Text(title).WithStyle(gruid.Style{Fg: ColorYellow})})
+	md.menu.main.SetEntries(entries)
+	md.menu.main.SetActiveInvokable(0)
+	md.updateModDesc(Mod(0))
+	md.mode = modeNewGameMods
+	md.menu.mode = modeSelection // not really needed
 }

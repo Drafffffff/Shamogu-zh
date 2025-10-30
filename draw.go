@@ -57,6 +57,9 @@ func (md *model) Draw() gruid.Grid {
 	case modeNewGame, modeNewGameAdvanced:
 		md.drawSpiritSelection()
 		return md.gd
+	case modeNewGameMods:
+		md.drawModSelection()
+		return md.gd
 	case modeLoadGame:
 		md.drawLoadGameScreen()
 		return md.gd
@@ -538,6 +541,12 @@ func (md *model) drawSpiritSelection() {
 		`that dungeon in order to find and destroy the source of corruption… ` +
 		`You hope luck will be on your side!`).Format(72).
 		Draw(md.gd.Slice(gruid.NewRange(4, 16, UIWidth-4, UIHeight)))
+}
+
+func (md *model) drawModSelection() {
+	menugd := md.menu.main.Draw()
+	md.gd.Copy(menugd)
+	md.desc.Draw(md.gd.Slice(md.gd.Range().Columns(UIWidth/2, UIWidth)))
 }
 
 func (md *model) drawLoadGameScreen() {

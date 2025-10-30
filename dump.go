@@ -103,6 +103,9 @@ func (g *Game) DumpSummary() string {
 		}
 		sb.WriteString(").\n")
 	}
+	if nmods := g.modCount(); nmods > 0 {
+		fmt.Fprintf(&sb, "ENABLED %d MODS.\n", nmods)
+	}
 	pa := g.PlayerActor()
 	if g.win {
 		fmt.Fprintf(&sb, "You destroyed the Orb of Corruption!\n")
@@ -117,11 +120,25 @@ func (g *Game) DumpSummary() string {
 	return sb.String()
 }
 
+func (g *Game) modCount() int {
+	var n int
+	for _, b := range g.Mods {
+		if b {
+			n++
+		}
+	}
+	return n
+}
+
 // Dump produces the game statistics full summary.
 func (g *Game) Dump() string {
 	var sb strings.Builder
 	summary := g.DumpSummary()
 	sb.WriteString(summary)
+	if g.modCount() > 0 {
+		sb.WriteString("\nMods:\n")
+		g.dumpMods(&sb)
+	}
 	g.dumpPlayer(&sb)
 	sb.WriteString("\nLast messages:\n")
 	for _, e := range g.Logs.Entries[max(0, len(g.Logs.Entries)-20):] {
@@ -145,6 +162,15 @@ func (g *Game) Dump() string {
 		sb.WriteByte('\n')
 	}
 	return sb.String()
+}
+
+func (g *Game) dumpMods(sb *strings.Builder) {
+	for i, b := range g.Mods {
+		if !b {
+			continue
+		}
+		fmt.Fprintf(sb, "- %s\n", Mod(i).String())
+	}
 }
 
 func (g *Game) dumpPlayer(sb *strings.Builder) {

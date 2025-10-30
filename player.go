@@ -27,7 +27,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 	}
 	j, aj := g.RangedTargetInDir(pl.P, dir)
 	if j >= 0 {
-		if pa.Has(StatusFear) {
+		if g.PlayerFears(j, aj) {
 			g.Log("You’re afraid to go in that direction.")
 			return false
 		}
@@ -119,6 +119,12 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 	return true
 }
 
+// PlayerFears reports whether the players fears the given actor.
+func (g *Game) PlayerFears(j ID, aj *Actor) bool {
+	pa := g.PlayerActor()
+	return pa.Has(StatusFear) || g.Mod(ModSpiderPhobia) && aj.IsMonster(BerserkingSpider) && !pa.Has(StatusBerserk)
+}
+
 func (g *Game) logDaze() {
 	g.Log("You’re dazed: you need to wait (ENTER) or eat.")
 }
@@ -126,8 +132,8 @@ func (g *Game) logDaze() {
 // Sprint performs a sprinting bump-movement in the given direction.
 func (g *Game) Sprint(dir gruid.Point) bool {
 	pl, pa := g.Player()
-	if j, _ := g.RangedTargetInDir(pl.P, dir); j >= 0 {
-		if pa.Has(StatusFear) {
+	if j, aj := g.RangedTargetInDir(pl.P, dir); j >= 0 {
+		if g.PlayerFears(j, aj) {
 			g.Log("You’re afraid to go in that direction.")
 			return false
 		}

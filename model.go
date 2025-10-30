@@ -278,7 +278,7 @@ func (md *model) openSpiritSelectionMenu(m mode) {
 	md.menu.main.SetBox(&ui.Box{Title: ui.Text(title).WithStyle(gruid.Style{Fg: ColorYellow})})
 	md.menu.main.SetEntries(entries)
 	md.menu.main.SetActiveInvokable(0)
-	md.updateItemDesc(spiritEntity(spirits[0]))
+	md.updateItemDesc(md.g.spiritEntity(spirits[0]))
 	md.mode = m
 	md.menu.mode = modeSelection // not really needed
 }

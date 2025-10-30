@@ -31,9 +31,6 @@ func NewActor(attack, defense, hp int, t Traits) *Actor {
 		Statuses: make(Statuses, NStatuses),
 		Traits:   t,
 	}
-	if !a.IsPlayer() {
-		a.Behavior = &Behavior{Guard: InvalidPos, Target: InvalidPos}
-	}
 	return a
 }
 
@@ -55,6 +52,11 @@ func (a *Actor) DoesAll(t Traits) bool {
 // Has reports whether the player has status st.
 func (a *Actor) Has(st Status) bool {
 	return a.Statuses.Has(st)
+}
+
+// IsMonster reports whether the actor is a monster of the given kind.
+func (a *Actor) IsMonster(mk monsterKind) bool {
+	return a.Behavior != nil && a.Behavior.Kind == mk
 }
 
 // CanMove reports whether the actor isn't under any status that prevents
@@ -624,6 +626,7 @@ type Behavior struct {
 	Path     []gruid.Point // path to destination
 	Guard    gruid.Point   // position to guard (InvalidPos if not)
 	Target   gruid.Point   // Current goal (if not static)
+	Kind     monsterKind   // specific kind of monster
 	State    Mindstate     // Wandering, Hunting, ...
 	SkipTurn bool          // skip turn (like after swapped positions with another monster)
 }
@@ -729,7 +732,19 @@ func (g *Game) exudeFog() {
 
 // handleCornered makes cornered and afraid actors become berserk.
 func (g *Game) handleCornered(i ID, ai *Actor) {
-	if !ai.Has(StatusFear) && !ai.DoesAny(MonsMusic) || ai.Has(StatusClarity) {
+	switch {
+	case ai.Has(StatusClarity):
+		// Players under clarity cannot become Berserk.
+		return
+	case ai.Has(StatusFear) || ai.DoesAny(MonsMusic) && !ai.Has(StatusBerserk):
+		// Actor is afraid or is playing music while not berserk: it
+		// may become berserk if cornered.
+	case i == PlayerID && g.Mod(ModSpiderPhobia):
+		g.handleCorneredWithSpiderPhobia()
+		return
+	default:
+		// The actor isn't afraid of anything, so it cannot feel
+		// cornered.
 		return
 	}
 	ei := g.Entity(i)
@@ -767,6 +782,30 @@ func (g *Game) handleCornered(i ID, ai *Actor) {
 		g.LogfStyled("The afraid %s feels cornered.", logSpecial, ei.Name)
 	}
 	g.PutStatus1(i, ai, StatusBerserk, DurationBerserkAfraid)
+}
+
+func (g *Game) handleCorneredWithSpiderPhobia() {
+	from, pa := g.PP(), g.PlayerActor()
+	for _, dir := range Directions {
+		p := from.Add(dir)
+		if !inMap(p) {
+			continue
+		}
+		if !g.Map.Passable(p) && !pa.Has(StatusDig) && !pa.DoesAny(MonsDig) {
+			continue
+		}
+		if j, aj := g.ActorAt(p); j >= 0 && g.PlayerFears(j, aj) {
+			continue
+		}
+		if j, aj := g.RangedTargetInDir(from, dir); j < 0 || !g.PlayerFears(j, aj) {
+			// One direction is free of any fearsome actors: the
+			// player is not cornered yet.
+			return
+		}
+	}
+	// You feel cornered: become berserk for a short while.
+	g.Log("You feel cornered.")
+	g.PutStatus1(PlayerID, pa, StatusBerserk, DurationBerserkAfraid)
 }
 
 // TeleportActor teleports the given actor, adjusting final duration of debuff

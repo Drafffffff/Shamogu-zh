@@ -117,6 +117,22 @@ func (g *Game) generateMap(ml MapLayout) (*MapGen, bool) {
 	mg.PR.CCMap(&MappingPath{passable: pass}, freep)
 	mgen := rl.MapGen{Rand: mg.rand, Grid: mg.terrain}
 	ntiles := mgen.KeepCC(mg.PR, freep, Wall)
+	// Mods.
+	if g.Mod(ModTerrainFlip) {
+		g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
+			if mg.vault.At(p) {
+				return t
+			}
+			switch t {
+			case Floor:
+				return Foliage
+			case Foliage:
+				return Floor
+			default:
+				return t
+			}
+		})
+	}
 	// Report whether the generated map has enough passable terrain.
 	const minCaveSize = 1000
 	return mg, ntiles > minCaveSize

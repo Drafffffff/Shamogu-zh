@@ -23,7 +23,7 @@ func (g *Game) InitPlayer() {
 }
 
 func (g *Game) debugBuild() {
-	// g.Entities[PrimarySpiritID+1] = spiritEntity(secondarySpirits[0])
+	// g.Entities[PrimarySpiritID+1] = g.spiritEntity(secondarySpirits[0])
 	// g.Entities[PrimarySpiritID+3] = comestibleEntity(ComestibleData[4])
 }
 
@@ -67,8 +67,10 @@ func (g *Game) genPlayerOnNewLevel(mg *MapGen) {
 	}
 	p.KnownP = p.P
 	g.Map.ActorCache.SetU(p.P, PlayerID)
-	for _, sp := range g.PlayerSpirits() {
-		sp.Charges = sp.MaxCharges[sp.Level]
+	if !g.Mod(ModNoRecharges) {
+		for _, sp := range g.PlayerSpirits() {
+			sp.Charges = sp.MaxCharges[sp.Level]
+		}
 	}
 	pa := g.PlayerActor()
 	clear(pa.Statuses)
@@ -179,7 +181,11 @@ var secondarySpirits = []spiritInfo{
 }
 
 // spiritEntity generates a new spirit entity using the given data.
-func spiritEntity(si spiritInfo) *Entity {
+func (g *Game) spiritEntity(si spiritInfo) *Entity {
+	if g.Mod(ModNoRecharges) {
+		si.MaxCharges[0] *= 2
+		si.MaxCharges[1] *= 2
+	}
 	return &Entity{
 		Name:   si.Name,
 		KnownP: InvalidPos,
@@ -305,7 +311,7 @@ func (g *Game) genItems(mg *MapGen) {
 	}
 	// Totemic spirit.
 	if spiritIndex := g.ProcInfo.Spirits[g.Map.Level-1]; spiritIndex >= 0 {
-		sp := spiritEntity(secondarySpirits[spiritIndex])
+		sp := g.spiritEntity(secondarySpirits[spiritIndex])
 		spr := sp.Role.(*Spirit)
 		spr.Charges = spr.MaxCharges[spr.Level]
 		sp.Rune = '!'
@@ -614,6 +620,16 @@ func (g *Game) genMonsters(mg *MapGen) {
 		}
 		nM = 1
 	}
+	if g.Mod(ModMonsterSwarm) {
+		nE += 1 + g.Map.Level/4
+		nM += (1 + g.Map.Level) / 3
+		nL += g.Map.Level / 4
+	}
+	if g.Mod(ModSpiderPhobia) {
+		for range 1 + g.Map.Level/3 {
+			g.genMonster(BerserkingSpider)
+		}
+	}
 	for range nE {
 		g.genMonster(monsEarly[g.IntN(len(monsEarly))])
 	}
@@ -663,7 +679,7 @@ func (g *Game) genMonsterGuardian(mk monsterKind, at gruid.Point) (ID, *Actor) {
 // genMonsterAt spawns a monster of the given kind on the given position
 // (assumed to be free).
 func (g *Game) genMonsterAt(mk monsterKind, p gruid.Point) (ID, *Entity) {
-	mons := monster(MonsData[mk])
+	mons := monster(mk)
 	mons.P = p
 	id := ID(len(g.Entities))
 	g.Map.ActorCache.SetU(mons.P, id)
@@ -672,12 +688,15 @@ func (g *Game) genMonsterAt(mk monsterKind, p gruid.Point) (ID, *Entity) {
 }
 
 // monster generates a new monster entity using the given data.
-func monster(mi monsterInfo) *Entity {
+func monster(mk monsterKind) *Entity {
+	mi := MonsData[mk]
+	a := NewActor(mi.Attack, mi.Defense, mi.HP, mi.Traits)
+	a.Behavior = &Behavior{Kind: mk, Guard: InvalidPos, Target: InvalidPos}
 	return &Entity{
 		Name:   mi.Name,
 		Rune:   mi.R,
 		KnownP: InvalidPos,
-		Role:   NewActor(mi.Attack, mi.Defense, mi.HP, mi.Traits),
+		Role:   a,
 	}
 }
 
