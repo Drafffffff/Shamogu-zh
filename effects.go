@@ -29,6 +29,7 @@ const (
 	DurationFearAmbrosia           = 4
 	DurationFearBark               = 4
 	DurationFearFakePortal         = 6
+	DurationFearScream             = 2
 	DurationFearUndead             = 3
 	DurationFire                   = 3
 	DurationFoggySkin              = 10
@@ -248,8 +249,7 @@ func (eff EffectTeleportMushroom) Apply(g *Game) bool {
 		g.Log("You resist teleport while lignified.")
 	}
 	if j >= 0 {
-		ej := g.Entity(j)
-		g.SenseEntity(ej, "sense")
+		g.SenseEntity(j, "sense")
 	}
 	return true
 }
@@ -877,12 +877,12 @@ func (eff EffectWarpingMenhir) Apply(g *Game) bool {
 		}
 	}
 	// Reveal portal or orb of corruption.
-	for _, ei := range g.NPMapEntities() {
+	for i, ei := range g.NPMapEntities() {
 		switch ei.Role.(type) {
 		case *Portal:
-			g.SenseEntity(ei, "sense")
+			g.SenseEntity(i, "sense")
 		case *CorruptionOrb:
-			g.SenseEntity(ei, "sense")
+			g.SenseEntity(i, "sense")
 		}
 	}
 	if g.IntN(2+(MapLevels-g.Map.Level)/2) == 0 {

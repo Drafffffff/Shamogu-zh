@@ -516,6 +516,25 @@ func (g *Game) genMonsters(mg *MapGen) {
 	if g.Map.Orb != InvalidPos {
 		g.genMonsterGuardian(FearsomeLich, g.Map.Orb)
 		g.genMonsterGuardian(UndeadKnight, g.Map.Orb)
+		if g.Mod(ModExtraGuardians) {
+			g.genMonsterGuardian(monsLate[g.IntN(len(monsLate))], g.Map.Orb)
+			g.genMonsterGuardian(monsMid[g.IntN(len(monsMid))], g.Map.Orb)
+		}
+	} else if g.Mod(ModExtraGuardians) {
+		p := g.Map.Portal
+		if g.IntN(4) == 0 {
+			// Occasionally make extra guardians guard a random
+			// non-player vault.
+			_, p = mg.RandomVaultsPlace(mg.vaults[1:], PlaceWaypoint)
+		}
+		if g.Map.Level > 3 {
+			g.genMonsterGuardian(monsMid[g.IntN(len(monsMid))], p)
+		} else {
+			g.genMonsterGuardian(monsEarly[g.IntN(len(monsEarly))], p)
+		}
+		if g.IntN(3) > 0 {
+			g.genMonsterGuardian(monsMid[g.IntN(len(monsMid))], p)
+		}
 	}
 	if g.ProcInfo.GuardianPortal2 == g.Map.Level {
 		g.genMonsterGuardian(MadOctopode, g.Map.Portal)
@@ -621,9 +640,9 @@ func (g *Game) genMonsters(mg *MapGen) {
 		nM = 1
 	}
 	if g.Mod(ModMonsterSwarm) {
-		nE += 1 + g.Map.Level/4
-		nM += (1 + g.Map.Level) / 3
-		nL += g.Map.Level / 4
+		nE += 1 + g.Map.Level/3
+		nM += g.Map.Level / 2
+		nL += g.Map.Level/4 + g.Map.Level/8
 	}
 	if g.Mod(ModSpiderPhobia) {
 		for range 1 + g.Map.Level/3 {

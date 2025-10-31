@@ -5,10 +5,11 @@ type Mod int
 
 // Those constants describe the available mods.
 const (
-	ModHeavySteps             Mod = iota // noisy movement
+	ModNoisy                  Mod = iota // noisy movement and uncontrollable screams
 	ModSpiderPhobia                      // fear of spiders (unless berserk); more spiders
 	ModMonsterSwarm                      // mod with extra monsters
-	ModTerrainFlip                       // mod with flipped foliage/floor cells
+	ModExtraGuardians                    // mod with extra regular guardians
+	ModExtraFoliage                      // mod with flipped foliage/floor cells
 	ModNoRecharges                       // mod without spirit recharges
 	ModHeavyTelepathy                    // two-way Clarity-like telepathy with heavy-step monsters
 	ModSmallInventory                    // inventory with 3 comestibles slots
@@ -17,19 +18,21 @@ const (
 
 const NMods = 1 + int(ModEnableChallengeSpirits)
 
-var gameMods = []Mod{ModHeavySteps, ModSpiderPhobia, ModMonsterSwarm, ModTerrainFlip, ModNoRecharges,
+var gameMods = []Mod{ModNoisy, ModSpiderPhobia, ModMonsterSwarm, ModExtraGuardians, ModExtraFoliage, ModNoRecharges,
 	ModHeavyTelepathy, ModSmallInventory, ModEnableChallengeSpirits}
 
 func (m Mod) String() string {
 	switch m {
-	case ModHeavySteps:
-		return "Heavy Steps"
+	case ModNoisy:
+		return "Noisy"
 	case ModSpiderPhobia:
 		return "Spider Phobia"
 	case ModMonsterSwarm:
 		return "Monster Swarm"
-	case ModTerrainFlip:
-		return "Terrain Flip"
+	case ModExtraGuardians:
+		return "Extra Guardians"
+	case ModExtraFoliage:
+		return "Extra foliage"
 	case ModNoRecharges:
 		return "No Recharges"
 	case ModHeavyTelepathy:
@@ -45,14 +48,16 @@ func (m Mod) String() string {
 
 func (m Mod) Desc() string {
 	switch m {
-	case ModHeavySteps:
-		return "You make noise when you move (about half view range)."
+	case ModNoisy:
+		return "You make noise when you move (about half view range). You sometimes uncontrollably scream at your foes frighteningly."
 	case ModSpiderPhobia:
 		return "You fear spiders. More spiders."
 	case ModMonsterSwarm:
 		return "Extra monsters."
-	case ModTerrainFlip:
-		return "Flipped foliage and floor terrains outside of vaults (usually means lots of foliage)."
+	case ModExtraGuardians:
+		return "Some portals now have extra regular monsters as guardians."
+	case ModExtraFoliage:
+		return "Extra foliage."
 	case ModNoRecharges:
 		return "Spirit ability charges are doubled but don't recharge when going to next floor."
 	case ModHeavyTelepathy:

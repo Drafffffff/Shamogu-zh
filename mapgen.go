@@ -96,7 +96,7 @@ func (g *Game) generateMap(ml MapLayout) (*MapGen, bool) {
 		mg.genCellularAutomataCaveMap(mg.terrain)
 	}
 
-	mg.genFoliage()
+	mg.genFoliage(g.Mod(ModExtraFoliage))
 	// Vault placement.
 	bigCenter := g.IntN(2) == 0
 	if bigCenter {
@@ -118,21 +118,21 @@ func (g *Game) generateMap(ml MapLayout) (*MapGen, bool) {
 	mgen := rl.MapGen{Rand: mg.rand, Grid: mg.terrain}
 	ntiles := mgen.KeepCC(mg.PR, freep, Wall)
 	// Mods.
-	if g.Mod(ModTerrainFlip) {
-		g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
-			if mg.vault.At(p) {
-				return t
-			}
-			switch t {
-			case Floor:
-				return Foliage
-			case Foliage:
-				return Floor
-			default:
-				return t
-			}
-		})
-	}
+	// if g.Mod(ModTerrainFlip) {
+	// g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
+	// 	if mg.vault.At(p) {
+	// 		return t
+	// 	}
+	// 	switch t {
+	// 	case Floor:
+	// 		return Foliage
+	// 	case Foliage:
+	// 		return Floor
+	// 	default:
+	// 		return t
+	// 	}
+	// })
+	// }
 	// Report whether the generated map has enough passable terrain.
 	const minCaveSize = 1000
 	return mg, ntiles > minCaveSize
@@ -291,7 +291,7 @@ func passableNeighbor(gd rl.Grid, p gruid.Point) bool {
 }
 
 // genFoliage generates foliage with a cellular automata.
-func (mg *MapGen) genFoliage() {
+func (mg *MapGen) genFoliage(lots bool) {
 	size := mg.terrain.Size()
 	// We use a new grid layer for drawing the foliage.
 	gd := rl.NewGrid(size.X, size.Y)
@@ -306,6 +306,9 @@ func (mg *MapGen) genFoliage() {
 		winit = 0.53
 	case 2:
 		winit = 0.55
+	}
+	if lots {
+		winit = 0.1
 	}
 	rlmg.CellularAutomataCave(Wall, Foliage, winit, rules)
 	// We now draw the foliage on floor cells of the real map.

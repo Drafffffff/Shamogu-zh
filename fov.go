@@ -62,9 +62,9 @@ func (g *Game) SensePassable(p gruid.Point) {
 // SeeEntities handles knowledge changes about the last known position of
 // map entities that are in the field of view.
 func (g *Game) SeeEntities() {
-	for _, e := range g.NPMapEntities() {
+	for i, e := range g.NPMapEntities() {
 		if g.InFOV(e.P) {
-			g.SenseEntity(e, "see")
+			g.SenseEntity(i, "see")
 		} else if g.InFOV(e.KnownP) {
 			e.KnownP = InvalidPos
 		}
@@ -76,44 +76,45 @@ func (g *Game) SeeEntities() {
 
 // SenseEntity updates known position of an entity to its real one. The given
 // verb is used in the log message (one of "see", "sense").
-func (g *Game) SenseEntity(e *Entity, verb string) {
-	if e.Role == nil {
+func (g *Game) SenseEntity(i ID, verb string) {
+	ei := g.Entity(i)
+	if ei.Role == nil {
 		return
 	}
-	if !e.Seen {
-		e.Seen = true
-		g.SensePassable(e.P)
+	if !ei.Seen {
+		ei.Seen = true
+		g.SensePassable(ei.P)
 		g.md.auto.mode = noAuto
-		switch r := e.Role.(type) {
+		switch ri := ei.Role.(type) {
 		case *Actor:
-			if r.IsAlive() {
-				g.Logf("You %s %s.", verb, One(e.Name))
-				if r.DoesAny(MonsNotable) {
-					g.StoryLogf("Saw %s (distance: %d)", One(e.Name), g.ppDist(e.P))
+			if ri.IsAlive() {
+				g.Logf("You %s %s.", verb, One(ei.Name))
+				if ri.DoesAny(MonsNotable) {
+					g.StoryLogf("Saw %s (distance: %d)", One(ei.Name), g.ppDist(ei.P))
 				}
 			}
 		case *Comestible:
-			g.LogfStyled("You %s %s.", logNotable, verb, One(e.Name))
-			g.StoryLogf("Spotted %s (distance: %d)", One(e.Name), g.ppDist(e.P))
+			g.LogfStyled("You %s %s.", logNotable, verb, One(ei.Name))
+			g.StoryLogf("Spotted %s (distance: %d)", One(ei.Name), g.ppDist(ei.P))
 		case *Spirit:
-			g.LogfStyled("You %s %s totem.", logNotable, verb, One(e.Name))
-			g.StoryLogf("Spotted %s totem (distance: %d)", One(e.Name), g.ppDist(e.P))
+			g.LogfStyled("You %s %s totem.", logNotable, verb, One(ei.Name))
+			g.StoryLogf("Spotted %s totem (distance: %d)", One(ei.Name), g.ppDist(ei.P))
 		case *EmptyTotem:
 			g.LogStyled("You see an empty totem.", logNotable)
-			g.StoryLogf("Spotted an empty totem (distance: %d)", g.ppDist(e.P))
+			g.StoryLogf("Spotted an empty totem (distance: %d)", g.ppDist(ei.P))
 		case *CorruptionOrb:
 			g.LogfStyled("You %s the Orb of Corruption!", logNotable, verb)
-			g.StoryLogf("Found the Orb of Corruption (distance: %d)", g.ppDist(e.P))
+			g.StoryLogf("Found the Orb of Corruption (distance: %d)", g.ppDist(ei.P))
 		case *RunicTrap:
-			g.LogfStyled("You %s %s.", logNotable, verb, One(e.Name))
-			g.StoryLogf("Spotted %s (distance: %d)", One(e.Name), g.ppDist(e.P))
+			g.LogfStyled("You %s %s.", logNotable, verb, One(ei.Name))
+			g.StoryLogf("Spotted %s (distance: %d)", One(ei.Name), g.ppDist(ei.P))
 		default:
-			g.LogfStyled("You %s %s.", logNotable, verb, One(e.Name))
-			g.StoryLogf("Discovered %s (distance: %d)", One(e.Name), g.ppDist(e.P))
+			g.LogfStyled("You %s %s.", logNotable, verb, One(ei.Name))
+			g.StoryLogf("Discovered %s (distance: %d)", One(ei.Name), g.ppDist(ei.P))
 		}
 	}
-	e.KnownP = e.P
-	switch r := e.Role.(type) {
+	ei.KnownP = ei.P
+	switch r := ei.Role.(type) {
 	case *Actor:
 		if r.IsDead() {
 			r.KnownDead = true
@@ -134,12 +135,12 @@ func (g *Game) ppDist(p gruid.Point) int {
 func (g *Game) senseMonsters() {
 	pp := g.PP()
 	// Sense monsters and terrain under them.
-	for _, ei := range g.NPMapEntities() {
+	for i, ei := range g.NPMapEntities() {
 		if !ei.IsActor() {
 			continue
 		}
 		if clarityRange(pp, ei.P) {
-			g.SenseEntity(ei, "sense")
+			g.SenseEntity(i, "sense")
 			g.SensePassable(ei.P)
 		}
 	}

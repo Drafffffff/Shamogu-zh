@@ -167,7 +167,7 @@ func (g *Game) MoveActor(i ID, ai *Actor, to gruid.Point) {
 		}
 	}
 	if i != PlayerID && g.InFOV(ei.P) {
-		g.SenseEntity(ei, "see")
+		g.SenseEntity(i, "see")
 	}
 	g.TriggerTrapAt(to)
 }
@@ -191,7 +191,7 @@ func (g *Game) BumpMoveActor(i ID, ai *Actor, to gruid.Point) {
 		g.dig(to)
 	}
 	g.MoveActor(i, ai, to)
-	if i == PlayerID && g.Mod(ModHeavySteps) {
+	if i == PlayerID && g.Mod(ModNoisy) {
 		g.MakeNoise(to, NoiseHeavySteps)
 	}
 	g.ApplyBumpMoveEffects(i, ai)

@@ -93,6 +93,11 @@ func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKi
 	ej := g.Entity(j)
 	switch {
 	case i >= 0 && ai != nil:
+		if i == PlayerID && g.Mod(ModNoisy) && g.IntN(5) == 0 {
+			g.Logf("You scream at the %s!", ej.Name)
+			g.MakeNoise(g.PP(), NoiseScream)
+			g.PutStatus(j, aj, StatusFear, DurationFearScream)
+		}
 		g.logBumpDamage(i, j, ai, aj, dmg, ap)
 		if ai.DoesAny(PatternSwap|PatternSwapDaze) || g.IntN(dmg) == 0 {
 			break

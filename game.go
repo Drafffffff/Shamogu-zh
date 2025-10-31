@@ -340,7 +340,7 @@ func (g *Game) MakeNoise(at gruid.Point, nt NoiseType) {
 	pa := g.PlayerActor()
 	goodhearing := pa.DoesAny(GoodHearing) && !pa.DoesAny(BadHearing)
 	d := g.PRnoise.BreadthFirstMapAt(pp)
-	if d <= maxdist && (goodhearing || d <= noise) && nt != NoiseHeavySteps {
+	if d <= maxdist && (goodhearing || d <= noise) && nt.Msg() != "" {
 		if at != pp && g.Map.Noise != nil {
 			g.Map.Noise[at] = nt
 		}
@@ -373,7 +373,9 @@ const (
 	NoiseMusic
 	NoiseRoar
 	NoiseWind
+
 	NoiseHeavySteps
+	NoiseScream
 )
 
 // Noise returns the amount of noise associated with the given type of noise.
@@ -381,7 +383,7 @@ func (nt NoiseType) Noise() int {
 	switch nt {
 	case NoiseCombat, NoiseChomp, NoiseHeavySteps:
 		return 4
-	case NoiseExplosion, NoiseFakePortal:
+	case NoiseExplosion, NoiseFakePortal, NoiseScream:
 		return MaxFOVRange + 4
 	case NoiseMusic, NoiseEarthMenhir:
 		return 2 * MaxFOVRange
@@ -416,8 +418,8 @@ func (nt NoiseType) Msg() string {
 		return "ROAR!"
 	case NoiseWind:
 		return "WHIZ!"
-	case NoiseHeavySteps:
-		// Don't log heavy steps from mod, happens too often
+	case NoiseHeavySteps, NoiseScream:
+		// Don't log heavy steps and screams from mod.
 		return ""
 	default:
 		// should not happen.
@@ -437,7 +439,7 @@ func (g *Game) SmellFood() {
 			// NOTE: using path-distance would leak information
 			// about walls (if the player goes through the tedious
 			// task of doing some math).
-			g.SenseEntity(ei, "smell")
+			g.SenseEntity(i, "smell")
 		}
 	}
 }
