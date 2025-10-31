@@ -269,7 +269,9 @@ func (g *Game) genItems(mg *MapGen) {
 			portal := &Entity{Name: "magic portal", Rune: '>', Role: &Portal{Fake: fake}}
 			i, portal.P = mg.RandomVaultsPlaceWithFunc(npvaults[len(npvaults)/3:], PlaceStatic, g.IntNBiasedUp)
 			portalIdxs = append(portalIdxs, i+1)
-			g.Map.Portal = portal.P
+			if !fake {
+				g.Map.Portal = portal.P
+			}
 			g.AddEntity(portal)
 		}
 		addPortal(false)
