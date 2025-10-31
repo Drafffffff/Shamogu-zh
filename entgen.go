@@ -362,8 +362,8 @@ func (g *Game) genItems(mg *MapGen) {
 			rtt++
 		}
 	}
-	if g.Mod(ModHorrorscape) && g.IntN(5) == 0 {
-		rto += 7 + g.IntN(4)
+	if g.Mod(ModHorrorscape) {
+		rto += 3 + g.IntN(9)
 		rtt += g.IntN(2)
 	}
 	if g.Map.Level == g.ProcInfo.TrapLevel {

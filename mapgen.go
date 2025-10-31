@@ -148,7 +148,10 @@ func (g *Game) genHorrorScapeTerrain(mg *MapGen) {
 			})
 		} else {
 			g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
-				return flipFoliageFloor(t)
+				if !mg.vault.At(p) || t != Floor {
+					return t
+				}
+				return Foliage
 			})
 		}
 	case 1:

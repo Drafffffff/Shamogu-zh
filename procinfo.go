@@ -255,6 +255,11 @@ func (g *Game) menhirsProcGen() {
 // ensures that all runes appear at least once in a while.
 func (g *Game) runeProcGen() {
 	g.ProcInfo.Runes = g.genRandomIndices(NRunes)
+	if g.Mod(ModHorrorscape) {
+		// Extra chance for Fire and Poison runes.
+		g.ProcInfo.Runes[g.IntN(len(g.ProcInfo.Runes))] = int(RuneFire)
+		g.ProcInfo.Runes[g.IntN(len(g.ProcInfo.Runes))] = int(RunePoison)
+	}
 }
 
 // NextRune returns the next rune kind to be generated.
