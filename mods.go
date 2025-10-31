@@ -7,9 +7,9 @@ type Mod int
 const (
 	ModNoisy                  Mod = iota // noisy movement and uncontrollable screams
 	ModSpiderPhobia                      // fear of spiders (unless berserk); more spiders
-	ModMonsterSwarm                      // mod with extra monsters
+	ModExtraMonsters                     // mod with extra monsters
 	ModExtraGuardians                    // mod with extra regular guardians
-	ModExtraFoliage                      // mod with flipped foliage/floor cells
+	ModHorrorscape                       // mod with lots of unusual and random stuff going on
 	ModNoRecharges                       // mod without spirit recharges
 	ModHeavyTelepathy                    // two-way Clarity-like telepathy with heavy-step monsters
 	ModSmallInventory                    // inventory with 3 comestibles slots
@@ -18,7 +18,7 @@ const (
 
 const NMods = 1 + int(ModEnableChallengeSpirits)
 
-var gameMods = []Mod{ModNoisy, ModSpiderPhobia, ModMonsterSwarm, ModExtraGuardians, ModExtraFoliage, ModNoRecharges,
+var gameMods = []Mod{ModNoisy, ModSpiderPhobia, ModExtraMonsters, ModExtraGuardians, ModHorrorscape, ModNoRecharges,
 	ModHeavyTelepathy, ModSmallInventory, ModEnableChallengeSpirits}
 
 func (m Mod) String() string {
@@ -27,12 +27,12 @@ func (m Mod) String() string {
 		return "Noisy"
 	case ModSpiderPhobia:
 		return "Spider Phobia"
-	case ModMonsterSwarm:
-		return "Monster Swarm"
+	case ModExtraMonsters:
+		return "Extra Monsters"
 	case ModExtraGuardians:
 		return "Extra Guardians"
-	case ModExtraFoliage:
-		return "Extra foliage"
+	case ModHorrorscape:
+		return "Horrorscape."
 	case ModNoRecharges:
 		return "No Recharges"
 	case ModHeavyTelepathy:
@@ -52,12 +52,12 @@ func (m Mod) Desc() string {
 		return "You make noise when you move (about half view range). You sometimes uncontrollably scream at your foes frighteningly."
 	case ModSpiderPhobia:
 		return "You fear spiders. More spiders."
-	case ModMonsterSwarm:
-		return "Extra monsters."
+	case ModExtraMonsters:
+		return "More wandering monsters than usual."
 	case ModExtraGuardians:
 		return "Some portals now have extra regular monsters as guardians."
-	case ModExtraFoliage:
-		return "Extra foliage."
+	case ModHorrorscape:
+		return "An unusual and bizarre dungeon."
 	case ModNoRecharges:
 		return "Spirit ability charges are doubled but don't recharge when going to next floor."
 	case ModHeavyTelepathy:

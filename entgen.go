@@ -265,16 +265,19 @@ func (g *Game) genItems(mg *MapGen) {
 	npvaults := mg.vaults[1:] // non-player vaults
 	if g.Map.Level < MapLevels {
 		var i int
-		portal := &Entity{Name: "magic portal", Rune: '>', Role: &Portal{}}
-		i, portal.P = mg.RandomVaultsPlaceWithFunc(npvaults[len(npvaults)/3:], PlaceStatic, g.IntNBiasedUp)
-		portalIdxs = append(portalIdxs, i+1)
-		g.Map.Portal = portal.P
-		g.AddEntity(portal)
-		if g.ProcInfo.FakePortal[g.Map.Level-1] {
-			portal := &Entity{Name: "magic portal", Rune: '>', Role: &Portal{Fake: true}}
+		addPortal := func(fake bool) {
+			portal := &Entity{Name: "magic portal", Rune: '>', Role: &Portal{Fake: fake}}
 			i, portal.P = mg.RandomVaultsPlaceWithFunc(npvaults[len(npvaults)/3:], PlaceStatic, g.IntNBiasedUp)
 			portalIdxs = append(portalIdxs, i+1)
+			g.Map.Portal = portal.P
 			g.AddEntity(portal)
+		}
+		addPortal(false)
+		if g.ProcInfo.FakePortal[g.Map.Level-1] {
+			addPortal(true)
+			if g.Mod(ModHorrorscape) && g.IntN(2) == 0 {
+				addPortal(true)
+			}
 		}
 	} else {
 		var i int
@@ -325,6 +328,13 @@ func (g *Game) genItems(mg *MapGen) {
 	}
 	// Comestibles.
 	nitems := g.ProcInfo.NComestibles[g.Map.Level-1]
+	if g.Mod(ModHorrorscape) && g.IntN(6) == 0 {
+		if g.IntN(2) == 0 {
+			nitems = 0
+		} else {
+			nitems += 7
+		}
+	}
 	for i := range nitems {
 		co := comestibleEntity(ComestibleData[g.NextComestibleIdx()])
 		if i <= (nitems+1)/2 {
@@ -349,6 +359,10 @@ func (g *Game) genItems(mg *MapGen) {
 		} else {
 			rtt++
 		}
+	}
+	if g.Mod(ModHorrorscape) && g.IntN(5) == 0 {
+		rto += 7 + g.IntN(4)
+		rtt += g.IntN(2)
 	}
 	if g.Map.Level == g.ProcInfo.TrapLevel {
 		rto += 4
@@ -639,7 +653,7 @@ func (g *Game) genMonsters(mg *MapGen) {
 		}
 		nM = 1
 	}
-	if g.Mod(ModMonsterSwarm) {
+	if g.Mod(ModExtraMonsters) {
 		nE += 1 + g.Map.Level/3
 		nM += g.Map.Level / 2
 		nL += g.Map.Level/4 + g.Map.Level/8
@@ -648,6 +662,9 @@ func (g *Game) genMonsters(mg *MapGen) {
 		for range 1 + g.Map.Level/3 {
 			g.genMonster(BerserkingSpider)
 		}
+	}
+	if g.Mod(ModHorrorscape) {
+		nE, nM, nL = g.genMonstersHorrorscape(nE, nM+1, nL+1)
 	}
 	for range nE {
 		g.genMonster(monsEarly[g.IntN(len(monsEarly))])
@@ -663,6 +680,30 @@ func (g *Game) genMonsters(mg *MapGen) {
 var nMonsE = [MapLevels]int{3, 5, 6, 6, 5, 5, 4, 4, 3}
 var nMonsM = [MapLevels]int{2, 3, 4, 6, 8, 10, 11, 10, 10}
 var nMonsL = [MapLevels]int{0, 0, 1, 1, 2, 2, 3, 4, 6}
+
+func (g *Game) genMonstersHorrorscape(nE, nM, nL int) (int, int, int) {
+	// Special early monsters.
+	nEs := min(nE, 1+g.IntN(3+g.Map.Level/4))
+	for range nEs {
+		g.genMonster(TotemWasp)
+	}
+	nE -= nEs
+	// Special mid monsters.
+	nMs := min(nM, 1+g.IntN(3+g.Map.Level/3))
+	monsSpecialMid := []monsterKind{WalkingMushroom, BlazingGolem, CrazyDruid, NoisyImp}
+	for range nMs {
+		g.genMonster(monsSpecialMid[g.IntN(len(monsSpecialMid))])
+	}
+	nM -= nMs
+	// Special late monsters.
+	nLs := min(nL, 1+g.IntN(2+g.Map.Level/3))
+	monsSpecialLate := []monsterKind{FearsomeLich, UndeadKnight, MadOctopode}
+	for range nLs {
+		g.genMonster(monsSpecialLate[g.IntN(len(monsSpecialLate))])
+	}
+	nL -= nLs
+	return nE, nM, nL
+}
 
 // monsterSelection returns a random monster kind subset of size n.
 func (g *Game) monsterSelection(mks []monsterKind, n int) []monsterKind {

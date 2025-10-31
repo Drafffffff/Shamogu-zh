@@ -48,7 +48,7 @@ func (g *Game) GenerateMap(ml MapLayout) {
 			break
 		}
 	}
-	if g.ProcInfo.Earthquake == g.Map.Level {
+	if g.ProcInfo.Earthquake == g.Map.Level || g.Mod(ModHorrorscape) && g.IntN(10) == 0 {
 		g.earthquake()
 	}
 	g.computeWaypoints(mg)
@@ -96,7 +96,7 @@ func (g *Game) generateMap(ml MapLayout) (*MapGen, bool) {
 		mg.genCellularAutomataCaveMap(mg.terrain)
 	}
 
-	mg.genFoliage(g.Mod(ModExtraFoliage))
+	mg.genFoliage()
 	// Vault placement.
 	bigCenter := g.IntN(2) == 0
 	if bigCenter {
@@ -109,6 +109,10 @@ func (g *Game) generateMap(ml MapLayout) (*MapGen, bool) {
 	mg.genVaults(BigVaultTemplates, 1, PlacementRandom)
 	mg.genVaults(SmallVaultTemplates, 4+mg.rand.IntN(2), PlacementRandom)
 	mg.connectAllVaults()
+	// Mods.
+	if g.Mod(ModHorrorscape) {
+		g.genHorrorScapeTerrain(mg)
+	}
 	// Ensure that all the cells are connected.
 	pass := func(p gruid.Point) bool {
 		return Passable(mt.At(p))
@@ -117,25 +121,65 @@ func (g *Game) generateMap(ml MapLayout) (*MapGen, bool) {
 	mg.PR.CCMap(&MappingPath{passable: pass}, freep)
 	mgen := rl.MapGen{Rand: mg.rand, Grid: mg.terrain}
 	ntiles := mgen.KeepCC(mg.PR, freep, Wall)
-	// Mods.
-	// if g.Mod(ModTerrainFlip) {
-	// g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
-	// 	if mg.vault.At(p) {
-	// 		return t
-	// 	}
-	// 	switch t {
-	// 	case Floor:
-	// 		return Foliage
-	// 	case Foliage:
-	// 		return Floor
-	// 	default:
-	// 		return t
-	// 	}
-	// })
-	// }
 	// Report whether the generated map has enough passable terrain.
 	const minCaveSize = 1000
 	return mg, ntiles > minCaveSize
+}
+
+func (g *Game) genHorrorScapeTerrain(mg *MapGen) {
+	flipFoliageFloor := func(t rl.Cell) rl.Cell {
+		switch t {
+		case Floor:
+			return Foliage
+		case Foliage:
+			return Floor
+		default:
+			return t
+		}
+	}
+	switch g.IntN(4) {
+	case 0:
+		if g.IntN(2) == 0 {
+			g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
+				if mg.vault.At(p) {
+					return t
+				}
+				return flipFoliageFloor(t)
+			})
+		} else {
+			g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
+				return flipFoliageFloor(t)
+			})
+		}
+	case 1:
+		var nt rl.Cell
+		switch g.IntN(2) {
+		case 0:
+			nt = Foliage
+		case 1:
+			nt = Rubble
+		}
+		g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
+			if g.IntN(5) == 0 {
+				return nt
+			}
+			return t
+		})
+	case 2:
+		var nt rl.Cell
+		switch g.IntN(2) {
+		case 0:
+			nt = TranslucentWall
+		case 1:
+			nt = Rubble
+		}
+		g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
+			if t == Wall && g.IntN(5) == 0 {
+				return nt
+			}
+			return t
+		})
+	}
 }
 
 // genCellularAutomataCaveMap generates a floor/wall map with a cellular automata.
@@ -291,7 +335,7 @@ func passableNeighbor(gd rl.Grid, p gruid.Point) bool {
 }
 
 // genFoliage generates foliage with a cellular automata.
-func (mg *MapGen) genFoliage(lots bool) {
+func (mg *MapGen) genFoliage() {
 	size := mg.terrain.Size()
 	// We use a new grid layer for drawing the foliage.
 	gd := rl.NewGrid(size.X, size.Y)
@@ -306,9 +350,6 @@ func (mg *MapGen) genFoliage(lots bool) {
 		winit = 0.53
 	case 2:
 		winit = 0.55
-	}
-	if lots {
-		winit = 0.1
 	}
 	rlmg.CellularAutomataCave(Wall, Foliage, winit, rules)
 	// We now draw the foliage on floor cells of the real map.
