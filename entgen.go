@@ -666,7 +666,13 @@ func (g *Game) genMonsters(mg *MapGen) {
 		}
 	}
 	if g.Mod(ModHorrorscape) {
-		nE, nM, nL = g.genMonstersHorrorscape(nE, nM+1, nL+1)
+		if g.Map.Level > 1 {
+			nM++
+		}
+		if g.Map.Level > 2 {
+			nL++
+		}
+		nE, nM, nL = g.genMonstersHorrorscape(nE, nM, nL)
 	}
 	for range nE {
 		g.genMonster(monsEarly[g.IntN(len(monsEarly))])
@@ -685,25 +691,33 @@ var nMonsL = [MapLevels]int{0, 0, 1, 1, 2, 2, 3, 4, 6}
 
 func (g *Game) genMonstersHorrorscape(nE, nM, nL int) (int, int, int) {
 	// Special early monsters.
-	nEs := min(nE, 1+g.IntN(3+g.Map.Level/4))
-	for range nEs {
-		g.genMonster(TotemWasp)
+	if g.IntN(2) == 0 {
+		nEs := min(nE, 1+g.IntN(3))
+		for range nEs {
+			g.genMonster(TotemWasp)
+		}
+		nE -= nEs
 	}
-	nE -= nEs
 	// Special mid monsters.
-	nMs := min(nM, 1+g.IntN(3+g.Map.Level/3))
-	monsSpecialMid := []monsterKind{WalkingMushroom, BlazingGolem, CrazyDruid, NoisyImp}
-	for range nMs {
-		g.genMonster(monsSpecialMid[g.IntN(len(monsSpecialMid))])
+	if g.IntN(2) == 0 {
+		mks := []monsterKind{WalkingMushroom, BlazingGolem, CrazyDruid, NoisyImp}
+		nMs := min(nM, 1+g.IntN(3), len(mks))
+		monsSpecialMid := g.monsterSelection(mks, len(mks))
+		for _, mk := range monsSpecialMid[:nMs] {
+			g.genMonster(mk)
+		}
+		nM -= nMs
 	}
-	nM -= nMs
 	// Special late monsters.
-	nLs := min(nL, 1+g.IntN(2+g.Map.Level/3))
-	monsSpecialLate := []monsterKind{FearsomeLich, UndeadKnight, MadOctopode}
-	for range nLs {
-		g.genMonster(monsSpecialLate[g.IntN(len(monsSpecialLate))])
+	if g.IntN(2) == 0 {
+		mks := []monsterKind{FearsomeLich, UndeadKnight, MadOctopode}
+		nLs := min(nL, 1+g.IntN(2), len(mks))
+		monsSpecialLate := g.monsterSelection(mks, len(mks))
+		for _, mk := range monsSpecialLate[:nLs] {
+			g.genMonster(mk)
+		}
+		nL -= nLs
 	}
-	nL -= nLs
 	return nE, nM, nL
 }
 
