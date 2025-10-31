@@ -694,7 +694,7 @@ var nMonsL = [MapLevels]int{0, 0, 1, 1, 2, 2, 3, 4, 6}
 
 func (g *Game) genMonstersHorrorscape(nE, nM, nL int) (int, int, int) {
 	// Special early monsters.
-	if g.IntN(2) == 0 {
+	if g.IntN(3) == 0 {
 		nEs := min(nE, 1+g.IntN(3))
 		for range nEs {
 			g.genMonster(TotemWasp)
@@ -702,7 +702,7 @@ func (g *Game) genMonstersHorrorscape(nE, nM, nL int) (int, int, int) {
 		nE -= nEs
 	}
 	// Special mid monsters.
-	if g.IntN(2) == 0 {
+	if g.IntN(3) == 0 {
 		mks := []monsterKind{WalkingMushroom, BlazingGolem, CrazyDruid, NoisyImp}
 		nMs := min(nM, 1+g.IntN(3), len(mks))
 		monsSpecialMid := g.monsterSelection(mks, len(mks))
@@ -712,7 +712,7 @@ func (g *Game) genMonstersHorrorscape(nE, nM, nL int) (int, int, int) {
 		nM -= nMs
 	}
 	// Special late monsters.
-	if g.IntN(2) == 0 {
+	if g.IntN(3) == 0 {
 		mks := []monsterKind{FearsomeLich, UndeadKnight, MadOctopode}
 		nLs := min(nL, 1+g.IntN(2), len(mks))
 		monsSpecialLate := g.monsterSelection(mks, len(mks))
