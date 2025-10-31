@@ -279,6 +279,9 @@ func (g *Game) genItems(mg *MapGen) {
 			addPortal(true)
 			if g.Mod(ModHorrorscape) && g.IntN(2) == 0 {
 				addPortal(true)
+				if g.IntN(2) == 0 {
+					addPortal(true)
+				}
 			}
 		}
 	} else {
