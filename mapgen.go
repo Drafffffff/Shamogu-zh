@@ -48,7 +48,7 @@ func (g *Game) GenerateMap(ml MapLayout) {
 			break
 		}
 	}
-	if g.ProcInfo.Earthquake == g.Map.Level || g.Mod(ModHorrorscape) && g.IntN(10) == 0 {
+	if g.ProcInfo.Earthquake == g.Map.Level || g.Mod(ModHorrorscape) && g.IntN(7) == 0 {
 		g.earthquake()
 	}
 	g.computeWaypoints(mg)
