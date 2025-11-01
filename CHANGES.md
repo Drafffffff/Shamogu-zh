@@ -1,6 +1,8 @@
 # v? ?
 
 * Fix bug where you could get Imbalance despite being lignified (see #6).
+* Minor update in frog's catching description: it always unbalances when
+  ranged, but description said "may".
 
 # v1.1.0 2025-10-27
 
