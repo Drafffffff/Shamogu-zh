@@ -209,7 +209,7 @@ func (t Traits) String() string {
 	desc := []string{}
 	desc = traitDesc(desc, t, PatternFourDirs, "four-directional attack with attack bonus per extra foe")
 	desc = traitDesc(desc, t, PatternFourDirsMons, "four-directional attack")
-	desc = traitDesc(desc, t, PatternCatch, "ranged catching attack that may @Ounbalance@N foes")
+	desc = traitDesc(desc, t, PatternCatch, "ranged catching attack that @Ounbalances@N foes")
 	desc = traitDesc(desc, t, PatternCrocodile, "unbalancing dragging attack, slow rotation (cannot turn and attack)")
 	desc = traitDesc(desc, t, PatternRampage, "rampaging charge")
 	desc = traitDesc(desc, t, PatternRanged, "ranged attack")
@@ -480,7 +480,7 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 			turns = (turns + 1) / 2
 		}
 	case st == StatusImbalance:
-		if ai.Has(StatusBerserk) || ai.DoesAny(MonsImmunityImbalance) {
+		if ai.Has(StatusLignification) || ai.DoesAny(MonsImmunityImbalance) {
 			return false
 		}
 		if ai.DoesAny(ResistanceImbalance) {
