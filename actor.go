@@ -533,6 +533,7 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 		g.RemoveStatus(i, ai, StatusConfusion)
 		g.RemoveStatus(i, ai, StatusDaze)
 		g.RemoveStatus(i, ai, StatusBerserk)
+		g.senseMonsters()
 	case StatusLignification:
 		g.AdjustHP(i, ai, ai.HPBonus())
 		g.RemoveStatus(i, ai, StatusPoison)
