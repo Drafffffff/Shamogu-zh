@@ -32,7 +32,7 @@ func (m Mod) String() string {
 	case ModExtraGuardians:
 		return "Extra Guardians"
 	case ModCorruptedDungeon:
-		return "Corrupted dungeon."
+		return "Corrupted dungeon"
 	case ModNoRecharges:
 		return "No Recharges"
 	case ModHeavyTelepathy:
@@ -51,11 +51,11 @@ func (m Mod) Desc() string {
 	case ModNoisy:
 		return "You make noise when you move (about half view range). You sometimes uncontrollably scream at your foes frighteningly."
 	case ModSpiderPhobia:
-		return "You fear spiders. More spiders."
+		return "You fear spiders. Spiders are more common."
 	case ModExtraMonsters:
 		return "More wandering monsters than usual."
 	case ModExtraGuardians:
-		return "Some portals have extra regular monsters as guardians."
+		return "Some extra regular monsters as guardians."
 	case ModCorruptedDungeon:
 		return "The orb's influence has scattered twisted surprises through the land."
 	case ModNoRecharges:

@@ -668,9 +668,11 @@ func (g *Game) genMonsters(mg *MapGen) {
 		nL += g.Map.Level/4 + g.Map.Level/8
 	}
 	if g.Mod(ModSpiderPhobia) {
-		for range 1 + g.Map.Level/3 {
+		n := 1 + g.Map.Level/3
+		for range n {
 			g.genMonster(BerserkingSpider)
 		}
+		nE -= n
 	}
 	if g.Mod(ModCorruptedDungeon) {
 		if nE > 0 && nM > 0 && g.IntN(5) == 0 {
@@ -854,7 +856,7 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 			for range 5 + g.IntN(4) {
 				g.genMonsterGuardian(mk, p)
 			}
-			nE--
+			nE -= 2
 			nM--
 		default:
 			p := g.randomFreeFloor()
@@ -867,7 +869,7 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 				g.genMonsterGuardian(mk, p)
 			}
 			nE--
-			nM--
+			nM -= 2
 		}
 	}
 	return nE, nM, nL

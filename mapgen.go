@@ -127,7 +127,7 @@ func (g *Game) generateMap(ml MapLayout) (*MapGen, bool) {
 }
 
 func (g *Game) genCorruptedTerrain(mg *MapGen) {
-	switch g.IntN(8) {
+	switch g.IntN(MapLevels) {
 	case 0:
 		if g.IntN(2) == 0 {
 			g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
