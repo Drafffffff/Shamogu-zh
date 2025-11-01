@@ -1,3 +1,7 @@
+# v? ?
+
+* Fix bug where you could get Imbalance despite being lignified (see #6).
+
 # v1.1.0 2025-10-27
 
 This release is a polishing one with some gameplay improvements and various

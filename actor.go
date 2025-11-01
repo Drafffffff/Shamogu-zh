@@ -476,7 +476,7 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 			turns = (turns + 1) / 2
 		}
 	case st == StatusImbalance:
-		if ai.Has(StatusBerserk) || ai.DoesAny(MonsImmunityImbalance) {
+		if ai.Has(StatusLignification) || ai.DoesAny(MonsImmunityImbalance) {
 			return false
 		}
 		if ai.DoesAny(ResistanceImbalance) {
