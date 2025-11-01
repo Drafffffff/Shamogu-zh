@@ -69,10 +69,10 @@ func (g *Game) flavoursProcGen() {
 	gpi.Earthquake = 2 + g.IntN(MapLevels-1)
 	gpi.FakePortal = make([]bool, MapLevels)
 	nfakes := 1 // at least one fake portal per game
-	if g.IntN(3) > 0 {
+	if g.IntN(2) == 0 {
 		nfakes++
 	}
-	if g.IntN(10) == 0 {
+	if g.IntN(9) == 0 {
 		nfakes++
 	}
 	for range nfakes {
