@@ -748,6 +748,10 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 		case 0:
 			switch g.IntN(5) {
 			case 0, 1:
+				if g.IntN(10) == 0 {
+					// No one guarding the orb once in a while!
+					break
+				}
 				n := min(nL, 2)
 				for range n {
 					g.genMonsterGuardian(monsLate[g.IntN(len(monsLate))], g.Map.Orb)
