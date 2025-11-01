@@ -5,6 +5,7 @@ import (
 
 	"codeberg.org/anaseto/gruid"
 	"codeberg.org/anaseto/gruid/paths"
+	"codeberg.org/anaseto/gruid/rl"
 )
 
 // Version is the game's version string of the last release.
@@ -42,9 +43,10 @@ type Game struct {
 	PR       *paths.PathRange // path range for most pathfinding
 	PRnoise  *paths.PathRange // path range for noise computations (to avoid conflict with PR)
 
-	Dir  gruid.Point // last bump-direction
-	Prev gruid.Point // previous position of player
-	Turn int         // current game's turn
+	Dir            gruid.Point // last bump-direction
+	Prev           gruid.Point // previous position of player
+	Turn           int         // current game's turn
+	CorruptionTurn int         // next corruption event (corrupted dungeon mod)
 
 	Logs     *Logs     // game log
 	Mods     []bool    // active game mods
@@ -78,6 +80,7 @@ func (g *Game) Init() {
 	g.PR = paths.NewPathRange(gruid.NewRange(0, 0, MapWidth, MapHeight))
 	g.PRnoise = paths.NewPathRange(gruid.NewRange(0, 0, MapWidth, MapHeight))
 	g.Dir = gruid.Point{1, 0}
+	g.CorruptionTurn = 50 + g.IntN(250)
 	g.InitPlayer()
 }
 
@@ -151,6 +154,9 @@ func (g *Game) EndTurn() {
 // HandleTurnCount() increments the turn count and handles watching.
 func (g *Game) HandleTurnCount() {
 	g.IncrTurn()
+	if g.Mod(ModCorruptedDungeon) && g.Turn >= g.CorruptionTurn {
+		g.handleCorruptionEvent()
+	}
 	nmt := g.Stats.MapTurns[g.Map.Level-1]
 	switch nmt {
 	case 950:
@@ -168,6 +174,83 @@ func (g *Game) HandleTurnCount() {
 		g.genMonster(BlazingGolem)
 		g.genMonster(BlazingGolem)
 	}
+}
+
+// handleCorruptionEvent handles a corruption event for the corrupted dungeon
+// mod.
+func (g *Game) handleCorruptionEvent() {
+	g.CorruptionTurn = g.Turn + 25 + g.IntN(300)
+	switch g.IntN(5) {
+	case 0:
+		g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
+			if g.InFOV(p) {
+				return t
+			}
+			if g.IntN(5) == 0 {
+				return t
+			}
+			switch t {
+			case Foliage:
+				return Floor
+			case Rubble:
+				return Foliage
+			case Wall:
+				if g.IntN(50) == 0 {
+					return TranslucentWall
+				}
+			case Floor:
+				g.AddCloud(Cloud{Kind: CloudNormal, P: p, Duration: 5 + g.IntN(150)})
+			}
+			return t
+		})
+	default:
+		n := 1 + g.IntN(3)
+		g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
+			inFOV := g.InFOV(p)
+			if g.IntN(100) > 0 || inFOV && n >= 0 {
+				return t
+			}
+			if inFOV {
+				n--
+			}
+			switch t {
+			case Foliage:
+				return Floor
+			case Rubble:
+				return Floor
+			case Wall:
+				if g.IntN(2) == 0 {
+					return TranslucentWall
+				}
+			case TranslucentWall:
+				return Wall
+			case Floor:
+				if i, _ := g.ItemAt(p); i < 0 {
+					if g.IntN(10) == 0 {
+						return Rubble
+					}
+					return Foliage
+				}
+			}
+			if inFOV {
+				// We didn't change terrain.
+				n++
+			}
+			return t
+		})
+	}
+	switch g.IntN(4) {
+	case 0:
+		g.Log("Uh.")
+	case 1:
+		g.Log("Um.")
+	case 2:
+		g.Log("Oh.")
+	default:
+		g.Log("Eh.")
+	}
+	g.UpdateFOV()
+	g.UpdateKnowledge()
 }
 
 // Marked reports whether you've been found by the Orb of Corruption.

@@ -89,17 +89,46 @@ func (g *Game) flavoursProcGen() {
 			}
 		}
 	}
-	gpi.GuardianTotem1 = randTotemLevel(3, 4)
+	// Levels with special monsters.
+	var (
+		guardianTotem1Level   = 3
+		guardianTotem2Level   = 3
+		guardianPortal2Level  = 6
+		guardianPortal1Level  = 4
+		wanderingUnique1Level = 4
+		wanderingUnique2Level = 4
+	)
+	if g.Mod(ModCorruptedDungeon) {
+		// Minimal level where some monsters may appear is sometimes
+		// reduced.
+		if g.IntN(MapLevels) == 0 {
+			guardianTotem1Level = 1
+		}
+		if g.IntN(MapLevels) == 0 {
+			guardianTotem2Level = 1
+		}
+		if g.IntN(MapLevels) == 0 {
+			guardianPortal1Level = 2
+		}
+		if g.IntN(MapLevels) == 0 {
+			guardianPortal2Level = 1
+		}
+		if g.IntN(MapLevels) == 0 {
+			wanderingUnique1Level = 1
+			wanderingUnique2Level = 1
+		}
+	}
+	gpi.GuardianTotem1 = randTotemLevel(guardianTotem1Level, 4)
 	for gpi.GuardianTotem2 == 0 || gpi.GuardianTotem2 == gpi.GuardianTotem1 {
 		// Wasps do not care about the totem being empty or not.
-		gpi.GuardianTotem2 = 3 + g.IntN(4)
+		gpi.GuardianTotem2 = guardianTotem2Level + g.IntN(4)
 	}
-	gpi.GuardianPortal2 = 6 + g.IntN(3)
+	gpi.GuardianPortal2 = guardianPortal2Level + g.IntN(3)
 	for gpi.GuardianPortal1 == 0 || gpi.GuardianPortal1 == gpi.GuardianPortal2 {
-		gpi.GuardianPortal1 = 4 + g.IntN(4)
+		gpi.GuardianPortal1 = guardianPortal1Level + g.IntN(4)
 	}
-	gpi.WanderingUnique1 = 4 + g.IntN(6)
-	gpi.WanderingUnique2 = 4 + g.IntN(6)
+	gpi.WanderingUnique1 = wanderingUnique1Level + g.IntN(6)
+	gpi.WanderingUnique2 = wanderingUnique2Level + g.IntN(6)
 	gpi.MonsEarly = g.IntN(4)
 	gpi.MonsMid = 4 + g.IntN(3)
 	gpi.MonsMidLate = 6 + g.IntN(4) // 6-9 but != MonsMid or MonsLateSwarm
@@ -255,11 +284,6 @@ func (g *Game) menhirsProcGen() {
 // ensures that all runes appear at least once in a while.
 func (g *Game) runeProcGen() {
 	g.ProcInfo.Runes = g.genRandomIndices(NRunes)
-	if g.Mod(ModHorrorscape) {
-		// Extra chance for Fire and Poison runes.
-		g.ProcInfo.Runes[g.IntN(len(g.ProcInfo.Runes))] = int(RuneFire)
-		g.ProcInfo.Runes[g.IntN(len(g.ProcInfo.Runes))] = int(RunePoison)
-	}
 }
 
 // NextRune returns the next rune kind to be generated.

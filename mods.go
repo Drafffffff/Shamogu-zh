@@ -9,7 +9,7 @@ const (
 	ModSpiderPhobia                      // fear of spiders (unless berserk); more spiders
 	ModExtraMonsters                     // mod with extra monsters
 	ModExtraGuardians                    // mod with extra regular guardians
-	ModHorrorscape                       // mod with lots of unusual and random stuff going on
+	ModCorruptedDungeon                  // mod with lots of unusual and random stuff going on
 	ModNoRecharges                       // mod without spirit recharges
 	ModHeavyTelepathy                    // two-way Clarity-like telepathy with heavy-step monsters
 	ModSmallInventory                    // inventory with 3 comestibles slots
@@ -18,7 +18,7 @@ const (
 
 const NMods = 1 + int(ModEnableChallengeSpirits)
 
-var gameMods = []Mod{ModNoisy, ModSpiderPhobia, ModExtraMonsters, ModExtraGuardians, ModHorrorscape, ModNoRecharges,
+var gameMods = []Mod{ModNoisy, ModSpiderPhobia, ModExtraMonsters, ModExtraGuardians, ModCorruptedDungeon, ModNoRecharges,
 	ModHeavyTelepathy, ModSmallInventory, ModEnableChallengeSpirits}
 
 func (m Mod) String() string {
@@ -31,8 +31,8 @@ func (m Mod) String() string {
 		return "Extra Monsters"
 	case ModExtraGuardians:
 		return "Extra Guardians"
-	case ModHorrorscape:
-		return "Horrorscape."
+	case ModCorruptedDungeon:
+		return "Corrupted dungeon."
 	case ModNoRecharges:
 		return "No Recharges"
 	case ModHeavyTelepathy:
@@ -55,9 +55,9 @@ func (m Mod) Desc() string {
 	case ModExtraMonsters:
 		return "More wandering monsters than usual."
 	case ModExtraGuardians:
-		return "Some portals now have extra regular monsters as guardians."
-	case ModHorrorscape:
-		return "An unusual and bizarre dungeon."
+		return "Some portals have extra regular monsters as guardians."
+	case ModCorruptedDungeon:
+		return "The orb's influence has scattered twisted surprises through the land."
 	case ModNoRecharges:
 		return "Spirit ability charges are doubled but don't recharge when going to next floor."
 	case ModHeavyTelepathy:

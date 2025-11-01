@@ -48,7 +48,7 @@ func (g *Game) GenerateMap(ml MapLayout) {
 			break
 		}
 	}
-	if g.ProcInfo.Earthquake == g.Map.Level || g.Mod(ModHorrorscape) && g.IntN(7) == 0 {
+	if g.ProcInfo.Earthquake == g.Map.Level || g.Mod(ModCorruptedDungeon) && g.IntN(7) == 0 {
 		g.earthquake()
 	}
 	g.computeWaypoints(mg)
@@ -110,8 +110,8 @@ func (g *Game) generateMap(ml MapLayout) (*MapGen, bool) {
 	mg.genVaults(SmallVaultTemplates, 4+mg.rand.IntN(2), PlacementRandom)
 	mg.connectAllVaults()
 	// Mods.
-	if g.Mod(ModHorrorscape) {
-		g.genHorrorScapeTerrain(mg)
+	if g.Mod(ModCorruptedDungeon) {
+		g.genCorruptedTerrain(mg)
 	}
 	// Ensure that all the cells are connected.
 	pass := func(p gruid.Point) bool {
@@ -126,25 +126,22 @@ func (g *Game) generateMap(ml MapLayout) (*MapGen, bool) {
 	return mg, ntiles > minCaveSize
 }
 
-func (g *Game) genHorrorScapeTerrain(mg *MapGen) {
-	flipFoliageFloor := func(t rl.Cell) rl.Cell {
-		switch t {
-		case Floor:
-			return Foliage
-		case Foliage:
-			return Floor
-		default:
-			return t
-		}
-	}
-	switch g.IntN(4) {
+func (g *Game) genCorruptedTerrain(mg *MapGen) {
+	switch g.IntN(8) {
 	case 0:
 		if g.IntN(2) == 0 {
 			g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
 				if mg.vault.At(p) {
 					return t
 				}
-				return flipFoliageFloor(t)
+				switch t {
+				case Floor:
+					return Foliage
+				case Foliage:
+					return Floor
+				default:
+					return t
+				}
 			})
 		} else {
 			g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
@@ -169,15 +166,22 @@ func (g *Game) genHorrorScapeTerrain(mg *MapGen) {
 			return t
 		})
 	case 2:
+		g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
+			if t == Wall && g.IntN(5) == 0 {
+				return TranslucentWall
+			}
+			return t
+		})
+	case 3:
 		var nt rl.Cell
 		switch g.IntN(2) {
 		case 0:
-			nt = TranslucentWall
+			nt = Foliage
 		case 1:
-			nt = Rubble
+			nt = Floor
 		}
 		g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
-			if t == Wall && g.IntN(5) == 0 {
+			if t == Wall && !mg.vault.At(p) && g.IntN(5) > 0 {
 				return nt
 			}
 			return t

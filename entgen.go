@@ -260,6 +260,9 @@ func menhirEntity(ci itemInfo) *Entity {
 
 // genItems generates items for the new level.
 func (g *Game) genItems(mg *MapGen) {
+	// We keep count of static places (there's a limit of about 2 with
+	// the current number of vaults).
+	extraStatic := 0
 	// Portal.
 	portalIdxs := []int{}
 	npvaults := mg.vaults[1:] // non-player vaults
@@ -277,9 +280,11 @@ func (g *Game) genItems(mg *MapGen) {
 		addPortal(false)
 		if g.ProcInfo.FakePortal[g.Map.Level-1] {
 			addPortal(true)
-			if g.Mod(ModHorrorscape) && g.IntN(2) == 0 {
+			if g.Mod(ModCorruptedDungeon) && g.IntN(2) == 0 {
+				extraStatic++
 				addPortal(true)
 				if g.IntN(2) == 0 {
+					extraStatic++
 					addPortal(true)
 				}
 			}
@@ -314,40 +319,63 @@ func (g *Game) genItems(mg *MapGen) {
 			}
 		}
 		me := menhirEntity(MenhirData[idx])
-		_, me.P = mg.RandomVaultsPlace(tvaults, PlaceStatic)
+		if g.Mod(ModCorruptedDungeon) && g.IntN(5) == 0 || extraStatic >= 2 {
+			me.P = g.randomFreeItemFloor()
+		} else {
+			_, me.P = mg.RandomVaultsPlace(tvaults, PlaceStatic)
+		}
 		g.AddEntity(me)
 	}
 	// Totemic spirit.
+	totemPoint := func() gruid.Point {
+		if g.Mod(ModCorruptedDungeon) && g.IntN(2*MapLevels) == 0 {
+			return g.randomFreeItemFloor()
+		}
+		_, p := mg.RandomVaultsPlace(npvaults, PlaceItem)
+		return p
+	}
 	if spiritIndex := g.ProcInfo.Spirits[g.Map.Level-1]; spiritIndex >= 0 {
 		sp := g.spiritEntity(secondarySpirits[spiritIndex])
 		spr := sp.Role.(*Spirit)
 		spr.Charges = spr.MaxCharges[spr.Level]
 		sp.Rune = '!'
-		_, sp.P = mg.RandomVaultsPlace(npvaults, PlaceItem)
+		sp.P = totemPoint()
 		g.Map.Totem = sp.P
 		g.AddEntity(sp)
 	} else if g.Map.Level < MapLevels {
-		_, p := mg.RandomVaultsPlace(npvaults, PlaceItem)
-		g.Map.Totem = p
-		g.genEmptyTotemAt(p)
+		addEmptyTotem := func() {
+			p := totemPoint()
+			g.Map.Totem = p
+			g.genEmptyTotemAt(p)
+		}
+		addEmptyTotem()
+		if g.Mod(ModCorruptedDungeon) && g.IntN(5) == 0 && extraStatic < 2 {
+			extraStatic++
+			addEmptyTotem()
+		}
 	}
 	// Comestibles.
 	nitems := g.ProcInfo.NComestibles[g.Map.Level-1]
-	if g.Mod(ModHorrorscape) && g.IntN(6) == 0 {
-		if g.IntN(2) == 0 {
-			nitems = 0
-		} else {
-			nitems += 7
-		}
-	}
-	for i := range nitems {
-		co := comestibleEntity(ComestibleData[g.NextComestibleIdx()])
+	addComestible := func(i int, cod itemInfo) {
+		co := comestibleEntity(cod)
 		if i <= (nitems+1)/2 {
 			co.P = mg.RandomPlace(PlaceItem)
 		} else {
 			co.P = g.randomFreeItemFloor()
 		}
 		g.AddEntity(co)
+	}
+	if g.Mod(ModCorruptedDungeon) && g.IntN(MapLevels) == 0 {
+		if g.IntN(2) == 0 {
+			cod := ComestibleData[g.NextComestibleIdx()]
+			for i := range nitems + 7 {
+				addComestible(i, cod)
+			}
+		}
+		nitems = 0
+	}
+	for i := range nitems {
+		addComestible(i, ComestibleData[g.NextComestibleIdx()])
 	}
 	// Runic traps.
 	rto, rtt := 1, 1 // runes in open areas and in tunnels
@@ -365,13 +393,13 @@ func (g *Game) genItems(mg *MapGen) {
 			rtt++
 		}
 	}
-	if g.Mod(ModHorrorscape) {
-		rto += 3 + g.IntN(9)
-		rtt += g.IntN(2)
-	}
 	if g.Map.Level == g.ProcInfo.TrapLevel {
 		rto += 4
 		rtt++
+		if g.Mod(ModCorruptedDungeon) {
+			rto += g.IntN(6)
+			rtt += g.IntN(2)
+		}
 	}
 	for range rto {
 		g.genRunicTrap(mg)
@@ -532,61 +560,15 @@ var monsLate = []monsterKind{
 
 // genMonsters generates monster entities for the current level.
 func (g *Game) genMonsters(mg *MapGen) {
-	if g.Map.Orb != InvalidPos {
-		g.genMonsterGuardian(FearsomeLich, g.Map.Orb)
-		g.genMonsterGuardian(UndeadKnight, g.Map.Orb)
-		if g.Mod(ModExtraGuardians) {
-			g.genMonsterGuardian(monsLate[g.IntN(len(monsLate))], g.Map.Orb)
-			g.genMonsterGuardian(monsMid[g.IntN(len(monsMid))], g.Map.Orb)
-		}
-	} else if g.Mod(ModExtraGuardians) {
-		p := g.Map.Portal
-		if g.IntN(4) == 0 {
-			// Occasionally make extra guardians guard a random
-			// non-player vault.
-			_, p = mg.RandomVaultsPlace(mg.vaults[1:], PlaceWaypoint)
-		}
-		if g.Map.Level > 3 {
-			g.genMonsterGuardian(monsMid[g.IntN(len(monsMid))], p)
-		} else {
-			g.genMonsterGuardian(monsEarly[g.IntN(len(monsEarly))], p)
-		}
-		if g.IntN(3) > 0 {
-			g.genMonsterGuardian(monsMid[g.IntN(len(monsMid))], p)
-		}
-	}
-	if g.ProcInfo.GuardianPortal2 == g.Map.Level {
-		g.genMonsterGuardian(MadOctopode, g.Map.Portal)
-	}
-	if g.ProcInfo.GuardianTotem1 == g.Map.Level {
-		g.genMonsterGuardian(CrazyDruid, g.Map.Totem)
-	}
-	// number of early, mid, late monsters.
+	// Number of early, mid, late monsters.
 	nE, nM, nL := nMonsE[g.Map.Level-1], nMonsM[g.Map.Level-1], nMonsL[g.Map.Level-1]
-	if g.ProcInfo.WanderingUnique1 == g.Map.Level {
-		nM--
-		g.genMonster(WalkingMushroom)
+	// Guardians and wandering uniques.
+	if g.Mod(ModCorruptedDungeon) {
+		nE, nM, nL = g.genGuardiansCorrupted(mg, nE, nM, nL)
+	} else {
+		nE, nM, nL = g.genGuardians(mg, nE, nM, nL)
 	}
-	if g.ProcInfo.WanderingUnique2 == g.Map.Level {
-		nM--
-		g.genMonster(NoisyImp)
-	}
-	if g.ProcInfo.GuardianTotem2 == g.Map.Level {
-		nE--
-		g.genMonsterGuardian(TotemWasp, g.Map.Totem)
-		g.genMonsterGuardian(TotemWasp, g.Map.Totem)
-	}
-	if g.ProcInfo.GuardianPortal1 == g.Map.Level {
-		nM--
-		p := g.Map.Portal
-		if g.IntN(4) == 0 {
-			// Occasionally make golems guard a random non-player
-			// vault.
-			_, p = mg.RandomVaultsPlace(mg.vaults[1:], PlaceWaypoint)
-		}
-		g.genMonsterGuardian(BlazingGolem, p)
-		g.genMonsterGuardian(BlazingGolem, p)
-	}
+	// Special levels.
 	switch g.Map.Level {
 	case g.ProcInfo.MonsEarly:
 		// Special level with many early monsters of same kind.
@@ -658,6 +640,28 @@ func (g *Game) genMonsters(mg *MapGen) {
 		}
 		nM = 1
 	}
+	// Mod adjustments.
+	if g.Mod(ModExtraGuardians) {
+		if g.Map.Orb != InvalidPos {
+			g.genMonsterGuardian(monsLate[g.IntN(len(monsLate))], g.Map.Orb)
+			g.genMonsterGuardian(monsMid[g.IntN(len(monsMid))], g.Map.Orb)
+		} else {
+			p := g.Map.Portal
+			if g.IntN(4) == 0 {
+				// Occasionally make extra guardians guard a random
+				// non-player vault.
+				_, p = mg.RandomVaultsPlace(mg.vaults[1:], PlaceWaypoint)
+			}
+			if g.Map.Level > 3 {
+				g.genMonsterGuardian(monsMid[g.IntN(len(monsMid))], p)
+			} else {
+				g.genMonsterGuardian(monsEarly[g.IntN(len(monsEarly))], p)
+			}
+			if g.IntN(3) > 0 {
+				g.genMonsterGuardian(monsMid[g.IntN(len(monsMid))], p)
+			}
+		}
+	}
 	if g.Mod(ModExtraMonsters) {
 		nE += 1 + g.Map.Level/3
 		nM += g.Map.Level / 2
@@ -668,15 +672,20 @@ func (g *Game) genMonsters(mg *MapGen) {
 			g.genMonster(BerserkingSpider)
 		}
 	}
-	if g.Mod(ModHorrorscape) {
-		if g.Map.Level > 1 {
-			nM++
-		}
-		if g.Map.Level > 2 {
+	if g.Mod(ModCorruptedDungeon) {
+		if nE > 0 && nM > 0 && g.IntN(5) == 0 {
+			// Occasionally one extra late monster (even in early game).
+			nE--
+			nM--
 			nL++
 		}
-		nE, nM, nL = g.genMonstersHorrorscape(nE, nM, nL)
+		if g.IntN(6) == 0 {
+			// Occasionally spawn extra uniques or guardians
+			// (possibly not unique anymore).
+			nE, nM, nL = g.genMonstersCorrupted(mg, nE, nM, nL)
+		}
 	}
+	// Generate remaining monsters randomly from each category.
 	for range nE {
 		g.genMonster(monsEarly[g.IntN(len(monsEarly))])
 	}
@@ -692,7 +701,168 @@ var nMonsE = [MapLevels]int{3, 5, 6, 6, 5, 5, 4, 4, 3}
 var nMonsM = [MapLevels]int{2, 3, 4, 6, 8, 10, 11, 10, 10}
 var nMonsL = [MapLevels]int{0, 0, 1, 1, 2, 2, 3, 4, 6}
 
-func (g *Game) genMonstersHorrorscape(nE, nM, nL int) (int, int, int) {
+// genGuardians generates any monster guardians and special wandering uniques.
+func (g *Game) genGuardians(mg *MapGen, nE, nM, nL int) (int, int, int) {
+	if g.Map.Orb != InvalidPos {
+		g.genMonsterGuardian(FearsomeLich, g.Map.Orb)
+		g.genMonsterGuardian(UndeadKnight, g.Map.Orb)
+	}
+	if g.ProcInfo.GuardianPortal2 == g.Map.Level {
+		g.genMonsterGuardian(MadOctopode, g.Map.Portal)
+	}
+	if g.ProcInfo.GuardianTotem1 == g.Map.Level {
+		g.genMonsterGuardian(CrazyDruid, g.Map.Totem)
+	}
+	if g.ProcInfo.WanderingUnique1 == g.Map.Level {
+		nM--
+		g.genMonster(WalkingMushroom)
+	}
+	if g.ProcInfo.WanderingUnique2 == g.Map.Level {
+		nM--
+		g.genMonster(NoisyImp)
+	}
+	if g.ProcInfo.GuardianTotem2 == g.Map.Level {
+		nE--
+		g.genMonsterGuardian(TotemWasp, g.Map.Totem)
+		g.genMonsterGuardian(TotemWasp, g.Map.Totem)
+	}
+	if g.ProcInfo.GuardianPortal1 == g.Map.Level {
+		nM--
+		p := g.Map.Portal
+		if g.IntN(4) == 0 {
+			// Occasionally make golems guard a random non-player
+			// vault.
+			_, p = mg.RandomVaultsPlace(mg.vaults[1:], PlaceWaypoint)
+		}
+		g.genMonsterGuardian(BlazingGolem, p)
+		g.genMonsterGuardian(BlazingGolem, p)
+	}
+	return nE, nM, nL
+}
+
+// genGuardiansCorrupted generates any monster guardians and special
+// wandering uniques with special adjustments to account for extra corruption.
+func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int) {
+	if g.Map.Orb != InvalidPos {
+		switch g.IntN(3) {
+		case 0:
+			switch g.IntN(5) {
+			case 0, 1:
+				n := min(nL, 2)
+				for range n {
+					g.genMonsterGuardian(monsLate[g.IntN(len(monsLate))], g.Map.Orb)
+				}
+				nL -= n
+			case 2, 3:
+				mk := monsMid[g.IntN(len(monsEarly))]
+				n := min(nM, 4)
+				for range n {
+					g.genMonsterGuardian(mk, g.Map.Orb)
+				}
+				nM -= n
+			}
+			g.genMonster(FearsomeLich)
+			g.genMonster(UndeadKnight)
+		case 1:
+			g.genMonsterGuardian(monsLate[g.IntN(len(monsLate))], g.Map.Orb)
+			nL--
+			if g.IntN(4) == 0 {
+				g.genMonsterGuardian(UndeadKnight, g.Map.Orb)
+				g.genMonster(FearsomeLich)
+			} else {
+				g.genMonsterGuardian(FearsomeLich, g.Map.Orb)
+				g.genMonster(UndeadKnight)
+			}
+		default:
+			g.genMonsterGuardian(FearsomeLich, g.Map.Orb)
+			g.genMonsterGuardian(UndeadKnight, g.Map.Orb)
+		}
+	}
+	if g.ProcInfo.GuardianPortal2 == g.Map.Level {
+		if g.IntN(3) > 0 {
+			p := g.corruptedPortalGuardianPoint(mg)
+			g.genMonsterGuardian(MadOctopode, p)
+		} else {
+			g.genMonster(MadOctopode)
+		}
+	}
+	if g.ProcInfo.GuardianTotem1 == g.Map.Level {
+		if g.IntN(3) > 0 {
+			p := g.corruptedTotemGuardianPoint(mg)
+			g.genMonsterGuardian(CrazyDruid, p)
+		} else {
+			g.genMonster(CrazyDruid)
+		}
+	}
+	if g.ProcInfo.WanderingUnique1 == g.Map.Level {
+		nM--
+		if g.IntN(3) > 0 {
+			g.genMonster(WalkingMushroom)
+		} else {
+			p := g.corruptedPortalGuardianPoint(mg)
+			g.genMonsterGuardian(WalkingMushroom, p)
+		}
+	}
+	if g.ProcInfo.WanderingUnique2 == g.Map.Level {
+		nM--
+		if g.IntN(3) > 0 {
+			g.genMonster(NoisyImp)
+		} else {
+			p := g.corruptedPortalGuardianPoint(mg)
+			g.genMonsterGuardian(NoisyImp, p)
+		}
+	}
+	if g.ProcInfo.GuardianTotem2 == g.Map.Level {
+		nE--
+		if g.IntN(3) > 0 {
+			p := g.corruptedTotemGuardianPoint(mg)
+			g.genMonsterGuardian(TotemWasp, p)
+			g.genMonsterGuardian(TotemWasp, p)
+		} else {
+			g.genMonster(TotemWasp)
+			g.genMonster(TotemWasp)
+		}
+	}
+	if g.ProcInfo.GuardianPortal1 == g.Map.Level {
+		nM--
+		if g.IntN(3) > 0 {
+			p := g.corruptedPortalGuardianPoint(mg)
+			g.genMonsterGuardian(BlazingGolem, p)
+			g.genMonsterGuardian(BlazingGolem, p)
+		} else {
+			g.genMonster(BlazingGolem)
+			g.genMonster(BlazingGolem)
+		}
+	}
+	return nE, nM, nL
+}
+
+func (g *Game) corruptedPortalGuardianPoint(mg *MapGen) gruid.Point {
+	var p gruid.Point
+	if g.Map.Orb != InvalidPos {
+		p = g.Map.Orb
+	} else {
+		p = g.Map.Portal
+	}
+	if g.IntN(3) == 0 {
+		// Occasionally guard a random non-player vault.
+		_, p = mg.RandomVaultsPlace(mg.vaults[1:], PlaceWaypoint)
+		if g.Map.Totem != InvalidPos && g.IntN(4) == 0 {
+			p = g.Map.Totem
+		}
+	}
+	return p
+}
+
+func (g *Game) corruptedTotemGuardianPoint(mg *MapGen) gruid.Point {
+	if g.IntN(3) > 0 {
+		return g.Map.Totem
+	}
+	return g.corruptedPortalGuardianPoint(mg)
+}
+
+// genMonstersCorrupted may generate extra special wandering monsters.
+func (g *Game) genMonstersCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int) {
 	// Special early monsters.
 	if g.IntN(3) == 0 {
 		nEs := min(nE, 1+g.IntN(3))
@@ -704,7 +874,7 @@ func (g *Game) genMonstersHorrorscape(nE, nM, nL int) (int, int, int) {
 	// Special mid monsters.
 	if g.IntN(3) == 0 {
 		mks := []monsterKind{WalkingMushroom, BlazingGolem, CrazyDruid, NoisyImp}
-		nMs := min(nM, 1+g.IntN(3), len(mks))
+		nMs := min(nM, 1+g.IntN(2), len(mks))
 		monsSpecialMid := g.monsterSelection(mks, len(mks))
 		for _, mk := range monsSpecialMid[:nMs] {
 			g.genMonster(mk)
@@ -713,11 +883,17 @@ func (g *Game) genMonstersHorrorscape(nE, nM, nL int) (int, int, int) {
 	}
 	// Special late monsters.
 	if g.IntN(3) == 0 {
-		mks := []monsterKind{FearsomeLich, UndeadKnight, MadOctopode}
-		nLs := min(nL, 1+g.IntN(2), len(mks))
-		monsSpecialLate := g.monsterSelection(mks, len(mks))
-		for _, mk := range monsSpecialLate[:nLs] {
-			g.genMonster(mk)
+		nLs := min(nL, 1+g.IntN(2))
+		if g.IntN(3) == 0 && g.Map.Level < MapLevels {
+			for range nLs {
+				p := g.corruptedTotemGuardianPoint(mg)
+				g.genMonsterGuardian(FearsomeLich, p)
+			}
+		} else {
+			mks := []monsterKind{UndeadKnight, MadOctopode}
+			for range nLs {
+				g.genMonster(mks[g.IntN(len(mks))])
+			}
 		}
 		nL -= nLs
 	}
