@@ -365,7 +365,7 @@ func (g *Game) genItems(mg *MapGen) {
 		}
 		g.AddEntity(co)
 	}
-	if g.Mod(ModCorruptedDungeon) && g.IntN(MapLevels) == 0 {
+	if g.Mod(ModCorruptedDungeon) && g.IntN(MapLevels+MapLevels/2) == 0 {
 		if g.IntN(2) == 0 {
 			cod := ComestibleData[g.NextComestibleIdx()]
 			for i := range nitems + 7 {
@@ -829,13 +829,45 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 	}
 	if g.ProcInfo.GuardianPortal1 == g.Map.Level {
 		nM--
+		mk := BlazingGolem
+		if g.IntN(5) == 0 {
+			mk = WarpingWraith
+		}
 		if g.IntN(3) > 0 {
 			p := g.corruptedPortalGuardianPoint(mg)
-			g.genMonsterGuardian(BlazingGolem, p)
-			g.genMonsterGuardian(BlazingGolem, p)
+			g.genMonsterGuardian(mk, p)
+			g.genMonsterGuardian(mk, p)
 		} else {
-			g.genMonster(BlazingGolem)
-			g.genMonster(BlazingGolem)
+			g.genMonster(mk)
+			g.genMonster(mk)
+		}
+	}
+	if g.IntN(2*MapLevels) == 0 && nE > 2 && nM > 2 {
+		var p gruid.Point
+		switch g.IntN(2) {
+		case 0:
+			_, p = mg.RandomVaultsPlace(mg.vaults[1:], PlaceWaypoint)
+			mk := HungryRat
+			if g.IntN(2) == 0 {
+				mk = BerserkingSpider
+			}
+			for range 5 + g.IntN(4) {
+				g.genMonsterGuardian(mk, p)
+			}
+			nE--
+			nM--
+		default:
+			p := g.randomFreeFloor()
+			mk := ExplodingNadre
+			switch g.IntN(3) {
+			case 0:
+				mk = BlinkButterfly
+			}
+			for range 4 + g.IntN(2) {
+				g.genMonsterGuardian(mk, p)
+			}
+			nE--
+			nM--
 		}
 	}
 	return nE, nM, nL
