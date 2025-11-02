@@ -898,18 +898,14 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 	if g.Map.Orb != InvalidPos {
 		switch g.IntN(9) {
 		case 0, 1:
-			switch g.IntN(5) {
-			case 0, 1:
-				if g.IntN(3) == 0 {
-					// No one guarding the orb once in a while!
-					break
-				}
+			switch g.IntN(3) {
+			case 0:
 				n := min(nL, 2)
 				for range n {
 					g.genMonsterGuardian(g.randMonsKind(monsLate), g.Map.Orb)
 				}
 				nL -= n
-			case 2, 3:
+			case 1:
 				mk := g.randMonsKind(monsMid)
 				n := min(nM, 4)
 				for range n {
