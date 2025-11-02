@@ -272,15 +272,15 @@ type EffectFocus struct{}
 func (eff EffectFocus) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	if pa.Has(StatusDaze) {
-		g.Log("Using focus while dazed would be useless.")
+		g.Log("Invoking “focus” while dazed would be useless.")
 		return false
 	}
 	if pa.Has(StatusFocus) {
-		g.Log("You’re already focusing your heads.")
+		g.Log("You cannot invoke “focus” when you’re already focusing.")
 		return false
 	}
 	if pa.Has(StatusFear) {
-		g.Log("You cannot focus while afraid.")
+		g.Log("You cannot invoke “focus” while afraid.")
 		return false
 	}
 	g.PutStatus(PlayerID, pa, StatusFocus, DurationFocus)
@@ -301,11 +301,11 @@ type EffectDig struct{}
 func (eff EffectDig) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	if pa.Has(StatusDaze) {
-		g.Log("Using dig while dazed would be useless.")
+		g.Log("Invoking “dig” while dazed would be useless.")
 		return false
 	}
 	if pa.Has(StatusDig) {
-		g.Log("You’re already on a destructive charge.")
+		g.Log("You cannot invoke “dig” when you’re already digging.")
 		return false
 	}
 	g.PutStatus(PlayerID, pa, StatusDig, DurationDig)
@@ -452,7 +452,7 @@ type EffectTimeStop struct{}
 func (eff EffectTimeStop) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	if pa.Has(StatusTimeStop) {
-		g.Log("You're already freezing time.")
+		g.Log("You cannot invoke “stop time” when you’re already freezing time.")
 		return false
 	}
 	g.PutStatus(PlayerID, pa, StatusTimeStop, DurationTimeStop)
@@ -514,7 +514,7 @@ func (eff EffectLightning) Apply(g *Game) bool {
 	)
 	pa := g.PlayerActor()
 	if pa.HP <= 1 {
-		g.Log("You’re too injured for using lightning.")
+		g.Log("You’re too injured for invoking “lightning”.")
 		return false
 	}
 	mp := &MapPath{passable: func(q gruid.Point) bool {
@@ -704,15 +704,15 @@ type EffectSprint struct{}
 func (eff EffectSprint) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	if pa.Has(StatusDaze) {
-		g.Log("Using sprint while dazed would be useless.")
+		g.Log("Invoking “sprint” while dazed would be useless.")
 		return false
 	}
 	if pa.Has(StatusSprint) {
-		g.Log("You’re already sprinting.")
+		g.Log("You cannot invoke “sprint” while you’re already sprinting.")
 		return false
 	}
 	if !pa.CanMove() {
-		g.Log("You cannot sprint while lignified.")
+		g.Log("You cannot invoke “sprint” while lignified.")
 		return false
 	}
 	g.PutStatus(PlayerID, pa, StatusSprint, DurationSprint)
