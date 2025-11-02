@@ -204,14 +204,10 @@ func (g *Game) handleCorruptionEvent() {
 			return t
 		})
 	default:
-		n := 1 + g.IntN(3)
 		g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
 			inFOV := g.InFOV(p)
-			if g.IntN(100) > 0 || inFOV && n <= 0 {
+			if g.IntN(100) > 0 && (!inFOV || g.IntN(20) == 0) {
 				return t
-			}
-			if inFOV {
-				n--
 			}
 			switch t {
 			case Foliage:
@@ -231,10 +227,6 @@ func (g *Game) handleCorruptionEvent() {
 					}
 					return Foliage
 				}
-			}
-			if inFOV {
-				// We didn't change terrain.
-				n++
 			}
 			return t
 		})
