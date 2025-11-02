@@ -799,7 +799,7 @@ func (g *Game) genMonsters(mg *MapGen) {
 			if g.IntN(4) == 0 {
 				// Occasionally make extra guardians guard a random
 				// non-player vault.
-				_, p = mg.RandomVaultsPlace(mg.vaults[1:], PlaceWaypoint)
+				p = g.RandomWaypoint()
 			}
 			if g.Map.Level > 3 {
 				g.genMonsterGuardian(g.randMonsKind(monsMid), p)
@@ -830,7 +830,31 @@ func (g *Game) genMonsters(mg *MapGen) {
 			nM--
 			nL++
 		}
-		if g.IntN(6) == 0 {
+		if g.Map.Level >= 4 && g.Map.Level < MapLevels && g.IntN(5*4) == 0 {
+			switch g.IntN(4) {
+			case 0:
+				// Rare level with many imps.
+				for range nE*2 + nM*2 + nL*3 {
+					g.genMonster(NoisyImp)
+				}
+			case 1:
+				// Rare spooky level with no remaining
+				// wandering monsters with no drawback!
+			default:
+				// Rare level where all remaining monsters
+				// become guardians scattered around.
+				for range nE {
+					g.genMonsterGuardian(g.randMonsKind(monsEarly), g.RandomWaypoint())
+				}
+				for range nM {
+					g.genMonsterGuardian(g.randMonsKind(monsMid), g.RandomWaypoint())
+				}
+				for range nL {
+					g.genMonsterGuardian(g.randMonsKind(monsLate), g.RandomWaypoint())
+				}
+			}
+			nE, nM, nL = 0, 0, 0
+		} else if g.IntN(6) == 0 {
 			// Occasionally spawn extra uniques or guardians
 			// (possibly not unique anymore).
 			nE, nM, nL = g.genMonstersCorrupted(mg, nE, nM, nL)
@@ -846,6 +870,21 @@ func (g *Game) genMonsters(mg *MapGen) {
 	for range nL {
 		g.genMonster(g.randMonsKind(monsLate))
 	}
+}
+
+// RandomWaypoint returns a random non-player waypoint, or a random free
+// position if there is no such place. It doesn't reserve the place for
+// exclusive use.
+func (g *Game) RandomWaypoint() gruid.Point {
+	if len(g.Map.Waypoints) > 0 {
+		p := g.Map.Waypoints[g.IntN(len(g.Map.Waypoints))]
+		if p == g.PP() {
+			//
+			return g.RandomPassableWithoutTrap()
+		}
+		return g.RandomPassableWithin(p, 5)
+	}
+	return g.RandomPassableWithoutTrap()
 }
 
 // randMonsKind returns a random monster kind among the given ones.
@@ -884,7 +923,7 @@ func (g *Game) genGuardians(mg *MapGen, nE, nM, nL int) (int, int, int) {
 		if g.IntN(4) == 0 {
 			// Occasionally make golems guard a random non-player
 			// vault.
-			_, p = mg.RandomVaultsPlace(mg.vaults[1:], PlaceWaypoint)
+			p = g.RandomWaypoint()
 		}
 		g.genMonsterGuardian(BlazingGolem, p)
 		g.genMonsterGuardian(BlazingGolem, p)
@@ -1014,7 +1053,7 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 		var p gruid.Point
 		switch g.IntN(2) {
 		case 0:
-			_, p = mg.RandomVaultsPlace(mg.vaults[1:], PlaceWaypoint)
+			p = g.RandomWaypoint()
 			var mk monsterKind
 			switch g.IntN(4) {
 			case 0:
@@ -1059,7 +1098,7 @@ func (g *Game) corruptedPortalGuardianPoint(mg *MapGen) gruid.Point {
 	}
 	if g.IntN(4) == 0 {
 		// Occasionally guard a random non-player vault.
-		_, p = mg.RandomVaultsPlace(mg.vaults[1:], PlaceWaypoint)
+		p = g.RandomWaypoint()
 		if g.Map.Totem != InvalidPos && g.IntN(4) == 0 {
 			p = g.Map.Totem
 		}
