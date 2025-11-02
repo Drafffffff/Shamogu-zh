@@ -372,7 +372,7 @@ func (g *Game) genItems(mg *MapGen) {
 			for i := range nitems + 7 {
 				addComestible(i, cod)
 			}
-		} else {
+		} else if g.IntN(3) > 0 {
 			// Extra traps (of same kind) to compensate for lack of
 			// comestibles.
 			r := g.NextRune()
