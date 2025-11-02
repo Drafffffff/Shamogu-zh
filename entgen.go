@@ -896,8 +896,8 @@ func (g *Game) genGuardians(mg *MapGen, nE, nM, nL int) (int, int, int) {
 // wandering uniques with special adjustments to account for extra corruption.
 func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int) {
 	if g.Map.Orb != InvalidPos {
-		switch g.IntN(3) {
-		case 0:
+		switch g.IntN(9) {
+		case 0, 1:
 			switch g.IntN(5) {
 			case 0, 1:
 				if g.IntN(3) == 0 {
@@ -919,7 +919,7 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 			}
 			g.genMonster(FearsomeLich)
 			g.genMonster(UndeadKnight)
-		case 1:
+		case 2, 3, 4:
 			g.genMonsterGuardian(g.randMonsKind(monsLate), g.Map.Orb)
 			nL--
 			if g.IntN(4) == 0 {
