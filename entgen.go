@@ -715,7 +715,7 @@ func (g *Game) genMonsters(mg *MapGen) {
 	if g.Mod(ModCorruptedDungeon) {
 		nE, nM, nL = g.genGuardiansCorrupted(mg, nE, nM, nL)
 	} else {
-		nE, nM, nL = g.genGuardians(mg, nE, nM, nL)
+		nE, nM, nL = g.genGuardians(nE, nM, nL)
 	}
 	// Special levels.
 	switch g.Map.Level {
@@ -893,7 +893,7 @@ func (g *Game) randMonsKind(mks []monsterKind) monsterKind {
 }
 
 // genGuardians generates any monster guardians and special wandering uniques.
-func (g *Game) genGuardians(mg *MapGen, nE, nM, nL int) (int, int, int) {
+func (g *Game) genGuardians(nE, nM, nL int) (int, int, int) {
 	if g.Map.Orb != InvalidPos {
 		g.genMonsterGuardian(FearsomeLich, g.Map.Orb)
 		g.genMonsterGuardian(UndeadKnight, g.Map.Orb)
