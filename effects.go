@@ -452,7 +452,7 @@ type EffectTimeStop struct{}
 func (eff EffectTimeStop) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	if pa.Has(StatusTimeStop) {
-		g.Log("You already froze time.")
+		g.Log("You're already freezing time.")
 		return false
 	}
 	g.PutStatus(PlayerID, pa, StatusTimeStop, DurationTimeStop)
