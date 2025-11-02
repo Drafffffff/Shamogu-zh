@@ -206,7 +206,7 @@ func (g *Game) handleCorruptionEvent() {
 	default:
 		g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
 			inFOV := g.InFOV(p)
-			if g.IntN(100) > 0 && (!inFOV || g.IntN(20) == 0) {
+			if g.IntN(100) > 0 && (!inFOV || g.IntN(20) > 0) {
 				return t
 			}
 			switch t {
