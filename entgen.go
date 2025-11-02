@@ -367,9 +367,17 @@ func (g *Game) genItems(mg *MapGen) {
 	}
 	if g.Mod(ModCorruptedDungeon) && g.IntN(MapLevels+MapLevels/2) == 0 {
 		if g.IntN(2) == 0 {
+			// Field of comestibles of same kind.
 			cod := ComestibleData[g.NextComestibleIdx()]
 			for i := range nitems + 7 {
 				addComestible(i, cod)
+			}
+		} else {
+			// Extra traps (of same kind) to compensate for lack of
+			// comestibles.
+			r := g.NextRune()
+			for range 7 {
+				g.genRunicTrap(mg, r)
 			}
 		}
 		nitems = 0
@@ -402,10 +410,10 @@ func (g *Game) genItems(mg *MapGen) {
 		}
 	}
 	for range rto {
-		g.genRunicTrap(mg)
+		g.genRunicTrap(mg, g.NextRune())
 	}
 	for range rtt {
-		g.genRunicTrapInTunnel(mg)
+		g.genRunicTrapInTunnel(mg, g.NextRune())
 	}
 }
 
@@ -449,6 +457,143 @@ func (g *Game) RandomPassableBiased() gruid.Point {
 		// bias toward corners and dead ends).
 		return ps[g.IntN(len(ps))]
 	}
+}
+
+// runicTrap generates a new runic trap entity using the given data.
+func runicTrap(mr MagicRune) *Entity {
+	return &Entity{
+		Name:   mr.String(),
+		Rune:   '=',
+		KnownP: InvalidPos,
+		Role:   &RunicTrap{Rune: mr},
+	}
+}
+
+// genRunicTrap generates a runic trap at a position that doesn't truly block
+// passage, somewhat biased toward vaults.
+func (g *Game) genRunicTrap(mg *MapGen, r MagicRune) (ID, *Entity) {
+	for {
+		p := g.RandomPassableWithoutTrap()
+		inVault := mg.vault.At(p)
+		if !inVault && g.IntN(6) > 0 {
+			// Make vault cells more likely candidates.
+			continue
+		}
+		if i, _ := g.ItemAt(p); i >= 0 {
+			continue
+		}
+		if inVault && slices.Contains(g.Map.Waypoints, p) {
+			// Waypoints should be free of traps, because monsters
+			// may chose nearby locations reachable from them
+			// without passing traps.
+			continue
+		}
+		if p == g.PP() {
+			// Don't put a trap on the player's starting position.
+			continue
+		}
+		n, nfree := g.neighborInfo(p)
+		if inVault && nfree >= 2 && nfree < 4 && g.suitableTrapLocation(p) {
+			return g.genRunicTrapAt(r, p)
+		}
+		if n > 2 || nfree < 2 {
+			// Not connex or not connex enough or not enough free
+			// space.
+			continue
+		}
+		if !inVault && n == 2 && nfree == 2 {
+			// Likely an uninteresting corner.
+			continue
+		}
+		return g.genRunicTrapAt(r, p)
+	}
+}
+
+// genRunicTrapInTunnel generates a runic trap in an extra tunnel, if possible.
+// It blocks locally the passage, but there's always an alternative path.
+func (g *Game) genRunicTrapInTunnel(mg *MapGen, r MagicRune) (ID, *Entity) {
+	if len(mg.xtunnel) == 0 {
+		return g.genRunicTrap(mg, r)
+	}
+	// We shuffle extra tunnel tiles.
+	g.rand.Shuffle(len(mg.xtunnel), func(i, j int) {
+		mg.xtunnel[i], mg.xtunnel[j] = mg.xtunnel[j], mg.xtunnel[i]
+	})
+	for _, p := range mg.xtunnel {
+		if i, _ := g.ItemAt(p); i >= 0 {
+			continue
+		}
+		if !g.suitableTrapLocation(p) {
+			continue
+		}
+		return g.genRunicTrapAt(r, p)
+	}
+	return g.genRunicTrap(mg, r)
+}
+
+// suitableTrapLocation reports whether p's neighborhood makes it suitable for
+// a new trap location.
+func (g *Game) suitableTrapLocation(p gruid.Point) bool {
+	var nbs paths.Neighbors
+	ps := nbs.Cardinal(p, g.Map.PassableWithoutTraps)
+	if len(ps) <= 1 {
+		// Not an interesting trap location.
+		return false
+	}
+	passable := func(q gruid.Point) bool {
+		return g.Map.Passable(q) && g.NoTrapAt(q) && q != p
+	}
+	for i := range len(ps) - 1 {
+		path := g.PR.JPSPath(nil, ps[i], ps[i+1], passable, false)
+		if len(path) == 0 {
+			// No alternative path.
+			return false
+		}
+	}
+	return true
+}
+
+// genRunicTrapAt adds a new runic trap entity at the given position. It
+// replaces foliage or rubble with floor on that tile.
+func (g *Game) genRunicTrapAt(r MagicRune, p gruid.Point) (ID, *Entity) {
+	g.Map.Terrain.Set(p, Floor)
+	e := runicTrap(r)
+	e.P = p
+	id := ID(len(g.Entities))
+	g.Map.RuneCache.SetU(p, id)
+	g.AddEntity(e)
+	return id, e
+}
+
+// neighborInfo returns the number of passability toggles (non-passable/passable
+// alternations) and passable neighbors without traps.
+func (g *Game) neighborInfo(p gruid.Point) (n int, nfree int) {
+	passable := g.Map.PassableWithoutTraps
+	pass := false
+	directions := append(slices.Clone(Directions), gruid.Point{1, 0})
+	var pdir gruid.Point // previous direction
+	for i, dir := range directions {
+		q := p.Add(dir)
+		qpass := passable(q)
+		if i == 0 {
+			pdir = dir
+			pass = qpass
+			continue
+		}
+		if qpass {
+			if pass && !passable(q.Add(pdir)) {
+				// Not connex or not connex enough.
+				return -1, -1
+			}
+			nfree++
+		}
+		if pass != qpass {
+			n++
+		}
+		pass = qpass
+		pdir = dir
+	}
+	return n, nfree
 }
 
 // monsterInfo gathers information for generating a specific kind of monster.
@@ -558,6 +703,10 @@ var monsLate = []monsterKind{
 	WalkingTree,
 }
 
+var nMonsE = [MapLevels]int{3, 5, 6, 6, 5, 5, 4, 4, 3}
+var nMonsM = [MapLevels]int{2, 3, 4, 6, 8, 10, 11, 10, 10}
+var nMonsL = [MapLevels]int{0, 0, 1, 1, 2, 2, 3, 4, 6}
+
 // genMonsters generates monster entities for the current level.
 func (g *Game) genMonsters(mg *MapGen) {
 	// Number of early, mid, late monsters.
@@ -574,7 +723,7 @@ func (g *Game) genMonsters(mg *MapGen) {
 		// Special level with many early monsters of same kind.
 		nE += 2
 		nM--
-		mk := monsEarly[g.IntN(len(monsEarly))]
+		mk := g.randMonsKind(monsEarly)
 		for range nE - 2 {
 			g.genMonster(mk)
 		}
@@ -583,7 +732,7 @@ func (g *Game) genMonsters(mg *MapGen) {
 		// Special level with many mid monsters of same kind.
 		nE -= 2
 		nM += 2
-		mk := monsMid[g.IntN(len(monsMid))]
+		mk := g.randMonsKind(monsMid)
 		for range nM - 2 {
 			g.genMonster(mk)
 		}
@@ -593,7 +742,7 @@ func (g *Game) genMonsters(mg *MapGen) {
 		nE--
 		nM -= 3
 		nL += 3
-		mk := monsLate[g.IntN(len(monsLate))]
+		mk := g.randMonsKind(monsLate)
 		for range nL - 2 {
 			g.genMonster(mk)
 		}
@@ -617,7 +766,7 @@ func (g *Game) genMonsters(mg *MapGen) {
 			nM -= 2
 			md := g.monsterSelection(monsEarly, 2)
 			for range nE - 1 {
-				g.genMonster(md[g.IntN(len(md))])
+				g.genMonster(g.randMonsKind(md))
 			}
 			nE = 1
 		case 1:
@@ -627,7 +776,7 @@ func (g *Game) genMonsters(mg *MapGen) {
 			nM++
 			md := g.monsterSelection(monsMid, 3)
 			for range nM - 1 {
-				g.genMonster(md[g.IntN(len(md))])
+				g.genMonster(g.randMonsKind(md))
 			}
 			nM = 1
 		}
@@ -636,15 +785,15 @@ func (g *Game) genMonsters(mg *MapGen) {
 		// Special level with a smaller selection of mid monsters.
 		md := g.monsterSelection(monsMid, 4)
 		for range nM - 1 {
-			g.genMonster(md[g.IntN(len(md))])
+			g.genMonster(g.randMonsKind(md))
 		}
 		nM = 1
 	}
 	// Mod adjustments.
 	if g.Mod(ModExtraGuardians) {
 		if g.Map.Orb != InvalidPos {
-			g.genMonsterGuardian(monsLate[g.IntN(len(monsLate))], g.Map.Orb)
-			g.genMonsterGuardian(monsMid[g.IntN(len(monsMid))], g.Map.Orb)
+			g.genMonsterGuardian(g.randMonsKind(monsLate), g.Map.Orb)
+			g.genMonsterGuardian(g.randMonsKind(monsMid), g.Map.Orb)
 		} else {
 			p := g.Map.Portal
 			if g.IntN(4) == 0 {
@@ -653,12 +802,12 @@ func (g *Game) genMonsters(mg *MapGen) {
 				_, p = mg.RandomVaultsPlace(mg.vaults[1:], PlaceWaypoint)
 			}
 			if g.Map.Level > 3 {
-				g.genMonsterGuardian(monsMid[g.IntN(len(monsMid))], p)
+				g.genMonsterGuardian(g.randMonsKind(monsMid), p)
 			} else {
-				g.genMonsterGuardian(monsEarly[g.IntN(len(monsEarly))], p)
+				g.genMonsterGuardian(g.randMonsKind(monsEarly), p)
 			}
 			if g.IntN(3) > 0 {
-				g.genMonsterGuardian(monsMid[g.IntN(len(monsMid))], p)
+				g.genMonsterGuardian(g.randMonsKind(monsMid), p)
 			}
 		}
 	}
@@ -689,19 +838,20 @@ func (g *Game) genMonsters(mg *MapGen) {
 	}
 	// Generate remaining monsters randomly from each category.
 	for range nE {
-		g.genMonster(monsEarly[g.IntN(len(monsEarly))])
+		g.genMonster(g.randMonsKind(monsEarly))
 	}
 	for range nM {
-		g.genMonster(monsMid[g.IntN(len(monsMid))])
+		g.genMonster(g.randMonsKind(monsMid))
 	}
 	for range nL {
-		g.genMonster(monsLate[g.IntN(len(monsLate))])
+		g.genMonster(g.randMonsKind(monsLate))
 	}
 }
 
-var nMonsE = [MapLevels]int{3, 5, 6, 6, 5, 5, 4, 4, 3}
-var nMonsM = [MapLevels]int{2, 3, 4, 6, 8, 10, 11, 10, 10}
-var nMonsL = [MapLevels]int{0, 0, 1, 1, 2, 2, 3, 4, 6}
+// randMonsKind returns a random monster kind among the given ones.
+func (g *Game) randMonsKind(mks []monsterKind) monsterKind {
+	return mks[g.IntN(len(mks))]
+}
 
 // genGuardians generates any monster guardians and special wandering uniques.
 func (g *Game) genGuardians(mg *MapGen, nE, nM, nL int) (int, int, int) {
@@ -750,17 +900,17 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 		case 0:
 			switch g.IntN(5) {
 			case 0, 1:
-				if g.IntN(10) == 0 {
+				if g.IntN(3) == 0 {
 					// No one guarding the orb once in a while!
 					break
 				}
 				n := min(nL, 2)
 				for range n {
-					g.genMonsterGuardian(monsLate[g.IntN(len(monsLate))], g.Map.Orb)
+					g.genMonsterGuardian(g.randMonsKind(monsLate), g.Map.Orb)
 				}
 				nL -= n
 			case 2, 3:
-				mk := monsMid[g.IntN(len(monsEarly))]
+				mk := g.randMonsKind(monsMid)
 				n := min(nM, 4)
 				for range n {
 					g.genMonsterGuardian(mk, g.Map.Orb)
@@ -770,7 +920,7 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 			g.genMonster(FearsomeLich)
 			g.genMonster(UndeadKnight)
 		case 1:
-			g.genMonsterGuardian(monsLate[g.IntN(len(monsLate))], g.Map.Orb)
+			g.genMonsterGuardian(g.randMonsKind(monsLate), g.Map.Orb)
 			nL--
 			if g.IntN(4) == 0 {
 				g.genMonsterGuardian(UndeadKnight, g.Map.Orb)
@@ -785,19 +935,27 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 		}
 	}
 	if g.ProcInfo.GuardianPortal2 == g.Map.Level {
+		p := g.corruptedPortalGuardianPoint(mg)
 		if g.IntN(3) > 0 {
-			p := g.corruptedPortalGuardianPoint(mg)
 			g.genMonsterGuardian(MadOctopode, p)
 		} else {
 			g.genMonster(MadOctopode)
+			if nL > 0 && g.IntN(2) == 0 {
+				g.genMonsterGuardian(g.randMonsKind(monsLate), p)
+				nL--
+			}
 		}
 	}
 	if g.ProcInfo.GuardianTotem1 == g.Map.Level {
+		p := g.corruptedTotemGuardianPoint(mg)
 		if g.IntN(3) > 0 {
-			p := g.corruptedTotemGuardianPoint(mg)
 			g.genMonsterGuardian(CrazyDruid, p)
 		} else {
 			g.genMonster(CrazyDruid)
+			if nM > 0 && g.IntN(2) == 0 {
+				g.genMonsterGuardian(g.randMonsKind(monsMid), p)
+				nM--
+			}
 		}
 	}
 	if g.ProcInfo.WanderingUnique1 == g.Map.Level {
@@ -820,13 +978,19 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 	}
 	if g.ProcInfo.GuardianTotem2 == g.Map.Level {
 		nE--
+		p := g.corruptedTotemGuardianPoint(mg)
 		if g.IntN(3) > 0 {
-			p := g.corruptedTotemGuardianPoint(mg)
 			g.genMonsterGuardian(TotemWasp, p)
 			g.genMonsterGuardian(TotemWasp, p)
 		} else {
 			g.genMonster(TotemWasp)
 			g.genMonster(TotemWasp)
+			if nE >= 2 && g.IntN(3) == 0 {
+				nmk := g.randMonsKind(monsEarly)
+				g.genMonsterGuardian(nmk, p)
+				g.genMonsterGuardian(nmk, p)
+				nE -= 2
+			}
 		}
 	}
 	if g.ProcInfo.GuardianPortal1 == g.Map.Level {
@@ -835,13 +999,19 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 		if g.IntN(5) == 0 {
 			mk = WarpingWraith
 		}
+		p := g.corruptedPortalGuardianPoint(mg)
 		if g.IntN(3) > 0 {
-			p := g.corruptedPortalGuardianPoint(mg)
 			g.genMonsterGuardian(mk, p)
 			g.genMonsterGuardian(mk, p)
 		} else {
 			g.genMonster(mk)
 			g.genMonster(mk)
+			if nM >= 2 && g.IntN(2) == 0 {
+				nmk := g.randMonsKind(monsMid)
+				g.genMonsterGuardian(nmk, p)
+				g.genMonsterGuardian(nmk, p)
+				nM -= 2
+			}
 		}
 	}
 	if g.IntN(2*MapLevels) == 0 && nE > 2 && nM > 2 {
@@ -849,9 +1019,14 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 		switch g.IntN(2) {
 		case 0:
 			_, p = mg.RandomVaultsPlace(mg.vaults[1:], PlaceWaypoint)
-			mk := HungryRat
-			if g.IntN(2) == 0 {
+			var mk monsterKind
+			switch g.IntN(4) {
+			case 0:
 				mk = BerserkingSpider
+			case 1:
+				mk = ConfusingEye
+			default:
+				mk = HungryRat
 			}
 			for range 5 + g.IntN(4) {
 				g.genMonsterGuardian(mk, p)
@@ -860,10 +1035,14 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 			nM--
 		default:
 			p := g.randomFreeFloor()
-			mk := ExplodingNadre
+			var mk monsterKind
 			switch g.IntN(3) {
 			case 0:
 				mk = BlinkButterfly
+			case 1:
+				mk = ExplodingNadre
+			default:
+				mk = g.randMonsKind(monsMid)
 			}
 			for range 4 + g.IntN(2) {
 				g.genMonsterGuardian(mk, p)
@@ -882,7 +1061,7 @@ func (g *Game) corruptedPortalGuardianPoint(mg *MapGen) gruid.Point {
 	} else {
 		p = g.Map.Portal
 	}
-	if g.IntN(3) == 0 {
+	if g.IntN(4) == 0 {
 		// Occasionally guard a random non-player vault.
 		_, p = mg.RandomVaultsPlace(mg.vaults[1:], PlaceWaypoint)
 		if g.Map.Totem != InvalidPos && g.IntN(4) == 0 {
@@ -930,7 +1109,7 @@ func (g *Game) genMonstersCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int) 
 		} else {
 			mks := []monsterKind{UndeadKnight, MadOctopode}
 			for range nLs {
-				g.genMonster(mks[g.IntN(len(mks))])
+				g.genMonster(g.randMonsKind(mks))
 			}
 		}
 		nL -= nLs
@@ -1020,142 +1199,4 @@ func (g *Game) randomFreeNearby(at gruid.Point, maxdist int) gruid.Point {
 		}
 		return p
 	}
-}
-
-// runicTrap generates a new runic trap entity using the given data.
-func runicTrap(mr MagicRune) *Entity {
-	return &Entity{
-		Name:   mr.String(),
-		Rune:   '=',
-		KnownP: InvalidPos,
-		Role:   &RunicTrap{Rune: mr},
-	}
-}
-
-// genRunicTrap generates a runic trap at a position that doesn't truly block
-// passage, somewhat biased toward vaults.
-func (g *Game) genRunicTrap(mg *MapGen) (ID, *Entity) {
-	for {
-		p := g.RandomPassableWithoutTrap()
-		inVault := mg.vault.At(p)
-		if !inVault && g.IntN(6) > 0 {
-			// Make vault cells more likely candidates.
-			continue
-		}
-		if i, _ := g.ItemAt(p); i >= 0 {
-			continue
-		}
-		if inVault && slices.Contains(g.Map.Waypoints, p) {
-			// Waypoints should be free of traps, because monsters
-			// may chose nearby locations reachable from them
-			// without passing traps.
-			continue
-		}
-		if p == g.PP() {
-			// Don't put a trap on the player's starting position.
-			continue
-		}
-		n, nfree := g.neighborInfo(p)
-		if inVault && nfree >= 2 && nfree < 4 && g.suitableTrapLocation(p) {
-			return g.genRunicTrapAt(p)
-		}
-		if n > 2 || nfree < 2 {
-			// Not connex or not connex enough or not enough free
-			// space.
-			continue
-		}
-		if !inVault && n == 2 && nfree == 2 {
-			// Likely an uninteresting corner.
-			continue
-		}
-		return g.genRunicTrapAt(p)
-	}
-}
-
-// genRunicTrapInTunnel generates a runic trap in an extra tunnel, if possible.
-// It blocks locally the passage, but there's always an alternative path.
-func (g *Game) genRunicTrapInTunnel(mg *MapGen) (ID, *Entity) {
-	if len(mg.xtunnel) == 0 {
-		return g.genRunicTrap(mg)
-	}
-	// We shuffle extra tunnel tiles.
-	g.rand.Shuffle(len(mg.xtunnel), func(i, j int) {
-		mg.xtunnel[i], mg.xtunnel[j] = mg.xtunnel[j], mg.xtunnel[i]
-	})
-	for _, p := range mg.xtunnel {
-		if i, _ := g.ItemAt(p); i >= 0 {
-			continue
-		}
-		if !g.suitableTrapLocation(p) {
-			continue
-		}
-		return g.genRunicTrapAt(p)
-	}
-	return g.genRunicTrap(mg)
-}
-
-// suitableTrapLocation reports whether p's neighborhood makes it suitable for
-// a new trap location.
-func (g *Game) suitableTrapLocation(p gruid.Point) bool {
-	var nbs paths.Neighbors
-	ps := nbs.Cardinal(p, g.Map.PassableWithoutTraps)
-	if len(ps) <= 1 {
-		// Not an interesting trap location.
-		return false
-	}
-	passable := func(q gruid.Point) bool {
-		return g.Map.Passable(q) && g.NoTrapAt(q) && q != p
-	}
-	for i := range len(ps) - 1 {
-		path := g.PR.JPSPath(nil, ps[i], ps[i+1], passable, false)
-		if len(path) == 0 {
-			// No alternative path.
-			return false
-		}
-	}
-	return true
-}
-
-// genRunicTrapAt adds a new runic trap entity at the given position. It
-// replaces foliage or rubble with floor on that tile.
-func (g *Game) genRunicTrapAt(p gruid.Point) (ID, *Entity) {
-	g.Map.Terrain.Set(p, Floor)
-	r := g.NextRune()
-	e := runicTrap(r)
-	e.P = p
-	id := ID(len(g.Entities))
-	g.Map.RuneCache.SetU(p, id)
-	g.AddEntity(e)
-	return id, e
-}
-
-// neighborInfo returns the number of passability toggles (non-passable/passable
-// alternations) and passable neighbors without traps.
-func (g *Game) neighborInfo(p gruid.Point) (n int, nfree int) {
-	passable := g.Map.PassableWithoutTraps
-	pass := false
-	directions := append(slices.Clone(Directions), gruid.Point{1, 0})
-	var pdir gruid.Point // previous direction
-	for i, dir := range directions {
-		q := p.Add(dir)
-		qpass := passable(q)
-		if i == 0 {
-			pdir = dir
-			pass = qpass
-			continue
-		}
-		if qpass {
-			if pass && !passable(q.Add(pdir)) {
-				// Not connex or not connex enough.
-				return -1, -1
-			}
-			nfree++
-		}
-		if pass != qpass {
-			n++
-		}
-		pass = qpass
-		pdir = dir
-	}
-	return n, nfree
 }

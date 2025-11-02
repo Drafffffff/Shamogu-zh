@@ -80,15 +80,6 @@ func (g *Game) flavoursProcGen() {
 		// portal.
 		gpi.FakePortal[1+g.IntN(7)] = true
 	}
-	randTotemLevel := func(n, m int) int {
-		for {
-			i := n + g.IntN(m)
-			if gpi.Spirits[i-1] >= 0 {
-				// There's a totem to guard on that level.
-				return i
-			}
-		}
-	}
 	// Levels with special monsters.
 	var (
 		guardianTotem1Level   = 3
@@ -116,6 +107,15 @@ func (g *Game) flavoursProcGen() {
 		if g.IntN(MapLevels) == 0 {
 			wanderingUnique1Level = 1
 			wanderingUnique2Level = 1
+		}
+	}
+	randTotemLevel := func(n, m int) int {
+		for {
+			i := n + g.IntN(m)
+			if gpi.Spirits[i-1] >= 0 {
+				// There's a totem to guard on that level.
+				return i
+			}
 		}
 	}
 	gpi.GuardianTotem1 = randTotemLevel(guardianTotem1Level, 4)
