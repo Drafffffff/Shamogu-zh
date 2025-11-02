@@ -11,15 +11,15 @@ const (
 	ModExtraGuardians                    // mod with extra regular guardians
 	ModCorruptedDungeon                  // mod with lots of unusual and random stuff going on
 	ModNoRecharges                       // mod without spirit recharges
+	ModGluttony                          // uncontrollable extra eating
 	ModHeavyTelepathy                    // two-way Clarity-like telepathy with heavy-step monsters
-	ModSmallInventory                    // inventory with 3 comestibles slots
 	ModEnableChallengeSpirits            // dedicated slot for challenge secondary spirits
 )
 
 const NMods = 1 + int(ModEnableChallengeSpirits)
 
 var gameMods = []Mod{ModNoisy, ModSpiderPhobia, ModExtraMonsters, ModExtraGuardians, ModCorruptedDungeon, ModNoRecharges,
-	ModHeavyTelepathy, ModSmallInventory, ModEnableChallengeSpirits}
+	ModGluttony, ModHeavyTelepathy, ModEnableChallengeSpirits}
 
 func (m Mod) String() string {
 	switch m {
@@ -32,13 +32,13 @@ func (m Mod) String() string {
 	case ModExtraGuardians:
 		return "Extra Guardians"
 	case ModCorruptedDungeon:
-		return "Corrupted dungeon"
+		return "Corrupted Dungeon"
 	case ModNoRecharges:
 		return "No Recharges"
+	case ModGluttony:
+		return "Gluttony"
 	case ModHeavyTelepathy:
 		return "Heavy Telepathy (NYI)"
-	case ModSmallInventory:
-		return "Small Inventory (NYI)"
 	case ModEnableChallengeSpirits:
 		return "Challenge Spirits (NYI)"
 	default:
@@ -62,8 +62,8 @@ func (m Mod) Desc() string {
 		return "Spirit ability charges are doubled but don't recharge when going to next floor."
 	case ModHeavyTelepathy:
 		return "You get Clarity-like telepathy with heavy-footstep monsters."
-	case ModSmallInventory:
-		return "Only 3 comestible inventory slots."
+	case ModGluttony:
+		return "When eating, you sometimes eat an extra random comestible on the same turn. You have +2 HP."
 	case ModEnableChallengeSpirits:
 		return "Replace one secondary spirit slot with a special challenge one."
 	default:

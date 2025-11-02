@@ -1,5 +1,11 @@
 # v? ?
 
+* Eating food that gives an already active beneficial status now extends it by
+  the remaining duration, too, instead of losing remaining turns. Also,
+  teleport mushroom now gives some healing when you're lignified instead of
+  doing nothing, and firebreath pepper now extends Fire and Confusion by the
+  remaining duration, so that using it on foes that already have the statuses
+  still has some useful effect.
 * Fix bug where you could get Imbalance despite being lignified (see #6).
 * Minor update in frog's catching description: it always unbalances when
   ranged, but description said "may".

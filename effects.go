@@ -48,10 +48,11 @@ const (
 	DurationPoisonBite             = 4
 	DurationPoisonCloud            = 3
 
-	HealAmbrosia         = 8
-	HealClarityLeaves    = 4
-	HealFirebreathPepper = 2
-	HealFoggySkinOnion   = 3
+	HealAmbrosia          = 8
+	HealClarityLeaves     = 4
+	HealFirebreathPepper  = 2
+	HealFoggySkinOnion    = 3
+	HealTeleportLignified = 2
 
 	DurationDig      = 5
 	DurationFocus    = 3
@@ -103,6 +104,7 @@ func (eff EffectBerserkingFlower) Apply(g *Game) bool {
 		d /= 2
 	}
 	g.eatMsg("berserking flower", "")
+	extraTurns := pa.Statuses[StatusBerserk]
 	if pa.Has(StatusBerserk) {
 		// The berserking flower can be used to prolong berserk
 		// duration, but you'll still get the Poison debuff.
@@ -110,7 +112,7 @@ func (eff EffectBerserkingFlower) Apply(g *Game) bool {
 		g.AdjustHP(PlayerID, pa, -pa.HPBonus())
 		g.PutStatus1(PlayerID, pa, StatusPoison, DurationPoisonBerserk)
 	}
-	g.PutStatus1(PlayerID, pa, StatusBerserk, d)
+	g.PutStatus1(PlayerID, pa, StatusBerserk, d+extraTurns)
 	return true
 }
 
@@ -131,12 +133,13 @@ func (eff EffectLignificationFruit) Apply(g *Game) bool {
 		d /= 2
 	}
 	g.eatMsg("lignification fruit", "")
+	extraTurns := pa.Statuses[StatusLignification]
 	if pa.Has(StatusLignification) {
 		// If already lignified, cancel previous effects.
 		pa.Statuses[StatusLignification] = 0
 		g.AdjustHP(PlayerID, pa, -pa.HPBonus())
 	}
-	g.PutStatus1(PlayerID, pa, StatusLignification, d)
+	g.PutStatus1(PlayerID, pa, StatusLignification, d+extraTurns)
 	return true
 }
 
@@ -155,8 +158,9 @@ func (eff EffectClarityLeaves) Apply(g *Game) bool {
 	} else {
 		hpstr = newHP(pa, HealClarityLeaves)
 	}
+	extraTurns := pa.Statuses[StatusClarity]
 	g.eatMsg("clarity leaves", hpstr)
-	g.PutStatus1(PlayerID, pa, StatusClarity, DurationClarity)
+	g.PutStatus1(PlayerID, pa, StatusClarity, DurationClarity+extraTurns)
 	g.AdjustHP(PlayerID, pa, HealClarityLeaves)
 	return true
 }
@@ -187,8 +191,9 @@ func (eff EffectFoggySkinOnion) Apply(g *Game) bool {
 	} else {
 		hpstr = newHP(pa, HealFoggySkinOnion)
 	}
+	extraTurns := pa.Statuses[StatusFoggySkin]
 	g.eatMsg("foggy-skin onion", hpstr)
-	g.PutStatus1(PlayerID, pa, StatusFoggySkin, DurationFoggySkin)
+	g.PutStatus1(PlayerID, pa, StatusFoggySkin, DurationFoggySkin+extraTurns)
 	g.AdjustHP(PlayerID, pa, HealFoggySkinOnion)
 	return true
 }
@@ -219,8 +224,10 @@ func (eff EffectFirebreathPepper) Apply(g *Game) bool {
 			g.FireCloudAt(p)
 		}
 		if j, aj := g.ActorAt(p); j >= 0 {
-			g.PutStatus(j, aj, StatusConfusion, DurationConfusionPepperBreath)
-			g.PutStatus(j, aj, StatusFire, DurationFire)
+			extraTurns := aj.Statuses[StatusConfusion]
+			g.PutStatus(j, aj, StatusConfusion, DurationConfusionPepperBreath+extraTurns)
+			extraTurns = aj.Statuses[StatusFire]
+			g.PutStatus(j, aj, StatusFire, DurationFire+extraTurns)
 		}
 	}
 	// Leave cloud at the last tile if passable.
@@ -238,15 +245,10 @@ type EffectTeleportMushroom struct{}
 func (eff EffectTeleportMushroom) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	j := g.TotemID()
-	if pa.Has(StatusLignification) {
-		if j < 0 || g.Entity(j).Seen {
-			g.Log("Eating that while lignified is useless now.")
-			return false
-		}
-	}
 	g.eatMsg("teleport mushroom", "")
 	if !g.TeleportActor(PlayerID, pa, 1) {
 		g.Log("You resist teleport while lignified.")
+		g.AdjustHP(PlayerID, pa, HealTeleportLignified)
 	}
 	if j >= 0 {
 		g.SenseEntity(j, "sense")
@@ -263,8 +265,8 @@ func (g *Game) teleportStatuses(i ID, ai *Actor, n int) {
 }
 
 func (eff EffectTeleportMushroom) Desc() string {
-	return fmt.Sprintf("Teleports you away and makes you sense any totemic spirit. Leaves you either @Odazed@N or @Oimbalanced@N for %d or %d turns respectively.",
-		DurationDazeTeleport, DurationImbalanceTeleport)
+	return fmt.Sprintf("Teleports you away and makes you sense any totemic spirit. Leaves you either @Odazed@N or @Oimbalanced@N for %d or %d turns respectively. Restores %+d HP when lignified instead.",
+		DurationDazeTeleport, DurationImbalanceTeleport, HealTeleportLignified)
 }
 
 type EffectFocus struct{}

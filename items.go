@@ -35,6 +35,12 @@ type Item interface {
 	Use(*Game, ID) bool
 }
 
+// IsComestible reports whether the item is a comestible.
+func IsComestible(it Item) bool {
+	_, ok := it.(*Comestible)
+	return ok
+}
+
 // Spirit represent an equipable spirit.
 type Spirit struct {
 	Level        int        // spirit's level (in range 0-1)

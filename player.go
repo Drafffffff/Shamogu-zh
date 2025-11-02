@@ -209,4 +209,7 @@ func (g *Game) ComputePlayerStats() {
 		p.MaxHP += sp.BonusHP[sp.Level]
 		p.Traits |= sp.BonusTraits[sp.Level]
 	}
+	if g.Mod(ModGluttony) {
+		p.MaxHP += 2
+	}
 }

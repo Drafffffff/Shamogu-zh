@@ -590,7 +590,7 @@ func (a ActionInventory) Handle(md *model) (gruid.Effect, bool) {
 		r = nextRuneKey(r)
 	}
 	if id, it := md.g.ItemAt(md.g.PP()); id >= 0 {
-		if _, ok := it.(*Comestible); ok {
+		if IsComestible(it) {
 			entries = appendMenuHeader(entries, InventorySize)
 			var entry ui.MenuEntry
 			entry.Text = ui.Textf("%c - %s", r, md.g.Entity(id).Name)
@@ -776,15 +776,38 @@ func (a ActionUseItem) Handle(md *model) (gruid.Effect, bool) {
 			return nil, false
 		}
 	}
+	md.mode = modeNormal
 	e := g.Entity(a.ID)
-	ev, ok := e.Role.(Item)
-	if ok {
-		ok = ev.Use(g, a.ID)
-	}
+	it, ok := e.Role.(Item)
 	if !ok {
-		md.mode = modeNormal
+		return nil, false
+	}
+	ok = it.Use(g, a.ID)
+	if g.Mod(ModGluttony) && IsComestible(it) && g.IntN(2) == 0 {
+		if id, nco := g.randomComestible(); id >= 0 {
+			if nco.Use(g, id) {
+				g.Log("You feel full!")
+			}
+		}
 	}
 	return nil, ok
+}
+
+func (g *Game) randomComestible() (ID, *Comestible) {
+	var ids []ID
+	for id := range g.PlayerComestibles() {
+		ids = append(ids, id)
+	}
+	if id, it := g.ItemAt(g.PP()); id >= 0 {
+		if IsComestible(it) {
+			ids = append(ids, id)
+		}
+	}
+	if len(ids) == 0 {
+		return -1, nil
+	}
+	id := ids[g.IntN(len(ids))]
+	return id, g.Entity(id).Role.(*Comestible)
 }
 
 func equipItem(md *model, i ID) bool {
