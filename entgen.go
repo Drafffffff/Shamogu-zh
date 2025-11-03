@@ -830,7 +830,7 @@ func (g *Game) genMonsters(mg *MapGen) {
 		for range n {
 			g.genMonster(BerserkingSpider)
 		}
-		nE -= n
+		nE -= n - 1
 	}
 	if g.Mod(ModCorruptedDungeon) {
 		if nE > 0 && nM > 0 && g.IntN(5) == 0 {
