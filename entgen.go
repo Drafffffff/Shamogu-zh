@@ -299,12 +299,17 @@ func (g *Game) genItems(mg *MapGen) {
 	}
 	// Menhirs.
 	nmenhirs := g.ProcInfo.NMenhirs[g.Map.Level-1]
+	if g.Mod(ModCorruptedDungeon) && g.IntN(10*MapLevels) == 0 {
+		nmenhirs = 0
+	}
 	menhirIdxs := []int{}
 	for range min(nmenhirs, len(MenhirData)) {
 		idx := g.NextMenhirIdx()
-		for slices.Contains(menhirIdxs, idx) {
-			// Never generate twice the same menhir in a given level.
-			idx = g.NextMenhirIdx()
+		if !g.Mod(ModCorruptedDungeon) || g.IntN(50) > 0 {
+			for slices.Contains(menhirIdxs, idx) {
+				// Never generate twice the same menhir in a given level.
+				idx = g.NextMenhirIdx()
+			}
 		}
 		menhirIdxs = append(menhirIdxs, idx)
 		tvaults := mg.vaults
@@ -323,6 +328,10 @@ func (g *Game) genItems(mg *MapGen) {
 			me.P = g.randomFreeItemFloor()
 		} else {
 			_, me.P = mg.RandomVaultsPlace(tvaults, PlaceStatic)
+		}
+		if g.Mod(ModCorruptedDungeon) && g.IntN(100) == 0 {
+			menhir := me.Role.(*Menhir)
+			menhir.Used = true
 		}
 		g.AddEntity(me)
 	}
