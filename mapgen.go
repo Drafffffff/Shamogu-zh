@@ -163,20 +163,22 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 		}
 	case 1:
 		if g.IntN(2) == 0 {
-			// Level with either extra sparse foliage/rubble
+			// Level with either extra sparse foliage/rubble/floor
 			// outside of vaults.
 			var nt rl.Cell
-			switch g.IntN(2) {
+			switch g.IntN(3) {
 			case 0:
 				nt = Foliage
 			case 1:
 				nt = Rubble
+			case 2:
+				nt = Floor
 			}
 			g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
 				if mg.vault.At(p) {
 					return t
 				}
-				if g.IntN(5) == 0 {
+				if g.IntN(5) == 0 && (nt != Rubble || g.IntN(2) == 0) {
 					return nt
 				}
 				return t
