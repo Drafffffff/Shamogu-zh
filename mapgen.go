@@ -48,10 +48,6 @@ func (g *Game) GenerateMap(ml MapLayout) {
 			break
 		}
 	}
-	if g.ProcInfo.Earthquake == g.Map.Level || g.Mod(ModCorruptedDungeon) && g.IntN(7) == 0 {
-		g.earthquake()
-	}
-	g.computeWaypoints(mg)
 	g.GenEntities(mg)
 	g.Map.Clouds.Reset()
 }
@@ -109,144 +105,27 @@ func (g *Game) generateMap(ml MapLayout) (*MapGen, bool) {
 	mg.genVaults(BigVaultTemplates, 1, PlacementRandom)
 	mg.genVaults(SmallVaultTemplates, 4+mg.rand.IntN(2), PlacementRandom)
 	mg.connectAllVaults()
-	// Mods.
+	g.computeWaypoints(mg)
+	// Terrain effects: may introduce new unreachable passable terrain, but
+	// shouldn't introduce unpassable terrain that affects traversability
+	// between vaults.
+	if g.ProcInfo.Earthquake == g.Map.Level {
+		g.earthquake(mg)
+	}
 	if g.Mod(ModCorruptedDungeon) {
 		g.genCorruptedTerrain(mg)
 	}
-	// Ensure that all the cells are connected.
+	// Replace cells unreachable from vaults by walls.
 	pass := func(p gruid.Point) bool {
 		return Passable(mt.At(p))
 	}
-	freep := mg.randomFloor()
+	freep := g.RandomWaypoint()
 	mg.PR.CCMap(&MappingPath{passable: pass}, freep)
 	mgen := rl.MapGen{Rand: mg.rand, Grid: mg.terrain}
 	ntiles := mgen.KeepCC(mg.PR, freep, Wall)
 	// Report whether the generated map has enough passable terrain.
 	const minCaveSize = 1000
 	return mg, ntiles > minCaveSize
-}
-
-// genCorruptedTerrain applies various terrain transformations. The result may
-// have less walls, so ensuring that all terrain is connected has to be done
-// later.
-func (g *Game) genCorruptedTerrain(mg *MapGen) {
-	flipFoliage := func(t rl.Cell) rl.Cell {
-		switch t {
-		case Floor:
-			return Foliage
-		case Foliage:
-			return Floor
-		default:
-			return t
-		}
-	}
-	switch g.IntN(MapLevels) {
-	case 0:
-		if g.IntN(2) == 0 {
-			// Level with foliage flip outside of vaults. Some
-			// randomization to create some blanks within the
-			// foliage and leave some floor in tunnels.
-			g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
-				if mg.vault.At(p) || mg.tunnel.At(p) && g.IntN(2) == 0 || g.IntN(10) == 0 {
-					return t
-				}
-				return flipFoliage(t)
-			})
-		} else {
-			// Level with foliage flip in vaults.
-			g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
-				if !mg.vault.At(p) {
-					return t
-				}
-				return flipFoliage(t)
-			})
-		}
-	case 1:
-		if g.IntN(2) == 0 {
-			// Level with either extra sparse foliage/rubble/floor
-			// outside of vaults.
-			var nt rl.Cell
-			switch g.IntN(3) {
-			case 0:
-				nt = Foliage
-			case 1:
-				nt = Rubble
-			case 2:
-				nt = Floor
-			}
-			g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
-				if mg.vault.At(p) {
-					return t
-				}
-				if g.IntN(5) == 0 && (nt != Rubble || g.IntN(2) == 0) {
-					return nt
-				}
-				return t
-			})
-		} else {
-			// Level with both extra sparse foliage/rubble outside
-			// of vaults.
-			g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
-				if mg.vault.At(p) {
-					return t
-				}
-				switch g.IntN(10) {
-				case 0, 1:
-					return flipFoliage(t)
-				case 2:
-					if t == Floor || g.IntN(3) == 0 {
-						return Rubble
-					}
-				}
-				return t
-			})
-		}
-	case 2:
-		if g.IntN(2) == 0 {
-			// Replace most non-vault walls by either foliage or floor.
-			var nt rl.Cell
-			switch g.IntN(2) {
-			case 0:
-				nt = Foliage
-			case 1:
-				nt = Floor
-			}
-			g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
-				if t == Wall && !mg.vault.At(p) && g.IntN(4) > 0 {
-					return nt
-				}
-				return t
-			})
-		} else {
-			// Replace most non-vault walls by foliage/floor/rubble.
-			g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
-				if t == Wall && !mg.vault.At(p) && g.IntN(4) > 0 {
-					switch g.IntN(5) {
-					case 0, 1:
-						return Foliage
-					case 2, 3:
-						return Floor
-					default:
-						return Rubble
-					}
-				}
-				return t
-			})
-		}
-	}
-	if g.IntN(MapLevels) == 0 {
-		// Put many translucent walls on non-interior walls.
-		g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
-			if t == Wall && g.IntN(5) == 0 {
-				for q := range Neighbors(p) {
-					if g.Map.Terrain.At(q) != Wall {
-						return TranslucentWall
-					}
-				}
-			}
-			return t
-		})
-	}
 }
 
 // genCellularAutomataCaveMap generates a floor/wall map with a cellular automata.
@@ -707,29 +586,6 @@ func (mg *MapGen) connectVaultPair(v1, v2 *vault, extra bool) bool {
 	return true
 }
 
-// earthquake produces extra rubble.
-func (g *Game) earthquake() {
-	n := g.Map.Terrain.Count(Wall)
-	walls := make([]gruid.Point, 0, n)
-	it := g.Map.Terrain.Iterator()
-	for it.Next() {
-		if it.Cell() == Wall {
-			walls = append(walls, it.P())
-		}
-	}
-	for range len(walls)/6 + g.IntN(len(walls)/15) {
-		i := g.IntN(len(walls))
-		p := walls[i]
-		for !g.Map.PassableNeighbor(p) {
-			i = g.IntN(len(walls))
-			p = walls[i]
-		}
-		walls[i], walls[len(walls)-1] = walls[len(walls)-1], walls[i]
-		walls = walls[:len(walls)-1]
-		g.Map.Terrain.Set(p, Rubble)
-	}
-}
-
 // computeWaypoints computes the list of vault patrol points.
 func (g *Game) computeWaypoints(mg *MapGen) {
 	g.Map.Waypoints = g.Map.Waypoints[:0]
@@ -739,5 +595,163 @@ func (g *Game) computeWaypoints(mg *MapGen) {
 				g.Map.Waypoints = append(g.Map.Waypoints, pl.p)
 			}
 		}
+	}
+}
+
+// earthquake produces extra rubble.
+func (g *Game) earthquake(mg *MapGen) {
+	mg.terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
+		if t == Wall && g.IntN(6) == 0 {
+			return Rubble
+		}
+		return t
+	})
+}
+
+// genCorruptedTerrain applies various terrain transformations. The result may
+// have less walls, so ensuring that all terrain is connected has to be done
+// later.
+func (g *Game) genCorruptedTerrain(mg *MapGen) {
+	getTerrain := func() rl.Grid {
+		switch g.IntN(4) {
+		// switch 2 {
+		case 0:
+			left := mg.terrain.Slice(mg.terrain.Range().Columns(0, 3+MapWidth/2))
+			right := mg.terrain.Slice(mg.terrain.Range().Columns(-3+MapWidth/2, MapWidth))
+			if mg.rand.IntN(2) == 0 {
+				return right
+			}
+			return left
+		case 1:
+			center := mg.terrain.Slice(mg.terrain.Range().Columns(25, 55))
+			return center
+		case 2:
+			top := mg.terrain.Slice(mg.terrain.Range().Lines(0, 1+MapHeight/2))
+			bottom := mg.terrain.Slice(mg.terrain.Range().Lines(-1+MapHeight/2, MapHeight))
+			if mg.rand.IntN(2) == 0 {
+				return bottom
+			}
+			return top
+		default:
+			return mg.terrain
+		}
+	}
+	flipFoliage := func(t rl.Cell) rl.Cell {
+		switch t {
+		case Floor:
+			return Foliage
+		case Foliage:
+			return Floor
+		default:
+			return t
+		}
+	}
+	switch terrain := getTerrain(); g.IntN(6) {
+	case 0:
+		if g.IntN(2) == 0 {
+			// Level with foliage flip outside of vaults. Some
+			// randomization to create some blanks within the
+			// foliage and leave some floor in tunnels.
+			terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
+				if mg.vault.At(p) || mg.tunnel.At(p) && g.IntN(2) == 0 || g.IntN(10) == 0 {
+					return t
+				}
+				return flipFoliage(t)
+			})
+		} else {
+			// Level with foliage flip in vaults.
+			terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
+				if !mg.vault.At(p) {
+					return t
+				}
+				return flipFoliage(t)
+			})
+		}
+	case 1:
+		if g.IntN(2) == 0 {
+			// Level with either extra sparse foliage/rubble/floor
+			// outside of vaults.
+			var nt rl.Cell
+			switch g.IntN(3) {
+			case 0:
+				nt = Foliage
+			case 1:
+				nt = Rubble
+			case 2:
+				nt = Floor
+			}
+			terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
+				if mg.vault.At(p) {
+					return t
+				}
+				if g.IntN(5) == 0 && (nt != Rubble || g.IntN(2) == 0) {
+					return nt
+				}
+				return t
+			})
+		} else {
+			// Level with both extra sparse foliage/rubble outside
+			// of vaults.
+			terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
+				if mg.vault.At(p) {
+					return t
+				}
+				switch g.IntN(10) {
+				case 0, 1:
+					return flipFoliage(t)
+				case 2:
+					if t == Floor || g.IntN(3) == 0 {
+						return Rubble
+					}
+				}
+				return t
+			})
+		}
+	case 2:
+		if g.IntN(2) == 0 {
+			// Replace most non-vault walls by either foliage or floor.
+			var nt rl.Cell
+			switch g.IntN(2) {
+			case 0:
+				nt = Foliage
+			case 1:
+				nt = Floor
+			}
+			terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
+				if t == Wall && !mg.vault.At(p) && g.IntN(4) > 0 {
+					return nt
+				}
+				return t
+			})
+		} else {
+			// Replace most non-vault walls by foliage/floor/rubble.
+			terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
+				if t == Wall && !mg.vault.At(p) && g.IntN(4) > 0 {
+					switch g.IntN(5) {
+					case 0, 1:
+						return Foliage
+					case 2, 3:
+						return Floor
+					default:
+						return Rubble
+					}
+				}
+				return t
+			})
+		}
+	}
+	if g.IntN(MapLevels) == 0 {
+		terrain := getTerrain()
+		// Put many translucent walls on non-interior walls.
+		terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
+			if t == Wall && g.IntN(5) == 0 {
+				for q := range Neighbors(p) {
+					if terrain.At(q) != Wall {
+						return TranslucentWall
+					}
+				}
+			}
+			return t
+		})
 	}
 }
