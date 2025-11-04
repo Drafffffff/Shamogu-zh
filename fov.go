@@ -92,6 +92,16 @@ func (g *Game) SenseEntity(i ID, verb string) {
 				if ri.DoesAny(MonsNotable) {
 					g.StoryLogf("Saw %s (distance: %d)", One(ei.Name), g.ppDist(ei.P))
 				}
+				if g.Mod(ModScaryRoar) && g.InFOV(ei.P) {
+					// Scary roar at foe on first sight.
+					// NOTE: Skipped if you already sensed
+					// the monster through Clarity. May
+					// happen several times in a turn if
+					// you see several monsters at once.
+					g.Logf("You roar at the %s", ei.Name)
+					g.MakeNoise(g.PP(), NoiseRoar)
+					g.PutStatus(i, ri, StatusFear, DurationFearRoar)
+				}
 			}
 		case *Comestible:
 			g.LogfStyled("You %s %s.", logNotable, verb, One(ei.Name))

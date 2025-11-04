@@ -29,7 +29,8 @@ const (
 	DurationFearAmbrosia           = 4
 	DurationFearBark               = 4
 	DurationFearFakePortal         = 6
-	DurationFearScream             = 2
+	DurationFearRoar               = 4
+	DurationFearGrowl              = 2
 	DurationFearUndead             = 3
 	DurationFire                   = 3
 	DurationFoggySkin              = 10
