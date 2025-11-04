@@ -19,7 +19,11 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 	}
 	dirChange := dir != g.Dir
 	to := pl.P.Add(dir)
-	if pa.DoesAny(PatternCrocodile) && dir == g.Dir.Mul(-1) && g.Map.Passable(to) {
+	passto := g.Map.Passable(to)
+	if g.Mod(ModGawalt) && !passto && !pa.Has(StatusDig) && g.WallJump(dir) {
+		return true
+	}
+	if pa.DoesAny(PatternCrocodile) && dir == g.Dir.Mul(-1) && passto {
 		// Crocodile needs to spend a turn turning before moving
 		// backwards.
 		g.Dir = dir
@@ -74,7 +78,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 	}
 	// We're not ranged and next position is not a monster: move.
 	if !pa.CanMove() {
-		if pa.DoesAny(PatternCrocodile) && dirChange && g.Map.Passable(to) {
+		if pa.DoesAny(PatternCrocodile) && dirChange && passto {
 			g.Dir = dir
 			return true
 		}
@@ -82,14 +86,14 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 		return false
 	}
 	if pa.HP == 1 && pa.Has(StatusPoison) {
-		if pa.DoesAny(PatternCrocodile) && dirChange && g.Map.Passable(to) {
+		if pa.DoesAny(PatternCrocodile) && dirChange && passto {
 			g.Dir = dir
 			return true
 		}
 		g.Log("You cannot move while poisoned and almost dead.")
 		return false
 	}
-	if !g.Map.Passable(to) {
+	if !passto {
 		if !inMap(to) {
 			g.Log("You cannot walk out of the map.")
 			return false
@@ -189,6 +193,48 @@ func (g *Game) Sprint(dir gruid.Point) bool {
 	}
 	g.md.MoveAnimation(from, to)
 	if n > 1 && pa.Has(StatusImbalance) && g.IntN(DurationSprint) == 0 {
+		g.Log("You fall due to imbalance.")
+		g.PutStatus(PlayerID, pa, StatusDaze, DurationDazeFall)
+	}
+	return true
+}
+
+// WallJump performs a jump by propulsing against a wall.
+func (g *Game) WallJump(dir gruid.Point) bool {
+	pl, pa := g.Player()
+	at := pl.P.Add(dir)
+	if !inMap(at) {
+		g.Log("You cannot walk out of the map.")
+		return false
+	}
+	// if dir == g.Dir || dir == g.Dir.Mul(-1) {
+	// 	g.Logf("You cannot walk into the %s.", TerrainName(g.Map.Terrain.At(at)))
+	// 	return false
+	// }
+	over := pl.P.Sub(dir)
+	to := over.Sub(dir)
+	if !g.Map.Passable(over) {
+		g.Log("There’s no room for a wall jump.")
+		return false
+	}
+	if !g.InFOV(to) {
+		g.Log("You cannot jump out of view.")
+		return false
+	}
+	if !g.IsFree(to) {
+		g.Log("There’s no room for a wall jump.")
+		return false
+	}
+	g.Dir = dir
+	from := pl.P
+	g.BumpMoveActor(PlayerID, pa, to)
+	g.md.MoveAnimation(from, to)
+	if i, ai := g.ActorAt(over); i >= 0 {
+		// if !pa.Has(StatusFear) {
+		g.BumpAttackActor(PlayerID, i, pa, ai, AttackPlain, 1, 0)
+		// }
+	}
+	if pa.Has(StatusImbalance) && g.IntN(10) == 0 {
 		g.Log("You fall due to imbalance.")
 		g.PutStatus(PlayerID, pa, StatusDaze, DurationDazeFall)
 	}

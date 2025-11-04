@@ -12,6 +12,7 @@ const (
 	ModCorruptedDungeon                  // mod with lots of unusual and random stuff going on
 	ModNoRecharges                       // mod without spirit recharges
 	ModGluttony                          // uncontrollable extra eating
+	ModGawalt                            // gawalt-like wall jumping
 	ModHeavyTelepathy                    // two-way Clarity-like telepathy with heavy-step monsters
 	ModEnableChallengeSpirits            // dedicated slot for challenge secondary spirits
 )
@@ -19,7 +20,7 @@ const (
 const NMods = 1 + int(ModEnableChallengeSpirits)
 
 var gameMods = []Mod{ModNoisy, ModSpiderPhobia, ModExtraMonsters, ModExtraGuardians, ModCorruptedDungeon, ModNoRecharges,
-	ModGluttony, ModHeavyTelepathy, ModEnableChallengeSpirits}
+	ModGluttony, ModGawalt, ModHeavyTelepathy, ModEnableChallengeSpirits}
 
 func (m Mod) String() string {
 	switch m {
@@ -37,6 +38,8 @@ func (m Mod) String() string {
 		return "No Recharges"
 	case ModGluttony:
 		return "Gluttony"
+	case ModGawalt:
+		return "Gawalt Monkey"
 	case ModHeavyTelepathy:
 		return "Heavy Telepathy (NYI)"
 	case ModEnableChallengeSpirits:
@@ -64,6 +67,8 @@ func (m Mod) Desc() string {
 		return "You get Clarity-like telepathy with heavy-footstep monsters."
 	case ModGluttony:
 		return "When eating, you sometimes eat an extra random comestible on the same turn. You have +2 HP."
+	case ModGawalt:
+		return "You can perform 2-tile jumps by propulsing against walls! You attack any monster on the jump path. When attacking, damage is reduced by one if greater than one."
 	case ModEnableChallengeSpirits:
 		return "Replace one secondary spirit slot with a special challenge one."
 	default:

@@ -233,7 +233,7 @@ func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
 		g.Mods[m] = !g.Mods[m]
 		md.modSelectionMenu()
 		md.menu.main.SetActiveInvokable(idx)
-		md.updateModDesc(Mod(idx))
+		md.updateModDesc(m)
 	}
 	return nil
 }
@@ -272,8 +272,13 @@ func (md *model) modSelectionMenu() {
 			Keys: []gruid.Key{gruid.Key(r)},
 		})
 		r++
-		if r == 's' {
-			r++
+		for {
+			switch r {
+			case 's', 'q', 'h', 'j', 'k', 'l':
+				r++
+				continue
+			}
+			break
 		}
 	}
 	entries = append(entries, ui.MenuEntry{
