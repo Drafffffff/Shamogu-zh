@@ -69,7 +69,7 @@ func (m Mod) Desc() string {
 	case ModCombatGrowl:
 		return "You sometimes growl during combat, briefly scaring foes."
 	case ModHeavySteps:
-		return "You sometimes make noise when you move."
+		return "You frequently make noise when you move."
 	case ModSpiderPhobia:
 		return "You fear spiders. Spiders are more common."
 	case ModGluttony:
