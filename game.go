@@ -180,7 +180,7 @@ func (g *Game) HandleTurnCount() {
 // mod.
 func (g *Game) handleCorruptionEvent() {
 	g.CorruptionTurn = g.Turn + 25 + g.IntN(300)
-	switch g.IntN(5) {
+	switch g.IntN(10) {
 	case 0:
 		g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
 			if g.InFOV(p) {
@@ -206,7 +206,7 @@ func (g *Game) handleCorruptionEvent() {
 	default:
 		g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
 			inFOV := g.InFOV(p)
-			if g.IntN(100) > 0 && (!inFOV || g.IntN(20) > 0) {
+			if g.IntN(100) > 0 && (!inFOV || g.IntN(40) > 0) {
 				return t
 			}
 			switch t {
