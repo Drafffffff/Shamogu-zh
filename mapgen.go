@@ -756,7 +756,8 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 			passable = func(p gruid.Point) bool { return true }
 		}
 		mp := &MappingPath{passable: passable}
-		nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{p}, 3*MaxFOVRange)
+		maxRange := 2*MaxFOVRange + MaxFOVRange/2 + g.IntN(MaxFOVRange/2)
+		nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{p}, maxRange)
 		var h func() rl.Cell
 		switch g.IntN(2) {
 		case 0:
@@ -795,7 +796,7 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 		}
 		m := 3 + g.IntN(2)
 		for _, n := range nodes {
-			if g.IntN(3*MaxFOVRange-n.Cost) >= m {
+			if g.IntN(maxRange-n.Cost) >= m {
 				mg.terrain.Set(n.P, f(mg.terrain.At(n.P)))
 			}
 		}
