@@ -785,14 +785,27 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 				}
 			}
 		}
-		f := func(t rl.Cell) rl.Cell {
-			if t == Wall && g.IntN(4) == 0 {
-				return TranslucentWall
+		var f func(t rl.Cell) rl.Cell
+		switch g.IntN(3) {
+		case 0:
+			// Corrupt even translucent walls.
+			f = func(t rl.Cell) rl.Cell {
+				if t == Wall && g.IntN(4) == 0 {
+					return TranslucentWall
+				}
+				if t == TranslucentWall && g.IntN(4) == 0 {
+					return Wall
+				}
+				return h()
 			}
-			if t == TranslucentWall && g.IntN(4) == 0 {
-				return TranslucentWall
+		default:
+			// Don't corrupt translucent walls.
+			f = func(t rl.Cell) rl.Cell {
+				if t == TranslucentWall {
+					return t
+				}
+				return h()
 			}
-			return h()
 		}
 		m := 3 + g.IntN(2)
 		for _, n := range nodes {
