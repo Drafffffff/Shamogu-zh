@@ -1078,7 +1078,7 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 			nE -= 2
 			nM--
 		default:
-			p := g.randomFreeFloor()
+			p := g.RandomWaypoint()
 			var mk monsterKind
 			switch g.IntN(3) {
 			case 0:
