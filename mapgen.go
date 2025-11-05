@@ -719,46 +719,45 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 					return Foliage
 				case 2:
 					return Rubble
+				default:
+					return t
 				}
-				return t
 			})
 		}
 	}
 
 	if g.IntN(sometimes) == 0 {
 		terrain := getTerrain()
+		// Replace most non-vault walls by foliage/floor/rubble.
+		var f func() rl.Cell
 		if g.IntN(2) == 0 {
-			// Replace most non-vault walls by either foliage or floor.
-			var nt rl.Cell
-			switch g.IntN(2) {
-			case 0:
+			// Either floor or foliage.
+			nt := Floor
+			if g.IntN(2) == 0 {
 				nt = Foliage
-			case 1:
-				nt = Floor
 			}
-			terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
-				if t == Wall && !mg.vault.At(p) && g.IntN(4) > 0 {
-					return nt
-				}
-				return t
-			})
+			f = func() rl.Cell { return nt }
 		} else {
-			// Replace most non-vault walls by foliage/floor/rubble.
-			terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
-				if t == Wall && !mg.vault.At(p) && g.IntN(4) > 0 {
-					switch g.IntN(6) {
-					case 0:
-						return Rubble
-					case 1, 2:
-						return Foliage
-					default:
-						return Floor
-					}
+			// Mix of rubble/foliage/floor 1/2/3.
+			f = func() rl.Cell {
+				switch g.IntN(6) {
+				case 0:
+					return Rubble
+				case 1, 2:
+					return Foliage
+				default:
+					return Floor
 				}
-				return t
-			})
+			}
 		}
+		terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
+			if t == Wall && !mg.vault.At(p) && g.IntN(4) > 0 {
+				return f()
+			}
+			return t
+		})
 	}
+
 	if g.IntN(often) == 0 {
 		// Corrupt terrain around some random point biased toward
 		// center.
@@ -780,7 +779,7 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 		var h func() rl.Cell
 		switch g.IntN(2) {
 		case 0:
-			// rubble/foliage/floor 1/3/5
+			// Mix of rubble/foliage/floor 1/3/5.
 			h = func() rl.Cell {
 				switch g.IntN(9) {
 				case 0:
@@ -792,7 +791,7 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 				}
 			}
 		default:
-			// rubble/foliage/floor 1/2/4
+			// Mix of rubble/foliage/floor 1/2/4.
 			h = func() rl.Cell {
 				switch g.IntN(7) {
 				case 0:
