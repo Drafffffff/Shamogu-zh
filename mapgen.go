@@ -672,19 +672,22 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 			// Level with either extra sparse foliage/rubble/floor
 			// outside of vaults.
 			var nt rl.Cell
+			n := 5
 			switch g.IntN(3) {
 			case 0:
 				nt = Foliage
 			case 1:
 				nt = Rubble
+				n = 10
 			case 2:
 				nt = Floor
 			}
 			terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
-				if mg.vault.At(p) {
+				if mg.vault.At(p) || !Passable(t) && g.IntN(10) > 0 {
+					// Preserve vaults and most walls.
 					return t
 				}
-				if g.IntN(5) == 0 && (nt != Rubble || g.IntN(2) == 0) {
+				if g.IntN(n) == 0 {
 					return nt
 				}
 				return t
@@ -693,16 +696,18 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 			// Level with both extra sparse foliage/rubble outside
 			// of vaults.
 			terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
-				if mg.vault.At(p) {
+				if mg.vault.At(p) || !Passable(t) && g.IntN(10) > 0 {
+					// Preserve vaults and most walls.
+					return t
+				}
+				if t == Foliage || t == Rubble {
 					return t
 				}
 				switch g.IntN(10) {
 				case 0, 1:
-					return flipFoliage(t)
+					return Foliage
 				case 2:
-					if t == Floor || g.IntN(3) == 0 {
-						return Rubble
-					}
+					return Rubble
 				}
 				return t
 			})
@@ -796,12 +801,17 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 				if t == TranslucentWall && g.IntN(4) == 0 {
 					return Wall
 				}
+				if !Passable(t) && g.IntN(2) == 0 {
+					// Preserve walls often.
+					return t
+				}
 				return h()
 			}
 		default:
 			// Don't corrupt translucent walls.
 			f = func(t rl.Cell) rl.Cell {
-				if t == TranslucentWall {
+				if !Passable(t) && g.IntN(2) == 0 {
+					// Preserve walls often.
 					return t
 				}
 				return h()
