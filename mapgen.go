@@ -612,9 +612,13 @@ func (g *Game) earthquake(mg *MapGen) {
 // have less walls, so ensuring that all terrain is connected has to be done
 // later.
 func (g *Game) genCorruptedTerrain(mg *MapGen) {
+	const often = 4
+	const sometimes = 6
+	const occasionally = MapLevels
+
+	// getTerrain returns a random rectangular portion of the map.
 	getTerrain := func() rl.Grid {
 		switch g.IntN(4) {
-		// switch 2 {
 		case 0:
 			left := mg.terrain.Slice(mg.terrain.Range().Columns(0, 3+MapWidth/2))
 			right := mg.terrain.Slice(mg.terrain.Range().Columns(-3+MapWidth/2, MapWidth))
@@ -636,18 +640,21 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 			return mg.terrain
 		}
 	}
-	flipFoliage := func(t rl.Cell) rl.Cell {
-		switch t {
-		case Floor:
-			return Foliage
-		case Foliage:
-			return Floor
-		default:
-			return t
+
+	if g.IntN(sometimes) == 0 {
+		// Flip foliage in vaults or outside of vaults.
+		flipFoliage := func(t rl.Cell) rl.Cell {
+			switch t {
+			case Floor:
+				return Foliage
+			case Foliage:
+				return Floor
+			default:
+				return t
+			}
 		}
-	}
-	switch terrain := getTerrain(); g.IntN(6) {
-	case 0:
+		// Apply to whole terrain, to avoid ugly things in borders.
+		terrain := mg.terrain
 		if g.IntN(2) == 0 {
 			// Level with foliage flip outside of vaults. Some
 			// randomization to create some blanks within the
@@ -667,15 +674,19 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 				return flipFoliage(t)
 			})
 		}
-	case 1:
+	}
+
+	if g.IntN(sometimes) == 0 {
+		terrain := getTerrain()
 		if g.IntN(2) == 0 {
 			// Level with either extra sparse foliage/rubble/floor
 			// outside of vaults.
 			var nt rl.Cell
-			n := 5
+			n := 3
 			switch g.IntN(3) {
 			case 0:
 				nt = Foliage
+				n = 5
 			case 1:
 				nt = Rubble
 				n = 10
@@ -712,7 +723,10 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 				return t
 			})
 		}
-	case 2:
+	}
+
+	if g.IntN(sometimes) == 0 {
+		terrain := getTerrain()
 		if g.IntN(2) == 0 {
 			// Replace most non-vault walls by either foliage or floor.
 			var nt rl.Cell
@@ -732,20 +746,20 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 			// Replace most non-vault walls by foliage/floor/rubble.
 			terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
 				if t == Wall && !mg.vault.At(p) && g.IntN(4) > 0 {
-					switch g.IntN(5) {
-					case 0, 1:
-						return Foliage
-					case 2, 3:
-						return Floor
-					default:
+					switch g.IntN(6) {
+					case 0:
 						return Rubble
+					case 1, 2:
+						return Foliage
+					default:
+						return Floor
 					}
 				}
 				return t
 			})
 		}
 	}
-	if g.IntN(4) == 0 {
+	if g.IntN(often) == 0 {
 		// Corrupt terrain around some random point biased toward
 		// center.
 		center := gruid.Point{MapWidth / 2, MapHeight / 2}
@@ -824,7 +838,8 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 			}
 		}
 	}
-	if g.IntN(MapLevels) == 0 {
+
+	if g.IntN(occasionally) == 0 {
 		terrain := getTerrain()
 		// Put many translucent walls on non-interior walls.
 		terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
