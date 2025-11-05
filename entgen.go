@@ -1059,10 +1059,9 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 		}
 	}
 	if g.IntN(2*MapLevels) == 0 && nE > 2 && nM > 2 {
-		var p gruid.Point
 		switch g.IntN(2) {
 		case 0:
-			p = g.RandomWaypoint()
+			p := g.RandomWaypoint()
 			var mk monsterKind
 			switch g.IntN(4) {
 			case 0:
