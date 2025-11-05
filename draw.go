@@ -495,7 +495,7 @@ func (md *model) drawTargInfo() {
 					st := Status(i)
 					fmt.Fprintf(&sb, " @%c%s(%d)@N ", statusColor(st, turns), st.Abbr(), turns)
 				}
-				if s := r.MindStateString(); s != "" {
+				if s := g.MindStateString(r); s != "" {
 					name += fmt.Sprintf(" (%s)", s)
 				}
 			default:

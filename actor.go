@@ -642,7 +642,7 @@ const (
 )
 
 // MindStateString returns a text describing a monster's main state.
-func (a *Actor) MindStateString() string {
+func (g *Game) MindStateString(a *Actor) string {
 	beh := a.Behavior
 	if beh == nil {
 		return ""
@@ -651,6 +651,9 @@ func (a *Actor) MindStateString() string {
 	case Hunting:
 		return "hunting"
 	default:
+		if g.Mod(ModCorruptedDungeon) {
+			return ""
+		}
 		if beh.Guard != InvalidPos {
 			return "guarding"
 		}
