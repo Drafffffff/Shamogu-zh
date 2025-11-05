@@ -740,6 +740,66 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 			})
 		}
 	}
+	if g.IntN(4) == 0 {
+		// Corrupt terrain around some random point biased toward
+		// center.
+		center := gruid.Point{MapWidth / 2, MapHeight / 2}
+		p := mg.randomFloor()
+		if q := mg.randomFloor(); paths.DistanceManhattan(center, q) < paths.DistanceManhattan(center, p) {
+			if g.IntN(3) > 0 {
+				p = q
+			}
+		}
+		passable := g.Map.Passable
+		if g.IntN(2) == 0 {
+			// More destructive corruption: ignore walls.
+			passable = func(p gruid.Point) bool { return true }
+		}
+		mp := &MappingPath{passable: passable}
+		nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{p}, 3*MaxFOVRange)
+		var h func() rl.Cell
+		switch g.IntN(2) {
+		case 0:
+			// rubble/foliage/floor 1/3/5
+			h = func() rl.Cell {
+				switch g.IntN(9) {
+				case 0:
+					return Rubble
+				case 1, 2, 3:
+					return Foliage
+				default:
+					return Floor
+				}
+			}
+		default:
+			// rubble/foliage/floor 1/2/4
+			h = func() rl.Cell {
+				switch g.IntN(7) {
+				case 0:
+					return Rubble
+				case 1, 2:
+					return Foliage
+				default:
+					return Floor
+				}
+			}
+		}
+		f := func(t rl.Cell) rl.Cell {
+			if t == Wall && g.IntN(4) == 0 {
+				return TranslucentWall
+			}
+			if t == TranslucentWall && g.IntN(4) == 0 {
+				return TranslucentWall
+			}
+			return h()
+		}
+		m := 3 + g.IntN(2)
+		for _, n := range nodes {
+			if g.IntN(3*MaxFOVRange-n.Cost) >= m {
+				mg.terrain.Set(n.P, f(mg.terrain.At(n.P)))
+			}
+		}
+	}
 	if g.IntN(MapLevels) == 0 {
 		terrain := getTerrain()
 		// Put many translucent walls on non-interior walls.
