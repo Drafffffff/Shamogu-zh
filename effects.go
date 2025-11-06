@@ -29,7 +29,7 @@ const (
 	DurationFearAmbrosia           = 4
 	DurationFearBark               = 4
 	DurationFearFakePortal         = 6
-	DurationFearRoar               = 6
+	DurationFearRoar               = 5
 	DurationFearGrowl              = 2
 	DurationFearUndead             = 3
 	DurationFire                   = 3
@@ -57,6 +57,8 @@ const (
 
 	DurationDig      = 5
 	DurationFocus    = 3
+	DurationShadow   = 7
+	DurationGarden   = 7
 	DurationSprint   = 6
 	DurationTimeStop = 5
 )
@@ -412,7 +414,7 @@ func (g *Game) pushingGale(from, dir gruid.Point) {
 		if ai.IsDead() {
 			continue
 		}
-		g.MonsterUpdateTarget(i, ai, g.PP()) // alert monster toward wind origin
+		g.MonsterUpdateTarget(i, ai, g.PP(), g.InFOV(ei.P)) // alert monster toward wind origin
 		g.PutStatus(i, ai, StatusImbalance, DurationImbalanceGale)
 		to := at.Add(dir)
 		n := 0
@@ -778,8 +780,88 @@ func (eff EffectFireRetreat) Desc() string {
 	return "Walk backwards up to two tiles while leaving a fire cloud lasting 6-12 turns."
 }
 
+type EffectShadows struct{}
+
+func (eff EffectShadows) Apply(g *Game) bool {
+	pa := g.PlayerActor()
+	if pa.Has(StatusShadow) {
+		g.Log("You cannot invoke “shadows” while you’re already shadowy.")
+		return false
+	}
+	g.PutStatus(PlayerID, pa, StatusShadow, DurationShadow)
+	g.instant = true
+	return true
+}
+
+func (eff EffectShadows) Name() string {
+	return "shadows"
+}
+
+func (eff EffectShadows) Desc() string {
+	return fmt.Sprintf("@BShadow@N for %d turns. %s @GInstant@N.",
+		DurationShadow, statusDesc[StatusSprint])
+}
+
+type EffectSnack struct{}
+
+func (eff EffectSnack) Apply(g *Game) bool {
+	pa := g.PlayerActor()
+	pp := g.PP()
+	var i ID = -1
+	var ci Item
+	for j, cj := range g.Comestibles() {
+		if i < 0 || paths.DistanceManhattan(pp, g.Entity(j).P) < paths.DistanceManhattan(pp, g.Entity(i).P) {
+			i = j
+			ci = cj
+		}
+	}
+	if i < 0 {
+		g.Log("No comestibles remaining in the map.")
+		return false
+	}
+	g.SenseEntity(i, "sense")
+	g.Log("You teleport for a quick snack!")
+	to := g.Entity(i).P
+	g.MoveActor(PlayerID, pa, to)
+	g.md.TeleportAnimation(pp, to, true)
+	g.UpdateFOV()
+	g.UpdateKnowledge()
+	ci.Use(g, i)
+	return true
+}
+
+func (eff EffectSnack) Name() string {
+	return "snack"
+}
+
+func (eff EffectSnack) Desc() string {
+	return "You teleport to nearest comestible, if any, and eat it."
+}
+
 func (g *Game) menhirMsg(name string) {
 	g.Logf("You activate the %s.", name)
+}
+
+type EffectGarden struct{}
+
+func (eff EffectGarden) Apply(g *Game) bool {
+	pa := g.PlayerActor()
+	if pa.Has(StatusGardener) {
+		g.Log("You cannot invoke “garden” while you’re already gardening.")
+		return false
+	}
+	g.PutStatus(PlayerID, pa, StatusGardener, DurationGarden)
+	g.instant = true
+	return true
+}
+
+func (eff EffectGarden) Name() string {
+	return "garden"
+}
+
+func (eff EffectGarden) Desc() string {
+	return fmt.Sprintf("@BGardener@N for %d turns. %s @GInstant@N.",
+		DurationGarden, statusDesc[StatusGardener])
 }
 
 type EffectEarthMenhir struct{}

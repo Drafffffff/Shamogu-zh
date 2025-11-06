@@ -7,30 +7,35 @@ const MapLevels = 9
 // were already generated, and so on. Note that slices indexed by map level
 // start from zero (for map level 1).
 type ProcInfo struct {
-	Layouts          []MapLayout // map layouts
-	Earthquake       int         // level with extra rubble
-	FakePortal       []bool      // levels with fake portal
-	GuardianTotem1   int         // level with early totem guardian
-	GuardianTotem2   int         // level with early totem guardian
-	GuardianPortal1  int         // level with early-mid portal guardian
-	GuardianPortal2  int         // level with mid-late portal guardian
-	WanderingUnique1 int         // level with walking mushroom
-	WanderingUnique2 int         // level with noisy imp
-	MonsEarly        int         // special early level (1-3)
-	MonsMid          int         // special mid level (4-6)
-	MonsMidLate      int         // special mid-late level (6-9)
-	MonsLate         int         // special late level (7-9)
-	MonsLateSwarm    int         // special “swarm” late level (8-9)
-	TrapLevel        int         // special level with lots of traps (5-9)
-	Spirits          []int       // spirit index for each dungeon level (-1 if no spirit)
-	Menhirs          []int       // menhir-generation data
-	MenhirIdx        int         // current index in Menhirs
-	Comestibles      []int       // comestible-generation data
-	ComestibleIdx    int         // current index in Comestibles
-	NComestibles     []int       // number of comestibles per level
-	NMenhirs         []int       // number of menhirs per level
-	Runes            []int       // rune-generation data
-	RuneIdx          int         // current index in Runes
+	Layouts          []MapLayout      // map layouts
+	Earthquake       int              // level with extra rubble
+	FakePortal       []bool           // levels with fake portal
+	GuardianTotem1   int              // level with early totem guardian
+	GuardianTotem2   int              // level with early totem guardian
+	GuardianPortal1  int              // level with early-mid portal guardian
+	GuardianPortal2  int              // level with mid-late portal guardian
+	WanderingUnique1 int              // level with walking mushroom
+	WanderingUnique2 int              // level with noisy imp
+	MonsEarly        int              // special early level (1-3)
+	MonsMid          int              // special mid level (4-6)
+	MonsMidLate      int              // special mid-late level (6-9)
+	MonsLate         int              // special late level (7-9)
+	MonsLateSwarm    int              // special “swarm” late level (8-9)
+	TrapLevel        int              // special level with lots of traps (5-9)
+	Spirits          []spiritProcInfo // spirit index for each dungeon level (-1 if no spirit)
+	Menhirs          []int            // menhir-generation data
+	MenhirIdx        int              // current index in Menhirs
+	Comestibles      []int            // comestible-generation data
+	ComestibleIdx    int              // current index in Comestibles
+	NComestibles     []int            // number of comestibles per level
+	NMenhirs         []int            // number of menhirs per level
+	Runes            []int            // rune-generation data
+	RuneIdx          int              // current index in Runes
+}
+
+type spiritProcInfo struct {
+	Idx   int
+	Extra bool
 }
 
 // InitProcInfo initializes procedural generation starting information.
@@ -112,7 +117,7 @@ func (g *Game) flavoursProcGen() {
 	randTotemLevel := func(n, m int) int {
 		for {
 			i := n + g.IntN(m)
-			if gpi.Spirits[i-1] >= 0 {
+			if gpi.Spirits[i-1].Idx >= 0 {
 				// There's a totem to guard on that level.
 				return i
 			}
@@ -167,8 +172,8 @@ func (g *Game) flavoursProcGen() {
 }
 
 func (g *Game) spiritProcGen() {
-	// spirits represents a permutation of indices (corresponding to
-	// secondary spirits).
+	// spirits represents a permutation of indices corresponding to
+	// secondary spirits.
 	spirits := make([]int, len(secondarySpirits))
 	for i := range spirits {
 		spirits[i] = i
@@ -176,16 +181,49 @@ func (g *Game) spiritProcGen() {
 	g.rand.Shuffle(len(spirits), func(i, j int) {
 		spirits[i], spirits[j] = spirits[j], spirits[i]
 	})
+	// extras represents a permutation of indices corresponding to
+	// extra spirits.
+	var extras []int
+	if g.Mod(ModChallengeSpirits) {
+		extras = make([]int, len(challengeSpirits))
+		for i := range extras {
+			extras[i] = i
+		}
+		g.rand.Shuffle(len(extras), func(i, j int) {
+			extras[i], extras[j] = extras[j], extras[i]
+		})
+	}
 	// mapSpirits maps dungeon levels to the index of the totemic spirit
 	// they contain.
-	mapSpirits := make([]int, MapLevels)
+	mapSpirits := make([]spiritProcInfo, MapLevels)
 	for i := range mapSpirits {
 		// We use -1 to represent the absence of totemic spirit in a
 		// level.
-		mapSpirits[i] = -1
+		mapSpirits[i].Idx = -1
 	}
-	// Games generate at most 6 totems among possible ones.
-	copy(mapSpirits, spirits[:min(6, len(spirits))])
+	// Games generate 6 totems per game.
+	if len(extras) > 0 {
+		// Extra totems: generate 3 of each kind.
+		for i := range 3 {
+			mapSpirits[i].Idx = extras[i]
+			mapSpirits[i].Extra = true
+		}
+		for i := range 3 {
+			mapSpirits[i+3].Idx = spirits[i]
+		}
+		// Shuffle totems of both kinds. NOTE: for testing purposes we
+		// currently guarantee that the first totem is a challenge one.
+		// s := mapSpirits[:6]
+		s := mapSpirits[1:6]
+		g.rand.Shuffle(len(s), func(i, j int) {
+			s[i], s[j] = s[j], s[i]
+		})
+	} else {
+		// Generate 6 regular secondary spirits.
+		for i := range 6 {
+			mapSpirits[i].Idx = spirits[i]
+		}
+	}
 	// We shuffle totems in map levels 2-8. The first level always contains
 	// a totem, and levels 2-8 contain five totems and two empty ones. The
 	// ninth level never contains a totem.

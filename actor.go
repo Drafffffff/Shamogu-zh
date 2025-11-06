@@ -131,7 +131,7 @@ func (t Traits) All(of Traits) bool {
 	return t&of == of
 }
 
-// Traits. NOTE: there shouldn't be more than 64.
+// Traits. NOTE: there shouldn't be more than 64 (remaining free: 5).
 const (
 	Player Traits = 1 << iota
 
@@ -148,10 +148,13 @@ const (
 	BadHearing    // worse hearing of noise (footsteps)
 	BurningHits   // hits may burn
 	DazingSpines  // body covered in dazing spines (porcupine)
+	Gawalt        // wall-jumping
+	Gluttony      // gluttony (extra random eating)
 	GoodHearing   // better hearing of noise (footsteps)
 	GoodSmell     // smell food from a distance
 	Pushing       // unbalancing pushing (earth-dragon)
 	PushingCharge // unbalancing pushing when charging (boar)
+	ScaryRoar     // intimidating roar on first sight
 	TrailingCloud // leave dust behind after moving (on floor tiles)
 	VenomousMelee // (non-ranged) attacks may poison foes
 	WoodyLegs     // can move while lignified
@@ -161,7 +164,7 @@ const (
 	ResistanceConfusion // halves duration of confusion status
 	ResistanceDaze      // allows spirit invocation while dazed
 	ResistanceFear      // halves duration of fear status
-	ResistanceFire      // halves duration of fire status
+	ResistanceFire      // delays burning
 	ResistanceImbalance // halves duration of imbalance status
 	ResistancePoison    // halves duration of poison status
 
@@ -221,6 +224,9 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, PushingCharge, "charging pushes and @Ounbalances@N foes")
 	desc = traitDesc(desc, t, BurningHits, "hits may @Oburn@N foes")
 	desc = traitDesc(desc, t, VenomousMelee, "@Ovenomous@N melee attack")
+	desc = traitDesc(desc, t, Gawalt, "wall-jumping movement and attack, weakened attacks")
+	desc = traitDesc(desc, t, Gluttony, "gluttony (may eat random extra comestible)")
+	desc = traitDesc(desc, t, ScaryRoar, "scary roar on first sight")
 	desc = traitDesc(desc, t, DazingSpines, "spines may @Odaze@N foes in melee")
 	switch {
 	case t.All(GoodHearing) && !t.All(BadHearing):
@@ -288,9 +294,11 @@ const (
 	StatusFire
 	StatusFocus
 	StatusFoggySkin
+	StatusGardener
 	StatusImbalance
 	StatusLignification
 	StatusPoison
+	StatusShadow
 	StatusSprint
 	StatusTimeStop
 )
@@ -318,10 +326,12 @@ var statusAbbrevation = []string{
 	StatusFear:          "Fea",
 	StatusFire:          "Fir",
 	StatusFocus:         "Foc",
+	StatusGardener:      "Gar",
 	StatusImbalance:     "Imb",
 	StatusFoggySkin:     "Fog",
 	StatusLignification: "Lig",
 	StatusPoison:        "Poi",
+	StatusShadow:        "Sha",
 	StatusSprint:        "Spr",
 	StatusTimeStop:      "Tim",
 }
@@ -340,9 +350,11 @@ var statusName = []string{
 	StatusFire:          "Fire",
 	StatusFocus:         "Focus",
 	StatusFoggySkin:     "Foggy Skin",
+	StatusGardener:      "Gardener",
 	StatusImbalance:     "Imbalance",
 	StatusLignification: "Lignification",
 	StatusPoison:        "Poison",
+	StatusShadow:        "Shadow",
 	StatusSprint:        "Sprint",
 	StatusTimeStop:      "Time Stop",
 }
@@ -361,9 +373,11 @@ var statusAdjective = []string{
 	StatusFire:          "on fire",
 	StatusFocus:         "focusing",
 	StatusFoggySkin:     "foggy",
+	StatusGardener:      "gardening",
 	StatusImbalance:     "imbalanced",
 	StatusLignification: "lignified",
 	StatusPoison:        "poisoned",
+	StatusShadow:        "shadowy",
 	StatusSprint:        "sprinting",
 	StatusTimeStop:      "freezing time",
 }
@@ -384,12 +398,14 @@ var statusDesc = []string{
 	StatusFire:      fmt.Sprintf("Remaining in place or moving into a cloud of fire will burn you for %d damage. When first catching @OFire@N, you also get burned once immediately.", FireDamage),
 	StatusFocus:     "Attack frontally with all four heads.",
 	StatusFoggySkin: "Exudes fog on the sides and behind. Protects from @OFire@N and @BLignification@N.",
+	StatusGardener:  "Grows foliage in a 2-tile radius each turn.",
 	StatusImbalance: fmt.Sprintf("Halves attack. When also confused, gives %+d Defense.", ConfusedImbalanceDefenseBonus),
 	StatusLignification: fmt.Sprintf(
 		"Gives %+d Defense with an extra +1 against ranged attacks. Caps incoming attack damage at 1. Provides temporary HP bonus. Protects from @OPoison@N and @OImbalance@N. Prevents movement. Increases @OFire@N duration by 2. Followed by @OImbalance@N for you and any adjacent actors on expiration for %d turns.",
 		LignificationDefenseBonus, DurationImbalanceLignification),
 	StatusPoison: fmt.Sprintf("Walking will hurt you for %d damage. Stinky toxins are exuded on expiration, confusing other creatures for %d turns.",
 		PoisonDamage, DurationConfusionToxins),
+	StatusShadow:   "Harmonic shadows make non-hunting monsters not notice you unless you attack them. You can move instantly through translucent walls.",
 	StatusSprint:   "You can move to a visible destination three times as fast on the current direction and twice as fast laterally. You can jump over foes, unbalancing them. Canceled by waiting.",
 	StatusTimeStop: "Time is frozen for everyone but you until expiration. Status effects affecting you will still progress.",
 }
@@ -680,10 +696,13 @@ func (g *Game) HandleActorTurn(i ID, ai *Actor) {
 		// monster, as it would have happened earlier for the player).
 		return
 	}
+	g.handleCornered(i, ai)
 	if ai.Has(StatusFoggySkin) {
 		g.exudeFog()
 	}
-	g.handleCornered(i, ai)
+	if ai.Has(StatusGardener) {
+		g.garden()
+	}
 	// NOTE: We make statuses progress at the end of the turn. That means
 	// bonus HP from expiring Berserk or Lignification stills protects
 	// against Fire or Poison damage happening during the player's turn but
@@ -711,8 +730,10 @@ var sortedStatuses = []Status{
 	StatusFire,
 	StatusFocus,
 	StatusFoggySkin,
+	StatusGardener,
 	StatusImbalance,
 	StatusPoison,
+	StatusShadow,
 	StatusSprint,
 	StatusTimeStop,
 
@@ -731,6 +752,21 @@ func (g *Game) exudeFog() {
 			continue
 		}
 		g.NormalCloudAt(q, 2+g.IntN(3))
+	}
+}
+
+// garden implements gardening for the player-only status effect Gardener.
+func (g *Game) garden() {
+	pp := g.PP()
+	mp := &MapPath{passable: g.Map.Passable}
+	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{pp}, 2)
+	for _, n := range nodes {
+		if i, _ := g.ItemAt(n.P); i >= 0 {
+			continue
+		}
+		if g.Map.Terrain.At(n.P) == Floor {
+			g.Map.Terrain.Set(n.P, Foliage)
+		}
 	}
 }
 

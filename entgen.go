@@ -9,7 +9,7 @@ import (
 )
 
 // InitPlayer initializes the player entity for the rest of the game.
-func (g *Game) InitPlayer() {
+func (g *Game) InitPlayer(spe *Entity) {
 	g.Entities[PlayerID] = &Entity{
 		Name: "You",
 		Rune: '@',
@@ -18,11 +18,14 @@ func (g *Game) InitPlayer() {
 	for i := PrimarySpiritID; i < FirstMapID; i++ {
 		g.Entities[i] = emptySlot()
 	}
+	g.Entities[PrimarySpiritID] = spe
 	// g.debugBuild()
 	g.ComputePlayerStats()
 }
 
 func (g *Game) debugBuild() {
+	// g.Entities[PrimarySpiritID+1] = g.spiritEntity(challengeSpirits[0])
+	// g.Entities[PrimarySpiritID+2] = g.spiritEntity(challengeSpirits[1])
 	// g.Entities[PrimarySpiritID+1] = g.spiritEntity(secondarySpirits[0])
 	// g.Entities[PrimarySpiritID+3] = comestibleEntity(ComestibleData[4])
 }
@@ -180,9 +183,30 @@ var secondarySpirits = []spiritInfo{
 		BonusTraits: [2]Traits{BadHearing | BurningHits, BadHearing | BurningHits | ResistanceFire}},
 }
 
+// challengeSpirits represents the various kinds of secondary spirit totems
+// that can be found.
+var challengeSpirits = []spiritInfo{
+	{
+		Name:        "Gawalt Monkey",
+		MaxCharges:  [2]int{2, 4},
+		Ability:     [2]Ability{EffectShadows{}, EffectShadows{}},
+		BonusTraits: [2]Traits{Gawalt, Gawalt}},
+	{
+		Name:        "Gluttonous Bear",
+		MaxCharges:  [2]int{2, 4},
+		Ability:     [2]Ability{EffectSnack{}, EffectSnack{}},
+		BonusHP:     [2]int{2, 2},
+		BonusTraits: [2]Traits{Gluttony, Gluttony}},
+	{
+		Name:        "Gardening Lion",
+		MaxCharges:  [2]int{2, 4},
+		Ability:     [2]Ability{EffectGarden{}, EffectGarden{}},
+		BonusTraits: [2]Traits{ScaryRoar, ScaryRoar}},
+}
+
 // spiritEntity generates a new spirit entity using the given data.
-func (g *Game) spiritEntity(si spiritInfo) *Entity {
-	if g.Mod(ModNoRecharges) {
+func spiritEntity(mods []bool, si spiritInfo) *Entity {
+	if len(mods) > int(ModNoRecharges) && mods[ModNoRecharges] {
 		si.MaxCharges[0] *= 2
 		si.MaxCharges[1] *= 2
 	}
@@ -343,8 +367,13 @@ func (g *Game) genItems(mg *MapGen) {
 		_, p := mg.RandomVaultsPlace(npvaults, PlaceItem)
 		return p
 	}
-	if spiritIndex := g.ProcInfo.Spirits[g.Map.Level-1]; spiritIndex >= 0 {
-		sp := g.spiritEntity(secondarySpirits[spiritIndex])
+	if spi := g.ProcInfo.Spirits[g.Map.Level-1]; spi.Idx >= 0 {
+		var sp *Entity
+		if spi.Extra {
+			sp = spiritEntity(g.Mods, challengeSpirits[spi.Idx])
+		} else {
+			sp = spiritEntity(g.Mods, secondarySpirits[spi.Idx])
+		}
 		spr := sp.Role.(*Spirit)
 		spr.Charges = spr.MaxCharges[spr.Level]
 		sp.Rune = '!'

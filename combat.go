@@ -322,6 +322,11 @@ func (g *Game) FourDirectionalAttack(i ID, ai *Actor, ap AttackKind, dist int) b
 // BumpAttackActor does an attack against an actor at a given position.
 // It returns the damage done.
 func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonus int) {
+	if j == PlayerID {
+		// Ensure that an attacking monster becomes a hunting one even
+		// if the player is shadowed.
+		ai.Behavior.State = Hunting
+	}
 	dazed := aj.Has(StatusDaze)
 	ei, ej := g.Entity(i), g.Entity(j)
 	dmg := g.AttackDamage(i, j, ai, aj, ap, bonus)
@@ -483,7 +488,8 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 		// Lignification caps attack damage at 1.
 		dmg = min(1, dmg)
 	}
-	if i == PlayerID && g.Mod(ModGawalt) && dmg > 1 {
+	if i == PlayerID && ai.DoesAny(Gawalt) && dmg > 1 {
+		// Gawalt monkey reduces damage of non-weak hits.
 		dmg--
 	}
 	if ai.Has(StatusDig) && (ap == AttackCharge || dmg == 0) || ap == AttackSlap {

@@ -41,7 +41,6 @@ func (md *model) updateMenu(msg gruid.Msg) {
 
 func (md *model) updateMainMenu(msg gruid.Msg) {
 	md.menu.main.Update(msg)
-	g := md.g
 	switch act := md.menu.main.Action(); act {
 	case ui.MenuQuit:
 		md.mode = modeNormal
@@ -57,6 +56,7 @@ func (md *model) updateMainMenu(msg gruid.Msg) {
 			}
 			md.action = md.menuActions[idx]
 		case modeInventory:
+			g := md.g
 			id := md.inventoryItemID(idx)
 			e := g.Entity(id)
 			md.updateItemDesc(e)
@@ -65,6 +65,7 @@ func (md *model) updateMainMenu(msg gruid.Msg) {
 			}
 			md.action = ActionUseItem{ID: id}
 		case modeEquip:
+			g := md.g
 			i, it := g.ItemAt(g.PP())
 			if i < 0 {
 				// Should not happen.
@@ -153,7 +154,6 @@ func (md *model) updateSpiritSelectionMenu(msg gruid.Msg) gruid.Effect {
 		return nil
 	}
 	md.menu.main.Update(msg)
-	g := md.g
 	switch act := md.menu.main.Action(); act {
 	case ui.MenuQuit:
 		return gruid.End()
@@ -163,19 +163,19 @@ func (md *model) updateSpiritSelectionMenu(msg gruid.Msg) gruid.Effect {
 			break
 		}
 		spirits := getPrimarySpirits(md.mode)
-		e := g.spiritEntity(spirits[idx])
-		md.updateItemDesc(e)
+		spe := spiritEntity(md.g.Mods, spirits[idx])
+		md.updateItemDesc(spe)
 		if act != ui.MenuInvoke {
 			break
 		}
-		g.Entities[PrimarySpiritID] = e
-		g.ComputePlayerStats()
-		md.startNewGame()
+		md.startNewGame(spe)
 	}
 	return nil
 }
 
-func (md *model) startNewGame() {
+func (md *model) startNewGame(spe *Entity) {
+	md.g.Init(spe)
+	md.g.ComputePlayerStats()
 	md.g.InitLevel()
 	md.updateStatus()
 	md.g.LogStyled("Press SPACE for menu and ? for help. Good luck!", logSpecial)

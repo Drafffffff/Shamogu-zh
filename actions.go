@@ -769,8 +769,10 @@ type ActionUseItem struct {
 
 func (a ActionUseItem) Handle(md *model) (gruid.Effect, bool) {
 	g := md.g
-	if a.ID >= InventorySize {
+	floor := false
+	if a.ID >= FirstMapID {
 		// Comestible on the floor.
+		floor = true
 		if a.ID, _ = g.ItemAt(g.PP()); a.ID < 0 {
 			// Should not happen.
 			return nil, false
@@ -783,7 +785,8 @@ func (a ActionUseItem) Handle(md *model) (gruid.Effect, bool) {
 		return nil, false
 	}
 	ok = it.Use(g, a.ID)
-	if g.Mod(ModGluttony) && IsComestible(it) && g.IntN(2) == 0 {
+	pa := g.PlayerActor()
+	if pa.DoesAny(Gluttony) && IsComestible(it) && !floor {
 		if id, nco := g.randomComestible(); id >= 0 {
 			if nco.Use(g, id) {
 				g.Log("You feel full!")
@@ -793,15 +796,11 @@ func (a ActionUseItem) Handle(md *model) (gruid.Effect, bool) {
 	return nil, ok
 }
 
+// randomComestible returns a random comestible from the inventory.
 func (g *Game) randomComestible() (ID, *Comestible) {
 	var ids []ID
 	for id := range g.PlayerComestibles() {
 		ids = append(ids, id)
-	}
-	if id, it := g.ItemAt(g.PP()); id >= 0 {
-		if IsComestible(it) {
-			ids = append(ids, id)
-		}
 	}
 	if len(ids) == 0 {
 		return -1, nil
@@ -1620,12 +1619,16 @@ On the map, monster color may change depending on active status effects.  By def
 			details = "Monsters will flee when facing you. Ambushing charges against unseen foes can still happen. At the end of a turn, a cornered and afraid actor with no possible escape will become berserk. "
 		case StatusFire:
 			details = "Players with “fire resistance” from the upgraded Fire Salamander don’t take that extra immediate damage."
+		case StatusGardener:
+			details = "Player-only effect obtainable with the Gardening Lion spirit."
 		case StatusImbalance:
 			details = "Sprinting or jumping while imbalanced may sometimes lead to a @Odazing@N fall."
 		case StatusPoison:
 			details = "Watch out for confusion if any monsters survive poisoning!"
 		case StatusFoggySkin:
 			details = "Player-only effect obtainable by eating a foggy-skin onion. May be removed by eating a lignification fruit for half the @BLignification@N duration."
+		case StatusShadow:
+			details = "Player-only effect obtainable with the Gawalt Monkey spirit."
 		case StatusSprint:
 			details = "Disables normal attack. Player-only effect obtainable with the Sprinting Gazelle spirit."
 		case StatusTimeStop:

@@ -75,9 +75,10 @@ func testGame(t *testing.T) {
 	g := md.g
 	g.md = md
 	g.rand = rand.New(rand.NewPCG(rand.Uint64(), rand.Uint64()))
-	g.Init()
+	g.Mods = make([]bool, NMods)
 	g.Mods[ModCorruptedDungeon] = true
-	g.Entities[PrimarySpiritID] = g.spiritEntity(primarySpirits[g.rand.IntN(len(primarySpirits))])
+	// g.Mods[ModChallengeSpirits] = true
+	g.Init(spiritEntity(g.Mods, primarySpirits[g.rand.IntN(len(primarySpirits))]))
 	g.ComputePlayerStats()
 	g.InitLevel()
 	if !connex(g.Map.Terrain, g.PR, g.rand) {
@@ -93,7 +94,7 @@ func testGame(t *testing.T) {
 			t.Errorf("Missing Orb of Corruption:\n%s\n", map2String(g.Map.Terrain))
 		case g.Map.Level < MapLevels && g.Map.Portal == InvalidPos:
 			t.Errorf("Missing portal at level %d:\n%s\n", g.Map.Level, map2String(g.Map.Terrain))
-		case g.ProcInfo.Spirits[g.Map.Level-1] >= 0 && g.Map.Portal == InvalidPos:
+		case g.ProcInfo.Spirits[g.Map.Level-1].Idx >= 0 && g.Map.Portal == InvalidPos:
 			t.Errorf("Missing totem at level %d:\n%s\n", g.Map.Level, map2String(g.Map.Terrain))
 		}
 	}

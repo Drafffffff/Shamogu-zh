@@ -69,19 +69,18 @@ const (
 
 // Init initializes main game structures related to map and entities.
 // It performs only general initialization not specific to a particular map.
-func (g *Game) Init() {
+func (g *Game) Init(spe *Entity) {
 	g.Version = Version
 	g.InitProcInfo()
 	g.Stats = newStats()
 	g.Logs = &Logs{}
-	g.Mods = make([]bool, NMods)
 	g.Entities = make([]*Entity, InventorySize+1)
 	g.Map = NewMap() // initialize empty map object
 	g.PR = paths.NewPathRange(gruid.NewRange(0, 0, MapWidth, MapHeight))
 	g.PRnoise = paths.NewPathRange(gruid.NewRange(0, 0, MapWidth, MapHeight))
 	g.Dir = gruid.Point{1, 0}
 	g.CorruptionTurn = 50 + g.IntN(250)
-	g.InitPlayer()
+	g.InitPlayer(spe)
 }
 
 // InitLevel generates a new map level.
@@ -434,7 +433,7 @@ func (g *Game) MakeNoise(at gruid.Point, nt NoiseType) {
 		if d > maxdist || d > noise && !ai.DoesAny(GoodHearing) {
 			continue
 		}
-		g.MonsterUpdateTarget(i, ai, at)
+		g.MonsterUpdateTarget(i, ai, at, true)
 	}
 }
 

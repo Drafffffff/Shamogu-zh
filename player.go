@@ -20,7 +20,10 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 	dirChange := dir != g.Dir
 	to := pl.P.Add(dir)
 	passto := g.Map.Passable(to)
-	if g.Mod(ModGawalt) && !passto && !pa.Has(StatusDig) && g.WallJump(dir) {
+	if !passto && pa.Has(StatusShadow) && g.WallThrough(dir, to) {
+		return true
+	}
+	if pa.DoesAny(Gawalt) && !passto && !pa.Has(StatusDig) && g.WallJump(dir) {
 		return true
 	}
 	if pa.DoesAny(PatternCrocodile) && dir == g.Dir.Mul(-1) && passto {
@@ -199,6 +202,21 @@ func (g *Game) Sprint(dir gruid.Point) bool {
 	return true
 }
 
+// WallThrough performs a move through a translucent wall.
+func (g *Game) WallThrough(dir, at gruid.Point) bool {
+	if g.Map.Terrain.At(at) != TranslucentWall {
+		return false
+	}
+	to := at.Add(dir)
+	if !g.IsFree(to) {
+		return false
+	}
+	from := g.PP()
+	g.BumpMoveActor(PlayerID, g.PlayerActor(), to)
+	g.md.MoveAnimation(from, to)
+	return true
+}
+
 // WallJump performs a jump by propulsing against a wall.
 func (g *Game) WallJump(dir gruid.Point) bool {
 	pl, pa := g.Player()
@@ -254,8 +272,5 @@ func (g *Game) ComputePlayerStats() {
 		p.Defense += sp.BonusDefense[sp.Level]
 		p.MaxHP += sp.BonusHP[sp.Level]
 		p.Traits |= sp.BonusTraits[sp.Level]
-	}
-	if g.Mod(ModGluttony) {
-		p.MaxHP += 2
 	}
 }

@@ -92,7 +92,8 @@ func (g *Game) SenseEntity(i ID, verb string) {
 				if ri.DoesAny(MonsNotable) {
 					g.StoryLogf("Saw %s (distance: %d)", One(ei.Name), g.ppDist(ei.P))
 				}
-				if g.Mod(ModScaryRoar) && g.InFOV(ei.P) {
+				pa := g.PlayerActor()
+				if pa.DoesAny(ScaryRoar) && g.InFOV(ei.P) {
 					// Scary roar at foe on first sight.
 					// NOTE: Skipped if you already sensed
 					// the monster through Clarity. May

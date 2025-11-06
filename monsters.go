@@ -20,7 +20,7 @@ func (g *Game) HandleMonsterTurn(i ID, ai *Actor) {
 	if ai.Has(StatusConfusion) && g.monsterDiscord(i, ai) {
 		return
 	}
-	if g.InFOV(ei.P) && g.MonsterUpdateTarget(i, ai, g.PP()) {
+	if g.InFOV(ei.P) && g.MonsterUpdateTarget(i, ai, g.PP(), false) {
 		// A wandering monster spends one turn noticing the player.
 		return
 	}
@@ -93,8 +93,9 @@ func (g *Game) monsterDiscord(i ID, ai *Actor) bool {
 }
 
 // MonsterUpdateTarget makes an ai entity aware about a new target position.
-// It reports whether the monster's mindstate changed.
-func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point) bool {
+// It reports whether the monster's mindstate changed. The noise argument
+// indicates whether the trigger for updating the target came from noise.
+func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point, noise bool) bool {
 	ei, beh := g.Entity(i), ai.Behavior
 	if beh.State == Hunting {
 		if g.InFOV(ei.P) {
@@ -105,7 +106,8 @@ func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point) bool {
 		}
 		return false
 	}
-	if g.InFOV(ei.P) && at == g.PP() {
+	pa := g.PlayerActor()
+	if g.InFOV(ei.P) && at == g.PP() && !pa.Has(StatusShadow) {
 		g.Logf("The %s notices you.", ei.Name)
 		beh.State = Hunting
 		switch {
@@ -119,12 +121,14 @@ func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point) bool {
 				g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
 			}
 		case ai.DoesAny(MonsSpores):
-			if pa := g.PlayerActor(); !pa.Has(StatusLignification) {
+			if !pa.Has(StatusLignification) {
 				g.releaseSpores(i)
 			}
 		}
 	}
-	beh.Target = at
+	if noise || !pa.Has(StatusShadow) {
+		beh.Target = at
+	}
 	return beh.State == Hunting
 }
 
@@ -160,14 +164,15 @@ func (g *Game) monsterBumpTo(i ID, ai *Actor, to gruid.Point) {
 		return
 	}
 	ei := g.Entity(i)
-	pl := g.PlayerEntity()
+	pl, pa := g.Player()
 	dist := paths.DistanceManhattan(ei.P, pl.P)
-	if dist == 1 {
-		// Attack player.
+	shadowed := pa.Has(StatusShadow) && ai.Behavior.State != Hunting
+	if pl.P == to || dist == 1 && !shadowed {
+		// Attack player and ensure Hunting status (shadowed case).
 		g.BumpAttackActor(i, PlayerID, ai, pl.Actor(), AttackPlain, dist, 0)
 		return
 	}
-	if g.InFOV(ei.P) && g.ActorInRange(ei.P, pl.P) == PlayerID {
+	if g.InFOV(ei.P) && !shadowed && g.ActorInRange(ei.P, pl.P) == PlayerID {
 		pa := g.PlayerActor()
 		switch {
 		case ai.DoesAny(PatternRanged|PatternRangedRecoil) ||
@@ -199,6 +204,11 @@ func (g *Game) monsterBumpTo(i ID, ai *Actor, to gruid.Point) {
 		delta := to.Sub(ei.P)
 		nto := to.Add(delta)
 		g.BumpMoveActor(i, ai, to)
+		if shadowed {
+			// Non-hunting monsters don't perform charge against
+			// shadowed player.
+			return
+		}
 		if ai.DoesAny(PatternFourDirsMons) {
 			g.FourDirectionalAttack(i, ai, AttackCharge, 2)
 		} else if j, aj := g.ActorAt(nto); j == PlayerID {

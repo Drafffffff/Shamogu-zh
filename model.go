@@ -93,7 +93,10 @@ func (md *model) init() gruid.Effect {
 	md.g.md = md // handy cycle
 	g.rand = rand.New(rand.NewPCG(rand.Uint64(), rand.Uint64()))
 	if !load {
-		g.Init()
+		// Start a new game: go to spirit selection menu.
+		// Initialize mods before starting the game, because we need
+		// that information during the advanced new game settings.
+		g.Mods = make([]bool, NMods)
 		md.openSpiritSelectionMenu(modeNewGame)
 	}
 	if err != nil {
@@ -278,7 +281,7 @@ func (md *model) openSpiritSelectionMenu(m mode) {
 	md.menu.main.SetBox(&ui.Box{Title: ui.Text(title).WithStyle(gruid.Style{Fg: ColorYellow})})
 	md.menu.main.SetEntries(entries)
 	md.menu.main.SetActiveInvokable(0)
-	md.updateItemDesc(md.g.spiritEntity(spirits[0]))
+	md.updateItemDesc(spiritEntity(md.g.Mods, spirits[0]))
 	md.mode = m
 	md.menu.mode = modeSelection // not really needed
 }
