@@ -20,11 +20,13 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 	dirChange := dir != g.Dir
 	to := pl.P.Add(dir)
 	passto := g.Map.Passable(to)
-	if !passto && pa.Has(StatusShadow) && g.WallThrough(dir, to) {
-		return true
-	}
-	if pa.DoesAny(Gawalt) && !passto && !pa.Has(StatusDig) && g.WallJump(dir) {
-		return true
+	if !passto && pa.CanMove() {
+		if pa.Has(StatusShadow) && g.WallThrough(dir, to) {
+			return true
+		}
+		if pa.DoesAny(Gawalt) && !pa.Has(StatusDig) && g.WallJump(dir) {
+			return true
+		}
 	}
 	if pa.DoesAny(PatternCrocodile) && dir == g.Dir.Mul(-1) && passto {
 		// Crocodile needs to spend a turn turning before moving
