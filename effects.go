@@ -806,6 +806,10 @@ type EffectSnack struct{}
 
 func (eff EffectSnack) Apply(g *Game) bool {
 	pa := g.PlayerActor()
+	if pa.Has(StatusLignification) {
+		g.Log("You cannot get a snack while lignified.")
+		return false
+	}
 	pp := g.PP()
 	var i ID = -1
 	var ci Item
