@@ -57,7 +57,7 @@ const (
 
 	DurationDig      = 5
 	DurationFocus    = 3
-	DurationShadow   = 7
+	DurationShadow   = 8
 	DurationGarden   = 7
 	DurationSprint   = 6
 	DurationTimeStop = 5
