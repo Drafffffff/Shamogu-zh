@@ -403,7 +403,7 @@ func (g *Game) genItems(mg *MapGen) {
 		}
 		g.AddEntity(co)
 	}
-	if g.Mod(ModCorruptedDungeon) && g.IntN(MapLevels+MapLevels/2) == 0 {
+	if g.Mod(ModCorruptedDungeon) && g.IntN(2*MapLevels) == 0 {
 		if g.IntN(2) == 0 {
 			// Field of comestibles of same kind.
 			cod := ComestibleData[g.NextComestibleIdx()]
