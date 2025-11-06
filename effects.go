@@ -799,7 +799,7 @@ func (eff EffectShadows) Name() string {
 
 func (eff EffectShadows) Desc() string {
 	return fmt.Sprintf("@BShadow@N for %d turns. %s @GInstant@N.",
-		DurationShadow, statusDesc[StatusSprint])
+		DurationShadow, statusDesc[StatusShadow])
 }
 
 type EffectSnack struct{}
