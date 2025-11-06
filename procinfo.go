@@ -107,11 +107,11 @@ func (g *Game) flavoursProcGen() {
 			guardianPortal1Level = 2
 		}
 		if g.IntN(MapLevels) == 0 {
-			guardianPortal2Level = 1
+			guardianPortal2Level = 4
 		}
 		if g.IntN(MapLevels) == 0 {
-			wanderingUnique1Level = 1
-			wanderingUnique2Level = 1
+			wanderingUnique1Level = 2
+			wanderingUnique2Level = 2
 		}
 	}
 	randTotemLevel := func(n, m int) int {
