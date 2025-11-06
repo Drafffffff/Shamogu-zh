@@ -193,9 +193,9 @@ var challengeSpirits = []spiritInfo{
 		BonusTraits: [2]Traits{Gawalt, Gawalt}},
 	{
 		Name:        "Gluttonous Bear",
-		MaxCharges:  [2]int{2, 4},
+		MaxCharges:  [2]int{1, 2},
 		Ability:     [2]Ability{EffectSnack{}, EffectSnack{}},
-		BonusHP:     [2]int{2, 2},
+		BonusHP:     [2]int{2, 3},
 		BonusTraits: [2]Traits{Gluttony, Gluttony}},
 	{
 		Name:        "Gardening Lion",
