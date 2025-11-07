@@ -12,7 +12,7 @@ import (
 var driver gruid.Driver
 var isFullscreen bool
 
-func initDriver(fullscreen bool) {
+func initDriver(fullscreen bool, sx, sy float64) {
 	isFullscreen = fullscreen
 	icon, err := base64pngToRGBA(TileImgs["favicon"])
 	if err != nil {
@@ -24,6 +24,9 @@ func initDriver(fullscreen bool) {
 		WindowTitle: "Shamogu",
 		WindowIcon:  icon,
 	})
+	if sx != 1 || sy != 1 {
+		dr.SetScale(float32(sx), float32(sy))
+	}
 	driver = dr
 }
 

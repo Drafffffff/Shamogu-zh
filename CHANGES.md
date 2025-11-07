@@ -4,6 +4,13 @@
 * Minor update in frog's catching description: it always unbalances when
   ranged, but description said "may".
 
+UI, graphics, QoL:
+
+* SDL2 version: new command-line options `-w` and `-h` to set window width and
+  height scaling factors (see issue #8). Results may look ugly for non-integer
+  factors. At the very least, using multiples of 0.25 seems better (some other
+  values result in visual glitches).
+
 # v1.1.0 2025-10-27
 
 This release is a polishing one with some gameplay improvements and various

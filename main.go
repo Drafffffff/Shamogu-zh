@@ -29,8 +29,11 @@ func main() {
 	opt256colors := new(bool)
 	optTrueColor := new(bool)
 	optFullscreen := new(bool)
+	optWidthScale, optHeightScale := new(float64), new(float64)
 	if Tiles {
 		optFullscreen = flag.Bool("F", false, "fullscreen")
+		optWidthScale = flag.Float64("w", 1.0, "window width scale factor (default: 1.0, examples: 0.75, 1.25)")
+		optHeightScale = flag.Float64("h", 1.0, "window height scale factor (default: 1.0, examples: 0.75, 1.25)")
 	} else {
 		opt16colors = flag.Bool("s", false, "use standard 16-color palette (default on most systems)")
 		opt256colors = flag.Bool("x", false, "use xterm 256-color palette (solarized approximation)")
@@ -64,7 +67,7 @@ func main() {
 	if err != nil {
 		log.Print(err)
 	}
-	initDriver(*optFullscreen)
+	initDriver(*optFullscreen, *optWidthScale, *optHeightScale)
 	if *optReplay != "" {
 		RunReplay(*optReplay)
 	} else {
