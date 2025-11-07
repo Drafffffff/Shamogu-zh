@@ -1,14 +1,38 @@
 # v? ?
 
+New content:
+
+* New advanced new game settings, accessed by pressing TAB in the new game
+  menu. They allow to select various game mods, as well as extra advanced
+  primary spirits.
+* New advanced primary spirit: **Spinning Crocodile**. It features a
+  *tail-slap* ability that hits and unbalances all adjacent foes and reverses
+  the player's current direction. The crocodile's attacks are melee attacks
+  that drag foes backwards, unbalancing them. The crocodile cannot rotate
+  easily: it needs a turn to reverse current direction, and while it can move
+  laterally as usual, it cannot attack laterally without first moving or
+  rotating.  Attack and defense bonuses compensate somewhat for the crocodile's
+  mobility restrictions, but it's still considered an *advanced* primary spirit
+  (only accessible through the advanced new game settings). See design
+  discussion in issue #6.
+* New **Corrupted Dungeon** (wip) mod: the orb's influence has scattered
+  twisted surprises through the land! The mod is recommended to any player that
+  wants some extra variability and surprises during their adventures. See
+  design discussion in issue #6.
+* New **Challenge Spirits** (wip) mod that introduces several new kinds of
+  non-primary spirits with both heavy drawbacks and advantages, somewhat less
+  balanced than regular secondary spirits. See design discussion in issue #7.
+* New **No Recharges** mod: double spirit charges but going to the next level
+  doesn't recharge them anymore!
+
+Reworked and improved content:
+
 * Eating food that gives an already active beneficial status now extends it by
   the remaining duration, too, instead of losing remaining turns. Also,
   teleport mushroom now gives some healing when you're lignified instead of
   doing nothing, and firebreath pepper now extends Fire and Confusion by the
   remaining duration, so that using it on foes that already have the statuses
   still has some useful effect.
-* Fix bug where you could get Imbalance despite being lignified (see #6).
-* Minor update in frog's catching description: it always unbalances when
-  ranged, but description said "may".
 
 UI, graphics, QoL:
 
@@ -16,6 +40,14 @@ UI, graphics, QoL:
   height scaling factors (see issue #8). Results may look ugly for non-integer
   factors. At the very least, using multiples of 0.25 seems better (some other
   values result in visual glitches).
+
+Fixes:
+
+* Fix bug where you could get Imbalance despite being lignified (see #6).
+* Fix small animation glitch with Clarity, where the previous last-seen
+  position of a monster would be briefly shown with the wrong color (see #6).
+* Minor update in frog's catching description: it always unbalances when
+  ranged, but description said "may".
 
 # v1.1.0 2025-10-27
 
