@@ -79,7 +79,13 @@ func (g *Game) LevelStats() {
 			}
 		}
 	}
-	gs.MapDeathPerc[g.Map.Level-1] = int(100 * float64(n) / float64(total))
+	if total == 0 {
+		// In no monsters, show 100% (0% would make sense, too,
+		// but be less recognizable).
+		gs.MapDeathPerc[g.Map.Level-1] = 100
+	} else {
+		gs.MapDeathPerc[g.Map.Level-1] = int(100 * float64(n) / float64(total))
+	}
 
 }
 
