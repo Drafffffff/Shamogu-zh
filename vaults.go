@@ -225,18 +225,23 @@ func (mg *MapGen) RandomVaultsPlaceWithFunc(vs []*vault, kind placeKind, rf func
 }
 
 // RandomVaultPlace returns a random free place of the given kind in the given
-// vault, or returns an invalid position if there is no such place.
+// vault, or returns an invalid position if there is no such place. It sets the
+// terrain to Floor for PlaceStatic and PlaceItem place kinds.
 func (mg *MapGen) RandomVaultPlace(v *vault, kind placeKind) gruid.Point {
-	var p []int
+	var ps []int
 	for i, pl := range v.places {
 		if pl.kind == kind && !pl.used {
-			p = append(p, i)
+			ps = append(ps, i)
 		}
 	}
-	if len(p) == 0 {
+	if len(ps) == 0 {
 		return InvalidPos
 	}
-	j := p[mg.rand.IntN(len(p))]
+	j := ps[mg.rand.IntN(len(ps))]
 	v.places[j].used = true
-	return v.places[j].p
+	p := v.places[j].p
+	if kind == PlaceItem || kind == PlaceStatic {
+		mg.terrain.Set(p, Floor)
+	}
+	return p
 }

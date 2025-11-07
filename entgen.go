@@ -455,8 +455,9 @@ func (g *Game) genItems(mg *MapGen) {
 	}
 }
 
-// randomFreeItemFloor returns a random map floor position that is not occupied by
-// an item.
+// randomFreeItemFloor returns a random passable position that is not occupied
+// by an item. The returned position has some bias toward walls and sets the
+// terrain to Floor.
 func (g *Game) randomFreeItemFloor() gruid.Point {
 	for {
 		p := g.RandomPassableBiased()
