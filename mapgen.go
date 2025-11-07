@@ -774,39 +774,55 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 			passable = func(p gruid.Point) bool { return true }
 		}
 		mp := &MappingPath{passable: passable}
-		maxRange := 2*MaxFOVRange + MaxFOVRange/2 + g.IntN(MaxFOVRange/2)
+		maxRange := 2*MaxFOVRange + g.IntN(MaxFOVRange)
 		nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{p}, maxRange)
-		var h func() rl.Cell
-		switch g.IntN(2) {
-		case 0:
-			// Mix of rubble/foliage/floor 1/3/5.
-			h = func() rl.Cell {
-				switch g.IntN(9) {
-				case 0:
-					return Rubble
-				case 1, 2, 3:
-					return Foliage
-				default:
-					return Floor
-				}
-			}
-		default:
-			// Mix of rubble/foliage/floor 1/2/4.
-			h = func() rl.Cell {
-				switch g.IntN(7) {
-				case 0:
-					return Rubble
-				case 1, 2:
-					return Foliage
-				default:
-					return Floor
-				}
+		// Natural mix of rubble/foliage/floor 1/3/5.
+		mix := func() rl.Cell {
+			switch g.IntN(9) {
+			case 0:
+				return Rubble
+			case 1, 2, 3:
+				return Foliage
+			default:
+				return Floor
 			}
 		}
 		var f func(t rl.Cell) rl.Cell
-		switch g.IntN(3) {
+		switch g.IntN(4) {
 		case 0:
-			// Corrupt even translucent walls.
+			// Uniform corruption.
+			var nt rl.Cell
+			switch g.IntN(3) {
+			case 0:
+				nt = Foliage
+			case 1:
+				nt = Rubble
+			default:
+				nt = Floor
+			}
+			if nt == Rubble || g.IntN(3) == 0 {
+				// Walls may be destroyed.
+				f = func(t rl.Cell) rl.Cell {
+					if !Passable(t) {
+						if g.IntN(2) == 2 {
+							return t
+						}
+						return mix()
+					}
+					return nt
+				}
+			} else {
+				// Walls become translucent ones.
+				f = func(t rl.Cell) rl.Cell {
+					if !Passable(t) {
+						return TranslucentWall
+					}
+					return nt
+				}
+			}
+		case 1:
+			// Sparse corruption that may swap wall/translucent
+			// wall nature.
 			f = func(t rl.Cell) rl.Cell {
 				if t == Wall && g.IntN(4) == 0 {
 					return TranslucentWall
@@ -818,19 +834,19 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 					// Preserve walls often.
 					return t
 				}
-				return h()
+				return mix()
 			}
 		default:
-			// Don't corrupt translucent walls.
+			// Sparse corruption.
 			f = func(t rl.Cell) rl.Cell {
 				if !Passable(t) && g.IntN(2) == 0 {
 					// Preserve walls often.
 					return t
 				}
-				return h()
+				return mix()
 			}
 		}
-		m := 3 + g.IntN(2)
+		m := g.IntN(5)
 		for _, n := range nodes {
 			if g.IntN(maxRange-n.Cost) >= m {
 				mg.terrain.Set(n.P, f(mg.terrain.At(n.P)))
