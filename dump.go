@@ -238,7 +238,7 @@ func (g *Game) dumpDungeon(sb *strings.Builder) {
 				sb.WriteString("|\n|")
 			}
 		}
-		r := g.Map.RuneAt(p)
+		r := g.Map.KnownTerrainRuneAt(p)
 		if r == '♫' {
 			r = ' '
 		}

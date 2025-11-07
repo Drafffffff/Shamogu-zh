@@ -146,7 +146,8 @@ func (md *model) drawMap(gd gruid.Grid) {
 	}
 	// Terrain drawing.
 	for p := range g.Map.KnownTerrain.Points() {
-		g.drawTerrainRuneAt(gd, g.Map.RuneAt(p), p)
+		r := g.Map.KnownTerrainRuneAt(p)
+		g.drawTerrainRuneAt(gd, r, p)
 	}
 	for _, cl := range g.Map.Clouds.Clouds {
 		if !g.InFOV(cl.P) {
@@ -221,10 +222,7 @@ func (md *model) drawMapWizardReveal(gd gruid.Grid) {
 	g := md.g
 	// Terrain drawing.
 	for p, t := range g.Map.Terrain.All() {
-		r := MapRune(t)
-		if (r == '#' || r == '◊') && !g.Map.PassableNeighbor(p) {
-			r = ' '
-		}
+		r := g.Map.TerrainRuneAt(p, t)
 		g.drawTerrainRuneAt(gd, r, p)
 	}
 	for _, cl := range g.Map.Clouds.Clouds {
@@ -263,10 +261,7 @@ func (md *model) drawMapWizardRevealTerrain(gd gruid.Grid) {
 	g := md.g
 	// Terrain drawing.
 	for p, t := range g.Map.Terrain.All() {
-		r := MapRune(t)
-		if (r == '#' || r == '◊') && !g.Map.PassableNeighbor(p) {
-			r = ' '
-		}
+		r := g.Map.TerrainRuneAt(p, t)
 		g.drawTerrainRuneAt(gd, r, p)
 	}
 	// Entity drawing (with rendering order).

@@ -108,7 +108,7 @@ func (md *model) updateStatus() {
 				Disabled: true})
 		} else if t := g.Map.Terrain.At(pp); t != Floor {
 			entries = append(entries, ui.MenuEntry{
-				Text:     stt.WithTextf("%c ", MapRune(t)).WithStyle(gruid.Style{Fg: ColorForeground, Attrs: AttrInMap}),
+				Text:     stt.WithTextf("%c ", TerrainRune(t)).WithStyle(gruid.Style{Fg: ColorForeground, Attrs: AttrInMap}),
 				Disabled: true})
 		}
 		clk := g.Map.Clouds.At(pp).Kind
