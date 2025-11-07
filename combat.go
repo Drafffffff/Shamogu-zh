@@ -248,7 +248,7 @@ func (g *Game) ExplosionAt(i ID, at gruid.Point) {
 	for _, q := range ps {
 		if g.Map.Burnable(q) {
 			g.FireCloudAt(q)
-		} else if !g.dig(q) {
+		} else if !g.digAt(q) {
 			g.NormalCloudAt(q, 2+g.IntN(3))
 		}
 		if j, aj := g.ActorAt(q); j >= 0 {
@@ -745,8 +745,8 @@ func (g *Game) AdjacentEntities(i, j ID) bool {
 	return paths.DistanceManhattan(g.Entity(i).P, g.Entity(j).P) == 1
 }
 
-// Dig attempts to make an actor dig at a given position. It reports true on
-// success.
+// Dig makes an actor attempt digging at a given position. It reports whether
+// the position is now passable.
 func (g *Game) Dig(i ID, ai *Actor, at gruid.Point) bool {
 	if !inMap(at) {
 		return false
@@ -754,11 +754,13 @@ func (g *Game) Dig(i ID, ai *Actor, at gruid.Point) bool {
 	if !ai.Has(StatusDig) {
 		return false
 	}
-	g.dig(at)
+	g.digAt(at)
 	return true
 }
 
-func (g *Game) dig(at gruid.Point) bool {
+// digAt performs digging at a given position. It reports whether any walls were
+// dug.
+func (g *Game) digAt(at gruid.Point) bool {
 	t := g.Map.Terrain.At(at)
 	if Passable(t) {
 		return false

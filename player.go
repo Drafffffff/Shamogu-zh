@@ -105,7 +105,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 		}
 		switch {
 		case pa.Has(StatusDig):
-			g.dig(to)
+			g.digAt(to)
 		default:
 			g.Logf("You cannot walk into the %s.", TerrainName(g.Map.Terrain.At(to)))
 			return false

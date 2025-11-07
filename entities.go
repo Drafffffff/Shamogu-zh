@@ -188,7 +188,7 @@ func (g *Game) BumpMoveActor(i ID, ai *Actor, to gruid.Point) {
 		if !g.Map.Passable(to) {
 			g.monsConfusionPenalty(i, ai)
 		}
-		g.dig(to)
+		g.digAt(to)
 	}
 	g.MoveActor(i, ai, to)
 	if i == PlayerID && g.Mod(ModHeavySteps) && g.IntN(4) == 0 {
