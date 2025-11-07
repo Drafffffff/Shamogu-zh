@@ -248,8 +248,7 @@ func (g *Game) ExplosionAt(i ID, at gruid.Point) {
 	for _, q := range ps {
 		if g.Map.Burnable(q) {
 			g.FireCloudAt(q)
-		} else {
-			g.dig(q)
+		} else if !g.dig(q) {
 			g.NormalCloudAt(q, 2+g.IntN(3))
 		}
 		if j, aj := g.ActorAt(q); j >= 0 {
@@ -759,10 +758,10 @@ func (g *Game) Dig(i ID, ai *Actor, at gruid.Point) bool {
 	return true
 }
 
-func (g *Game) dig(at gruid.Point) {
+func (g *Game) dig(at gruid.Point) bool {
 	t := g.Map.Terrain.At(at)
 	if Passable(t) {
-		return
+		return false
 	}
 	g.Stats.Digs++
 	g.Map.Terrain.Set(at, Rubble)
@@ -778,6 +777,7 @@ func (g *Game) dig(at gruid.Point) {
 			g.md.AnimationFrame()
 		}
 	}
+	return true
 }
 
 // blinkOther implements the blinking bump effect.

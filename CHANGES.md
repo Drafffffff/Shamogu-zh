@@ -43,6 +43,9 @@ UI, graphics, QoL:
 
 Fixes:
 
+* A translucent wall explosion now releases a poison cloud, without replacing
+  it with a normal cloud. The cloud replacing wasn't very interesting and was
+  an oversight.
 * Fix bug where you could get Imbalance despite being lignified (see #6).
 * Fix small animation glitch with Clarity, where the previous last-seen
   position of a monster would be briefly shown with the wrong color (see #6).
