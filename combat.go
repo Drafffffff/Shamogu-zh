@@ -99,7 +99,7 @@ func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKi
 			g.PutStatus(j, aj, StatusFear, DurationFearGrowl)
 		}
 		g.logBumpDamage(i, j, ai, aj, dmg, ap)
-		if ai.DoesAny(PatternSwap|PatternSwapDaze) || g.IntN(dmg) == 0 {
+		if ai.DoesAny(PatternSwap|PatternSwapDaze) || ai.Has(StatusShadow) || aj.Has(StatusShadow) || g.IntN(dmg) == 0 {
 			break
 		}
 		switch {
@@ -487,7 +487,7 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 		// Lignification caps attack damage at 1.
 		dmg = min(1, dmg)
 	}
-	if i == PlayerID && ai.DoesAny(Gawalt) && dmg > 1 {
+	if i == PlayerID && ai.DoesAny(Gawalt) && !ai.Has(StatusShadow) && dmg > 1 {
 		// Gawalt monkey reduces damage of non-weak hits.
 		dmg--
 	}
