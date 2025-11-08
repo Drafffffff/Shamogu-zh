@@ -33,6 +33,9 @@ Reworked and improved content:
   doing nothing, and firebreath pepper now extends Fire and Confusion by the
   remaining duration, so that using it on foes that already have the statuses
   still has some useful effect.
+* Monster fear is now somewhat biased toward going in the opposite direction
+  from the player, instead of fleeing laterally, so that non-Hydra players get
+  more offensive use from Fear.
 
 UI, graphics, QoL:
 

@@ -259,7 +259,7 @@ func (g *Game) monsterFlee(i ID, ai *Actor) bool {
 	}
 	var nbs paths.Neighbors
 	ps := nbs.Cardinal(ei.P, func(p gruid.Point) bool {
-		if j, _ := g.ActorAt(p); j >= 0 || !g.Map.Passable(p) {
+		if !g.IsFree(p) {
 			return false
 		}
 		return paths.DistanceManhattan(p, pl.P) > paths.DistanceManhattan(ei.P, p)
@@ -269,6 +269,10 @@ func (g *Game) monsterFlee(i ID, ai *Actor) bool {
 		return true
 	}
 	to := ps[g.IntN(len(ps))]
+	if to.X != pl.P.X && to.Y != pl.P.Y {
+		// Extra chance of going in the opposite direction.
+		to = ps[g.IntN(len(ps))]
+	}
 	g.BumpMoveActor(i, ai, to)
 	return true
 }
