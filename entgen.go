@@ -834,32 +834,6 @@ func (g *Game) genMonsters(mg *MapGen) {
 		nM = 1
 	}
 	// Mod adjustments.
-	if g.Mod(ModExtraGuardians) {
-		if g.Map.Orb != InvalidPos {
-			g.genMonsterGuardian(g.randMonsKind(monsLate), g.Map.Orb)
-			g.genMonsterGuardian(g.randMonsKind(monsMid), g.Map.Orb)
-		} else {
-			p := g.Map.Portal
-			if g.IntN(4) == 0 {
-				// Occasionally make extra guardians guard a random
-				// non-player vault.
-				p = g.RandomWaypoint()
-			}
-			if g.Map.Level > 3 {
-				g.genMonsterGuardian(g.randMonsKind(monsMid), p)
-			} else {
-				g.genMonsterGuardian(g.randMonsKind(monsEarly), p)
-			}
-			if g.IntN(3) > 0 {
-				g.genMonsterGuardian(g.randMonsKind(monsMid), p)
-			}
-		}
-	}
-	if g.Mod(ModExtraMonsters) {
-		nE += 1 + g.Map.Level/3
-		nM += g.Map.Level / 2
-		nL += g.Map.Level/4 + g.Map.Level/8
-	}
 	if g.Mod(ModCorruptedDungeon) {
 		if nE > 0 && nM > 0 && g.IntN(5) == 0 {
 			// Occasionally one extra late monster (even in early game).

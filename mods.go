@@ -12,17 +12,13 @@ const (
 	ModCombatGrowl // uncontrollable growling during combat
 	ModHeavySteps  // noisy movement
 
-	ModExtraMonsters  // mod with extra monsters (XXX: maybe remove)
-	ModExtraGuardians // mod with extra regular guardians (XXX: maybe remove)
-
 )
 
-const NMods = 1 + int(ModExtraGuardians)
+const NMods = 1 + int(ModHeavySteps)
 
 var gameMods = []Mod{
 	ModCorruptedDungeon, ModChallengeSpirits, ModNoRecharges,
-	ModCombatGrowl, ModHeavySteps,
-	ModExtraMonsters, ModExtraGuardians}
+	ModCombatGrowl, ModHeavySteps}
 
 func (m Mod) String() string {
 	switch m {
@@ -36,10 +32,6 @@ func (m Mod) String() string {
 		return "Combat Growl"
 	case ModHeavySteps:
 		return "Heavy Steps"
-	case ModExtraMonsters:
-		return "Extra Monsters"
-	case ModExtraGuardians:
-		return "Extra Guardians"
 	default:
 		return "(unknown mod)"
 	}
@@ -53,20 +45,10 @@ func (m Mod) Desc() string {
 		return "Enable extra challenge secondary spirits: Gawalt Monkey, Gardening Lion, Gluttonous Bear. You cannot chose more than one regular secondary spirit, and the first totem is always a challenge one!"
 	case ModNoRecharges:
 		return "Spirit ability charges are doubled but don't recharge when going to next floor. Use them wisely!"
-	// case ModScaryRoar:
-	// 	return "You roar at monsters on first sight to scare them off."
 	case ModCombatGrowl:
 		return "You sometimes growl during combat, briefly scaring foes."
 	case ModHeavySteps:
 		return "You frequently make noise when you move."
-	// case ModGluttony:
-	// 	return "When eating, you sometimes eat an extra random comestible on the same turn. You have +2 HP."
-	// case ModGawalt:
-	// 	return "You can perform 2-tile jumps by propulsing against walls! You attack any monster on the jump path. When attacking, damage is reduced by one if greater than one."
-	case ModExtraMonsters:
-		return "More wandering monsters than usual."
-	case ModExtraGuardians:
-		return "Some extra regular monsters as guardians."
 	default:
 		return "(unknown mod)"
 	}
