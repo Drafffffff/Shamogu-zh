@@ -149,12 +149,12 @@ const (
 	BurningHits   // hits may burn
 	DazingSpines  // body covered in dazing spines (porcupine)
 	Gawalt        // wall-jumping
-	Gluttony      // gluttony (extra random eating)
 	GoodHearing   // better hearing of noise (footsteps)
 	GoodSmell     // smell food from a distance
 	Pushing       // unbalancing pushing (earth-dragon)
 	PushingCharge // unbalancing pushing when charging (boar)
 	ScaryRoar     // intimidating roar on first sight
+	SpiderPhobia  // fear of spiders
 	TrailingCloud // leave dust behind after moving (on floor tiles)
 	VenomousMelee // (non-ranged) attacks may poison foes
 	WoodyLegs     // can move while lignified
@@ -225,8 +225,8 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, BurningHits, "hits may @Oburn@N foes")
 	desc = traitDesc(desc, t, VenomousMelee, "@Ovenomous@N melee attack")
 	desc = traitDesc(desc, t, Gawalt, "wall-jumping movement and attack, weakened attacks")
-	desc = traitDesc(desc, t, Gluttony, "gluttony (may eat random extra comestible)")
 	desc = traitDesc(desc, t, ScaryRoar, "scary roar on first sight")
+	desc = traitDesc(desc, t, SpiderPhobia, "spider phobia")
 	desc = traitDesc(desc, t, DazingSpines, "spines may @Odaze@N foes in melee")
 	switch {
 	case t.All(GoodHearing) && !t.All(BadHearing):
@@ -779,7 +779,7 @@ func (g *Game) handleCornered(i ID, ai *Actor) {
 	case ai.Has(StatusFear) || ai.DoesAny(MonsMusic) && !ai.Has(StatusBerserk):
 		// Actor is afraid or is playing music while not berserk: it
 		// may become berserk if cornered.
-	case i == PlayerID && g.Mod(ModSpiderPhobia):
+	case i == PlayerID && ai.DoesAny(SpiderPhobia):
 		g.handleCorneredWithSpiderPhobia()
 		return
 	default:

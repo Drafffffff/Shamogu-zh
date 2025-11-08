@@ -769,10 +769,8 @@ type ActionUseItem struct {
 
 func (a ActionUseItem) Handle(md *model) (gruid.Effect, bool) {
 	g := md.g
-	floor := false
 	if a.ID >= FirstMapID {
 		// Comestible on the floor.
-		floor = true
 		if a.ID, _ = g.ItemAt(g.PP()); a.ID < 0 {
 			// Should not happen.
 			return nil, false
@@ -785,14 +783,6 @@ func (a ActionUseItem) Handle(md *model) (gruid.Effect, bool) {
 		return nil, false
 	}
 	ok = it.Use(g, a.ID)
-	pa := g.PlayerActor()
-	if pa.DoesAny(Gluttony) && IsComestible(it) && !floor {
-		if id, nco := g.randomComestible(); id >= 0 {
-			if nco.Use(g, id) {
-				g.Log("You feel full!")
-			}
-		}
-	}
 	return nil, ok
 }
 

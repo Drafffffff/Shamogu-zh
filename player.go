@@ -133,7 +133,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 // PlayerFears reports whether the players fears the given actor.
 func (g *Game) PlayerFears(j ID, aj *Actor) bool {
 	pa := g.PlayerActor()
-	return pa.Has(StatusFear) || g.Mod(ModSpiderPhobia) && aj.IsMonster(BerserkingSpider) && !pa.Has(StatusBerserk)
+	return pa.Has(StatusFear) || pa.DoesAny(SpiderPhobia) && aj.IsMonster(BerserkingSpider) && !pa.Has(StatusBerserk)
 }
 
 func (g *Game) logDaze() {

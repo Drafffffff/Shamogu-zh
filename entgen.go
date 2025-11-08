@@ -193,10 +193,10 @@ var challengeSpirits = []spiritInfo{
 		BonusTraits: [2]Traits{Gawalt, Gawalt}},
 	{
 		Name:        "Gluttonous Bear",
-		MaxCharges:  [2]int{1, 2},
+		MaxCharges:  [2]int{1, 3},
 		Ability:     [2]Ability{EffectSnack{}, EffectSnack{}},
-		BonusHP:     [2]int{2, 3},
-		BonusTraits: [2]Traits{Gluttony, Gluttony}},
+		BonusHP:     [2]int{3, 3},
+		BonusTraits: [2]Traits{SpiderPhobia, SpiderPhobia}},
 	{
 		Name:        "Gardening Lion",
 		MaxCharges:  [2]int{2, 4},
@@ -854,13 +854,6 @@ func (g *Game) genMonsters(mg *MapGen) {
 		nE += 1 + g.Map.Level/3
 		nM += g.Map.Level / 2
 		nL += g.Map.Level/4 + g.Map.Level/8
-	}
-	if g.Mod(ModSpiderPhobia) {
-		n := 1 + g.Map.Level/3
-		for range n {
-			g.genMonster(BerserkingSpider)
-		}
-		nE -= n - 1
 	}
 	if g.Mod(ModCorruptedDungeon) {
 		if nE > 0 && nM > 0 && g.IntN(5) == 0 {

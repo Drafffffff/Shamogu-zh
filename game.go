@@ -319,9 +319,9 @@ func (g *Game) ComputeNoise() {
 		switch {
 		case ai.DoesAny(MonsSilent):
 			switch {
-			case g.Mod(ModSpiderPhobia) && ai.IsMonster(BerserkingSpider):
-				// Hear spiders like heavy footsteps.
-				dist -= 3
+			case pa.DoesAny(SpiderPhobia) && ai.IsMonster(BerserkingSpider):
+				// Hear spiders normally (you've developed a
+				// kind of extra sense for them).
 			case goodhearing:
 				// Good hearing allows to hear almost silent
 				// monsters like spiders, but not too far.

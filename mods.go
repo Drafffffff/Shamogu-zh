@@ -9,9 +9,8 @@ const (
 	ModChallengeSpirits            // dedicated slot for challenge secondary spirits
 	ModNoRecharges                 // mod without spirit recharges
 
-	ModCombatGrowl  // uncontrollable growling during combat
-	ModHeavySteps   // noisy movement
-	ModSpiderPhobia // fear of spiders (unless berserk); more spiders
+	ModCombatGrowl // uncontrollable growling during combat
+	ModHeavySteps  // noisy movement
 
 	ModExtraMonsters  // mod with extra monsters (XXX: maybe remove)
 	ModExtraGuardians // mod with extra regular guardians (XXX: maybe remove)
@@ -22,7 +21,7 @@ const NMods = 1 + int(ModExtraGuardians)
 
 var gameMods = []Mod{
 	ModCorruptedDungeon, ModChallengeSpirits, ModNoRecharges,
-	ModCombatGrowl, ModHeavySteps, ModSpiderPhobia,
+	ModCombatGrowl, ModHeavySteps,
 	ModExtraMonsters, ModExtraGuardians}
 
 func (m Mod) String() string {
@@ -37,8 +36,6 @@ func (m Mod) String() string {
 		return "Combat Growl"
 	case ModHeavySteps:
 		return "Heavy Steps"
-	case ModSpiderPhobia:
-		return "Spider Phobia"
 	case ModExtraMonsters:
 		return "Extra Monsters"
 	case ModExtraGuardians:
@@ -62,8 +59,6 @@ func (m Mod) Desc() string {
 		return "You sometimes growl during combat, briefly scaring foes."
 	case ModHeavySteps:
 		return "You frequently make noise when you move."
-	case ModSpiderPhobia:
-		return "You fear spiders. Spiders are more common."
 	// case ModGluttony:
 	// 	return "When eating, you sometimes eat an extra random comestible on the same turn. You have +2 HP."
 	// case ModGawalt:
