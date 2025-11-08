@@ -90,6 +90,7 @@ type spiritInfo struct {
 	BonusDefense [2]int     // defense bonuses per level (may be zero)
 	BonusTraits  [2]Traits  // bonus traits per level
 	BonusHP      [2]int     // bonus hp per level (may be zero)
+	Challenge    bool       // challenge spirit
 }
 
 // primarySpirits represents the various kinds of primary spirits.
@@ -190,18 +191,21 @@ var challengeSpirits = []spiritInfo{
 		Name:        "Gawalt Monkey",
 		MaxCharges:  [2]int{2, 4},
 		Ability:     [2]Ability{EffectShadows{}, EffectShadows{}},
-		BonusTraits: [2]Traits{Gawalt, Gawalt}},
+		BonusTraits: [2]Traits{Gawalt, Gawalt},
+		Challenge:   true},
 	{
 		Name:        "Gluttonous Bear",
 		MaxCharges:  [2]int{1, 3},
 		Ability:     [2]Ability{EffectSnack{}, EffectSnack{}},
 		BonusHP:     [2]int{3, 3},
-		BonusTraits: [2]Traits{SpiderPhobia, SpiderPhobia}},
+		BonusTraits: [2]Traits{SpiderPhobia, SpiderPhobia},
+		Challenge:   true},
 	{
 		Name:        "Gardening Lion",
 		MaxCharges:  [2]int{2, 4},
 		Ability:     [2]Ability{EffectGarden{}, EffectGarden{}},
-		BonusTraits: [2]Traits{ScaryRoar, ScaryRoar}},
+		BonusTraits: [2]Traits{ScaryRoar, ScaryRoar},
+		Challenge:   true},
 }
 
 // spiritEntity generates a new spirit entity using the given data.
@@ -220,7 +224,8 @@ func spiritEntity(mods []bool, si spiritInfo) *Entity {
 			BonusAttack:  si.BonusAttack,
 			BonusDefense: si.BonusDefense,
 			BonusTraits:  si.BonusTraits,
-			BonusHP:      si.BonusHP}}
+			BonusHP:      si.BonusHP,
+			Challenge:    si.Challenge}}
 }
 
 // genEmptyTotemAt generates a new empty totem entity at the given point.

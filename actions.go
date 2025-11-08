@@ -802,7 +802,7 @@ func (g *Game) randomComestible() (ID, *Comestible) {
 func equipItem(md *model, i ID) bool {
 	g := md.g
 	ei := g.Entity(i)
-	spirit := false
+	spirit := false // whether the to-be-equipped item is a spirit
 	var from, to ID
 	switch ei.Role.(type) {
 	case *Spirit:
@@ -824,11 +824,27 @@ func equipItem(md *model, i ID) bool {
 		var entry ui.MenuEntry
 		entry.Disabled = j < from || j >= to
 		if !entry.Disabled {
-			if rj, ok := ej.Role.(*Spirit); ok && rj.Level >= 1 {
+			rj, ok := ej.Role.(*Spirit)
+			switch {
+			case ok && rj.Level >= 1:
+				// Cannot upgrade a spirit more than once.
 				entry.Disabled = true
-				if j == from {
-					from++
+			case g.Mod(ModChallengeSpirits) && !ok && spirit:
+				// When challenge spirits are enabled, only one
+				// regular secondary spirit is allowed.
+				ri := ei.Role.(*Spirit)
+				if ri.Challenge {
+					break
 				}
+				for k, sk := range g.PlayerSpirits() {
+					if k > PrimarySpiritID && !sk.Challenge {
+						entry.Disabled = true
+						break
+					}
+				}
+			}
+			if entry.Disabled && j == from {
+				from++
 			}
 		}
 		if entry.Disabled {
@@ -853,7 +869,7 @@ func equipItem(md *model, i ID) bool {
 	md.mode = modeMenu
 	md.menu.mode = modeEquip
 	ej := g.Entity(from)
-	md.menu.main.SetActiveInvokable(md.equipItemIdx(from))
+	md.menu.main.SetActiveInvokable(0)
 	_, ok := ej.Role.(*Spirit)
 	md.drawGroundDesc = !ok
 	md.updateEquipItemDesc(ei, ej)

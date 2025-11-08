@@ -52,6 +52,7 @@ type Spirit struct {
 	BonusTraits  [2]Traits  // bonus traits per level
 	BonusHP      [2]int     // bonus hp per level (may be zero)
 	Uses         int        // number of times it was used (for statistics)
+	Challenge    bool       // challenge spirit
 }
 
 func (sp *Spirit) Desc() string {
