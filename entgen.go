@@ -239,15 +239,28 @@ type itemInfo struct {
 	Effect Effect
 }
 
+// comestibleKind represents the various kinds of comestibles.
+type comestibleKind int
+
+const (
+	AmbrosiaBerries comestibleKind = iota
+	BerserkingFlower
+	ClarityLeaves
+	FirebreathPepper
+	FoggySkinOnion
+	LignificationFruit
+	TeleportMushroom
+)
+
 // ComestibleData provides information about the various kinds of comestibles.
 var ComestibleData = []itemInfo{
-	{"ambrosia berries", EffectAmbrosiaBerries{}},
-	{"berserking flower", EffectBerserkingFlower{}},
-	{"clarity leaves", EffectClarityLeaves{}},
-	{"firebreath pepper", EffectFirebreathPepper{}},
-	{"foggy-skin onion", EffectFoggySkinOnion{}},
-	{"lignification fruit", EffectLignificationFruit{}},
-	{"teleport mushroom", EffectTeleportMushroom{}},
+	AmbrosiaBerries:    {"ambrosia berries", EffectAmbrosiaBerries{}},
+	BerserkingFlower:   {"berserking flower", EffectBerserkingFlower{}},
+	ClarityLeaves:      {"clarity leaves", EffectClarityLeaves{}},
+	FirebreathPepper:   {"firebreath pepper", EffectFirebreathPepper{}},
+	FoggySkinOnion:     {"foggy-skin onion", EffectFoggySkinOnion{}},
+	LignificationFruit: {"lignification fruit", EffectLignificationFruit{}},
+	TeleportMushroom:   {"teleport mushroom", EffectTeleportMushroom{}},
 }
 
 // comestibleEntity generates a new comestible Entity entity using the given
@@ -326,44 +339,6 @@ func (g *Game) genItems(mg *MapGen) {
 		portalIdxs = append(portalIdxs, i+1)
 		g.AddEntity(orb)
 	}
-	// Menhirs.
-	nmenhirs := g.ProcInfo.NMenhirs[g.Map.Level-1]
-	if g.Mod(ModCorruptedDungeon) && g.IntN(10*MapLevels) == 0 {
-		nmenhirs = 0
-	}
-	menhirIdxs := []int{}
-	for range min(nmenhirs, len(MenhirData)) {
-		idx := g.NextMenhirIdx()
-		if !g.Mod(ModCorruptedDungeon) || g.IntN(50) > 0 {
-			for slices.Contains(menhirIdxs, idx) {
-				// Never generate twice the same menhir in a given level.
-				idx = g.NextMenhirIdx()
-			}
-		}
-		menhirIdxs = append(menhirIdxs, idx)
-		tvaults := mg.vaults
-		if menhirKind(idx) == MenhirWarping {
-			// Never generate warping menhir in vault containing a
-			// portal or the orb of corruption.
-			tvaults = []*vault{}
-			for i, v := range mg.vaults {
-				if !slices.Contains(portalIdxs, i) {
-					tvaults = append(tvaults, v)
-				}
-			}
-		}
-		me := menhirEntity(MenhirData[idx])
-		if g.Mod(ModCorruptedDungeon) && g.IntN(5) == 0 || extraStatic >= 2 {
-			me.P = g.randomFreeItemFloor()
-		} else {
-			_, me.P = mg.RandomVaultsPlace(tvaults, PlaceStatic)
-		}
-		if g.Mod(ModCorruptedDungeon) && g.IntN(100) == 0 {
-			menhir := me.Role.(*Menhir)
-			menhir.Used = true
-		}
-		g.AddEntity(me)
-	}
 	// Totemic spirit.
 	totemPoint := func() gruid.Point {
 		if g.Mod(ModCorruptedDungeon) && g.IntN(2*MapLevels) == 0 {
@@ -397,6 +372,54 @@ func (g *Game) genItems(mg *MapGen) {
 			addEmptyTotem()
 		}
 	}
+	// Menhirs.
+	nmenhirs := g.ProcInfo.NMenhirs[g.Map.Level-1]
+	if g.Mod(ModCorruptedDungeon) && g.IntN(10*MapLevels) == 0 {
+		nmenhirs = 0
+	}
+	menhirIdxs := []menhirKind{}
+	menhirIdx := func() menhirKind {
+		idx := g.NextMenhirKind()
+		if !g.Mod(ModCorruptedDungeon) || g.IntN(50) > 0 {
+			for slices.Contains(menhirIdxs, idx) {
+				// Never generate twice the same menhir in a given level.
+				idx = g.NextMenhirKind()
+			}
+		}
+		return idx
+	}
+	switch mg.theme {
+	case ThemeWarp:
+		menhirIdx = func() menhirKind { return MenhirWarping }
+	case ThemeFire:
+		menhirIdx = func() menhirKind { return MenhirFire }
+	}
+	for range min(nmenhirs, len(MenhirData)) {
+		idx := menhirIdx()
+		menhirIdxs = append(menhirIdxs, idx)
+		tvaults := mg.vaults
+		if menhirKind(idx) == MenhirWarping && mg.theme != ThemeWarp {
+			// Never generate warping menhir in vault containing a
+			// portal or the orb of corruption.
+			tvaults = []*vault{}
+			for i, v := range mg.vaults {
+				if !slices.Contains(portalIdxs, i) {
+					tvaults = append(tvaults, v)
+				}
+			}
+		}
+		me := menhirEntity(MenhirData[idx])
+		if g.Mod(ModCorruptedDungeon) && g.IntN(5) == 0 || extraStatic >= 2 {
+			me.P = g.randomFreeItemFloor()
+		} else {
+			_, me.P = mg.RandomVaultsPlace(tvaults, PlaceStatic)
+		}
+		if g.Mod(ModCorruptedDungeon) && g.IntN(100) == 0 {
+			menhir := me.Role.(*Menhir)
+			menhir.Used = true
+		}
+		g.AddEntity(me)
+	}
 	// Comestibles.
 	nitems := g.ProcInfo.NComestibles[g.Map.Level-1]
 	addComestible := func(i int, cod itemInfo) {
@@ -408,10 +431,21 @@ func (g *Game) genItems(mg *MapGen) {
 		}
 		g.AddEntity(co)
 	}
-	if g.Mod(ModCorruptedDungeon) && g.IntN(2*MapLevels) == 0 {
+	comestibleIdx := g.NextComestibleKind
+	switch mg.theme {
+	case ThemeBerserk:
+		comestibleIdx = func() comestibleKind { return BerserkingFlower }
+	case ThemeFire:
+		comestibleIdx = func() comestibleKind { return FirebreathPepper }
+	case ThemeLignification:
+		comestibleIdx = func() comestibleKind { return LignificationFruit }
+	case ThemeWarp:
+		comestibleIdx = func() comestibleKind { return TeleportMushroom }
+	}
+	if g.Mod(ModCorruptedDungeon) && mg.theme == ThemeNone && g.IntN(3*MapLevels) == 0 {
 		if g.IntN(2) == 0 {
 			// Field of comestibles of same kind.
-			cod := ComestibleData[g.NextComestibleIdx()]
+			cod := ComestibleData[comestibleIdx()]
 			for i := range nitems + 7 {
 				addComestible(i, cod)
 			}
@@ -425,8 +459,15 @@ func (g *Game) genItems(mg *MapGen) {
 		}
 		nitems = 0
 	}
+	switch mg.theme {
+	case ThemeNone:
+	case ThemeWarp:
+		nitems += 6
+	default:
+		nitems += 4
+	}
 	for i := range nitems {
-		addComestible(i, ComestibleData[g.NextComestibleIdx()])
+		addComestible(i, ComestibleData[comestibleIdx()])
 	}
 	// Runic traps.
 	rto, rtt := 1, 1 // runes in open areas and in tunnels
@@ -444,7 +485,7 @@ func (g *Game) genItems(mg *MapGen) {
 			rtt++
 		}
 	}
-	if g.Map.Level == g.ProcInfo.TrapLevel {
+	if g.Map.Level == g.ProcInfo.TrapLevel || mg.theme != ThemeNone {
 		rto += 4
 		rtt++
 		if g.Mod(ModCorruptedDungeon) {
@@ -452,11 +493,22 @@ func (g *Game) genItems(mg *MapGen) {
 			rtt += g.IntN(2)
 		}
 	}
+	trapRune := g.NextRune
+	switch mg.theme {
+	case ThemeBerserk:
+		trapRune = func() MagicRune { return RuneBerserk }
+	case ThemeFire:
+		trapRune = func() MagicRune { return RuneFire }
+	case ThemeLignification:
+		trapRune = func() MagicRune { return RuneLignification }
+	case ThemeWarp:
+		trapRune = func() MagicRune { return RuneWarp }
+	}
 	for range rto {
-		g.genRunicTrap(mg, g.NextRune())
+		g.genRunicTrap(mg, trapRune())
 	}
 	for range rtt {
-		g.genRunicTrapInTunnel(mg, g.NextRune())
+		g.genRunicTrapInTunnel(mg, trapRune())
 	}
 }
 
@@ -762,6 +814,11 @@ func (g *Game) genMonsters(mg *MapGen) {
 		nE, nM, nL = g.genGuardians(nE, nM, nL)
 	}
 	// Special levels.
+	if mg.theme != ThemeNone {
+		// Rare themed level: special treatment.
+		g.genThemedMonsters(mg, nE, nM, nL)
+		return
+	}
 	switch g.Map.Level {
 	case g.ProcInfo.MonsEarly:
 		// Special level with many early monsters of same kind.
@@ -880,6 +937,86 @@ func (g *Game) genMonsters(mg *MapGen) {
 	}
 	for range nL {
 		g.genMonster(g.randMonsKind(monsLate))
+	}
+}
+
+func (g *Game) genThemedMonsters(mg *MapGen, nE, nM, nL int) {
+	// The idea behind each theme is that the generated monsters should
+	// have some relation to it and, generally, immune monsters should be
+	// rare, because it's not fun if the related consumables and runes
+	// aren't useful. Some rare annoying monsters are fine.
+	switch mg.theme {
+	case ThemeBerserk:
+		mks := []monsterKind{BerserkingSpider, HungryRat}
+		for range 1 + nE {
+			g.genMonster(g.randMonsKind(mks))
+		}
+		n := g.IntN(2)
+		mksAnnoying := []monsterKind{CrazyDruid, ExplodingNadre}
+		for range 1 + n {
+			// Annoying monsters leading to poison+fire risk.
+			g.genMonster(g.randMonsKind(mksAnnoying))
+		}
+		for range 1 + nM - n {
+			g.genMonster(BarkingHound)
+		}
+		mksLate := []monsterKind{UndeadKnight, FearsomeLich}
+		for range nL {
+			g.genMonster(g.randMonsKind(mksLate))
+		}
+	case ThemeFire:
+		for range 2 + nE {
+			g.genMonster(ExplodingNadre)
+		}
+		mksAnnoying := []monsterKind{BerserkingSpider, VenomousViper}
+		g.genMonster(g.randMonsKind(mksAnnoying)) // Annoying poison monster.
+		for range 2 + nM {
+			g.genMonster(FireLlama)
+		}
+		switch g.IntN(4) {
+		case 0:
+			// Rare annoying fire/berserk monster (risk of poison+fire).
+			g.genMonster(CrazyDruid)
+		case 1:
+			// Rare annoying poison monster (risk of poison+fire).
+			g.genMonster(MadOctopode)
+		default:
+			// Rare annoying fire immune monster.
+			g.genMonster(BurningPhoenix)
+		}
+		for range nL + 2 {
+			g.genMonster(WalkingTree)
+		}
+	case ThemeLignification:
+		mks := []monsterKind{RampagingBoar, BlinkButterfly, TemporalCat, LashingFrog, AcidMound}
+		for range nM + nE {
+			g.genMonster(g.randMonsKind(mks))
+		}
+		switch g.IntN(4) {
+		case 0:
+			g.genMonster(BurningPhoenix)
+		case 1:
+			g.genMonster(FireLlama)
+		default:
+			g.genMonster(ExplodingNadre)
+		}
+		for range 2 {
+			g.genMonster(WalkingTree)
+		}
+		mksLate := []monsterKind{FourHeadedHydra, EarthDragon}
+		for range nL {
+			g.genMonster(g.randMonsKind(mksLate))
+		}
+	case ThemeWarp:
+		for range nE {
+			g.genMonster(TemporalCat)
+		}
+		for range 2 + nM {
+			g.genMonster(BlinkButterfly)
+		}
+		for range 1 + nL {
+			g.genMonster(WarpingWraith)
+		}
 	}
 }
 

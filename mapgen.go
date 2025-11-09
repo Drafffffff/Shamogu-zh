@@ -30,6 +30,7 @@ const NLayouts = 3
 // MapGen gathers all terrain and vault information for generating a new map.
 type MapGen struct {
 	terrain rl.Grid         // map terrain
+	theme   mapTheme        // particular theme for the level
 	vaults  []*vault        // list of special vaults
 	tunnel  CacheGrid[bool] // in tunnel
 	xtunnel []gruid.Point   // points belonging to extra tunnels
@@ -37,6 +38,18 @@ type MapGen struct {
 	PR      *paths.PathRange
 	rand    *rand.Rand
 }
+
+// mapTheme represents the various kinds of special rare themed levels. They
+// affect item and monster generation.
+type mapTheme int
+
+const (
+	ThemeNone mapTheme = iota
+	ThemeBerserk
+	ThemeFire
+	ThemeLignification
+	ThemeWarp
+)
 
 // GenerateMap produces a new map level using the given map layout as base
 // generation algorithm. It generates map entities too.
@@ -60,6 +73,7 @@ func (g *Game) generateMap(ml MapLayout) (*MapGen, bool) {
 		tunnel: make(CacheGrid[bool], MapWidth*MapHeight),
 		vault:  make(CacheGrid[bool], MapWidth*MapHeight),
 	}
+	g.choseTheme(mg)
 	halves := func() (rl.Grid, rl.Grid) {
 		left := mg.terrain.Slice(mg.terrain.Range().Columns(0, 3+MapWidth/2))
 		right := mg.terrain.Slice(mg.terrain.Range().Columns(-3+MapWidth/2, MapWidth))
@@ -126,6 +140,23 @@ func (g *Game) generateMap(ml MapLayout) (*MapGen, bool) {
 	// Report whether the generated map has enough passable terrain.
 	const minCaveSize = 1000
 	return mg, ntiles > minCaveSize
+}
+
+// choseTheme choses the theme for thematic levels.
+func (g *Game) choseTheme(mg *MapGen) {
+	if g.ProcInfo.ThemedLevel == g.Map.Level {
+		switch g.IntN(5) {
+		case 0:
+			mg.theme = ThemeBerserk
+		case 1:
+			mg.theme = ThemeFire
+		case 2:
+			mg.theme = ThemeLignification
+		default:
+			// Double chance for the warp theme.
+			mg.theme = ThemeWarp
+		}
+	}
 }
 
 // genCellularAutomataCaveMap generates a floor/wall map with a cellular automata.
@@ -641,7 +672,7 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 		}
 	}
 
-	if g.IntN(sometimes) == 0 {
+	if g.IntN(sometimes) == 0 || mg.theme == ThemeFire && g.IntN(2) == 0 {
 		// Flip foliage in vaults or outside of vaults.
 		flipFoliage := func(t rl.Cell) rl.Cell {
 			switch t {
@@ -766,7 +797,7 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 		})
 	}
 
-	if g.IntN(often) == 0 {
+	if g.IntN(often) == 0 || mg.theme != ThemeNone && g.IntN(2) == 0 {
 		// Corrupt terrain around some random point biased toward
 		// center.
 		center := gruid.Point{MapWidth / 2, MapHeight / 2}
@@ -793,6 +824,12 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 			// Uniform corruption (with some occasional secondary terrain).
 			ts := [3]rl.Cell{Foliage, Rubble, Floor}
 			nt := ts[g.IntN(3)]
+			switch mg.theme {
+			case ThemeFire:
+				nt = Foliage
+			case ThemeWarp:
+				nt = Floor
+			}
 			st := ts[g.IntN(3)]
 			switch {
 			case nt == Rubble || g.IntN(4) == 0:
@@ -856,11 +893,15 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 		}
 	}
 
-	if g.IntN(occasionally) == 0 {
+	if g.IntN(occasionally) == 0 || mg.theme == ThemeWarp && g.IntN(2) == 0 {
 		terrain := getTerrain()
 		// Put many translucent walls.
+		n := 5
+		if mg.theme == ThemeWarp {
+			n = 1 + g.IntN(2)
+		}
 		terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
-			if t == Wall && g.IntN(5) == 0 {
+			if t == Wall && g.IntN(n) == 0 {
 				return TranslucentWall
 			}
 			return t

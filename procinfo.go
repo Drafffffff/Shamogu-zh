@@ -21,6 +21,7 @@ type ProcInfo struct {
 	MonsMidLate      int              // special mid-late level (6-9)
 	MonsLate         int              // special late level (7-9)
 	MonsLateSwarm    int              // special “swarm” late level (8-9)
+	ThemedLevel      int              // special theme for rare late corrupted level (4-8)
 	TrapLevel        int              // special level with lots of traps (5-9)
 	Spirits          []spiritProcInfo // spirit index for each dungeon level (-1 if no spirit)
 	Menhirs          []int            // menhir-generation data
@@ -156,6 +157,10 @@ func (g *Game) flavoursProcGen() {
 	if gpi.MonsMidLate == gpi.MonsLateSwarm {
 		gpi.MonsMidLate-- // still > MonsMid
 	}
+	if g.Mod(ModCorruptedDungeon) && g.IntN(4) == 0 {
+		// Rare thematic level.
+		gpi.ThemedLevel = 4 + g.IntN(6)
+	}
 	gpi.TrapLevel = 5 + g.IntN(5)
 	// Disable very occasionally some events/flavours, for some
 	// extra unpredictability.
@@ -255,9 +260,9 @@ func (g *Game) genRandomIndices(l int) []int {
 	return indices
 }
 
-// NextMenhirIdx returns the next menhir kind (index of menhirData) to be
+// NextMenhirKind returns the next menhir kind (index of menhirData) to be
 // generated.
-func (g *Game) NextMenhirIdx() int {
+func (g *Game) NextMenhirKind() menhirKind {
 	gpi := g.ProcInfo
 	if gpi.MenhirIdx >= len(gpi.Menhirs) {
 		gpi.MenhirIdx = 0
@@ -265,7 +270,7 @@ func (g *Game) NextMenhirIdx() int {
 	}
 	i := gpi.Menhirs[gpi.MenhirIdx]
 	gpi.MenhirIdx++
-	return i
+	return menhirKind(i)
 }
 
 // comestibleProcGen creates a random sequence of comestibles kinds that still
@@ -274,9 +279,9 @@ func (g *Game) comestibleProcGen() {
 	g.ProcInfo.Comestibles = g.genRandomIndices(len(ComestibleData))
 }
 
-// NextComestibleIdx returns the next comestible kind (index of
+// NextComestibleKind returns the next comestible kind (index of
 // comestibleData) to be generated.
-func (g *Game) NextComestibleIdx() int {
+func (g *Game) NextComestibleKind() comestibleKind {
 	gpi := g.ProcInfo
 	if gpi.ComestibleIdx >= len(gpi.Comestibles) {
 		gpi.ComestibleIdx = 0
@@ -284,7 +289,7 @@ func (g *Game) NextComestibleIdx() int {
 	}
 	i := gpi.Comestibles[gpi.ComestibleIdx]
 	gpi.ComestibleIdx++
-	return i
+	return comestibleKind(i)
 }
 
 func (g *Game) comestiblesProcGen() {
