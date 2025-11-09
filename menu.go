@@ -206,7 +206,7 @@ func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
 		g := md.g
 		if idx == len(g.Mods) {
 			l := md.desc
-			l.Box = &ui.Box{Title: ui.Text("Save and return")}
+			l.Box = &ui.Box{Title: ui.Text("Save and continue")}
 			l.Content = ui.Text("Save mod selection and continue to advanced primary spirit selection screen").
 				Format(UIWidth/2 - 1 - 2)
 			if act == ui.MenuInvoke {
@@ -286,7 +286,7 @@ func (md *model) modSelectionMenu() {
 		Disabled: true,
 	})
 	entries = append(entries, ui.MenuEntry{
-		Text: ui.Text("s - Save and return"),
+		Text: ui.Text("s - Save and continue"),
 		Keys: []gruid.Key{gruid.Key('s'), gruid.Key('S')},
 	})
 	entries = append(entries, ui.MenuEntry{
