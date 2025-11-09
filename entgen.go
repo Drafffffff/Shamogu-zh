@@ -202,8 +202,9 @@ var challengeSpirits = []spiritInfo{
 		Challenge:   true},
 	{
 		Name:        "Gardening Lion",
-		MaxCharges:  [2]int{2, 4},
+		MaxCharges:  [2]int{1, 3},
 		Ability:     [2]Ability{EffectGarden{}, EffectGarden{}},
+		BonusAttack: [2]int{1, 1},
 		BonusTraits: [2]Traits{ScaryRoar, ScaryRoar},
 		Challenge:   true},
 }
