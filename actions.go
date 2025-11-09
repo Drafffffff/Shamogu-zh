@@ -143,12 +143,15 @@ func (a ActionTravel) Handle(md *model) (gruid.Effect, bool) {
 		return nil, false
 	}
 	fif := g.DangerInFOV() || g.PlayerActor().Has(StatusPoison)
-	bump := ActionBump{Delta: path[1].Sub(pp)}
+	next := path[1]
+	bump := ActionBump{Delta: next.Sub(pp)}
 	eff, done := bump.Handle(md)
 	if !done {
 		return eff, false
 	}
-	md.auto.path = path[1:]
+	if g.PP() == next {
+		md.auto.path = path[1:]
+	}
 	if fif {
 		// do not start auto-travel if there was a foe in view.
 		return eff, true
@@ -1396,16 +1399,13 @@ func (a actionAuto) Handle(md *model) (gruid.Effect, bool) {
 			md.auto.mode = noAuto
 			return nil, false
 		}
-		pp := g.PP()
 		bump := ActionBump{Delta: md.auto.delta}
 		eff, done := bump.Handle(md)
 		if !done {
 			md.auto.mode = noAuto
 			return eff, false
 		}
-		if g.PP() != pp {
-			md.UpdateRun(md.auto.delta)
-		}
+		md.UpdateRun(md.auto.delta)
 		return md.UpdateAutoMode(eff, autoRun), true
 	case autoTravel:
 		if !md.KeepTraveling() {
