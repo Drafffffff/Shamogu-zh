@@ -149,6 +149,7 @@ const (
 	BurningHits   // hits may burn
 	DazingSpines  // body covered in dazing spines (porcupine)
 	Gawalt        // wall-jumping
+	Gluttony      // gluttony status after eating
 	GoodHearing   // better hearing of noise (footsteps)
 	GoodSmell     // smell food from a distance
 	Pushing       // unbalancing pushing (earth-dragon)
@@ -225,6 +226,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, BurningHits, "hits may @Oburn@N foes")
 	desc = traitDesc(desc, t, VenomousMelee, "@Ovenomous@N melee attack")
 	desc = traitDesc(desc, t, Gawalt, "wall-jumping movement and attack, weakened attacks")
+	desc = traitDesc(desc, t, Gluttony, "gluttony (needs to eat in pairs)")
 	desc = traitDesc(desc, t, ScaryRoar, "scary roar on first sight")
 	desc = traitDesc(desc, t, SpiderPhobia, "spider phobia")
 	desc = traitDesc(desc, t, DazingSpines, "spines may @Odaze@N foes in melee")
@@ -295,6 +297,7 @@ const (
 	StatusFocus
 	StatusFoggySkin
 	StatusGardener
+	StatusGluttony
 	StatusImbalance
 	StatusLignification
 	StatusPoison
@@ -327,6 +330,7 @@ var statusAbbrevation = []string{
 	StatusFire:          "Fir",
 	StatusFocus:         "Foc",
 	StatusGardener:      "Gar",
+	StatusGluttony:      "Glu",
 	StatusImbalance:     "Imb",
 	StatusFoggySkin:     "Fog",
 	StatusLignification: "Lig",
@@ -351,6 +355,7 @@ var statusName = []string{
 	StatusFocus:         "Focus",
 	StatusFoggySkin:     "Foggy Skin",
 	StatusGardener:      "Gardener",
+	StatusGluttony:      "Gluttony",
 	StatusImbalance:     "Imbalance",
 	StatusLignification: "Lignification",
 	StatusPoison:        "Poison",
@@ -374,6 +379,7 @@ var statusAdjective = []string{
 	StatusFocus:         "focusing",
 	StatusFoggySkin:     "foggy",
 	StatusGardener:      "gardening",
+	StatusGluttony:      "gluttonous",
 	StatusImbalance:     "imbalanced",
 	StatusLignification: "lignified",
 	StatusPoison:        "poisoned",
@@ -399,6 +405,7 @@ var statusDesc = []string{
 	StatusFocus:     "Attack frontally with all four heads.",
 	StatusFoggySkin: "Exudes fog on the sides and behind. Protects from @OFire@N and @BLignification@N.",
 	StatusGardener:  "Grows foliage in a 2-tile radius each turn.",
+	StatusGluttony:  "Eating anything while gluttonous heals for 1 extra HP, but if you don’t eat anything before expiration, you’ll lose 1 maximum HP.",
 	StatusImbalance: fmt.Sprintf("Halves attack. When also confused, gives %+d Defense.", ConfusedImbalanceDefenseBonus),
 	StatusLignification: fmt.Sprintf(
 		"Gives %+d Defense with an extra +1 against ranged attacks. Caps incoming attack damage at 1. Provides temporary HP bonus. Protects from @OPoison@N and @OImbalance@N. Prevents movement. Increases @OFire@N duration by 2. Followed by @OImbalance@N for you and any adjacent actors on expiration for %d turns.",
@@ -626,6 +633,25 @@ func (g *Game) RemoveStatus(i ID, ai *Actor, st Status) {
 				g.PutStatus(j, aj, StatusImbalance, DurationImbalanceLignification)
 			}
 		}
+	case StatusGluttony:
+		for _, sp := range g.PlayerSpirits() {
+			if !sp.BonusTraits[sp.Level].Any(Gluttony) {
+				continue
+			}
+			n := sp.BonusHP[sp.Level] - 1
+			if n < -3 {
+				// Fasted many times: lose the gluttony trait.
+				sp.BonusTraits[0] ^= Gluttony
+				sp.BonusTraits[1] ^= Gluttony
+				g.Log("You overcame gluttony after fasting many times.")
+			} else {
+				// Reduce HP bonus by 1.
+				sp.BonusHP[0], sp.BonusHP[1] = n, n
+				g.Log("Fasting makes you lose 1 maximum HP.")
+			}
+			g.ComputePlayerStats()
+			break
+		}
 	}
 }
 
@@ -731,6 +757,7 @@ var sortedStatuses = []Status{
 	StatusFocus,
 	StatusFoggySkin,
 	StatusGardener,
+	StatusGluttony,
 	StatusImbalance,
 	StatusPoison,
 	StatusShadow,

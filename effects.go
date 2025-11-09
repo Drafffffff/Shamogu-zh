@@ -53,12 +53,14 @@ const (
 	HealClarityLeaves     = 4
 	HealFirebreathPepper  = 2
 	HealFoggySkinOnion    = 3
+	HealGluttony          = 1
 	HealTeleportLignified = 2
 
 	DurationDig      = 5
 	DurationFocus    = 3
 	DurationShadow   = 8
 	DurationGarden   = 7
+	DurationGluttony = 5
 	DurationSprint   = 6
 	DurationTimeStop = 5
 )

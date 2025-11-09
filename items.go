@@ -192,6 +192,18 @@ func (c *Comestible) Use(g *Game, i ID) bool {
 	g.Entities[i] = emptySlot()
 	g.Stats.EatenComestibles++
 	g.Stats.MapEatenComestibles[g.Map.Level-1]++
+	switch pa := g.PlayerActor(); {
+	case pa.Has(StatusGluttony):
+		pa.Statuses[StatusGluttony] = 0
+		if maxHP := pa.GetMaxHP(); pa.HP < maxHP {
+			pa.HP += HealGluttony
+			g.Logf("You feel full (+%d HP).", HealGluttony)
+		} else {
+			g.Log("You feel full.")
+		}
+	case pa.DoesAny(Gluttony):
+		g.PutStatus1(PlayerID, pa, StatusGluttony, DurationGluttony)
+	}
 	for i, ai := range g.Monsters() {
 		if ai.DoesAny(MonsHungry) && g.InFOV(g.Entity(i).P) {
 			g.PutStatus(i, ai, StatusBerserk, DurationBerserk)

@@ -275,4 +275,5 @@ func (g *Game) ComputePlayerStats() {
 		p.MaxHP += sp.BonusHP[sp.Level]
 		p.Traits |= sp.BonusTraits[sp.Level]
 	}
+	p.HP = min(p.HP, p.GetMaxHP())
 }

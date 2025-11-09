@@ -24,9 +24,9 @@ func (g *Game) InitPlayer(spe *Entity) {
 }
 
 func (g *Game) debugBuild() {
-	// g.Entities[PrimarySpiritID+1] = g.spiritEntity(challengeSpirits[0])
-	// g.Entities[PrimarySpiritID+2] = g.spiritEntity(challengeSpirits[1])
-	// g.Entities[PrimarySpiritID+1] = g.spiritEntity(secondarySpirits[0])
+	// g.Entities[PrimarySpiritID+1] = spiritEntity(g.Mods, challengeSpirits[0])
+	// g.Entities[PrimarySpiritID+2] = spiritEntity(g.Mods, challengeSpirits[1])
+	// g.Entities[PrimarySpiritID+1] = spiritEntity(g.Mods, secondarySpirits[0])
 	// g.Entities[PrimarySpiritID+3] = comestibleEntity(ComestibleData[4])
 }
 
@@ -198,7 +198,7 @@ var challengeSpirits = []spiritInfo{
 		MaxCharges:  [2]int{1, 3},
 		Ability:     [2]Ability{EffectSnack{}, EffectSnack{}},
 		BonusHP:     [2]int{3, 3},
-		BonusTraits: [2]Traits{SpiderPhobia, SpiderPhobia},
+		BonusTraits: [2]Traits{Gluttony, Gluttony},
 		Challenge:   true},
 	{
 		Name:        "Gardening Lion",
