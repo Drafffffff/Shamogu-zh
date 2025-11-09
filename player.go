@@ -14,9 +14,6 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 		g.logDaze()
 		return false
 	}
-	if pa.Has(StatusSprint) && !pa.Has(StatusLignification) {
-		return g.Sprint(dir)
-	}
 	dirChange := dir != g.Dir
 	to := pl.P.Add(dir)
 	passto := g.Map.Passable(to)
@@ -27,6 +24,9 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 		if pa.DoesAny(Gawalt) && !pa.Has(StatusDig) && g.WallJump(dir) {
 			return true
 		}
+	}
+	if pa.Has(StatusSprint) && !pa.Has(StatusLignification) {
+		return g.Sprint(dir)
 	}
 	if pa.DoesAny(PatternCrocodile) && dir == g.Dir.Mul(-1) && passto {
 		// Crocodile needs to spend a turn turning before moving
@@ -250,9 +250,11 @@ func (g *Game) WallJump(dir gruid.Point) bool {
 	g.BumpMoveActor(PlayerID, pa, to)
 	g.md.MoveAnimation(from, to)
 	if i, ai := g.ActorAt(over); i >= 0 {
-		// if !pa.Has(StatusFear) {
-		g.BumpAttackActor(PlayerID, i, pa, ai, AttackPlain, 1, 0)
-		// }
+		if pa.Has(StatusSprint) {
+			g.PutStatus(i, ai, StatusImbalance, DurationImbalanceSprint)
+		} else {
+			g.BumpAttackActor(PlayerID, i, pa, ai, AttackPlain, 1, 0)
+		}
 	}
 	if pa.Has(StatusImbalance) && g.IntN(10) == 0 {
 		g.Log("You fall due to imbalance.")
