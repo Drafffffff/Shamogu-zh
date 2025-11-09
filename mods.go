@@ -40,11 +40,11 @@ func (m Mod) String() string {
 func (m Mod) Desc() string {
 	switch m {
 	case ModCorruptedDungeon:
-		return "The orb's influence has scattered twisted surprises through the dungeon. Some might even be good! Recommended for players that want more unpredictability and variability between playthroughs."
+		return "The orb’s influence has scattered twisted surprises through the dungeon. Some might even be good! Recommended for players that want more unpredictability and variability between playthroughs."
 	case ModChallengeSpirits:
 		return "Enable extra challenge secondary spirits: Gawalt Monkey, Gardening Lion, Gluttonous Bear. You cannot chose more than one regular secondary spirit, and the first totem is always a challenge one!"
 	case ModNoRecharges:
-		return "Spirit ability charges are doubled but don't recharge when going to next floor. Use them wisely!"
+		return "Spirit ability charges are doubled but don’t recharge when going to next floor. Use them wisely!"
 	case ModCombatGrowl:
 		return "You sometimes growl during combat, briefly scaring foes."
 	case ModHeavySteps:
