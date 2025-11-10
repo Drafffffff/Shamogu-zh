@@ -56,6 +56,7 @@ type Game struct {
 	Wizard   Wizard    // wizard mode (default: no)
 
 	instant bool       // whether the last action was instant-effect
+	snack   bool       // whether you're eating a snack
 	win     bool       // whether we just won the game
 	rand    *rand.Rand // random number generator
 	md      *model     // reference to the UI model

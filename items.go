@@ -186,6 +186,8 @@ func (c *Comestible) Use(g *Game, i ID) bool {
 	pp := g.PP()
 	done := c.Effect.Apply(g)
 	if !done {
+		// Should never happen with comestibles.
+		log.Printf("BUG: did not eat the %s.", g.Entity(i).Name)
 		return false
 	}
 	g.Stats.Comestibles[g.Entity(i).Name]++
@@ -201,7 +203,7 @@ func (c *Comestible) Use(g *Game, i ID) bool {
 		} else {
 			g.Log("You feel full.")
 		}
-	case pa.DoesAny(Gluttony):
+	case pa.DoesAny(Gluttony) && !g.snack:
 		g.PutStatus1(PlayerID, pa, StatusGluttony, DurationGluttony)
 	}
 	for i, ai := range g.Monsters() {

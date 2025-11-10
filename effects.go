@@ -832,8 +832,10 @@ func (eff EffectSnack) Apply(g *Game) bool {
 	g.md.TeleportAnimation(pp, to, true)
 	g.UpdateFOV()
 	g.UpdateKnowledge()
-	ci.Use(g, i)
-	return true
+	// Eating a snack doesn't trigger gluttony.
+	g.snack = true
+	defer func() { g.snack = false }()
+	return ci.Use(g, i)
 }
 
 func (eff EffectSnack) Name() string {
@@ -841,7 +843,7 @@ func (eff EffectSnack) Name() string {
 }
 
 func (eff EffectSnack) Desc() string {
-	return "You teleport to nearest comestible, if any, and eat it."
+	return "You teleport to nearest comestible, if any, and eat it. It doesn’t trigger @BGluttony@N."
 }
 
 func (g *Game) menhirMsg(name string) {
