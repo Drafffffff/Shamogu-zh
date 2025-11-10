@@ -925,7 +925,7 @@ func (m *Map) revelableWallAt(p gruid.Point) bool {
 }
 
 // interiorWallAt reports whether there's an interior wall at the given
-// position (wall not connected to any non-wall tile).
+// position (plain wall not connected to any non-wall tile).
 func (m *Map) interiorWallAt(p gruid.Point) bool {
 	if m.Terrain.At(p) != Wall {
 		return false

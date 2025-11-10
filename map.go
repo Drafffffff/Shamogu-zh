@@ -114,6 +114,17 @@ func (m *Map) PassableWithoutTraps(p gruid.Point) bool {
 	return Passable(m.Terrain.At(p)) && m.RuneCache.At(p) <= 0
 }
 
+// Connected reports whether the given position is connected to an adjacent
+// passable tile.
+func (m *Map) Connected(p gruid.Point) bool {
+	for q := range Neighbors(p) {
+		if m.Passable(q) {
+			return true
+		}
+	}
+	return false
+}
+
 // NoWallAt reports whether the given position is not a (regular) wall.
 func (m *Map) NoWallAt(p gruid.Point) bool {
 	// Cells outside the map are considered as walls, so not walkable.

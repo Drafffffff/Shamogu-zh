@@ -195,7 +195,7 @@ func (g *Game) handleCorruptionEvent() {
 			case Rubble:
 				return Foliage
 			case Wall:
-				if g.IntN(50) == 0 {
+				if g.IntN(50) == 0 && g.Map.Connected(p) {
 					return TranslucentWall
 				}
 			case Floor:
@@ -215,7 +215,7 @@ func (g *Game) handleCorruptionEvent() {
 			case Rubble:
 				return Floor
 			case Wall:
-				if g.IntN(2) == 0 {
+				if g.IntN(2) == 0 && g.Map.Connected(p) {
 					return TranslucentWall
 				}
 			case TranslucentWall:
