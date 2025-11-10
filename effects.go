@@ -60,7 +60,7 @@ const (
 	DurationFocus    = 3
 	DurationShadow   = 8
 	DurationGarden   = 7
-	DurationGluttony = 5
+	DurationGluttony = 7
 	DurationSprint   = 6
 	DurationTimeStop = 5
 )
