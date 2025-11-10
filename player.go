@@ -16,23 +16,23 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 	}
 	dirChange := dir != g.Dir
 	to := pl.P.Add(dir)
-	passto := g.Map.Passable(to)
-	if !passto && pa.CanMove() {
-		if pa.Has(StatusShadow) && g.WallThrough(dir, to) {
-			return true
-		}
-		if pa.DoesAny(Gawalt) && !pa.Has(StatusDig) && g.WallJump(dir) {
-			return true
-		}
-	}
-	if pa.Has(StatusSprint) && !pa.Has(StatusLignification) {
-		return g.Sprint(dir)
-	}
-	if pa.DoesAny(PatternCrocodile) && dir == g.Dir.Mul(-1) && passto {
+	tto := g.Map.Terrain.At(to)
+	passto := Passable(tto)
+	if pa.DoesAny(PatternCrocodile) && passto && dir == g.Dir.Mul(-1) {
 		// Crocodile needs to spend a turn turning before moving
 		// backwards.
 		g.Dir = dir
 		return true
+	}
+	if pa.CanMove() {
+		switch {
+		case pa.Has(StatusShadow) && tto == TranslucentWall:
+			return g.WallThrough(dir, to)
+		case pa.DoesAny(Gawalt) && !passto && !pa.Has(StatusDig):
+			return g.WallJump(dir)
+		case pa.Has(StatusSprint):
+			return g.Sprint(dir)
+		}
 	}
 	j, aj := g.RangedTargetInDir(pl.P, dir)
 	if j >= 0 {
@@ -107,7 +107,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 		case pa.Has(StatusDig):
 			g.digAt(to)
 		default:
-			g.Logf("You cannot walk into the %s.", TerrainName(g.Map.Terrain.At(to)))
+			g.Logf("You cannot walk into the %s.", TerrainName(tto))
 			return false
 		}
 	}
@@ -206,11 +206,9 @@ func (g *Game) Sprint(dir gruid.Point) bool {
 
 // WallThrough performs a move through a translucent wall.
 func (g *Game) WallThrough(dir, at gruid.Point) bool {
-	if g.Map.Terrain.At(at) != TranslucentWall {
-		return false
-	}
 	to := at.Add(dir)
 	if !g.IsFree(to) {
+		g.Log("There is no room behind the translucent wall.")
 		return false
 	}
 	from := g.PP()
