@@ -1627,6 +1627,8 @@ On the map, monster color may change depending on active status effects.  By def
 			details = "Players with “fire resistance” from the upgraded Fire Salamander don’t take that extra immediate damage."
 		case StatusGardener:
 			details = "Player-only effect obtainable with the Gardening Lion spirit."
+		case StatusGluttony:
+			details = "Player-only effect obtainable with the Gluttonous Bear spirit."
 		case StatusImbalance:
 			details = "Sprinting or jumping while imbalanced may sometimes lead to a @Odazing@N fall."
 		case StatusPoison:
