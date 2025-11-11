@@ -57,10 +57,9 @@ func (gs *Stats) Death(name string) {
 func (g *Game) LevelStats() {
 	gs := g.Stats
 	// Explored percentage.
-	mp := &MapPath{passable: g.Map.Passable}
 	n, total := 0, 0
-	for p, t := range g.Map.KnownTerrain.All() {
-		if !g.Map.Passable(p) && len(mp.Neighbors(p)) == 0 {
+	for p, t := range g.Map.Terrain.All() {
+		if !Passable(t) && !g.Map.Connected(p) {
 			continue
 		}
 		total++

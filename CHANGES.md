@@ -59,6 +59,9 @@ Fixes:
   position of a monster would be briefly shown with the wrong color (see #6).
 * Minor update in frog's catching description: it always unbalances when
   ranged, but description said "may".
+* Fix translucent-wall related cases of auto-explore saying you couldn't
+  explore the whole map, when you actually had explored all the terrain
+  connected to passable tiles.
 
 # v1.1.0 2025-10-27
 

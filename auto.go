@@ -3,6 +3,7 @@ package main
 import (
 	"codeberg.org/anaseto/gruid"
 	"codeberg.org/anaseto/gruid/paths"
+	"codeberg.org/anaseto/gruid/rl"
 )
 
 // auto represents information related to all kinds of auto-travel.
@@ -133,13 +134,9 @@ func (md *model) KeepTraveling() bool {
 func (md *model) UpdateAutoExplore() (next gruid.Point, ok bool) {
 	g := md.g
 	if md.auto.aemRebuild {
-		if g.allExplored() {
-			g.Log("You finished exploring.")
-			return next, false
-		}
 		sources := md.autoExploreSources()
 		if len(sources) == 0 {
-			g.Log("You cannot reach some places.")
+			g.Log("You finished exploring.")
 			return next, false
 		}
 		md.buildAutoExploreMap(sources)
@@ -177,37 +174,33 @@ func (md *model) UpdateAutoExplore() (next gruid.Point, ok bool) {
 	return next, true
 }
 
-func (g *Game) allExplored() bool {
-	mp := &MapPath{passable: g.Map.Passable}
-	for p, t := range g.Map.KnownTerrain.All() {
-		if !Passable(t) {
-			if len(mp.Neighbors(p)) == 0 {
-				continue
-			}
-		}
-		if !IsKnown(t) {
-			return false
-		}
-	}
-	return true
-}
-
+// autoExploreSources gathers all the unknown tiles at the frontier of
+// exploration.
 func (md *model) autoExploreSources() []gruid.Point {
 	g := md.g
 	md.auto.sources = md.auto.sources[:0]
-	mp := &MapPath{passable: g.Map.Passable}
 	for p, t := range g.Map.KnownTerrain.All() {
-		if !Passable(t) {
-			if len(mp.Neighbors(p)) == 0 {
-				continue
-			}
-		}
-		if !IsKnown(t) {
+		if g.Map.inExploreFrontier(p, t) {
 			md.auto.sources = append(md.auto.sources, p)
 		}
 
 	}
 	return md.auto.sources
+}
+
+// inExploreFrontier reports whether the given tile is unknown and belongs to
+// the exploration frontier.
+func (m *Map) inExploreFrontier(p gruid.Point, t rl.Cell) bool {
+	if IsKnown(t) {
+		return false
+	}
+	for q := range Neighbors(p) {
+		t := m.KnownTerrain.At(q)
+		if IsKnown(t) && Passable(t) {
+			return true
+		}
+	}
+	return false
 }
 
 const unreachable = 9999
