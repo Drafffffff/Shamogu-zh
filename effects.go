@@ -788,11 +788,7 @@ type EffectShadows struct{}
 
 func (eff EffectShadows) Apply(g *Game) bool {
 	pa := g.PlayerActor()
-	if pa.Has(StatusShadow) {
-		g.Log("You cannot invoke “shadows” while you’re already shadowy.")
-		return false
-	}
-	g.PutStatus(PlayerID, pa, StatusShadow, DurationShadow)
+	g.PutStatus(PlayerID, pa, StatusShadow, DurationShadow+pa.Statuses[StatusShadow])
 	g.instant = true
 	return true
 }
@@ -802,7 +798,7 @@ func (eff EffectShadows) Name() string {
 }
 
 func (eff EffectShadows) Desc() string {
-	return fmt.Sprintf("@BShadow@N for %d turns. %s @GInstant@N.",
+	return fmt.Sprintf("@BShadow@N for %d more turns. %s @GInstant@N.",
 		DurationShadow, statusDesc[StatusShadow])
 }
 
