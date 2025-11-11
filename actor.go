@@ -605,20 +605,6 @@ func (g *Game) RemoveStatus(i ID, ai *Actor, st Status) {
 	if ai.Statuses[st] <= 0 {
 		return
 	}
-	if st == StatusGluttony {
-		// On Gluttony expiration, the Gluttonous Bear cannot control
-		// itself anymore and eats a random comestible, or becomes
-		// confused if it cannot find one.
-		if id, co := g.randomComestible(); id >= 0 {
-			g.LogStyled("You cannot hold your appetite any longer!", logStatusEnd)
-			co.Use(g, id)
-		} else {
-			ai.Statuses[st] = 0
-			g.LogStyled("You search but cannot find anything to eat!", logStatusEnd)
-			g.PutStatus1(i, ai, StatusConfusion, DurationConfusionGluttony)
-		}
-		return
-	}
 	ai.Statuses[st] = 0
 	if i == PlayerID {
 		g.LogfStyled("You’re no longer %s.", logStatusEnd, Status(st))
@@ -737,11 +723,22 @@ func (g *Game) HandleActorTurn(i ID, ai *Actor) {
 		return
 	}
 	g.handleCornered(i, ai)
-	if ai.Has(StatusFoggySkin) {
-		g.exudeFog()
-	}
-	if ai.Has(StatusGardener) {
-		g.garden()
+	if i == PlayerID {
+		// Gluttony is handled separately from other statuses, because
+		// it may lead to eating and may hence mess with other
+		// statuses, so it should happen before the progression of
+		// other statuses, as well as before some special effects like
+		// exuding fog.
+		g.handleGluttony()
+		if ai.IsDead() {
+			return
+		}
+		if ai.Has(StatusFoggySkin) {
+			g.exudeFog()
+		}
+		if ai.Has(StatusGardener) {
+			g.garden()
+		}
 	}
 	// NOTE: We make statuses progress at the end of the turn. That means
 	// bonus HP from expiring Berserk or Lignification stills protects
@@ -756,14 +753,34 @@ func (g *Game) HandleActorTurn(i ID, ai *Actor) {
 	}
 }
 
+// handleGluttony handles progression of the Gluttony status.
+func (g *Game) handleGluttony() {
+	pa := g.PlayerActor()
+	switch {
+	case pa.Statuses[StatusGluttony] <= 0:
+	case pa.Statuses[StatusGluttony] == 1:
+		// On Gluttony expiration, the Gluttonous Bear cannot control
+		// itself anymore and eats a random comestible, or becomes
+		// confused if it cannot find one.
+		if id, co := g.randomComestible(); id >= 0 {
+			g.LogStyled("You cannot hold your appetite any longer!", logStatusEnd)
+			co.Use(g, id)
+		} else {
+			pa.Statuses[StatusGluttony] = 0
+			g.LogStyled("You search but cannot find anything to eat!", logStatusEnd)
+			g.PutStatus1(PlayerID, pa, StatusConfusion, DurationConfusionGluttony)
+		}
+	default:
+		pa.Statuses[StatusGluttony]--
+	}
+}
+
 // sortedStatuses contains statuses sorted for progression dependencies,
 // so that it's easier to get durations right in a consistent way. NOTE: it
 // allows Poison to expire before being applied again too (which may or may not
 // make more sense than just prolonging it, though it's a quite rare
 // edge-case).
 var sortedStatuses = []Status{
-	StatusGluttony, // before all (random eating should happen early)
-
 	StatusClarity,
 	StatusConfusion,
 	StatusDaze,
