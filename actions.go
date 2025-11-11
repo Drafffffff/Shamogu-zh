@@ -789,19 +789,6 @@ func (a ActionUseItem) Handle(md *model) (gruid.Effect, bool) {
 	return nil, ok
 }
 
-// randomComestible returns a random comestible from the inventory.
-func (g *Game) randomComestible() (ID, *Comestible) {
-	var ids []ID
-	for id := range g.PlayerComestibles() {
-		ids = append(ids, id)
-	}
-	if len(ids) == 0 {
-		return -1, nil
-	}
-	id := ids[g.IntN(len(ids))]
-	return id, g.Entity(id).Role.(*Comestible)
-}
-
 func equipItem(md *model, i ID) bool {
 	g := md.g
 	ei := g.Entity(i)

@@ -405,7 +405,7 @@ var statusDesc = []string{
 	StatusFocus:     "Attack frontally with all four heads.",
 	StatusFoggySkin: "Exudes fog on the sides and behind. Protects from @OFire@N and @BLignification@N.",
 	StatusGardener:  "Grows foliage in a 2-tile radius each turn.",
-	StatusGluttony:  "Eating anything while gluttonous heals for 1 extra HP, but if you don’t eat anything before expiration, you’ll lose 1 maximum HP.",
+	StatusGluttony:  fmt.Sprintf("Unless you eat before expiration, you’ll eat a random comestible without taking a turn. If there is no food, you’ll become confused for %d turns.", DurationConfusionGluttony),
 	StatusImbalance: fmt.Sprintf("Halves attack. When also confused, gives %+d Defense.", ConfusedImbalanceDefenseBonus),
 	StatusLignification: fmt.Sprintf(
 		"Gives %+d Defense with an extra +1 against ranged attacks. Caps incoming attack damage at 1. Provides temporary HP bonus. Protects from @OPoison@N and @OImbalance@N. Prevents movement. Increases @OFire@N duration by 2. Followed by @OImbalance@N for you and any adjacent actors on expiration for %d turns.",
@@ -605,6 +605,20 @@ func (g *Game) RemoveStatus(i ID, ai *Actor, st Status) {
 	if ai.Statuses[st] <= 0 {
 		return
 	}
+	if st == StatusGluttony {
+		// On Gluttony expiration, the Gluttonous Bear cannot control
+		// itself anymore and eats a random comestible, or becomes
+		// confused if it cannot find one.
+		if id, co := g.randomComestible(); id >= 0 {
+			g.LogStyled("You cannot hold your appetite any longer!", logStatusEnd)
+			co.Use(g, id)
+		} else {
+			ai.Statuses[st] = 0
+			g.LogStyled("You search but cannot find anything to eat!", logStatusEnd)
+			g.PutStatus1(i, ai, StatusConfusion, DurationConfusionGluttony)
+		}
+		return
+	}
 	ai.Statuses[st] = 0
 	if i == PlayerID {
 		g.LogfStyled("You’re no longer %s.", logStatusEnd, Status(st))
@@ -633,26 +647,26 @@ func (g *Game) RemoveStatus(i ID, ai *Actor, st Status) {
 				g.PutStatus(j, aj, StatusImbalance, DurationImbalanceLignification)
 			}
 		}
-	case StatusGluttony:
-		for _, sp := range g.PlayerSpirits() {
-			if !sp.BonusTraits[sp.Level].Any(Gluttony) {
-				continue
-			}
-			n := sp.BonusHP[sp.Level] - 1
-			if n < -3 {
-				// Fasted many times: lose the gluttony trait.
-				sp.BonusTraits[0] ^= Gluttony
-				sp.BonusTraits[1] ^= Gluttony
-				g.Log("You overcame gluttony after fasting many times.")
-			} else {
-				// Reduce HP bonus by 1.
-				sp.BonusHP[0], sp.BonusHP[1] = n, n
-				g.Log("Fasting makes you lose 1 maximum HP.")
-			}
-			g.ComputePlayerStats()
-			break
+	}
+}
+
+// randomComestible returns a random comestible among inventory and ground
+// comestibles.
+func (g *Game) randomComestible() (ID, *Comestible) {
+	var ids []ID
+	for id := range g.PlayerComestibles() {
+		ids = append(ids, id)
+	}
+	if id, it := g.ItemAt(g.PP()); id >= 0 {
+		if IsComestible(it) {
+			ids = append(ids, id)
 		}
 	}
+	if len(ids) == 0 {
+		return -1, nil
+	}
+	id := ids[g.IntN(len(ids))]
+	return id, g.Entity(id).Role.(*Comestible)
 }
 
 // ProgressStatus reduces the number of remaining turns for a status by one.
@@ -748,6 +762,8 @@ func (g *Game) HandleActorTurn(i ID, ai *Actor) {
 // make more sense than just prolonging it, though it's a quite rare
 // edge-case).
 var sortedStatuses = []Status{
+	StatusGluttony, // before all (random eating should happen early)
+
 	StatusClarity,
 	StatusConfusion,
 	StatusDaze,
@@ -757,7 +773,6 @@ var sortedStatuses = []Status{
 	StatusFocus,
 	StatusFoggySkin,
 	StatusGardener,
-	StatusGluttony,
 	StatusImbalance,
 	StatusPoison,
 	StatusShadow,

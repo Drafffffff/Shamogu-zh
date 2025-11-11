@@ -17,6 +17,7 @@ const (
 	DurationClarity                = 5
 	DurationConfusionAmbrosia      = 6
 	DurationConfusionFireTrap      = 3
+	DurationConfusionGluttony      = 6
 	DurationConfusionHit           = 6
 	DurationConfusionPepperBreath  = 2
 	DurationConfusionSkunk         = 5
@@ -53,7 +54,6 @@ const (
 	HealClarityLeaves     = 4
 	HealFirebreathPepper  = 2
 	HealFoggySkinOnion    = 3
-	HealGluttony          = 1
 	HealTeleportLignified = 2
 
 	DurationDig      = 5

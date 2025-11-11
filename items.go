@@ -197,12 +197,7 @@ func (c *Comestible) Use(g *Game, i ID) bool {
 	switch pa := g.PlayerActor(); {
 	case pa.Has(StatusGluttony):
 		pa.Statuses[StatusGluttony] = 0
-		if maxHP := pa.GetMaxHP(); pa.HP < maxHP {
-			pa.HP += HealGluttony
-			g.Logf("You feel full (+%d HP).", HealGluttony)
-		} else {
-			g.Log("You feel full.")
-		}
+		g.LogStyled("You feel full.", logStatusEnd)
 	case pa.DoesAny(Gluttony) && !g.snack:
 		g.PutStatus1(PlayerID, pa, StatusGluttony, DurationGluttony)
 	}
