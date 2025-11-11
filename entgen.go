@@ -27,7 +27,11 @@ func (g *Game) debugBuild() {
 	// g.Entities[PrimarySpiritID+1] = spiritEntity(g.Mods, challengeSpirits[0])
 	// g.Entities[PrimarySpiritID+2] = spiritEntity(g.Mods, challengeSpirits[1])
 	// g.Entities[PrimarySpiritID+1] = spiritEntity(g.Mods, secondarySpirits[0])
-	// g.Entities[PrimarySpiritID+3] = comestibleEntity(ComestibleData[4])
+	// g.Entities[PrimarySpiritID+3] = comestibleEntity(ComestibleData[BerserkingFlower])
+	// g.Entities[PrimarySpiritID+4] = comestibleEntity(ComestibleData[BerserkingFlower])
+	// g.Entities[PrimarySpiritID+5] = comestibleEntity(ComestibleData[BerserkingFlower])
+	// g.Entities[PrimarySpiritID+6] = comestibleEntity(ComestibleData[BerserkingFlower])
+	// g.Entities[PrimarySpiritID+7] = comestibleEntity(ComestibleData[BerserkingFlower])
 }
 
 func emptySlot() *Entity {

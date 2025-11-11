@@ -102,19 +102,20 @@ type EffectBerserkingFlower struct{}
 func (eff EffectBerserkingFlower) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	d := DurationBerserk
+	g.eatMsg("berserking flower", "")
 	if pa.Has(StatusClarity) {
 		// Eating a berserking flower while clear-minded works but
 		// reduces the duration by half.
 		g.RemoveStatus(PlayerID, pa, StatusClarity)
 		d /= 2
 	}
-	g.eatMsg("berserking flower", "")
 	if pa.Has(StatusBerserk) {
-		// The berserking flower can be used to prolong berserk
-		// duration, but you'll still get the Poison debuff.
-		pa.Statuses[StatusBerserk] = 0
-		g.AdjustHP(PlayerID, pa, -pa.HPBonus())
-		g.PutStatus1(PlayerID, pa, StatusPoison, DurationPoisonBerserk)
+		// The berserking flower can be used to renew berserk duration
+		// and temporary HP bonus.
+		pa.Statuses[StatusBerserk] = d
+		bonusHP := pa.HP - max(1, pa.HP-pa.HPBonus())
+		g.AdjustHP(PlayerID, pa, pa.HPBonus()-bonusHP)
+		return true
 	}
 	g.PutStatus1(PlayerID, pa, StatusBerserk, d)
 	return true
@@ -130,17 +131,20 @@ type EffectLignificationFruit struct{}
 func (eff EffectLignificationFruit) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	d := DurationLignification
+	g.eatMsg("lignification fruit", "")
 	if pa.Has(StatusFoggySkin) {
 		// Eating a lignification fruit while foggy works but reduces
 		// the duration by half.
 		g.RemoveStatus(PlayerID, pa, StatusFoggySkin)
 		d /= 2
 	}
-	g.eatMsg("lignification fruit", "")
 	if pa.Has(StatusLignification) {
-		// If already lignified, cancel previous effects.
-		pa.Statuses[StatusLignification] = 0
-		g.AdjustHP(PlayerID, pa, -pa.HPBonus())
+		// The lignification ruit can be used to renew lignification
+		// duration and temporary HP bonus.
+		pa.Statuses[StatusLignification] = d
+		bonusHP := pa.HP - max(min(3, pa.HP), pa.HP-pa.HPBonus())
+		g.AdjustHP(PlayerID, pa, pa.HPBonus()-bonusHP)
+		return true
 	}
 	g.PutStatus1(PlayerID, pa, StatusLignification, d)
 	return true

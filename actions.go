@@ -1614,11 +1614,11 @@ On the map, monster color may change depending on active status effects.  By def
 		var details string
 		switch st {
 		case StatusBerserk:
-			details = "HP never falls below 1 after losing bonus HP."
+			details = "HP never falls below 1 after losing bonus HP. Duration and HP bonus may be renewed by eating a berserking flower."
 		case StatusClarity:
 			details = "Player-only effect obtainable by eating clarity leaves. May be removed by eating a berserking flower for half the @BBerserk@N duration."
 		case StatusLignification:
-			details = "HP never falls below 3 after losing bonus HP. Cancels @BSprint@N. Players with “woody legs” can move while @Blignified@N at the cost of reducing the duration by an extra turn."
+			details = "HP never falls below 3 after losing bonus HP. Duration and HP bonus may be renewed by eating a lignification fruit. Cancels @BSprint@N. Players with “woody legs” can move while @Blignified@N at the cost of reducing the duration by an extra turn. "
 		case StatusConfusion:
 			details = "Confused monsters will attack other monsters too when adjacent. Some monsters may even hurt or affect themselves when performing special actions like digging, spitting fire, barking, or pushing."
 		case StatusFear:
