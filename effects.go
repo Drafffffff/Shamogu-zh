@@ -109,7 +109,6 @@ func (eff EffectBerserkingFlower) Apply(g *Game) bool {
 		d /= 2
 	}
 	g.eatMsg("berserking flower", "")
-	extraTurns := pa.Statuses[StatusBerserk]
 	if pa.Has(StatusBerserk) {
 		// The berserking flower can be used to prolong berserk
 		// duration, but you'll still get the Poison debuff.
@@ -117,7 +116,7 @@ func (eff EffectBerserkingFlower) Apply(g *Game) bool {
 		g.AdjustHP(PlayerID, pa, -pa.HPBonus())
 		g.PutStatus1(PlayerID, pa, StatusPoison, DurationPoisonBerserk)
 	}
-	g.PutStatus1(PlayerID, pa, StatusBerserk, d+extraTurns)
+	g.PutStatus1(PlayerID, pa, StatusBerserk, d)
 	return true
 }
 
@@ -138,13 +137,12 @@ func (eff EffectLignificationFruit) Apply(g *Game) bool {
 		d /= 2
 	}
 	g.eatMsg("lignification fruit", "")
-	extraTurns := pa.Statuses[StatusLignification]
 	if pa.Has(StatusLignification) {
 		// If already lignified, cancel previous effects.
 		pa.Statuses[StatusLignification] = 0
 		g.AdjustHP(PlayerID, pa, -pa.HPBonus())
 	}
-	g.PutStatus1(PlayerID, pa, StatusLignification, d+extraTurns)
+	g.PutStatus1(PlayerID, pa, StatusLignification, d)
 	return true
 }
 

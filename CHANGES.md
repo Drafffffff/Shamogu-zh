@@ -27,12 +27,17 @@ New content:
 
 Reworked and improved content:
 
-* Eating food that gives an already active beneficial status now extends it by
-  the remaining duration, too, instead of losing remaining turns. Also,
-  teleport mushroom now gives some healing when you're lignified instead of
-  doing nothing, and firebreath pepper now extends Fire and Confusion by the
-  remaining duration, so that using it on foes that already have the statuses
-  still has some useful effect.
+* Eating clarity leaves and foggy-skin onion while Clarity or Foggy-Skin is
+  active now extends the beneficial status by the remaining duration, instead
+  of losing remaining turns. This new duration-extension behavior doesn't
+  happen with berserking flower and lignification fruit, because Berserk and
+  Lignification have special effects on expiration and renewed temporary HP
+  bonuses on eating, so eating those still cancels and then reapplies the
+  status (Lignification is already long enough anyway). Also, teleport mushroom
+  now gives some healing when you're lignified instead of doing nothing, and
+  firebreath pepper now extends Fire and Confusion by the remaining duration,
+  so that using it on foes that already have those statuses still has some
+  useful effect.
 * Monster fear is now somewhat biased toward going in the opposite direction
   from the player, instead of fleeing laterally, so that non-Hydra players get
   more offensive use from Fear.
