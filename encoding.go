@@ -98,6 +98,7 @@ func (g *Game) GameSave() ([]byte, error) {
 type Config struct {
 	DarkColors      bool                 // whether to use a dark color theme
 	ExamineModeKeys map[gruid.Key]Action // custom examine mode keys
+	Mods            []bool               // selected mods (in previous advanced game)
 	NormalModeKeys  map[gruid.Key]Action // custom normal mode keys
 	Tiles           bool                 // whether to use Tiles or Unicode
 	Version         string               // config's game version

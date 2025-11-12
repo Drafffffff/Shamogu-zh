@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"slices"
 
 	"codeberg.org/anaseto/gruid"
 	"codeberg.org/anaseto/gruid/ui"
@@ -169,6 +170,9 @@ func (md *model) updateSpiritSelectionMenu(msg gruid.Msg) gruid.Effect {
 		msg = msgmouse
 	}
 	if msgkey, ok := msg.(gruid.MsgKeyDown); ok && msgkey.Key == gruid.KeyTab {
+		if md.mode == modeNewGame && len(GameConfig.Mods) == NMods {
+			md.g.Mods = slices.Clone(GameConfig.Mods)
+		}
 		md.modSelectionMenu()
 		return nil
 	}
@@ -229,6 +233,10 @@ func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
 			l.Content = ui.Text("Save mod selection and continue to advanced primary spirit selection screen").
 				Format(UIWidth/2 - 1 - 2)
 			if act == ui.MenuInvoke {
+				GameConfig.Mods = slices.Clone(g.Mods)
+				if err := SaveConfig(); err != nil {
+					md.g.Logf("Error saving mod config changes: %v", err)
+				}
 				md.openSpiritSelectionMenu(modeNewGameAdvanced)
 			}
 			break
