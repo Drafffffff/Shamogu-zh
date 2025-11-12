@@ -700,7 +700,11 @@ func (md *model) openInventory(bound ID) (gruid.Effect, bool) {
 	}
 	md.menu.main.SetEntries(entries)
 	md.mode = modeMenu
-	md.menu.mode = modeInventory
+	if bound == -1 {
+		md.menu.mode = modeInventory
+	} else {
+		md.menu.mode = modeInventoryBound
+	}
 	md.menu.bound = bound
 	md.menu.main.SetActiveInvokable(0)
 	e := md.g.Entity(PrimarySpiritID)
@@ -745,87 +749,6 @@ func appendMenuHeader(entries []ui.MenuEntry, i ID) []ui.MenuEntry {
 	}
 	return entries
 }
-
-// inventoryItemID returns the entity ID corresponding to the given invokable
-// inventory index.
-func (md *model) inventoryItemID(i int) ID {
-	g := md.g
-	n := -1
-	for j, e := range g.Entities[:InventorySize] {
-		if e.Role != nil {
-			n++
-		}
-		if n < i {
-			continue
-		}
-		return ID(j + PrimarySpiritID)
-	}
-	id, _ := md.g.ItemAt(md.g.PP())
-	return id // should be positive
-}
-
-// equipItemID returns the entity ID corresponding to the given equipable
-// inventory item equip index.
-func (md *model) equipItemID(it Item, idx int) ID {
-	switch it.(type) {
-	case *Spirit:
-		return md.equipSpiritID(idx)
-	default:
-		// Comestible.
-		return ID(idx + NSpirits + PrimarySpiritID)
-	}
-}
-
-// equipSpiritID returns the entity ID corresponding to the given equipable
-// inventory spirit equip index.
-func (md *model) equipSpiritID(idx int) ID {
-	n := -1
-	for i, e := range md.g.Entities[:NSpirits] {
-		if sp, ok := e.Role.(*Spirit); !ok || sp.Level == 0 {
-			n++
-		}
-		if n == idx {
-			return ID(i)
-		}
-	}
-	return ID(-1)
-}
-
-// equipItemIdx returns the item equip index corresponding to the given
-// equipped entity ID.
-// func (md *model) equipItemIdx(i ID) int {
-// 	g := md.g
-// 	switch g.Entity(i).Role.(type) {
-// 	case *Spirit:
-// 		for _, e := range g.Entities[:i] {
-// 			if sp, ok := e.Role.(*Spirit); !ok || sp.Level == 1 {
-// 				i--
-// 			}
-// 		}
-// 		return int(i - PrimarySpiritID)
-// 	default:
-// 		// Comestible.
-// 		return int(i - NSpirits - PrimarySpiritID)
-// 	}
-// }
-
-// inventoryItemIdx returns the inventory item index corresponding to the given
-// equipped entity ID.
-// func (md *model) inventoryItemIdx(i ID) int {
-// 	g := md.g
-// 	switch g.Entity(i).Role.(type) {
-// 	case *Spirit:
-// 		for _, e := range g.Entities[:i] {
-// 			if e.Role == nil {
-// 				i--
-// 			}
-// 		}
-// 		return int(i - PrimarySpiritID)
-// 	default:
-// 		// Comestible.
-// 		return int(i - NSpirits - PrimarySpiritID)
-// 	}
-// }
 
 // altBgEntries updates entries to use alternate background color for entries
 // of odd index.

@@ -21,6 +21,7 @@ type menuMode int
 
 const (
 	modeInventory menuMode = iota
+	modeInventoryBound
 	modeEquip
 	modeConfigMenu
 	modeHelpMenu
@@ -69,13 +70,7 @@ func (md *model) updateMainMenu(msg gruid.Msg) {
 			if !g.Mod(ModGluttonyRework) || !g.PlayerActor().DoesAny(Gluttony) {
 				break
 			}
-			if md.menu.bound != -1 {
-				id += NSpirits
-				if id >= md.menu.bound {
-					id++
-				}
-				md.action = ActionUseTwoItems{md.menu.bound, id}
-			} else if _, ok := e.Role.(*Comestible); ok {
+			if _, ok := e.Role.(*Comestible); ok {
 				if len(g.ComestibleIDs()) > 1 {
 					md.action = ActionBindItem{id}
 				} else {
@@ -84,6 +79,17 @@ func (md *model) updateMainMenu(msg gruid.Msg) {
 					md.action = ActionNone{}
 				}
 			}
+		case modeInventoryBound:
+			// Choosing second comestible (for mod ModGluttonyRework).
+			g := md.g
+			idx := md.menu.main.Active()
+			id := md.inventoryComestibleID(idx)
+			e := g.Entity(id)
+			md.updateItemDesc(e)
+			if act != ui.MenuInvoke || id == md.menu.bound {
+				break
+			}
+			md.action = ActionUseTwoItems{md.menu.bound, id}
 		case modeEquip:
 			g := md.g
 			i, it := g.ItemAt(g.PP())
@@ -105,6 +111,69 @@ func (md *model) updateMainMenu(msg gruid.Msg) {
 			md.action = ActionEquipItemAt{ID: j}
 		}
 	}
+}
+
+// equipItemID returns the entity ID corresponding to the given equipable
+// inventory item equip index.
+func (md *model) equipItemID(it Item, idx int) ID {
+	switch it.(type) {
+	case *Spirit:
+		return md.equipSpiritID(idx)
+	default:
+		// Comestible.
+		return ID(idx + NSpirits + PrimarySpiritID)
+	}
+}
+
+// equipSpiritID returns the entity ID corresponding to the given equipable
+// inventory spirit equip index.
+func (md *model) equipSpiritID(idx int) ID {
+	n := -1
+	for i, e := range md.g.Entities[:NSpirits] {
+		if sp, ok := e.Role.(*Spirit); !ok || sp.Level == 0 {
+			n++
+		}
+		if n == idx {
+			return ID(i)
+		}
+	}
+	return ID(-1)
+}
+
+// inventoryItemID returns the entity ID corresponding to the given invokable
+// inventory index.
+func (md *model) inventoryItemID(i int) ID {
+	g := md.g
+	n := -1
+	for j, e := range g.Entities[:InventorySize] {
+		if e.Role != nil {
+			n++
+		}
+		if n < i {
+			continue
+		}
+		return ID(j + PrimarySpiritID)
+	}
+	id, _ := g.ItemAt(g.PP())
+	return id // should be positive
+}
+
+// inventoryComestible returns the entity ID corresponding to the given
+// inventory raw index.
+func (md *model) inventoryComestibleID(i int) ID {
+	// NOTE: this function assumes there are 3 headers before the first
+	// comestible in the inventory menu; if that ever changes, this should
+	// be updated.
+	const nHeaders = 3                                     // 3 headers before first comestible
+	const firstIdx = PrimarySpiritID + NSpirits + nHeaders // first non-ground comestible ID
+	const lastIdx = firstIdx + 4                           // last non-ground comestible ID
+	g := md.g
+	n := i - firstIdx
+	if n <= lastIdx {
+		return ID(NSpirits + n)
+	}
+	id, _ := g.ItemAt(g.PP())
+	return id // should be positive
 }
 
 func (md *model) updateKeysMenu(msg gruid.Msg) {
@@ -328,3 +397,42 @@ func (md *model) modSelectionMenu() {
 	md.mode = modeNewGameMods
 	md.menu.mode = modeSelection // not really needed
 }
+
+// NOTE: Old index-computation code below, kept here in case we ever need it
+// again.
+//
+// equipItemIdx returns the item equip index corresponding to the given
+// equipped entity ID.
+// func (md *model) equipItemIdx(i ID) int {
+// 	g := md.g
+// 	switch g.Entity(i).Role.(type) {
+// 	case *Spirit:
+// 		for _, e := range g.Entities[:i] {
+// 			if sp, ok := e.Role.(*Spirit); !ok || sp.Level == 1 {
+// 				i--
+// 			}
+// 		}
+// 		return int(i - PrimarySpiritID)
+// 	default:
+// 		// Comestible.
+// 		return int(i - NSpirits - PrimarySpiritID)
+// 	}
+// }
+//
+// inventoryItemIdx returns the inventory item index corresponding to the given
+// equipped entity ID.
+// func (md *model) inventoryItemIdx(i ID) int {
+// 	g := md.g
+// 	switch g.Entity(i).Role.(type) {
+// 	case *Spirit:
+// 		for _, e := range g.Entities[:i] {
+// 			if e.Role == nil {
+// 				i--
+// 			}
+// 		}
+// 		return int(i - PrimarySpiritID)
+// 	default:
+// 		// Comestible.
+// 		return int(i - NSpirits - PrimarySpiritID)
+// 	}
+// }

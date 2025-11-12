@@ -96,7 +96,7 @@ func (md *model) Draw() gruid.Grid {
 		md.gd.Copy(pgd)
 	case modeMenu:
 		switch md.menu.mode {
-		case modeInventory, modeEquip:
+		case modeInventory, modeInventoryBound, modeEquip:
 			md.drawInventory()
 		case modeGameMenu, modeConfigMenu, modeHelpMenu:
 			md.gd.Copy(md.menu.main.Draw())
