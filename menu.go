@@ -166,10 +166,9 @@ func (md *model) inventoryComestibleID(i int) ID {
 	// be updated.
 	const nHeaders = 3                                     // 3 headers before first comestible
 	const firstIdx = PrimarySpiritID + NSpirits + nHeaders // first non-ground comestible ID
-	const lastIdx = firstIdx + 4                           // last non-ground comestible ID
 	g := md.g
 	n := i - firstIdx
-	if n <= lastIdx {
+	if n < FirstMapID {
 		return ID(NSpirits + n)
 	}
 	id, _ := g.ItemAt(g.PP())
