@@ -56,7 +56,7 @@ type Game struct {
 	Wizard   Wizard    // wizard mode (default: no)
 
 	instant bool       // whether the last action was instant-effect
-	snack   bool       // whether you're eating a snack
+	snack   bool       // whether you're eating a snack (without ModGluttonyRework)
 	win     bool       // whether we just won the game
 	rand    *rand.Rand // random number generator
 	md      *model     // reference to the UI model
@@ -530,9 +530,13 @@ func (g *Game) SmellFood() {
 
 // Mod reports whether a given mod is enabled.
 func (g *Game) Mod(m Mod) bool {
-	if int(m) >= len(g.Mods) {
-		// Should not happen (except during mid-game development).
+	return HasMod(g.Mods, m)
+}
+
+// HasMod reports whether the given mod is enabled.
+func HasMod(mods []bool, m Mod) bool {
+	if int(m) >= len(mods) {
 		return false
 	}
-	return g.Mods[m]
+	return mods[m]
 }

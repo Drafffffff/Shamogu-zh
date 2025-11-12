@@ -194,13 +194,7 @@ func (c *Comestible) Use(g *Game, i ID) bool {
 	g.Entities[i] = emptySlot()
 	g.Stats.EatenComestibles++
 	g.Stats.MapEatenComestibles[g.Map.Level-1]++
-	switch pa := g.PlayerActor(); {
-	case pa.Has(StatusGluttony):
-		pa.Statuses[StatusGluttony] = 0
-		g.LogStyled("You feel full.", logStatusEnd)
-	case pa.DoesAny(Gluttony) && !g.snack:
-		g.PutStatus1(PlayerID, pa, StatusGluttony, DurationGluttony)
-	}
+	g.handleGluttonyOnEating()
 	for i, ai := range g.Monsters() {
 		if ai.DoesAny(MonsHungry) && g.InFOV(g.Entity(i).P) {
 			g.PutStatus(i, ai, StatusBerserk, DurationBerserk)
@@ -211,6 +205,19 @@ func (c *Comestible) Use(g *Game, i ID) bool {
 		}
 	}
 	return true
+}
+
+func (g *Game) handleGluttonyOnEating() {
+	if g.Mod(ModGluttonyRework) {
+		return
+	}
+	switch pa := g.PlayerActor(); {
+	case pa.Has(StatusGluttony):
+		pa.Statuses[StatusGluttony] = 0
+		g.LogStyled("You feel full.", logStatusEnd)
+	case pa.DoesAny(Gluttony) && !g.snack:
+		g.PutStatus1(PlayerID, pa, StatusGluttony, DurationGluttony)
+	}
 }
 
 // EquipItemAt equips the item currently in the ground at index i.

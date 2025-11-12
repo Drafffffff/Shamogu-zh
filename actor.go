@@ -639,15 +639,7 @@ func (g *Game) RemoveStatus(i ID, ai *Actor, st Status) {
 // randomComestible returns a random comestible among inventory and ground
 // comestibles.
 func (g *Game) randomComestible() (ID, *Comestible) {
-	var ids []ID
-	for id := range g.PlayerComestibles() {
-		ids = append(ids, id)
-	}
-	if id, it := g.ItemAt(g.PP()); id >= 0 {
-		if IsComestible(it) {
-			ids = append(ids, id)
-		}
-	}
+	ids := g.ComestibleIDs()
 	if len(ids) == 0 {
 		return -1, nil
 	}
@@ -755,6 +747,9 @@ func (g *Game) HandleActorTurn(i ID, ai *Actor) {
 
 // handleGluttony handles progression of the Gluttony status.
 func (g *Game) handleGluttony() {
+	if g.Mod(ModGluttonyRework) {
+		return
+	}
 	pa := g.PlayerActor()
 	switch {
 	case pa.Statuses[StatusGluttony] <= 0:

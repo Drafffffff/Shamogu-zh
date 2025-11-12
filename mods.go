@@ -8,6 +8,7 @@ const (
 	ModCorruptedDungeon Mod = iota // mod with lots of unusual and random stuff going on
 	ModChallengeSpirits            // dedicated slot for challenge secondary spirits
 	ModNoRecharges                 // mod without spirit recharges
+	ModGluttonyRework              // mod with choice-of-two gluttony rework
 
 	ModCombatGrowl // uncontrollable growling during combat
 	ModHeavySteps  // noisy movement
@@ -18,6 +19,7 @@ const NMods = 1 + int(ModHeavySteps)
 
 var gameMods = []Mod{
 	ModCorruptedDungeon, ModChallengeSpirits, ModNoRecharges,
+	ModGluttonyRework,
 	ModCombatGrowl, ModHeavySteps}
 
 func (m Mod) String() string {
@@ -28,6 +30,8 @@ func (m Mod) String() string {
 		return "Challenge Spirits"
 	case ModNoRecharges:
 		return "No Recharges"
+	case ModGluttonyRework:
+		return "Gluttony Rework"
 	case ModCombatGrowl:
 		return "Combat Growl"
 	case ModHeavySteps:
@@ -45,6 +49,8 @@ func (m Mod) Desc() string {
 		return "Enable extra challenge secondary spirits: Gawalt Monkey, Gardening Lion, Gluttonous Bear.\n\nYou cannot chose more than one regular secondary spirit, and the first totem is always a challenge one!"
 	case ModNoRecharges:
 		return "Spirit ability charges are doubled but don’t recharge when going to the next map level. Use them wisely!"
+	case ModGluttonyRework:
+		return "Makes the Gluttonous Bear eat in pairs through a choice-of-two menu, without relying on a Gluttony status.\n\nThe Challenge Spirits mod should be enabled too for this mod to take effect."
 	case ModCombatGrowl:
 		return "You sometimes growl during combat, briefly scaring foes (experimental)."
 	case ModHeavySteps:

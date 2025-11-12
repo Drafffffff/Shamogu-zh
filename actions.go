@@ -573,16 +573,102 @@ func (a ActionInteract) String() string {
 	return "Interact (equip/activate)"
 }
 
+func equipItem(md *model, i ID) bool {
+	g := md.g
+	ei := g.Entity(i)
+	spirit := false // whether the to-be-equipped item is a spirit
+	var from, to ID
+	switch ei.Role.(type) {
+	case *Spirit:
+		spirit = true
+		from, to = PrimarySpiritID, PrimarySpiritID+NSpirits
+	case *Comestible:
+		for i, e := range g.Entities[PrimarySpiritID+NSpirits : FirstMapID] {
+			if !e.IsItem() {
+				// Equip on first empty slot.
+				return g.EquipItemAt(ID(i + NSpirits))
+			}
+		}
+		from, to = PrimarySpiritID+NSpirits, FirstMapID
+	}
+	entries := []ui.MenuEntry{}
+	r := 'a'
+	for j, ej := range g.InventoryItems() {
+		entries = appendMenuHeader(entries, j)
+		var entry ui.MenuEntry
+		entry.Disabled = j < from || j >= to
+		if !entry.Disabled {
+			rj, ok := ej.Role.(*Spirit)
+			switch {
+			case ok && rj.Level >= 1:
+				// Cannot upgrade a spirit more than once.
+				entry.Disabled = true
+			case g.Mod(ModChallengeSpirits) && !ok && spirit:
+				// When challenge spirits are enabled, only one
+				// regular secondary spirit is allowed.
+				ri := ei.Role.(*Spirit)
+				if ri.Challenge {
+					break
+				}
+				for k, sk := range g.PlayerSpirits() {
+					if k > PrimarySpiritID && !sk.Challenge {
+						entry.Disabled = true
+						break
+					}
+				}
+			}
+			if entry.Disabled && j == from {
+				from++
+			}
+		}
+		if entry.Disabled {
+			entry.Text = ui.Textf("  - %s", ej.Name)
+		} else {
+			entry.Text = ui.Textf("%c - %s", r, ej.Text())
+			entry.Keys = []gruid.Key{gruid.Key(r)}
+		}
+		entries = append(entries, entry)
+		r = nextRuneKey(r)
+	}
+	if spirit && from == to {
+		// NOTE: At some point I considered providing another kind of
+		// benefit when all spirits were already upgraded, but I
+		// decided against it to not encourage perfectionism.
+		g.Log("No spirit upgrades or new slots available.")
+		return false
+	}
+	altBgEntries(entries)
+	md.menu.main.SetBox(&ui.Box{Title: ui.Text("Inventory (equip)").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
+	md.menu.main.SetEntries(entries)
+	md.mode = modeMenu
+	md.menu.mode = modeEquip
+	ej := g.Entity(from)
+	md.menu.main.SetActiveInvokable(0)
+	_, ok := ej.Role.(*Spirit)
+	md.drawGroundDesc = !ok
+	md.updateEquipItemDesc(ei, ej)
+	return false
+}
+
 // ActionInventory opens the inventory menu.
 type ActionInventory struct{}
 
 func (a ActionInventory) Handle(md *model) (gruid.Effect, bool) {
+	return md.openInventory(-1)
+}
+
+// openInventory opens the inventory. The entry corresponding to the given ID
+// is marked as already selected and disabled (used by ModGluttonyRework).
+func (md *model) openInventory(bound ID) (gruid.Effect, bool) {
 	entries := []ui.MenuEntry{}
 	r := 'a'
 	for i, ei := range md.g.InventoryItems() {
 		entries = appendMenuHeader(entries, i)
 		var entry ui.MenuEntry
-		if ei.IsItem() {
+		if bound == i {
+			entry.Text = ui.Textf("* - %s", ei.Name)
+			entry.Disabled = true
+		} else if ei.IsItem() && (bound == -1 || IsComestible(ei.Item())) {
 			entry.Text = ui.Textf("%c - %s", r, ei.Text())
 			entry.Keys = []gruid.Key{gruid.Key(r)}
 		} else {
@@ -596,16 +682,26 @@ func (a ActionInventory) Handle(md *model) (gruid.Effect, bool) {
 		if IsComestible(it) {
 			entries = appendMenuHeader(entries, InventorySize)
 			var entry ui.MenuEntry
-			entry.Text = ui.Textf("%c - %s", r, md.g.Entity(id).Name)
-			entry.Keys = []gruid.Key{gruid.Key(r)}
+			if id != bound {
+				entry.Text = ui.Textf("%c - %s", r, md.g.Entity(id).Name)
+				entry.Keys = []gruid.Key{gruid.Key(r)}
+			} else {
+				entry.Text = ui.Textf("* - %s", md.g.Entity(id).Name)
+				entry.Disabled = true
+			}
 			entries = append(entries, entry)
 		}
 	}
 	altBgEntries(entries)
-	md.menu.main.SetBox(&ui.Box{Title: ui.Text("Inventory (use)").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
+	if bound == -1 {
+		md.menu.main.SetBox(&ui.Box{Title: ui.Text("Inventory (use)").WithStyle(gruid.Style{Fg: ColorYellow})})
+	} else {
+		md.menu.main.SetBox(&ui.Box{Title: ui.Text("Choose another comestible!").WithStyle(gruid.Style{Fg: ColorYellow})})
+	}
 	md.menu.main.SetEntries(entries)
 	md.mode = modeMenu
 	md.menu.mode = modeInventory
+	md.menu.bound = bound
 	md.menu.main.SetActiveInvokable(0)
 	e := md.g.Entity(PrimarySpiritID)
 	md.updateItemDesc(e)
@@ -697,21 +793,21 @@ func (md *model) equipSpiritID(idx int) ID {
 
 // equipItemIdx returns the item equip index corresponding to the given
 // equipped entity ID.
-func (md *model) equipItemIdx(i ID) int {
-	g := md.g
-	switch g.Entity(i).Role.(type) {
-	case *Spirit:
-		for _, e := range g.Entities[:i] {
-			if sp, ok := e.Role.(*Spirit); !ok || sp.Level == 1 {
-				i--
-			}
-		}
-		return int(i - PrimarySpiritID)
-	default:
-		// Comestible.
-		return int(i - NSpirits - PrimarySpiritID)
-	}
-}
+// func (md *model) equipItemIdx(i ID) int {
+// 	g := md.g
+// 	switch g.Entity(i).Role.(type) {
+// 	case *Spirit:
+// 		for _, e := range g.Entities[:i] {
+// 			if sp, ok := e.Role.(*Spirit); !ok || sp.Level == 1 {
+// 				i--
+// 			}
+// 		}
+// 		return int(i - PrimarySpiritID)
+// 	default:
+// 		// Comestible.
+// 		return int(i - NSpirits - PrimarySpiritID)
+// 	}
+// }
 
 // inventoryItemIdx returns the inventory item index corresponding to the given
 // equipped entity ID.
@@ -771,99 +867,39 @@ type ActionUseItem struct {
 }
 
 func (a ActionUseItem) Handle(md *model) (gruid.Effect, bool) {
-	g := md.g
-	if a.ID >= FirstMapID {
-		// Comestible on the floor.
-		if a.ID, _ = g.ItemAt(g.PP()); a.ID < 0 {
-			// Should not happen.
-			return nil, false
-		}
-	}
 	md.mode = modeNormal
-	e := g.Entity(a.ID)
-	it, ok := e.Role.(Item)
-	if !ok {
-		return nil, false
-	}
-	ok = it.Use(g, a.ID)
-	return nil, ok
+	return nil, md.g.useItem(a.ID)
 }
 
-func equipItem(md *model, i ID) bool {
-	g := md.g
-	ei := g.Entity(i)
-	spirit := false // whether the to-be-equipped item is a spirit
-	var from, to ID
-	switch ei.Role.(type) {
-	case *Spirit:
-		spirit = true
-		from, to = PrimarySpiritID, PrimarySpiritID+NSpirits
-	case *Comestible:
-		for i, e := range g.Entities[PrimarySpiritID+NSpirits : FirstMapID] {
-			if !e.IsItem() {
-				// Equip on first empty slot.
-				return g.EquipItemAt(ID(i + NSpirits))
-			}
-		}
-		from, to = PrimarySpiritID+NSpirits, FirstMapID
-	}
-	entries := []ui.MenuEntry{}
-	r := 'a'
-	for j, ej := range g.InventoryItems() {
-		entries = appendMenuHeader(entries, j)
-		var entry ui.MenuEntry
-		entry.Disabled = j < from || j >= to
-		if !entry.Disabled {
-			rj, ok := ej.Role.(*Spirit)
-			switch {
-			case ok && rj.Level >= 1:
-				// Cannot upgrade a spirit more than once.
-				entry.Disabled = true
-			case g.Mod(ModChallengeSpirits) && !ok && spirit:
-				// When challenge spirits are enabled, only one
-				// regular secondary spirit is allowed.
-				ri := ei.Role.(*Spirit)
-				if ri.Challenge {
-					break
-				}
-				for k, sk := range g.PlayerSpirits() {
-					if k > PrimarySpiritID && !sk.Challenge {
-						entry.Disabled = true
-						break
-					}
-				}
-			}
-			if entry.Disabled && j == from {
-				from++
-			}
-		}
-		if entry.Disabled {
-			entry.Text = ui.Textf("  - %s", ej.Name)
-		} else {
-			entry.Text = ui.Textf("%c - %s", r, ej.Text())
-			entry.Keys = []gruid.Key{gruid.Key(r)}
-		}
-		entries = append(entries, entry)
-		r = nextRuneKey(r)
-	}
-	if spirit && from == to {
-		// NOTE: At some point I considered providing another kind of
-		// benefit when all spirits were already upgraded, but I
-		// decided against it to not encourage perfectionism.
-		g.Log("No spirit upgrades or new slots available.")
+// useItem attemps to use the entity with given ID if it's an item. It reports
+// whether the attempt was a success.
+func (g *Game) useItem(id ID) bool {
+	e := g.Entity(id)
+	it, ok := e.Role.(Item)
+	if !ok {
 		return false
 	}
-	altBgEntries(entries)
-	md.menu.main.SetBox(&ui.Box{Title: ui.Text("Inventory (equip)").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
-	md.menu.main.SetEntries(entries)
-	md.mode = modeMenu
-	md.menu.mode = modeEquip
-	ej := g.Entity(from)
-	md.menu.main.SetActiveInvokable(0)
-	_, ok := ej.Role.(*Spirit)
-	md.drawGroundDesc = !ok
-	md.updateEquipItemDesc(ei, ej)
-	return false
+	return it.Use(g, id)
+}
+
+// ActionBindItem chooses the first comestible for ModGluttonyRework.
+type ActionBindItem struct {
+	ID ID
+}
+
+func (a ActionBindItem) Handle(md *model) (gruid.Effect, bool) {
+	return md.openInventory(a.ID)
+}
+
+// ActionUseTwoItems uses two comestibles for ModGluttonyRework.
+type ActionUseTwoItems struct {
+	ID0 ID
+	ID1 ID
+}
+
+func (a ActionUseTwoItems) Handle(md *model) (gruid.Effect, bool) {
+	md.mode = modeNormal
+	return nil, md.g.useItem(a.ID0) && md.g.useItem(a.ID1)
 }
 
 // updateEquipItemDesc updates the label for equipping ei on ej.
@@ -1575,7 +1611,7 @@ func (md *model) helpTopic(title, content string) {
 type ActionHelpStatuses struct{}
 
 func (a ActionHelpStatuses) Handle(md *model) (gruid.Effect, bool) {
-	md.helpTopic("Statuses (Help)", statusesHelpText())
+	md.helpTopic("Statuses (Help)", statusesHelpText(md.g))
 	return nil, false
 }
 
@@ -1583,7 +1619,7 @@ func (a ActionHelpStatuses) String() string {
 	return "Statuses"
 }
 
-func statusesHelpText() string {
+func statusesHelpText(g *Game) string {
 	var sb strings.Builder
 	sb.WriteString(`@YCOLORS@N
 
@@ -1595,6 +1631,16 @@ On the map, monster color may change depending on active status effects.  By def
 	sb.WriteString("\n\n")
 	for i, desc := range statusDesc {
 		st := Status(i)
+		switch st {
+		case StatusGluttony:
+			if !g.Mod(ModChallengeSpirits) || g.Mod(ModGluttonyRework) {
+				continue
+			}
+		case StatusGardener, StatusShadow:
+			if !g.Mod(ModChallengeSpirits) {
+				continue
+			}
+		}
 		color := statusColor(st, 42)
 		fmt.Fprintf(&sb, "@%c%s@N (@%c%s@N). ", color, st.Name(), color, st.Abbr())
 		sb.WriteString(desc)

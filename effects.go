@@ -802,7 +802,7 @@ func (eff EffectShadows) Desc() string {
 		DurationShadow, statusDesc[StatusShadow])
 }
 
-type EffectSnack struct{}
+type EffectSnack struct{ NoGluttonyStatus bool }
 
 func (eff EffectSnack) Apply(g *Game) bool {
 	pa := g.PlayerActor()
@@ -830,9 +830,11 @@ func (eff EffectSnack) Apply(g *Game) bool {
 	g.md.TeleportAnimation(pp, to, true)
 	g.UpdateFOV()
 	g.UpdateKnowledge()
-	// Eating a snack doesn't trigger gluttony.
-	g.snack = true
-	defer func() { g.snack = false }()
+	if !eff.NoGluttonyStatus {
+		// Eating a snack doesn't trigger gluttony.
+		g.snack = true
+		defer func() { g.snack = false }()
+	}
 	return ci.Use(g, i)
 }
 
@@ -841,7 +843,11 @@ func (eff EffectSnack) Name() string {
 }
 
 func (eff EffectSnack) Desc() string {
-	return "You teleport to nearest comestible, if any, and eat it. It doesn’t trigger @BGluttony@N."
+	desc := "You teleport to nearest comestible, if any, and eat it."
+	if eff.NoGluttonyStatus {
+		return desc
+	}
+	return desc + " It doesn’t trigger @BGluttony@N."
 }
 
 func (g *Game) menhirMsg(name string) {

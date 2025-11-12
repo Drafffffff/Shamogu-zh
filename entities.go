@@ -419,6 +419,21 @@ func (g *Game) Comestibles() iter.Seq2[ID, Item] {
 	}
 }
 
+// ComestibleIDs returns a slice with all the comestible IDs that can be eaten,
+// including any comestible on the ground.
+func (g *Game) ComestibleIDs() []ID {
+	var ids []ID
+	for id := range g.PlayerComestibles() {
+		ids = append(ids, id)
+	}
+	if id, it := g.ItemAt(g.PP()); id >= 0 {
+		if IsComestible(it) {
+			ids = append(ids, id)
+		}
+	}
+	return ids
+}
+
 // TotemID returns the ID of the map's totem (if any). NOTE: there should never
 // be more than one, otherwise this function returns the first one.
 func (g *Game) TotemID() ID {

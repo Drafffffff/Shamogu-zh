@@ -9,9 +9,10 @@ import (
 
 // menu represents menus used in the game.
 type menu struct {
-	keys *ui.Menu // key settings menu
-	main *ui.Menu // typical main menu (game, settings, inventory)
-	mode menuMode
+	keys  *ui.Menu // key settings menu
+	main  *ui.Menu // typical main menu (game, settings, inventory)
+	bound ID       // pre-selected option for ModGluttonyRework
+	mode  menuMode
 }
 
 // menuMode represents the available menu modes
@@ -64,6 +65,24 @@ func (md *model) updateMainMenu(msg gruid.Msg) {
 				break
 			}
 			md.action = ActionUseItem{ID: id}
+			if !g.Mod(ModGluttonyRework) || !g.PlayerActor().DoesAny(Gluttony) {
+				break
+			}
+			if md.menu.bound != -1 {
+				id += NSpirits
+				if id >= md.menu.bound {
+					id++
+				}
+				md.action = ActionUseTwoItems{md.menu.bound, id}
+			} else if _, ok := e.Role.(*Comestible); ok {
+				if len(g.ComestibleIDs()) > 1 {
+					md.action = ActionBindItem{id}
+				} else {
+					md.mode = modeNormal
+					md.g.Log("You don’t have a second comestible!")
+					md.action = ActionNone{}
+				}
+			}
 		case modeEquip:
 			g := md.g
 			i, it := g.ItemAt(g.PP())
