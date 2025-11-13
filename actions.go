@@ -822,7 +822,11 @@ type ActionUseTwoItems struct {
 
 func (a ActionUseTwoItems) Handle(md *model) (gruid.Effect, bool) {
 	md.mode = modeNormal
-	return nil, md.g.useItem(a.ID0) && md.g.useItem(a.ID1)
+	ok := md.g.useItem(a.ID0) && md.g.useItem(a.ID1)
+	if !ok {
+		log.Print("BUG: did not eat both comestibles.")
+	}
+	return nil, ok
 }
 
 // updateEquipItemDesc updates the label for equipping ei on ej.

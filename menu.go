@@ -158,18 +158,16 @@ func (md *model) inventoryItemID(i int) ID {
 	return id // should be positive
 }
 
-// inventoryComestible returns the entity ID corresponding to the given
+// inventoryComestibleID returns the entity ID corresponding to the given
 // inventory raw index.
 func (md *model) inventoryComestibleID(i int) ID {
 	// NOTE: this function assumes there are 3 headers before the first
 	// comestible in the inventory menu; if that ever changes, this should
 	// be updated.
-	const nHeaders = 3                                     // 3 headers before first comestible
-	const firstIdx = PrimarySpiritID + NSpirits + nHeaders // first non-ground comestible ID
 	g := md.g
-	n := i - firstIdx
+	n := i - 3
 	if n < FirstMapID {
-		return ID(NSpirits + n)
+		return ID(n)
 	}
 	id, _ := g.ItemAt(g.PP())
 	return id // should be positive
