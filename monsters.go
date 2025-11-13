@@ -107,7 +107,8 @@ func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point, noise bool) 
 		return false
 	}
 	pa := g.PlayerActor()
-	if g.InFOV(ei.P) && at == g.PP() && !pa.Has(StatusShadow) {
+	canDetect := !pa.Has(StatusShadow) && (!pa.DoesAny(Elephanty) || g.AdjacentWallCount() < 3)
+	if g.InFOV(ei.P) && at == g.PP() && canDetect {
 		g.Logf("The %s notices you.", ei.Name)
 		beh.State = Hunting
 		switch {
@@ -126,7 +127,7 @@ func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point, noise bool) 
 			}
 		}
 	}
-	if noise || !pa.Has(StatusShadow) {
+	if noise || canDetect {
 		beh.Target = at
 	}
 	return beh.State == Hunting
