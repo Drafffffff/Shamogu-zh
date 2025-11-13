@@ -275,10 +275,8 @@ func (g *Game) WallJump(dir gruid.Point) bool {
 // is adjacent to, including adjacent tiles outside the map.
 func (g *Game) AdjacentNonPassableCount() int {
 	n := 0
-	for q := range Neighbors(g.PP()) {
-		if g.Map.Passable(q) {
-			n++
-		}
+	for range g.Map.PassableNeighbors(g.PP()) {
+		n++
 	}
 	return 4 - n
 }
