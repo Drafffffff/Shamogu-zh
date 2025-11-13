@@ -24,7 +24,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 		g.Dir = dir
 		return true
 	}
-	if pa.DoesAny(Elephanty) && passto && dir != g.Dir && g.AdjacentWallCount() >= 1 {
+	if pa.DoesAny(Elephanty) && passto && dir != g.Dir && g.AdjacentNonPassableCount() >= 1 {
 		// Elephant players need to spend a turn turning when adjacent
 		// to a wall.
 		// NOTE: Not sure if it makes sense thematically to allow
@@ -271,15 +271,16 @@ func (g *Game) WallJump(dir gruid.Point) bool {
 	return true
 }
 
-// AdjacentWallCount returns the number of walls the player is adjacent to.
-func (g *Game) AdjacentWallCount() int {
+// AdjacentNonPassableCount returns the number of non passable tiles the player
+// is adjacent to, including adjacent tiles outside the map.
+func (g *Game) AdjacentNonPassableCount() int {
 	n := 0
 	for q := range Neighbors(g.PP()) {
-		if !g.Map.Passable(q) {
+		if g.Map.Passable(q) {
 			n++
 		}
 	}
-	return n
+	return 4 - n
 }
 
 // ComputePlayerStats recomputes the player attack, defense, and trait

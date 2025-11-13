@@ -228,7 +228,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, Gawalt, "wall-jumping movement and attack, weakened attacks")
 	desc = traitDesc(desc, t, Gluttony, "gluttony (needs to eat in pairs)")
 	desc = traitDesc(desc, t, ScaryRoar, "scary roar on first sight")
-	desc = traitDesc(desc, t, Elephanty, "rat phobia, difficult rotation next to walls, immune to berserk after-effects")
+	desc = traitDesc(desc, t, Elephanty, "rat phobia, difficult rotation next to walls, unnoticed in dead-ends, immune to berserk after-effects")
 	desc = traitDesc(desc, t, DazingSpines, "spines may @Odaze@N foes in melee")
 	switch {
 	case t.All(GoodHearing) && !t.All(BadHearing):

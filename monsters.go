@@ -107,7 +107,7 @@ func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point, noise bool) 
 		return false
 	}
 	pa := g.PlayerActor()
-	canDetect := !pa.Has(StatusShadow) && (!pa.DoesAny(Elephanty) || g.AdjacentWallCount() < 3)
+	canDetect := !pa.Has(StatusShadow) && (!pa.DoesAny(Elephanty) || g.AdjacentNonPassableCount() < 3)
 	if g.InFOV(ei.P) && at == g.PP() && canDetect {
 		g.Logf("The %s notices you.", ei.Name)
 		beh.State = Hunting
