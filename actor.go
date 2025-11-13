@@ -131,7 +131,7 @@ func (t Traits) All(of Traits) bool {
 	return t&of == of
 }
 
-// Traits. NOTE: there shouldn't be more than 64 (remaining free: 5).
+// Traits. NOTE: there shouldn't be more than 64 (remaining free: 4).
 const (
 	Player Traits = 1 << iota
 
@@ -156,6 +156,7 @@ const (
 	PushingCharge // unbalancing pushing when charging (boar)
 	ScaryRoar     // intimidating roar on first sight
 	Elephanty     // rat phobia, difficult rotation next to walls, immune to berserk after-effects
+	OwlFlying     // flying a bit above the ground like an owl
 	TrailingCloud // leave dust behind after moving (on floor tiles)
 	VenomousMelee // (non-ranged) attacks may poison foes
 	WoodyLegs     // can move while lignified
@@ -229,6 +230,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, Gluttony, "gluttony (needs to eat in pairs)")
 	desc = traitDesc(desc, t, ScaryRoar, "scary roar on first sight")
 	desc = traitDesc(desc, t, Elephanty, "rat phobia, difficult rotation next to walls, unnoticed in dead-ends, immune to berserk after-effects")
+	desc = traitDesc(desc, t, OwlFlying, "flies over foliage")
 	desc = traitDesc(desc, t, DazingSpines, "spines may @Odaze@N foes in melee")
 	switch {
 	case t.All(GoodHearing) && !t.All(BadHearing):

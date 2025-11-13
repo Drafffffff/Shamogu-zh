@@ -232,10 +232,6 @@ func (md *model) RangedAttackAnimation(a *Actor, from, to gruid.Point) {
 	if DisableAnimations {
 		return
 	}
-	if from == to {
-		// should not happen
-		return
-	}
 	fg := ColorForeground
 	switch {
 	case a.DoesAny(MonsSpitFire):
@@ -244,6 +240,18 @@ func (md *model) RangedAttackAnimation(a *Actor, from, to gruid.Point) {
 		fg = ColorMagenta
 	case a.DoesAny(MonsConfusion):
 		fg = ColorGreen
+	}
+	md.RangedBeamAnimation(from, to, fg)
+}
+
+// RangedBeamAnimation animates a beam between two positions.
+func (md *model) RangedBeamAnimation(from, to gruid.Point, fg gruid.Color) {
+	if DisableAnimations {
+		return
+	}
+	if from == to {
+		// should not happen
+		return
 	}
 	done := false
 	delta := to.Sub(from)

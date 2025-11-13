@@ -18,7 +18,8 @@ func (g *Game) UpdateFOV() {
 		t := g.Map.Terrain.At(p)
 		return t != Wall && t != Rubble
 	}
-	lt := &lighter{g: g}
+	pa := g.PlayerActor()
+	lt := &lighter{g: g, flying: pa.DoesAny(OwlFlying) && !pa.Has(StatusLignification)}
 	g.Map.FOV.VisionMap(lt, pp)
 	g.Map.FOVPts = g.Map.FOV.SSCVisionMap(pp, MaxFOVRange, passable, false)
 }
@@ -218,7 +219,8 @@ func (g *Game) dangerousCloudInFOV() bool {
 
 // lighter implements rl.Lighter
 type lighter struct {
-	g *Game
+	g      *Game
+	flying bool // owl flying a bit above the ground
 }
 
 func (lt *lighter) MaxCost(src gruid.Point) int {
@@ -231,14 +233,17 @@ func (lt *lighter) Cost(src, from, to gruid.Point) int {
 	// no terrain cost on origin
 	if src == from {
 		// specific diagonal costs
-		opaque, hard := g.opaqueDiagonal(from, to)
-		if opaque {
+		vis := lt.diagonalVisibility(from, to)
+		switch vis {
+		case Opaque:
 			return wallcost
-		}
-		if hard {
+		case Fuzzy:
 			return wallcost - 1
+		case Unclear:
+			return paths.DistanceManhattan(to, from) + 1
+		default:
+			return paths.DistanceManhattan(to, from)
 		}
-		return paths.DistanceManhattan(to, from)
 	}
 	// from terrain specific costs
 	t := g.Map.Terrain.AtU(from)
@@ -250,24 +255,42 @@ func (lt *lighter) Cost(src, from, to gruid.Point) int {
 		return wallcost
 	}
 	// specific diagonal costs
-	opaque, hard := g.opaqueDiagonal(from, to)
-	if opaque {
+	vis := lt.diagonalVisibility(from, to)
+	if vis == Opaque {
 		return wallcost
 	}
-	if t == Foliage || clk != NoCloud {
+	if clk != NoCloud {
 		return wallcost + paths.DistanceManhattan(to, from) - 3
 	}
-	if hard {
-		cost := wallcost - paths.DistanceManhattan(from, src) - 1
-		if cost < 1 {
-			cost = 1
+	if t == Foliage {
+		if !lt.flying {
+			return wallcost + paths.DistanceManhattan(to, from) - 3
 		}
-		return cost
+		if vis != Fuzzy {
+			return 1 + paths.DistanceManhattan(to, from)
+		}
 	}
-	return paths.DistanceManhattan(to, from)
+	switch vis {
+	case Fuzzy:
+		cost := wallcost - paths.DistanceManhattan(from, src) - 1
+		return max(cost, 1)
+	case Unclear:
+		return 1 + paths.DistanceManhattan(to, from)
+	default:
+		return paths.DistanceManhattan(to, from)
+	}
 }
 
-func (g *Game) opaqueDiagonal(from, to gruid.Point) (opaque, hard bool) {
+type visibility uint32
+
+const (
+	Opaque  visibility = 0b000
+	Fuzzy   visibility = 0b001
+	Unclear visibility = 0b011
+	Clear   visibility = 0b111
+)
+
+func (lt *lighter) diagonalVisibility(from, to gruid.Point) visibility {
 	// The state uses cardinal movement only, so two diagonal walls should,
 	// for example, block line of sight. This is in contrast with the main
 	// mechanics of the line of sight algorithm, which for gameplay reasons
@@ -288,10 +311,10 @@ func (g *Game) opaqueDiagonal(from, to gruid.Point) (opaque, hard bool) {
 		ps[0] = from.Shift(1, 0)
 		ps[1] = from.Shift(0, 1)
 	default:
-		return false, false
+		return Clear
 	}
-	opaque = true
-	hard = true
+	vis := Opaque
+	g := lt.g
 	for _, p := range ps {
 		clk := g.Map.Clouds.At(p).Kind
 		if clk == CloudNormal {
@@ -300,14 +323,18 @@ func (g *Game) opaqueDiagonal(from, to gruid.Point) (opaque, hard bool) {
 		switch g.Map.Terrain.AtU(p) {
 		case Wall, Rubble:
 		case Foliage:
-			opaque = false
+			if lt.flying {
+				vis |= Unclear
+			} else {
+				vis |= Fuzzy
+			}
 		default:
 			if clk != NoCloud {
-				opaque = false
+				vis |= Fuzzy
 				continue
 			}
-			return false, false
+			return Clear
 		}
 	}
-	return opaque, hard
+	return vis
 }

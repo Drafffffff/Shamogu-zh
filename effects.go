@@ -923,6 +923,40 @@ func (eff EffectStomp) Desc() string {
 		DurationBerserkStomp)
 }
 
+type EffectDeathStare struct{}
+
+func (eff EffectDeathStare) Apply(g *Game) bool {
+	pp := g.PP()
+	if j, aj := g.RangedTargetInDir(pp, g.Dir); j >= 0 {
+		ej := g.Entity(j)
+		g.Logf("You give a deadly stare at the %s.", ej.Name)
+		g.md.RangedBeamAnimation(pp, ej.P, ColorViolet)
+		g.InflictDamage(j, aj, aj.HP, AttackOther)
+		return true
+	}
+	g.Log("You cannot use “death stare” without a visible foe in front.")
+	return false
+}
+
+// DeathStareTarget returns the first visible actor target in the given
+// direction. Works even through translucent walls.
+func (g *Game) DeathStareTarget(from, dir gruid.Point) (ID, *Actor) {
+	for p := from.Add(dir); g.InFOV(p); p = p.Add(dir) {
+		if i, ai := g.ActorAt(p); i >= 0 {
+			return i, ai
+		}
+	}
+	return -1, nil
+}
+
+func (eff EffectDeathStare) Name() string {
+	return "death stare"
+}
+
+func (eff EffectDeathStare) Desc() string {
+	return "Kills first visible foe in front."
+}
+
 type EffectEarthMenhir struct{}
 
 func (eff EffectEarthMenhir) Apply(g *Game) bool {
