@@ -155,7 +155,7 @@ const (
 	Pushing       // unbalancing pushing (earth-dragon)
 	PushingCharge // unbalancing pushing when charging (boar)
 	ScaryRoar     // intimidating roar on first sight
-	SpiderPhobia  // fear of spiders
+	Elephanty     // rat phobia, difficult rotation next to walls, immune to berserk after-effects
 	TrailingCloud // leave dust behind after moving (on floor tiles)
 	VenomousMelee // (non-ranged) attacks may poison foes
 	WoodyLegs     // can move while lignified
@@ -228,7 +228,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, Gawalt, "wall-jumping movement and attack, weakened attacks")
 	desc = traitDesc(desc, t, Gluttony, "gluttony (needs to eat in pairs)")
 	desc = traitDesc(desc, t, ScaryRoar, "scary roar on first sight")
-	desc = traitDesc(desc, t, SpiderPhobia, "spider phobia")
+	desc = traitDesc(desc, t, Elephanty, "rat phobia, difficult rotation next to walls, immune to berserk after-effects")
 	desc = traitDesc(desc, t, DazingSpines, "spines may @Odaze@N foes in melee")
 	switch {
 	case t.All(GoodHearing) && !t.All(BadHearing):
@@ -621,7 +621,9 @@ func (g *Game) RemoveStatus(i ID, ai *Actor, st Status) {
 		g.confusingSmell(i, dist, DurationConfusionToxins)
 	case StatusBerserk:
 		g.AdjustHP(i, ai, -ai.HPBonus())
-		g.PutStatus(i, ai, StatusPoison, DurationPoisonBerserk)
+		if !ai.DoesAny(Elephanty) {
+			g.PutStatus(i, ai, StatusPoison, DurationPoisonBerserk)
+		}
 	case StatusLignification:
 		g.AdjustHPWithMin(i, ai, -ai.HPBonus(), 3)
 		if !ai.DoesAny(WoodyLegs) {
@@ -833,8 +835,8 @@ func (g *Game) handleCornered(i ID, ai *Actor) {
 	case ai.Has(StatusFear) || ai.DoesAny(MonsMusic) && !ai.Has(StatusBerserk):
 		// Actor is afraid or is playing music while not berserk: it
 		// may become berserk if cornered.
-	case i == PlayerID && ai.DoesAny(SpiderPhobia):
-		g.handleCorneredWithSpiderPhobia()
+	case i == PlayerID && ai.DoesAny(Elephanty):
+		g.handleCorneredWithRatPhobia()
 		return
 	default:
 		// The actor isn't afraid of anything, so it cannot feel
@@ -878,7 +880,7 @@ func (g *Game) handleCornered(i ID, ai *Actor) {
 	g.PutStatus1(i, ai, StatusBerserk, DurationBerserkAfraid)
 }
 
-func (g *Game) handleCorneredWithSpiderPhobia() {
+func (g *Game) handleCorneredWithRatPhobia() {
 	from, pa := g.PP(), g.PlayerActor()
 	for _, dir := range Directions {
 		p := from.Add(dir)

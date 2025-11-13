@@ -24,6 +24,16 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 		g.Dir = dir
 		return true
 	}
+	if pa.DoesAny(Elephanty) && passto && dir != g.Dir && g.AdjacentWallCount() >= 1 {
+		// Elephant players need to spend a turn turning when adjacent
+		// to a wall.
+		// NOTE: Not sure if it makes sense thematically to allow
+		// turning toward a fearsome foe (same for croco when reversing
+		// directions), but it's helpful to not always lose a turn
+		// turning once you become cornered and berserk.
+		g.Dir = dir
+		return true
+	}
 	if pa.CanMove() {
 		switch {
 		case pa.Has(StatusShadow) && tto == TranslucentWall:
@@ -133,7 +143,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 // PlayerFears reports whether the players fears the given actor.
 func (g *Game) PlayerFears(j ID, aj *Actor) bool {
 	pa := g.PlayerActor()
-	return pa.Has(StatusFear) || pa.DoesAny(SpiderPhobia) && aj.IsMonster(BerserkingSpider) && !pa.Has(StatusBerserk)
+	return pa.Has(StatusFear) || pa.DoesAny(Elephanty) && aj.IsMonster(HungryRat) && !pa.Has(StatusBerserk)
 }
 
 func (g *Game) logDaze() {
@@ -259,6 +269,17 @@ func (g *Game) WallJump(dir gruid.Point) bool {
 		g.PutStatus(PlayerID, pa, StatusDaze, DurationDazeFall)
 	}
 	return true
+}
+
+// AdjacentWallCount returns the number of walls the player is adjacent to.
+func (g *Game) AdjacentWallCount() int {
+	n := 0
+	for q := range Neighbors(g.PP()) {
+		if !g.Map.Passable(q) {
+			n++
+		}
+	}
+	return n
 }
 
 // ComputePlayerStats recomputes the player attack, defense, and trait

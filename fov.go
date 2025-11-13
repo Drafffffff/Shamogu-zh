@@ -87,22 +87,30 @@ func (g *Game) SenseEntity(i ID, verb string) {
 		g.md.auto.mode = noAuto
 		switch ri := ei.Role.(type) {
 		case *Actor:
-			if ri.IsAlive() {
-				g.Logf("You %s %s.", verb, One(ei.Name))
-				if ri.DoesAny(MonsNotable) {
-					g.StoryLogf("Saw %s (distance: %d)", One(ei.Name), g.ppDist(ei.P))
-				}
-				pa := g.PlayerActor()
-				if pa.DoesAny(ScaryRoar) && g.InFOV(ei.P) {
-					// Scary roar at foe on first sight.
-					// NOTE: Skipped if you already sensed
-					// the monster through Clarity. May
-					// happen several times in a turn if
-					// you see several monsters at once.
-					g.Logf("You roar at the %s", ei.Name)
-					g.MakeNoise(g.PP(), NoiseRoar)
-					g.PutStatus(i, ri, StatusFear, DurationFearRoar)
-				}
+			if !ri.IsAlive() {
+				break
+			}
+			g.Logf("You %s %s.", verb, One(ei.Name))
+			if ri.DoesAny(MonsNotable) {
+				g.StoryLogf("Saw %s (distance: %d)", One(ei.Name), g.ppDist(ei.P))
+			}
+			if !g.InFOV(ei.P) {
+				break
+			}
+			pa := g.PlayerActor()
+			switch {
+			case pa.DoesAny(Elephanty) && ri.IsMonster(HungryRat):
+				g.Logf("You trumpet at the %s", ei.Name)
+				g.MakeNoise(g.PP(), NoiseTrumpet)
+			case pa.DoesAny(ScaryRoar):
+				// Scary roar at foe on first sight.
+				// NOTE: Skipped if you already sensed
+				// the monster through Clarity. May
+				// happen several times in a turn if
+				// you see several monsters at once.
+				g.Logf("You roar at the %s", ei.Name)
+				g.MakeNoise(g.PP(), NoiseRoar)
+				g.PutStatus(i, ri, StatusFear, DurationFearRoar)
 			}
 		case *Comestible:
 			g.LogfStyled("You %s %s.", logNotable, verb, One(ei.Name))

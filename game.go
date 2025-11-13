@@ -320,9 +320,6 @@ func (g *Game) ComputeNoise() {
 		switch {
 		case ai.DoesAny(MonsSilent):
 			switch {
-			case pa.DoesAny(SpiderPhobia) && ai.IsMonster(BerserkingSpider):
-				// Hear spiders normally (you've developed a
-				// kind of extra sense for them).
 			case goodhearing:
 				// Good hearing allows to hear almost silent
 				// monsters like spiders, but not too far.
@@ -452,6 +449,8 @@ const (
 	NoiseLightning
 	NoiseMusic
 	NoiseRoar
+	NoiseStomp
+	NoiseTrumpet
 	NoiseWind
 
 	NoiseHeavySteps
@@ -500,6 +499,10 @@ func (nt NoiseType) Msg() string {
 		return "Noisy Imp belts “♫ larilon, larila ♫ ♪”."
 	case NoiseRoar:
 		return "ROAR!"
+	case NoiseStomp:
+		return "STOMP!"
+	case NoiseTrumpet:
+		return "TARARA!"
 	case NoiseWind:
 		return "WHIZ!"
 	case NoiseHeavySteps:

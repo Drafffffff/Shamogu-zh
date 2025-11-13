@@ -33,6 +33,7 @@ func init() {
 	gob.Register(EffectFireRetreat{})
 	gob.Register(EffectShadows{})
 	gob.Register(EffectSnack{})
+	gob.Register(EffectStomp{})
 	gob.Register(EffectGarden{})
 
 	gob.Register(EffectEarthMenhir{})

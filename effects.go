@@ -12,6 +12,7 @@ const (
 	DurationBerserk                = 8
 	DurationBerserkAfraid          = 4
 	DurationBerserkHit             = 4
+	DurationBerserkStomp           = 4
 	DurationBerserkTotem           = 5
 	DurationBerserkTrap            = 5
 	DurationClarity                = 5
@@ -874,6 +875,52 @@ func (eff EffectGarden) Name() string {
 func (eff EffectGarden) Desc() string {
 	return fmt.Sprintf("@BGardener@N for %d turns. %s @GInstant@N.",
 		DurationGarden, statusDesc[StatusGardener])
+}
+
+type EffectStomp struct{}
+
+func (eff EffectStomp) Apply(g *Game) bool {
+	pp := g.PP()
+	mp := &MapPath{passable: inMap}
+	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{pp}, 2)
+	g.MakeNoise(pp, NoiseStomp)
+	for _, n := range nodes {
+		g.stompDigAt(n.P)
+	}
+	pa := g.PlayerActor()
+	if pa.Has(StatusBerserk) {
+		// Stomp renews berserk duration (if lower) and temporary HP bonus.
+		pa.Statuses[StatusBerserk] = max(pa.Statuses[StatusBerserk], DurationBerserkStomp)
+		bonusHP := pa.HP - max(1, pa.HP-pa.HPBonus())
+		g.AdjustHP(PlayerID, pa, pa.HPBonus()-bonusHP)
+	} else {
+		g.PutStatus1(PlayerID, pa, StatusBerserk, DurationBerserkStomp)
+	}
+	return true
+}
+
+// stompDig is similar to dig but with player-specific code only and without
+// the noise.
+func (g *Game) stompDigAt(at gruid.Point) {
+	t := g.Map.Terrain.At(at)
+	if Passable(t) {
+		return
+	}
+	g.Stats.Digs++
+	g.Map.Terrain.Set(at, Rubble)
+	if t == TranslucentWall {
+		g.PoisonCloudAt(at)
+	}
+	// XXX: generate dust like for the earth menhir?
+}
+
+func (eff EffectStomp) Name() string {
+	return "stomp"
+}
+
+func (eff EffectStomp) Desc() string {
+	return fmt.Sprintf("Destroys walls in a 2-tile radius. Makes you @BBerserk@N for %d turns.",
+		DurationBerserkStomp)
 }
 
 type EffectEarthMenhir struct{}
