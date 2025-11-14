@@ -119,21 +119,21 @@ func (g *Game) SenseEntity(i ID, verb string) {
 		case *Spirit:
 			g.LogfStyled("You %s %s totem.", logNotable, verb, One(ei.Name))
 			g.StoryLogf("Spotted %s totem (distance: %d)", One(ei.Name), g.ppDist(ei.P))
-			g.cackle()
+			g.cackleAt(ei.P)
 		case *EmptyTotem:
 			g.LogStyled("You see an empty totem.", logNotable)
 			g.StoryLogf("Spotted an empty totem (distance: %d)", g.ppDist(ei.P))
 		case *CorruptionOrb:
 			g.LogfStyled("You %s the Orb of Corruption!", logNotable, verb)
 			g.StoryLogf("Found the Orb of Corruption (distance: %d)", g.ppDist(ei.P))
-			g.cackle()
+			g.cackleAt(ei.P)
 		case *RunicTrap:
 			g.LogfStyled("You %s %s.", logNotable, verb, One(ei.Name))
 			g.StoryLogf("Spotted %s (distance: %d)", One(ei.Name), g.ppDist(ei.P))
 		case *Portal:
 			g.LogfStyled("You %s %s.", logNotable, verb, One(ei.Name))
 			g.StoryLogf("Discovered %s (distance: %d)", One(ei.Name), g.ppDist(ei.P))
-			g.cackle()
+			g.cackleAt(ei.P)
 		default:
 			g.LogfStyled("You %s %s.", logNotable, verb, One(ei.Name))
 			g.StoryLogf("Discovered %s (distance: %d)", One(ei.Name), g.ppDist(ei.P))
@@ -156,9 +156,9 @@ func (g *Game) ppDist(p gruid.Point) int {
 	return paths.DistanceManhattan(g.PP(), p)
 }
 
-// cackle emits a cackling sound if the player has the a runic chicken spirit.
-func (g *Game) cackle() {
-	if g.PlayerActor().DoesAny(RunicChicken) {
+// cackleAt emits a cackling sound if the player has the a runic chicken spirit.
+func (g *Game) cackleAt(p gruid.Point) {
+	if g.PlayerActor().DoesAny(RunicChicken) && g.InFOV(p) {
 		g.MakeNoise(g.PP(), NoiseCackle)
 	}
 }
