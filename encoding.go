@@ -36,6 +36,7 @@ func init() {
 	gob.Register(EffectStomp{})
 	gob.Register(EffectGarden{})
 	gob.Register(EffectDeathStare{})
+	gob.Register(EffectLayRune{})
 
 	gob.Register(EffectEarthMenhir{})
 	gob.Register(EffectWarpingMenhir{})

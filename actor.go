@@ -131,7 +131,7 @@ func (t Traits) All(of Traits) bool {
 	return t&of == of
 }
 
-// Traits. NOTE: there shouldn't be more than 64 (remaining free: 4).
+// Traits. NOTE: there shouldn't be more than 64 (remaining free: 3).
 const (
 	Player Traits = 1 << iota
 
@@ -157,6 +157,7 @@ const (
 	ScaryRoar     // intimidating roar on first sight
 	Elephanty     // rat phobia, difficult rotation in closed spaces, immune to berserk after-effects
 	OwlFlying     // flying a bit above the ground like an owl
+	RunicChicken  // doesn't trigger traps, cackles loudly on sighting a portal or totem
 	TrailingCloud // leave dust behind after moving (on floor tiles)
 	VenomousMelee // (non-ranged) attacks may poison foes
 	WoodyLegs     // can move while lignified
@@ -225,6 +226,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, Pushing, "hits may push and @Ounbalance@N foes")
 	desc = traitDesc(desc, t, PushingCharge, "charging pushes and @Ounbalances@N foes")
 	desc = traitDesc(desc, t, BurningHits, "hits may @Oburn@N foes")
+	desc = traitDesc(desc, t, RunicChicken, "doesn’t trigger traps, cackles loudly on sighting a portal or totem")
 	desc = traitDesc(desc, t, VenomousMelee, "@Ovenomous@N melee attack")
 	desc = traitDesc(desc, t, Gawalt, "wall-jumping movement and attack, weakened attacks")
 	desc = traitDesc(desc, t, Gluttony, "gluttony (needs to eat in pairs)")

@@ -47,7 +47,7 @@ func (g *Game) PlayerPath(from, to gruid.Point) []gruid.Point {
 		ppassNT, ppass = g.PlayerPassableNoTrapsFunc(), g.PlayerPassableFunc()
 	}
 	var path []gruid.Point
-	if g.NoTrapAt(to) {
+	if g.NoTrapAt(to) && !g.PlayerActor().DoesAny(RunicChicken) {
 		path = g.PR.JPSPath(path, from, to, ppassNT, false)
 	}
 	if len(path) == 0 {
@@ -174,6 +174,11 @@ func (g *Game) MonPath(i ID, ai *Actor, from, to gruid.Point) []gruid.Point {
 		if beh.State == Hunting && ai.DoesAny(MonsDig) {
 			aip.passable = func(p gruid.Point) bool { return true }
 		}
+		path = g.PR.AstarPath(aip, from, to)
+	}
+	if len(path) == 0 && beh.State != Hunting {
+		// Ignore traps if there's no other way.
+		aip.passable = g.Map.Passable
 		path = g.PR.AstarPath(aip, from, to)
 	}
 	if len(path) == 0 {

@@ -25,7 +25,7 @@ func (g *Game) InitPlayer(spe *Entity) {
 
 func (g *Game) debugBuild() {
 	// g.Entities[PrimarySpiritID+1] = spiritEntity(g.Mods, challengeSpirits[3])
-	// g.Entities[PrimarySpiritID+1] = spiritEntity(g.Mods, challengeSpirits[4])
+	// g.Entities[PrimarySpiritID+1] = spiritEntity(g.Mods, challengeSpirits[5])
 	// g.Entities[PrimarySpiritID+4] = comestibleEntity(ComestibleData[BerserkingFlower])
 	// g.Entities[PrimarySpiritID+5] = comestibleEntity(ComestibleData[ClarityLeaves])
 	// g.Entities[PrimarySpiritID+6] = comestibleEntity(ComestibleData[FirebreathPepper])
@@ -223,6 +223,13 @@ var challengeSpirits = []spiritInfo{
 		Ability:     [2]Ability{EffectDeathStare{}, EffectDeathStare{}},
 		BonusAttack: [2]int{1, 1},
 		BonusTraits: [2]Traits{OwlFlying, OwlFlying},
+		Challenge:   true},
+	{
+		Name:        "Runic Chicken",
+		MaxCharges:  [2]int{2, 4},
+		Ability:     [2]Ability{EffectLayRune{}, EffectLayRune{}},
+		BonusAttack: [2]int{1, 1},
+		BonusTraits: [2]Traits{RunicChicken, RunicChicken},
 		Challenge:   true},
 }
 

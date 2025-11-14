@@ -169,7 +169,9 @@ func (g *Game) MoveActor(i ID, ai *Actor, to gruid.Point) {
 	if i != PlayerID && g.InFOV(ei.P) {
 		g.SenseEntity(i, "see")
 	}
-	g.TriggerTrapAt(to)
+	if i != PlayerID || !ai.DoesAny(RunicChicken) {
+		g.TriggerTrapAt(to)
+	}
 }
 
 // BumpMoveActor is like MoveActor but with extra effects specific to

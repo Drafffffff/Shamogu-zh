@@ -442,6 +442,7 @@ const (
 	NoiseBark NoiseType = iota
 	NoiseCombat
 	NoiseChomp
+	NoiseCackle
 	NoiseDig
 	NoiseExplosion
 	NoiseEarthMenhir
@@ -464,7 +465,7 @@ func (nt NoiseType) Noise() int {
 		return 4
 	case NoiseGrowl, NoiseHeavySteps:
 		return 6
-	case NoiseExplosion, NoiseFakePortal:
+	case NoiseExplosion, NoiseFakePortal, NoiseCackle:
 		return MaxFOVRange + 4
 	case NoiseMusic, NoiseEarthMenhir:
 		return 2 * MaxFOVRange
@@ -483,6 +484,8 @@ func (nt NoiseType) Msg() string {
 		return "Smash!"
 	case NoiseChomp:
 		return "Chomp!"
+	case NoiseCackle:
+		return "KO-KO-KO!"
 	case NoiseDig:
 		return "CRACK!"
 	case NoiseExplosion:

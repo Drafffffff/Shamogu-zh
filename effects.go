@@ -957,6 +957,32 @@ func (eff EffectDeathStare) Desc() string {
 	return "Kills first visible foe in front."
 }
 
+type EffectLayRune struct{}
+
+func (eff EffectLayRune) Apply(g *Game) bool {
+	pp := g.PP()
+	if g.Map.Terrain.At(pp) != Floor {
+		g.Log("You cannot lay a rune on a non-floor tile.")
+		return false
+	}
+	if i, _ := g.ItemAt(pp); i >= 0 {
+		g.Log("You cannot lay a rune on a non-free tile.")
+		return false
+	}
+	r := MagicRune(g.IntN(NRunes))
+	g.genRunicTrapAt(r, pp)
+	g.MakeNoise(pp, NoiseCackle)
+	return true
+}
+
+func (eff EffectLayRune) Name() string {
+	return "lay rune"
+}
+
+func (eff EffectLayRune) Desc() string {
+	return "Lay a random runic trap on current floor tile."
+}
+
 type EffectEarthMenhir struct{}
 
 func (eff EffectEarthMenhir) Apply(g *Game) bool {
