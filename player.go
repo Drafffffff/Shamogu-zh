@@ -24,7 +24,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 		g.Dir = dir
 		return true
 	}
-	if pa.DoesAny(Elephanty) && passto && dir != g.Dir && g.AdjacentNonPassableCount() >= 1 {
+	if pa.DoesAny(Elephanty) && passto && dir != g.Dir && g.AdjacentNonPassableCount() >= 2 {
 		// Elephant players need to spend a turn turning when adjacent
 		// to a wall.
 		// NOTE: Not sure if it makes sense thematically to allow

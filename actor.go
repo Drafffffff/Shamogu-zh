@@ -155,7 +155,7 @@ const (
 	Pushing       // unbalancing pushing (earth-dragon)
 	PushingCharge // unbalancing pushing when charging (boar)
 	ScaryRoar     // intimidating roar on first sight
-	Elephanty     // rat phobia, difficult rotation next to walls, immune to berserk after-effects
+	Elephanty     // rat phobia, difficult rotation in closed spaces, immune to berserk after-effects
 	OwlFlying     // flying a bit above the ground like an owl
 	TrailingCloud // leave dust behind after moving (on floor tiles)
 	VenomousMelee // (non-ranged) attacks may poison foes
@@ -229,7 +229,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, Gawalt, "wall-jumping movement and attack, weakened attacks")
 	desc = traitDesc(desc, t, Gluttony, "gluttony (needs to eat in pairs)")
 	desc = traitDesc(desc, t, ScaryRoar, "scary roar on first sight")
-	desc = traitDesc(desc, t, Elephanty, "rat phobia, difficult rotation next to walls, unnoticed in dead-ends, immune to berserk after-effects")
+	desc = traitDesc(desc, t, Elephanty, "rat phobia, difficult rotation in closed spaces, unnoticed in dead-ends, immune to berserk after-effects")
 	desc = traitDesc(desc, t, OwlFlying, "flies over foliage")
 	desc = traitDesc(desc, t, DazingSpines, "spines may @Odaze@N foes in melee")
 	switch {
