@@ -534,6 +534,26 @@ func (g *Game) SmellFood() {
 	}
 }
 
+// SenseRunes performs runic trap sensing for the RunicChicken trait.
+func (g *Game) SenseRunes() {
+	pp := g.PP()
+	for i := range g.ItemEntities() {
+		ei := g.Entity(i)
+		if ei.KnownP == ei.P {
+			continue
+		}
+		if _, ok := ei.Role.(*RunicTrap); !ok {
+			continue
+		}
+		if paths.DistanceManhattan(ei.P, pp) <= 2*MaxFOVRange {
+			// NOTE: using path-distance would leak information
+			// about walls (if the player goes through the tedious
+			// task of doing some math).
+			g.SenseEntity(i, "sense")
+		}
+	}
+}
+
 // Mod reports whether a given mod is enabled.
 func (g *Game) Mod(m Mod) bool {
 	return HasMod(g.Mods, m)

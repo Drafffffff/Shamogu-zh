@@ -340,6 +340,9 @@ func (md *model) endTurn() {
 	if pa.DoesAny(GoodSmell) {
 		g.SmellFood()
 	}
+	if pa.DoesAny(RunicChicken) {
+		g.SenseRunes()
+	}
 	//g.TurnStats()
 	hp := pa.HP
 	if hp <= 0 {
