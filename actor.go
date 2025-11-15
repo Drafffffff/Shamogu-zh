@@ -226,7 +226,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, Pushing, "hits may push and @Ounbalance@N foes")
 	desc = traitDesc(desc, t, PushingCharge, "charging pushes and @Ounbalances@N foes")
 	desc = traitDesc(desc, t, BurningHits, "hits may @Oburn@N foes")
-	desc = traitDesc(desc, t, RunicChicken, "senses and doesn’t trigger runes, cackles loudly on sighting a portal or totem")
+	desc = traitDesc(desc, t, RunicChicken, "senses and doesn’t trigger runes, cackles loudly on sighting a portal or totem, confusion vulnerability (longer duration)")
 	desc = traitDesc(desc, t, VenomousMelee, "@Ovenomous@N melee attack")
 	desc = traitDesc(desc, t, Gawalt, "wall-jumping movement and attack, weakened attacks")
 	desc = traitDesc(desc, t, Gluttony, "gluttony (needs to eat in pairs)")
@@ -502,6 +502,9 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 	case st == StatusConfusion:
 		if ai.Has(StatusClarity) || ai.DoesAny(MonsImmunityConfusion) {
 			return false
+		}
+		if ai.DoesAny(RunicChicken) {
+			turns += (turns + 1) / 2
 		}
 		if ai.DoesAny(ResistanceConfusion) {
 			turns = (turns + 1) / 2
