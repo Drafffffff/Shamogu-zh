@@ -34,9 +34,10 @@ type ProcInfo struct {
 	RuneIdx          int              // current index in Runes
 }
 
+// spiritProcInfo represents procgen information for a secondary totem.
 type spiritProcInfo struct {
-	Idx   int
-	Extra bool
+	Idx       int  // totem's index in spiritInfo global data
+	Challenge bool // whether it's a challenge totem
 }
 
 // InitProcInfo initializes procedural generation starting information.
@@ -206,20 +207,25 @@ func (g *Game) spiritProcGen() {
 		// level.
 		mapSpirits[i].Idx = -1
 	}
+	g.ProcInfo.Spirits = mapSpirits
 	// Games generate 6 totems per game.
 	if len(extras) > 0 {
 		// Extra totems: generate 3 of each kind.
 		for i := range 3 {
 			mapSpirits[i].Idx = extras[i]
-			mapSpirits[i].Extra = true
+			mapSpirits[i].Challenge = true
 		}
 		for i := range 3 {
 			mapSpirits[i+3].Idx = spirits[i]
 		}
-		// Shuffle totems of both kinds. NOTE: for testing purposes we
-		// currently guarantee that the first totem is a challenge one.
-		// s := mapSpirits[:6]
-		s := mapSpirits[1:6]
+		// Shuffle totems of both kinds. We ensure the first totem is a
+		// challenge one with higher chance by not shuffling the first
+		// one half of the time.
+		i0 := 1
+		if g.IntN(2) == 0 {
+			i0 = 0
+		}
+		s := mapSpirits[i0:6]
 		g.rand.Shuffle(len(s), func(i, j int) {
 			s[i], s[j] = s[j], s[i]
 		})
@@ -236,7 +242,48 @@ func (g *Game) spiritProcGen() {
 	g.rand.Shuffle(len(s), func(i, j int) {
 		s[i], s[j] = s[j], s[i]
 	})
-	g.ProcInfo.Spirits = mapSpirits
+	if s[0].Idx == -1 && s[1].Idx == -1 && g.IntN(3) > 0 {
+		// Make two successive empty totems as second and third ones
+		// more unlikely, as that's a bit too disappointing when it
+		// happens.
+		i, j := g.IntN(2), 2+g.IntN(len(s)-2)
+		s[i], s[j] = s[j], s[i]
+	}
+	if len(extras) == 0 {
+		return
+	}
+	for needsShuffling(mapSpirits) {
+		// When challenge totems are enabled, we want to ensure totem
+		// distribution is never split into two 3-sized groups of the
+		// same kind, so we simply shuffle again in such cases.
+		g.rand.Shuffle(len(s), func(i, j int) {
+			s[i], s[j] = s[j], s[i]
+		})
+	}
+}
+
+// needsShuffling reports whether the first three non-empty totems aren't all
+// of the same kind.
+func needsShuffling(s []spiritProcInfo) bool {
+	nk := 0                // same-kind totems seen
+	kind := s[0].Challenge // first totem's kind
+	for _, sk := range s[1:] {
+		if sk.Idx < 0 {
+			continue
+		}
+		if sk.Challenge != kind {
+			// Seen distinct kinds of totems among first 3 ones, so
+			// no shuffling is necessary.
+			return false
+		}
+		nk++
+		if nk == 2 {
+			// Next 2 non-empty totems are of the same kind as the
+			// first one, so we need to shuffle again.
+			break
+		}
+	}
+	return true
 }
 
 // menhirProcGen creates a random sequence of menhir kinds that still ensures

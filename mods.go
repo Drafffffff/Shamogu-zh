@@ -46,7 +46,7 @@ func (m Mod) Desc() string {
 	case ModCorruptedDungeon:
 		return "The orb’s influence has scattered twisted surprises through the dungeon. Some might even be good!\n\nRecommended for experienced players that want more unpredictability and variability."
 	case ModChallengeSpirits:
-		return "Enable extra challenge secondary spirits: Gawalt Monkey, Gardening Lion, Gluttonous Bear.\n\nYou cannot chose more than one regular secondary spirit, and the first totem is always a challenge one!"
+		return "Enable extra challenge secondary spirits: Gawalt Monkey, Gardening Lion, Gluttonous Bear, Stomping Elephant, Staring Owl, Runic Chicken.\n\nYou cannot chose more than one regular secondary spirit!"
 	case ModNoRecharges:
 		return "Spirit ability charges are doubled but don’t recharge when going to the next map level. Use them wisely!"
 	case ModGluttonyRework:

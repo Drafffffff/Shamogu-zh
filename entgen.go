@@ -378,7 +378,7 @@ func (g *Game) genItems(mg *MapGen) {
 	}
 	if spi := g.ProcInfo.Spirits[g.Map.Level-1]; spi.Idx >= 0 {
 		var sp *Entity
-		if spi.Extra {
+		if spi.Challenge {
 			sp = spiritEntity(g.Mods, challengeSpirits[spi.Idx])
 		} else {
 			sp = spiritEntity(g.Mods, secondarySpirits[spi.Idx])
