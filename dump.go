@@ -63,7 +63,7 @@ func (g *Game) LevelStats() {
 			continue
 		}
 		total++
-		if IsKnown(t) {
+		if IsKnown(g.Map.KnownTerrain.At(p)) {
 			n++
 		}
 	}
