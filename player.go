@@ -24,9 +24,9 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 		g.Dir = dir
 		return true
 	}
-	if pa.DoesAny(Elephanty) && passto && dir != g.Dir && g.AdjacentNonPassableCount() >= 2 {
-		// Elephant players need to spend a turn turning when adjacent
-		// to a wall.
+	if pa.DoesAny(Elephanty) && passto && dir != g.Dir && !g.Map.Passable(pl.P.Add(g.Dir)) {
+		// Elephant players need to spend a turn turning when facing a
+		// wall.
 		// NOTE: Not sure if it makes sense thematically to allow
 		// turning toward a fearsome foe (same for croco when reversing
 		// directions), but it's helpful to not always lose a turn
@@ -269,16 +269,6 @@ func (g *Game) WallJump(dir gruid.Point) bool {
 		g.PutStatus(PlayerID, pa, StatusDaze, DurationDazeFall)
 	}
 	return true
-}
-
-// AdjacentNonPassableCount returns the number of non passable tiles the player
-// is adjacent to, including adjacent tiles outside the map.
-func (g *Game) AdjacentNonPassableCount() int {
-	n := 0
-	for range g.Map.PassableNeighbors(g.PP()) {
-		n++
-	}
-	return 4 - n
 }
 
 // ComputePlayerStats recomputes the player attack, defense, and trait

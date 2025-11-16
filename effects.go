@@ -12,7 +12,7 @@ const (
 	DurationBerserk                = 8
 	DurationBerserkAfraid          = 4
 	DurationBerserkHit             = 4
-	DurationBerserkStomp           = 4
+	DurationBerserkStomp           = 5
 	DurationBerserkTotem           = 5
 	DurationBerserkTrap            = 5
 	DurationClarity                = 5
@@ -106,9 +106,9 @@ func (eff EffectBerserkingFlower) Apply(g *Game) bool {
 	g.eatMsg("berserking flower", "")
 	if pa.Has(StatusClarity) {
 		// Eating a berserking flower while clear-minded works but
-		// reduces the duration by half.
+		// reduces the duration by half (rounding up).
 		g.RemoveStatus(PlayerID, pa, StatusClarity)
-		d /= 2
+		d = (d + 1) / 2
 	}
 	if pa.Has(StatusBerserk) {
 		// The berserking flower can be used to renew berserk duration
@@ -135,9 +135,9 @@ func (eff EffectLignificationFruit) Apply(g *Game) bool {
 	g.eatMsg("lignification fruit", "")
 	if pa.Has(StatusFoggySkin) {
 		// Eating a lignification fruit while foggy works but reduces
-		// the duration by half.
+		// the duration by half (rounding up).
 		g.RemoveStatus(PlayerID, pa, StatusFoggySkin)
-		d /= 2
+		d = (d + 1) / 2
 	}
 	if pa.Has(StatusLignification) {
 		// The lignification ruit can be used to renew lignification
@@ -883,18 +883,26 @@ func (eff EffectStomp) Apply(g *Game) bool {
 	pp := g.PP()
 	mp := &MapPath{passable: inMap}
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{pp}, 2)
+	g.Log("You stomp on the ground.")
 	g.MakeNoise(pp, NoiseStomp)
 	for _, n := range nodes {
 		g.stompDigAt(n.P)
 	}
 	pa := g.PlayerActor()
+	d := DurationBerserkStomp
+	if pa.Has(StatusClarity) {
+		// Using stomp while clear-minded works but reduces the
+		// duration by half (rounding up).
+		g.RemoveStatus(PlayerID, pa, StatusClarity)
+		d = (d + 1) / 2
+	}
 	if pa.Has(StatusBerserk) {
 		// Stomp renews berserk duration (if lower) and temporary HP bonus.
-		pa.Statuses[StatusBerserk] = max(pa.Statuses[StatusBerserk], DurationBerserkStomp)
+		pa.Statuses[StatusBerserk] = max(pa.Statuses[StatusBerserk], d)
 		bonusHP := pa.HP - max(1, pa.HP-pa.HPBonus())
 		g.AdjustHP(PlayerID, pa, pa.HPBonus()-bonusHP)
 	} else {
-		g.PutStatus1(PlayerID, pa, StatusBerserk, DurationBerserkStomp)
+		g.PutStatus1(PlayerID, pa, StatusBerserk, d)
 	}
 	return true
 }

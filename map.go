@@ -125,6 +125,16 @@ func (m *Map) Connected(p gruid.Point) bool {
 	return false
 }
 
+// AdjacentNonPassableCount returns the number of non passable tiles the player
+// is adjacent to, including adjacent tiles outside the map.
+func (m *Map) AdjacentNonPassableCount(p gruid.Point) int {
+	n := 0
+	for range m.PassableNeighbors(p) {
+		n++
+	}
+	return 4 - n
+}
+
 // NoWallAt reports whether the given position is not a (regular) wall.
 func (m *Map) NoWallAt(p gruid.Point) bool {
 	// Cells outside the map are considered as walls, so not walkable.
