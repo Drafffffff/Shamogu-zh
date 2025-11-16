@@ -18,6 +18,16 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 	to := pl.P.Add(dir)
 	tto := g.Map.Terrain.At(to)
 	passto := Passable(tto)
+	if pa.CanMove() {
+		switch {
+		case pa.Has(StatusShadow) && tto == TranslucentWall:
+			return g.WallThrough(dir, to)
+		case pa.DoesAny(Gawalt) && !passto && !pa.Has(StatusDig):
+			return g.WallJump(dir)
+		case pa.Has(StatusSprint):
+			return g.Sprint(dir)
+		}
+	}
 	if pa.DoesAny(PatternCrocodile) && passto && dir == g.Dir.Mul(-1) {
 		// Crocodile needs to spend a turn turning before moving
 		// backwards.
@@ -33,16 +43,6 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 		// turning once you become cornered and berserk.
 		g.Dir = dir
 		return true
-	}
-	if pa.CanMove() {
-		switch {
-		case pa.Has(StatusShadow) && tto == TranslucentWall:
-			return g.WallThrough(dir, to)
-		case pa.DoesAny(Gawalt) && !passto && !pa.Has(StatusDig):
-			return g.WallJump(dir)
-		case pa.Has(StatusSprint):
-			return g.Sprint(dir)
-		}
 	}
 	j, aj := g.RangedTargetInDir(pl.P, dir)
 	if j >= 0 {
