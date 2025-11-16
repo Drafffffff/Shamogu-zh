@@ -148,7 +148,7 @@ const (
 	BadHearing    // worse hearing of noise (footsteps)
 	BurningHits   // hits may burn
 	DazingSpines  // body covered in dazing spines (porcupine)
-	Gawalt        // wall-jumping
+	Gawalt        // wall-jumping, weakened attacks, menhir sensing and hiding
 	Gluttony      // gluttony status after eating
 	GoodHearing   // better hearing of noise (footsteps)
 	GoodSmell     // smell food from a distance
@@ -228,7 +228,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, BurningHits, "hits may @Oburn@N foes")
 	desc = traitDesc(desc, t, RunicChicken, "senses and doesn’t trigger runes, cackles loudly on sighting a portal or totem, confusion vulnerability (longer duration)")
 	desc = traitDesc(desc, t, VenomousMelee, "@Ovenomous@N melee attack")
-	desc = traitDesc(desc, t, Gawalt, "wall-jumping movement and attack, weakened attacks")
+	desc = traitDesc(desc, t, Gawalt, "wall-jumping movement and attack, weakened attacks, menhir sensing and hiding")
 	desc = traitDesc(desc, t, Gluttony, "gluttony (needs to eat in pairs)")
 	desc = traitDesc(desc, t, ScaryRoar, "scary roar on first sight")
 	desc = traitDesc(desc, t, Elephanty, "rat phobia, difficult rotation when facing a wall, unnoticed in dead-ends, immune to berserk after-effects")

@@ -191,7 +191,7 @@ var secondarySpirits = []spiritInfo{
 var challengeSpirits = []spiritInfo{
 	{
 		Name:        "Gawalt Monkey",
-		MaxCharges:  [2]int{2, 4},
+		MaxCharges:  [2]int{1, 4},
 		Ability:     [2]Ability{EffectShadows{}, EffectShadows{}},
 		BonusTraits: [2]Traits{Gawalt, Gawalt},
 		Challenge:   true},

@@ -341,7 +341,10 @@ func (md *model) endTurn() {
 		g.SmellFood()
 	}
 	if pa.DoesAny(RunicChicken) {
-		g.SenseRunes()
+		g.SenseItems(itemRune)
+	}
+	if pa.DoesAny(Gawalt) {
+		g.SenseItems(itemMenhir)
 	}
 	//g.TurnStats()
 	hp := pa.HP

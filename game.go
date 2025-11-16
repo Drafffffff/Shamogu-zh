@@ -534,15 +534,15 @@ func (g *Game) SmellFood() {
 	}
 }
 
-// SenseRunes performs runic trap sensing for the RunicChicken trait.
-func (g *Game) SenseRunes() {
+// SenseItems performs menhir sensing for the Gawalt trait.
+func (g *Game) SenseItems(ty itemType) {
 	pp := g.PP()
 	for i := range g.ItemEntities() {
 		ei := g.Entity(i)
 		if ei.KnownP == ei.P {
 			continue
 		}
-		if _, ok := ei.Role.(*RunicTrap); !ok {
+		if it, ok := ei.Role.(Item); !ok || item2type(it) != ty {
 			continue
 		}
 		if paths.DistanceManhattan(ei.P, pp) <= 2*MaxFOVRange {
