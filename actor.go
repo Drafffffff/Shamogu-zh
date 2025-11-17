@@ -713,7 +713,7 @@ func (g *Game) HandleActorTurn(i ID, ai *Actor) {
 	if ai.IsDead() {
 		if g.Mod(ModMonsterRevival) && i != PlayerID && !g.InFOV(ei.P) && g.IntN(150) == 0 {
 			ei.P = g.randomRevivalNearbyPoint(ei.P, MaxFOVRange+4)
-			ei.Name += "undead " + ei.Name
+			ei.Name = "undead " + ei.Name
 			ai.HP = ai.GetMaxHP()
 		}
 		return
