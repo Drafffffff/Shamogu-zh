@@ -10,17 +10,14 @@ const (
 	ModNoRecharges                 // mod without spirit recharges
 	ModGluttonyRework              // mod with choice-of-two gluttony rework
 
-	ModCombatGrowl // uncontrollable growling during combat
-	ModHeavySteps  // noisy movement
-
+	modCount // dummy mod (for NMods)
 )
 
-const NMods = 1 + int(ModHeavySteps)
+const NMods = int(modCount)
 
 var gameMods = []Mod{
 	ModCorruptedDungeon, ModChallengeSpirits, ModNoRecharges,
-	ModGluttonyRework,
-	ModCombatGrowl, ModHeavySteps}
+	ModGluttonyRework}
 
 func (m Mod) String() string {
 	switch m {
@@ -32,10 +29,6 @@ func (m Mod) String() string {
 		return "No Recharges"
 	case ModGluttonyRework:
 		return "Gluttony Rework"
-	case ModCombatGrowl:
-		return "Combat Growl"
-	case ModHeavySteps:
-		return "Heavy Steps"
 	default:
 		return "(unknown mod)"
 	}
@@ -51,10 +44,6 @@ func (m Mod) Desc() string {
 		return "Spirit ability charges are doubled but don’t recharge when going to the next map level. Use them wisely!"
 	case ModGluttonyRework:
 		return "Makes the Gluttonous Bear eat in pairs through a choice-of-two menu, without relying on a Gluttony status.\n\nThe Challenge Spirits mod should be enabled too for this mod to take effect."
-	case ModCombatGrowl:
-		return "You sometimes growl during combat, briefly scaring foes (experimental)."
-	case ModHeavySteps:
-		return "You frequently make noise when you move (experimental)."
 	default:
 		return "(unknown mod)"
 	}

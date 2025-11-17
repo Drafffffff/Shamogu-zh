@@ -93,11 +93,6 @@ func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKi
 	ej := g.Entity(j)
 	switch {
 	case i >= 0 && ai != nil:
-		if i == PlayerID && g.Mod(ModCombatGrowl) && g.IntN(5) == 0 {
-			g.LogfStyled("You growl at the %s!", logNotable, ej.Name)
-			g.MakeNoise(g.PP(), NoiseGrowl)
-			g.PutStatus(j, aj, StatusFear, DurationFearGrowl)
-		}
 		g.logBumpDamage(i, j, ai, aj, dmg, ap)
 		if ai.DoesAny(PatternSwap|PatternSwapDaze) || ai.Has(StatusShadow) || aj.Has(StatusShadow) || g.IntN(dmg) == 0 {
 			break
