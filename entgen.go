@@ -226,7 +226,7 @@ var challengeSpirits = []spiritInfo{
 		Challenge:   true},
 	{
 		Name:         "Runic Chicken",
-		MaxCharges:   [2]int{2, 4},
+		MaxCharges:   [2]int{2, 5},
 		Ability:      [2]Ability{EffectLayRune{}, EffectLayRune{}},
 		BonusDefense: [2]int{1, 1},
 		BonusTraits:  [2]Traits{RunicChicken, RunicChicken},
