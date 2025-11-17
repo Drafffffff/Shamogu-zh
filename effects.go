@@ -22,11 +22,13 @@ const (
 	DurationConfusionHit           = 6
 	DurationConfusionPepperBreath  = 2
 	DurationConfusionSkunk         = 5
+	DurationConfusionGallop        = 5
 	DurationConfusionToxins        = 4
 	DurationDazeFall               = 1
 	DurationDazeJump               = 4
 	DurationDazeLightning          = 4
 	DurationDazeSpines             = 2
+	DurationDazeGallop             = 2
 	DurationDazeTeleport           = 4
 	DurationFearAmbrosia           = 4
 	DurationFearBark               = 4
@@ -338,7 +340,7 @@ func (eff EffectJump) Apply(g *Game) bool {
 	pl, pa := g.Player()
 	if !pa.CanMove() {
 		g.Log("You cannot jump while lignified.")
-		return true
+		return false
 	}
 	if pa.HP == 1 && pa.Has(StatusPoison) {
 		g.Log("You cannot jump while poisoned and almost dead.")
@@ -991,6 +993,47 @@ func (eff EffectLayRune) Name() string {
 
 func (eff EffectLayRune) Desc() string {
 	return "Lay a random runic trap on current floor tile."
+}
+
+type EffectGallop struct{}
+
+func (eff EffectGallop) Apply(g *Game) bool {
+	pl, pa := g.Player()
+	if !pa.CanMove() {
+		g.Log("You cannot gallop while lignified.")
+		return false
+	}
+	if pa.HP == 1 && pa.Has(StatusPoison) {
+		g.Log("You cannot gallop while poisoned and almost dead.")
+		return false
+	}
+	j, aj := g.RangedTargetInDir(pl.P, g.Dir)
+	if j < 0 {
+		g.Log("There’s no foe you can gallop towards.")
+		return false
+	}
+	g.Log("You gallop.")
+	ej := g.Entity(j)
+	dist := paths.DistanceManhattan(pl.P, ej.P)
+	to := ej.P.Sub(g.Dir)
+	from := pl.P
+	if dist > 1 {
+		g.BumpMoveActor(PlayerID, pa, to)
+		g.md.MoveAnimation(from, to)
+	}
+	g.MoveActor(PlayerID, pa, ej.P)
+	g.PutStatus(j, aj, StatusDaze, DurationDazeGallop)
+	g.PutStatus(j, aj, StatusConfusion, DurationConfusionGallop)
+	return true
+}
+
+func (eff EffectGallop) Name() string {
+	return "gallop"
+}
+
+func (eff EffectGallop) Desc() string {
+	return fmt.Sprintf("Move next to nearest foe in current direction and then swap positions, leaving it @Odazed@N behind for %d turns and @Oconfused@N for %d turns.",
+		DurationDazeGallop, DurationConfusionGallop)
 }
 
 type EffectEarthMenhir struct{}

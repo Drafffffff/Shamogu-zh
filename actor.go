@@ -131,7 +131,7 @@ func (t Traits) All(of Traits) bool {
 	return t&of == of
 }
 
-// Traits. NOTE: there shouldn't be more than 64 (remaining free: 3).
+// Traits. NOTE: there shouldn't be more than 64 (remaining free: 2).
 const (
 	Player Traits = 1 << iota
 
@@ -147,6 +147,7 @@ const (
 
 	BadHearing    // worse hearing of noise (footsteps)
 	BurningHits   // hits may burn
+	Dazzling      // zebra's camouflage
 	DazingSpines  // body covered in dazing spines (porcupine)
 	Gawalt        // wall-jumping, weakened attacks, menhir sensing and hiding
 	Gluttony      // gluttony status after eating
@@ -233,6 +234,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, ScaryRoar, "scary roar on first sight")
 	desc = traitDesc(desc, t, Elephanty, "rat phobia, difficult rotation when facing a wall, unnoticed in dead-ends, immune to berserk after-effects")
 	desc = traitDesc(desc, t, OwlFlying, "flies over foliage")
+	desc = traitDesc(desc, t, Dazzling, "dazzling (redirect attacks just behind you, easily noticed)")
 	desc = traitDesc(desc, t, DazingSpines, "spines may @Odaze@N foes in melee")
 	switch {
 	case t.All(GoodHearing) && !t.All(BadHearing):

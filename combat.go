@@ -316,10 +316,18 @@ func (g *Game) FourDirectionalAttack(i ID, ai *Actor, ap AttackKind, dist int) b
 // BumpAttackActor does an attack against an actor at a given position.
 // It returns the damage done.
 func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonus int) {
+	redirected := false
 	if j == PlayerID {
 		// Ensure that an attacking monster becomes a hunting one even
 		// if the player is shadowed.
 		ai.Behavior.State = Hunting
+		if aj.DoesAny(Dazzling) && (ap == AttackCharge || ap == AttackPlain ||
+			ap == AttackRanged && !ai.DoesAny(PatternCatch)) {
+			if k, ak := g.dazzlingRedirect(i); k >= 0 {
+				j, aj = k, ak
+				redirected = true
+			}
+		}
 	}
 	dazed := aj.Has(StatusDaze)
 	ei, ej := g.Entity(i), g.Entity(j)
@@ -334,7 +342,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 	// Extra effects by attack pattern.
 	switch {
 	case ai.DoesAny(Pushing|PushingCharge) && ai.CanMove() && !aj.ResistsMove() &&
-		(ap == AttackCharge || !ai.Has(StatusPoison)):
+		(ap == AttackCharge || !ai.Has(StatusPoison)) && !redirected:
 		if ai.Has(StatusDig) || ai.DoesAny(PushingCharge) && ap == AttackCharge && dist > 2 ||
 			ai.DoesAny(Pushing) && g.IntN(5-dmg) < 2 {
 			g.push(i, j, ai, aj, ap, dist, bonus)
@@ -827,4 +835,13 @@ func (g *Game) BlinkPos(from gruid.Point) (gruid.Point, bool) {
 		return InvalidPos, false
 	}
 	return ps[g.IntN(len(ps))], true
+}
+
+// dazzlingRedirect may return a new target for the given monster, suitable for
+// cases where the the player has the Dazzling trait.
+func (g *Game) dazzlingRedirect(i ID) (ID, *Actor) {
+	ei := g.Entity(i)
+	pp := g.PP()
+	dir := toDir(pp.Sub(ei.P))
+	return g.ActorAt(pp.Add(dir))
 }

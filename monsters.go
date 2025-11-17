@@ -25,6 +25,11 @@ func (g *Game) HandleMonsterTurn(i ID, ai *Actor) {
 		// A wandering monster spends one turn noticing the player.
 		return
 	}
+	if pa := g.PlayerActor(); pa.DoesAny(Dazzling) {
+		// A dazzling player is easily noticeable by monsters at the
+		// end of their turn.
+		defer func() { _ = g.InFOV(ei.P) && g.MonsterUpdateTarget(i, ai, g.PP(), false) }()
+	}
 	if beh.Target == ei.P || beh.Target == InvalidPos {
 		// The monster's target has either been reached or is invalid:
 		// we spend a turn chosing a new target.
