@@ -978,7 +978,8 @@ func (eff EffectLayRune) Apply(g *Game) bool {
 		return false
 	}
 	r := MagicRune(g.IntN(NRunes))
-	g.genRunicTrapAt(r, pp)
+	_, e := g.genRunicTrapAt(r, pp)
+	e.Seen = true
 	g.Logf("You lay a %s.", r)
 	g.MakeNoise(pp, NoiseCackle)
 	return true
