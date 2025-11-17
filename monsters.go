@@ -20,7 +20,8 @@ func (g *Game) HandleMonsterTurn(i ID, ai *Actor) {
 	if ai.Has(StatusConfusion) && g.monsterDiscord(i, ai) {
 		return
 	}
-	if g.InFOV(ei.P) && g.MonsterUpdateTarget(i, ai, g.PP(), false) {
+	pp := g.PP()
+	if g.InFOV(ei.P) && g.MonsterUpdateTarget(i, ai, pp, false) {
 		// A wandering monster spends one turn noticing the player.
 		return
 	}
@@ -28,7 +29,7 @@ func (g *Game) HandleMonsterTurn(i ID, ai *Actor) {
 		// The monster's target has either been reached or is invalid:
 		// we spend a turn chosing a new target.
 		if ai.DoesAny(MonsHungry) && g.HungryHunt(ei.P) || g.Marked() && beh.Guard == InvalidPos {
-			beh.Target = g.PP()
+			beh.Target = pp
 			beh.State = Hunting
 			return
 		}
@@ -41,6 +42,8 @@ func (g *Game) HandleMonsterTurn(i ID, ai *Actor) {
 		}
 		if maxdist < unreachable {
 			beh.Target = g.RandomPassableWithin(from, maxdist)
+		} else if g.Mod(ModOrbTracking) && g.IntN(5) == 0 {
+			beh.Target = pp
 		} else {
 			beh.Target = g.RandomPassableNearbyTarget(from)
 		}

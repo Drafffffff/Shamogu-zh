@@ -707,10 +707,15 @@ func (g *Game) MindStateString(a *Actor) string {
 // HandleActorTurn handles turn status updates for an actor with given ID, as
 // well as monster behavior for non-player actors.
 func (g *Game) HandleActorTurn(i ID, ai *Actor) {
+	ei := g.Entity(i)
 	if ai.IsDead() {
+		if g.Mod(ModMonsterRevival) && i != PlayerID && !g.InFOV(ei.P) && g.IntN(50) == 0 {
+			ei.P = g.randomRevivalNearbyPoint(ei.P, MaxFOVRange+4)
+			ei.Name += "undead " + ei.Name
+			ai.HP = ai.GetMaxHP()
+		}
 		return
 	}
-	ei := g.Entity(i)
 	if ai.Behavior != nil {
 		g.UpdateFirePos(i, ai)
 		g.HandleMonsterTurn(i, ai)

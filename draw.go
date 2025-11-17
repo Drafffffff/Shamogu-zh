@@ -40,6 +40,22 @@ func (g *Game) RenderOrder(i ID) (ro RenderOrder) {
 	return RONone
 }
 
+// RenderOrderWizard returns the rendering priority of an entity for the wizard
+// monster revealing mode.
+func (g *Game) RenderOrderWizard(i ID) (ro RenderOrder) {
+	e := g.Entity(i)
+	if i == PlayerID {
+		return ROActor
+	}
+	if a, ok := e.Role.(*Actor); ok && a.IsAlive() {
+		return ROActor
+	}
+	if e.IsItem() && i >= FirstMapID {
+		return ROItem
+	}
+	return RONone
+}
+
 // Draw implements Draw() for gruid.Model.
 func (md *model) Draw() gruid.Grid {
 	if !md.anims.Done() {
@@ -231,7 +247,7 @@ func (md *model) drawMapWizardReveal(gd gruid.Grid) {
 	// Entity drawing (with rendering order).
 	sortedIDs := g.sortedIDsByRenderOrder()
 	for _, i := range sortedIDs {
-		o := g.RenderOrder(i)
+		o := g.RenderOrderWizard(i)
 		if o == RONone {
 			continue
 		}

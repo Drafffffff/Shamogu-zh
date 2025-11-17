@@ -10,7 +10,9 @@ const (
 	ModGluttonyRework              // mod with choice-of-two gluttony rework
 	ModNoRecharges                 // mod without spirit recharges
 
-	ModSmallInventory
+	ModSmallInventory // mod limiting inventory to 3 comestible slots
+	ModOrbTracking    // mod making the orb send monsters to you more actively
+	ModMonsterRevival // mod making monster occasionally revive
 
 	modCount // dummy mod (for NMods)
 )
@@ -22,6 +24,7 @@ var gameMods = []Mod{
 	ModCorruptedDungeon, ModChallengeSpirits, ModGluttonyRework,
 	// difficulty mods
 	ModNoRecharges, ModSmallInventory,
+	ModOrbTracking, ModMonsterRevival,
 }
 
 func (m Mod) String() string {
@@ -36,6 +39,10 @@ func (m Mod) String() string {
 		return "Gluttony Rework"
 	case ModSmallInventory:
 		return "Small Inventory"
+	case ModOrbTracking:
+		return "Orb Tracking"
+	case ModMonsterRevival:
+		return "Monster Revival"
 	default:
 		return "(unknown mod)"
 	}
@@ -53,6 +60,10 @@ func (m Mod) Desc() string {
 		return "Makes the Gluttonous Bear eat in pairs through a choice-of-two menu, without relying on a Gluttony status.\n\nThe Challenge Spirits mod should be enabled too for this mod to take effect."
 	case ModSmallInventory:
 		return "Inventory can only hold 3 comestibles."
+	case ModOrbTracking:
+		return "The orb occasionally sends your current position to wandering monsters. You need to keep moving!"
+	case ModMonsterRevival:
+		return "The orb revives monsters after a random delay. You cannot kill them all!"
 	default:
 		return "(unknown mod)"
 	}

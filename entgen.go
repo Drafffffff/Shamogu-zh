@@ -1411,3 +1411,13 @@ func (g *Game) randomFreeNearby(at gruid.Point, maxdist int) gruid.Point {
 		return p
 	}
 }
+
+// randomRevivalNearbyPoint returns a random free cell nearby to the given
+// point and outside the player's field of view.
+func (g *Game) randomRevivalNearbyPoint(at gruid.Point, maxdist int) gruid.Point {
+	q := g.randomFreeNearby(at, maxdist)
+	for g.InFOV(q) {
+		q = g.randomFreeNearby(at, maxdist)
+	}
+	return q
+}

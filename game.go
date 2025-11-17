@@ -109,10 +109,7 @@ func (g *Game) EndTurn() {
 	// explain to the player (even though it might actually feel more
 	// intuitive in some ways in practice as it'd often seem as if monsters
 	// cooperate).
-	ids := []ID{PlayerID}
-	for i := range g.Monsters() {
-		ids = append(ids, i)
-	}
+	ids := g.AllActorIDs()
 	mids := ids[1:] // monster ids (excluding player)
 	g.rand.Shuffle(len(mids), func(i, j int) { mids[i], mids[j] = mids[j], mids[i] })
 	for _, i := range ids {

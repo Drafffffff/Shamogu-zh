@@ -343,6 +343,17 @@ func (g *Game) Actors() iter.Seq2[ID, *Actor] {
 	}
 }
 
+// AllActorIDs returns an iterator over actor map IDs, including dead ones.
+func (g *Game) AllActorIDs() []ID {
+	var ids []ID
+	for id, e := range g.MapEntities() {
+		if e.IsActor() {
+			ids = append(ids, id)
+		}
+	}
+	return ids
+}
+
 // AdjacentActors returns an iterator over alive actor map entities adjacent to
 // the given position.
 func (g *Game) AdjacentActors(p gruid.Point) iter.Seq2[ID, *Actor] {
