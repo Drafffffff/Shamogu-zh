@@ -462,10 +462,11 @@ func (g *Game) PlayerSpirits() iter.Seq2[ID, *Spirit] {
 
 // PlayerComestibles returns an iterator over player's comestibles.
 func (g *Game) PlayerComestibles() iter.Seq2[ID, *Comestible] {
+	to := g.InventoryEnd()
 	return func(yield func(ID, *Comestible) bool) {
-		for i := PrimarySpiritID + NSpirits; i < FirstMapID; i++ {
-			if sp, ok := g.Entity(ID(i)).Role.(*Comestible); ok {
-				if !yield(ID(i), sp) {
+		for i := ID(PrimarySpiritID + NSpirits); i < to; i++ {
+			if sp, ok := g.Entity(i).Role.(*Comestible); ok {
+				if !yield(i, sp) {
 					return
 				}
 			}
@@ -473,10 +474,20 @@ func (g *Game) PlayerComestibles() iter.Seq2[ID, *Comestible] {
 	}
 }
 
+// InventoryEnd returns the first non-inventory ID. May be lower than
+// FirstMapID with ModSmallInventory.
+func (g *Game) InventoryEnd() ID {
+	if g.Mod(ModSmallInventory) {
+		return FirstMapID - 2
+	}
+	return FirstMapID
+}
+
 // InventoryItems returns an iterator over player's primary and secondary spirits.
 func (g *Game) InventoryItems() iter.Seq2[ID, *Entity] {
+	to := g.InventoryEnd()
 	return func(yield func(ID, *Entity) bool) {
-		for i, e := range g.Entities[PrimarySpiritID:FirstMapID] {
+		for i, e := range g.Entities[PrimarySpiritID:to] {
 			if !yield(ID(i+PrimarySpiritID), e) {
 				return
 			}

@@ -7,8 +7,10 @@ type Mod int
 const (
 	ModCorruptedDungeon Mod = iota // mod with lots of unusual and random stuff going on
 	ModChallengeSpirits            // dedicated slot for challenge secondary spirits
-	ModNoRecharges                 // mod without spirit recharges
 	ModGluttonyRework              // mod with choice-of-two gluttony rework
+	ModNoRecharges                 // mod without spirit recharges
+
+	ModSmallInventory
 
 	modCount // dummy mod (for NMods)
 )
@@ -16,8 +18,11 @@ const (
 const NMods = int(modCount)
 
 var gameMods = []Mod{
-	ModCorruptedDungeon, ModChallengeSpirits, ModNoRecharges,
-	ModGluttonyRework}
+	// extension mods
+	ModCorruptedDungeon, ModChallengeSpirits, ModGluttonyRework,
+	// difficulty mods
+	ModNoRecharges, ModSmallInventory,
+}
 
 func (m Mod) String() string {
 	switch m {
@@ -29,6 +34,8 @@ func (m Mod) String() string {
 		return "No Recharges"
 	case ModGluttonyRework:
 		return "Gluttony Rework"
+	case ModSmallInventory:
+		return "Small Inventory"
 	default:
 		return "(unknown mod)"
 	}
@@ -44,6 +51,8 @@ func (m Mod) Desc() string {
 		return "Spirit ability charges are doubled but don’t recharge when going to the next map level. Use them wisely!"
 	case ModGluttonyRework:
 		return "Makes the Gluttonous Bear eat in pairs through a choice-of-two menu, without relying on a Gluttony status.\n\nThe Challenge Spirits mod should be enabled too for this mod to take effect."
+	case ModSmallInventory:
+		return "Inventory can only hold 3 comestibles."
 	default:
 		return "(unknown mod)"
 	}

@@ -583,7 +583,7 @@ func equipItem(md *model, i ID) bool {
 		spirit = true
 		from, to = PrimarySpiritID, PrimarySpiritID+NSpirits
 	case *Comestible:
-		for i, e := range g.Entities[PrimarySpiritID+NSpirits : FirstMapID] {
+		for i, e := range g.Entities[PrimarySpiritID+NSpirits : g.InventoryEnd()] {
 			if !e.IsItem() {
 				// Equip on first empty slot.
 				return g.EquipItemAt(ID(i + NSpirits))
@@ -677,6 +677,11 @@ func (md *model) openInventory(bound ID) (gruid.Effect, bool) {
 		}
 		entries = append(entries, entry)
 		r = nextRuneKey(r)
+	}
+	if md.g.Mod(ModSmallInventory) {
+		// Ensure we get the same letter as usual for any ground
+		// comestibles.
+		r += 2
 	}
 	if id, it := md.g.ItemAt(md.g.PP()); id >= 0 {
 		if IsComestible(it) {
