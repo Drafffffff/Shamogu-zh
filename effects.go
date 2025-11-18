@@ -1013,18 +1013,23 @@ func (eff EffectGallop) Apply(g *Game) bool {
 		g.Log("There’s no foe you can gallop towards.")
 		return false
 	}
-	g.Log("You gallop.")
 	ej := g.Entity(j)
 	dist := paths.DistanceManhattan(pl.P, ej.P)
-	to := ej.P.Sub(g.Dir)
-	from := pl.P
+	if dist == 1 && aj.ResistsMove() {
+		g.Logf("You cannot swap positions with the %s.", ej.Name)
+		return false
+	}
+	g.Log("You gallop.")
+	from, to := pl.P, ej.P.Sub(g.Dir)
 	if dist > 1 {
 		g.BumpMoveActor(PlayerID, pa, to)
 		g.md.MoveAnimation(from, to)
 	}
-	g.MoveActor(PlayerID, pa, ej.P)
-	g.PutStatus(j, aj, StatusDaze, DurationDazeGallop)
-	g.PutStatus(j, aj, StatusConfusion, DurationConfusionGallop)
+	if !aj.ResistsMove() {
+		g.MoveActor(PlayerID, pa, ej.P)
+		g.PutStatus(j, aj, StatusDaze, DurationDazeGallop)
+		g.PutStatus(j, aj, StatusConfusion, DurationConfusionGallop)
+	}
 	if pa.Has(StatusFire) {
 		g.RemoveStatus(PlayerID, pa, StatusFire)
 		g.PutStatus1(PlayerID, pa, StatusImbalance, DurationImbalanceGallop)
