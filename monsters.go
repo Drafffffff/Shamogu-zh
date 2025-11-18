@@ -20,21 +20,24 @@ func (g *Game) HandleMonsterTurn(i ID, ai *Actor) {
 	if ai.Has(StatusConfusion) && g.monsterDiscord(i, ai) {
 		return
 	}
-	pp := g.PP()
-	if g.InFOV(ei.P) && g.MonsterUpdateTarget(i, ai, pp, false) {
-		// A wandering monster spends one turn noticing the player.
-		return
+	pl, pa := g.Player()
+	if g.InFOV(ei.P) && g.MonsterUpdateTarget(i, ai, pl.P, false) {
+		// A wandering monster spends one turn noticing the player,
+		// unless you have the Dazzling Zebra.
+		if !pa.DoesAny(Dazzling) {
+			return
+		}
 	}
-	if pa := g.PlayerActor(); pa.DoesAny(Dazzling) {
+	if pa.DoesAny(Dazzling) {
 		// A dazzling player is easily noticeable by monsters at the
 		// end of their turn.
-		defer func() { _ = g.InFOV(ei.P) && g.MonsterUpdateTarget(i, ai, g.PP(), false) }()
+		defer func() { _ = g.InFOV(ei.P) && g.MonsterUpdateTarget(i, ai, pl.P, false) }()
 	}
 	if beh.Target == ei.P || beh.Target == InvalidPos {
 		// The monster's target has either been reached or is invalid:
 		// we spend a turn chosing a new target.
 		if ai.DoesAny(MonsHungry) && g.HungryHunt(ei.P) || g.Marked() && beh.Guard == InvalidPos {
-			beh.Target = pp
+			beh.Target = pl.P
 			beh.State = Hunting
 			return
 		}
@@ -48,7 +51,7 @@ func (g *Game) HandleMonsterTurn(i ID, ai *Actor) {
 		if maxdist < unreachable {
 			beh.Target = g.RandomPassableWithin(from, maxdist)
 		} else if g.Mod(ModOrbTracking) && g.IntN(5) == 0 {
-			beh.Target = pp
+			beh.Target = pl.P
 		} else {
 			beh.Target = g.RandomPassableNearbyTarget(from)
 		}

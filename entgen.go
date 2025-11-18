@@ -232,11 +232,12 @@ var challengeSpirits = []spiritInfo{
 		BonusTraits:  [2]Traits{RunicChicken, RunicChicken},
 		Advanced:     true},
 	{
-		Name:        "Dazzling Zebra",
-		MaxCharges:  [2]int{1, 3},
-		Ability:     [2]Ability{EffectGallop{}, EffectGallop{}},
-		BonusTraits: [2]Traits{Dazzling, Dazzling},
-		Advanced:    true},
+		Name:         "Dazzling Zebra",
+		MaxCharges:   [2]int{1, 3},
+		Ability:      [2]Ability{EffectGallop{}, EffectGallop{}},
+		BonusDefense: [2]int{1, 1},
+		BonusTraits:  [2]Traits{Dazzling, Dazzling},
+		Advanced:     true},
 }
 
 // spiritEntity generates a new spirit entity using the given data.
