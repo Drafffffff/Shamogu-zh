@@ -672,7 +672,11 @@ func (g *Game) swapSpaceDistortion(i, j ID, ai, aj *Actor, dmg int, dazed bool) 
 		if k, ak := g.ActorAt(p); k >= 0 && k != j && !ak.ResistsMove() {
 			ek := g.Entity(k)
 			if to, ok := g.BlinkPos(ek.P); ok {
-				g.Logf("The space distortion blinks the %s away.", ek.Name)
+				if k == PlayerID {
+					g.Log("The space distortion blinks you away.")
+				} else {
+					g.Logf("The space distortion blinks the %s away.", ek.Name)
+				}
 				g.md.TeleportAnimation(ek.P, to, true)
 				g.MoveActor(k, ak, to)
 			}
