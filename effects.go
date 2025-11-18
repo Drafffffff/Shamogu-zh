@@ -40,6 +40,7 @@ const (
 	DurationFoggySkin              = 10
 	DurationImbalanceDragging      = 2
 	DurationImbalanceGale          = 5
+	DurationImbalanceGallop        = 5
 	DurationImbalanceLignification = 5
 	DurationImbalanceSprint        = 5
 	DurationImbalanceTailSlap      = 4
@@ -1024,6 +1025,10 @@ func (eff EffectGallop) Apply(g *Game) bool {
 	g.MoveActor(PlayerID, pa, ej.P)
 	g.PutStatus(j, aj, StatusDaze, DurationDazeGallop)
 	g.PutStatus(j, aj, StatusConfusion, DurationConfusionGallop)
+	if pa.Has(StatusFire) {
+		g.RemoveStatus(PlayerID, pa, StatusFire)
+		g.PutStatus1(PlayerID, pa, StatusImbalance, DurationImbalanceGallop)
+	}
 	return true
 }
 
@@ -1032,8 +1037,8 @@ func (eff EffectGallop) Name() string {
 }
 
 func (eff EffectGallop) Desc() string {
-	return fmt.Sprintf("Move next to nearest foe in current direction and then swap positions, leaving it @Odazed@N behind for %d turns and @Oconfused@N for %d turns.",
-		DurationDazeGallop, DurationConfusionGallop)
+	return fmt.Sprintf("Move next to nearest foe in current direction and then swap positions, leaving it @Odazed@N behind for %d turns and @Oconfused@N for %d turns. Replaces @OFire@N with @OImbalance@N for %d turns.",
+		DurationDazeGallop, DurationConfusionGallop, DurationImbalanceGallop)
 }
 
 type EffectEarthMenhir struct{}
