@@ -92,7 +92,7 @@ type spiritInfo struct {
 	BonusDefense [2]int     // defense bonuses per level (may be zero)
 	BonusTraits  [2]Traits  // bonus traits per level
 	BonusHP      [2]int     // bonus hp per level (may be zero)
-	Challenge    bool       // challenge spirit
+	Advanced     bool       // advanced secondary spirit
 }
 
 // primarySpirits represents the various kinds of primary spirits.
@@ -194,21 +194,21 @@ var challengeSpirits = []spiritInfo{
 		MaxCharges:  [2]int{1, 4},
 		Ability:     [2]Ability{EffectShadows{}, EffectShadows{}},
 		BonusTraits: [2]Traits{Gawalt, Gawalt},
-		Challenge:   true},
+		Advanced:    true},
 	{
 		Name:        "Gluttonous Bear",
 		MaxCharges:  [2]int{1, 3},
 		Ability:     [2]Ability{EffectSnack{}, EffectSnack{}},
 		BonusHP:     [2]int{3, 3},
 		BonusTraits: [2]Traits{Gluttony, Gluttony},
-		Challenge:   true},
+		Advanced:    true},
 	{
 		Name:        "Gardening Lion",
 		MaxCharges:  [2]int{1, 3},
 		Ability:     [2]Ability{EffectGarden{}, EffectGarden{}},
 		BonusAttack: [2]int{1, 1},
 		BonusTraits: [2]Traits{ScaryRoar, ScaryRoar},
-		Challenge:   true},
+		Advanced:    true},
 	{
 		Name:         "Stomping Elephant",
 		MaxCharges:   [2]int{1, 3},
@@ -216,27 +216,27 @@ var challengeSpirits = []spiritInfo{
 		BonusAttack:  [2]int{1, 1},
 		BonusDefense: [2]int{1, 1},
 		BonusTraits:  [2]Traits{Elephanty, Elephanty},
-		Challenge:    true},
+		Advanced:     true},
 	{
 		Name:        "Staring Owl",
 		MaxCharges:  [2]int{1, 3},
 		Ability:     [2]Ability{EffectDeathStare{}, EffectDeathStare{}},
 		BonusAttack: [2]int{1, 1},
 		BonusTraits: [2]Traits{OwlFlying, OwlFlying},
-		Challenge:   true},
+		Advanced:    true},
 	{
 		Name:         "Runic Chicken",
 		MaxCharges:   [2]int{2, 5},
 		Ability:      [2]Ability{EffectLayRune{}, EffectLayRune{}},
 		BonusDefense: [2]int{1, 1},
 		BonusTraits:  [2]Traits{RunicChicken, RunicChicken},
-		Challenge:    true},
+		Advanced:     true},
 	{
 		Name:        "Dazzling Zebra",
 		MaxCharges:  [2]int{1, 3},
 		Ability:     [2]Ability{EffectGallop{}, EffectGallop{}},
 		BonusTraits: [2]Traits{Dazzling, Dazzling},
-		Challenge:   true},
+		Advanced:    true},
 }
 
 // spiritEntity generates a new spirit entity using the given data.
@@ -260,7 +260,7 @@ func spiritEntity(mods []bool, si spiritInfo) *Entity {
 			BonusDefense: si.BonusDefense,
 			BonusTraits:  si.BonusTraits,
 			BonusHP:      si.BonusHP,
-			Challenge:    si.Challenge}}
+			Advanced:     si.Advanced}}
 }
 
 // genEmptyTotemAt generates a new empty totem entity at the given point.
@@ -384,7 +384,7 @@ func (g *Game) genItems(mg *MapGen) {
 	}
 	if spi := g.ProcInfo.Spirits[g.Map.Level-1]; spi.Idx >= 0 {
 		var sp *Entity
-		if spi.Challenge {
+		if spi.Advanced {
 			sp = spiritEntity(g.Mods, challengeSpirits[spi.Idx])
 		} else {
 			sp = spiritEntity(g.Mods, secondarySpirits[spi.Idx])

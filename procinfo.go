@@ -36,8 +36,8 @@ type ProcInfo struct {
 
 // spiritProcInfo represents procgen information for a secondary totem.
 type spiritProcInfo struct {
-	Idx       int  // totem's index in spiritInfo global data
-	Challenge bool // whether it's a challenge totem
+	Idx      int  // totem's index in spiritInfo global data
+	Advanced bool // whether it's an advanced totem
 }
 
 // InitProcInfo initializes procedural generation starting information.
@@ -190,7 +190,7 @@ func (g *Game) spiritProcGen() {
 	// extras represents a permutation of indices corresponding to
 	// extra spirits.
 	var extras []int
-	if g.Mod(ModChallengeSpirits) {
+	if g.Mod(ModAdvancedSpirits) {
 		extras = make([]int, len(challengeSpirits))
 		for i := range extras {
 			extras[i] = i
@@ -213,7 +213,7 @@ func (g *Game) spiritProcGen() {
 		// Extra totems: generate 3 of each kind.
 		for i := range 3 {
 			mapSpirits[i].Idx = extras[i]
-			mapSpirits[i].Challenge = true
+			mapSpirits[i].Advanced = true
 		}
 		for i := range 3 {
 			mapSpirits[i+3].Idx = spirits[i]
@@ -265,13 +265,13 @@ func (g *Game) spiritProcGen() {
 // needsShuffling reports whether the first three non-empty totems aren't all
 // of the same kind.
 func needsShuffling(s []spiritProcInfo) bool {
-	nk := 0                // same-kind totems seen
-	kind := s[0].Challenge // first totem's kind
+	nk := 0               // same-kind totems seen
+	kind := s[0].Advanced // first totem's kind
 	for _, sk := range s[1:] {
 		if sk.Idx < 0 {
 			continue
 		}
-		if sk.Challenge != kind {
+		if sk.Advanced != kind {
 			// Seen distinct kinds of totems among first 3 ones, so
 			// no shuffling is necessary.
 			return false

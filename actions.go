@@ -603,15 +603,15 @@ func equipItem(md *model, i ID) bool {
 			case ok && rj.Level >= 1:
 				// Cannot upgrade a spirit more than once.
 				entry.Disabled = true
-			case g.Mod(ModChallengeSpirits) && !ok && spirit:
+			case g.Mod(ModAdvancedSpirits) && !ok && spirit:
 				// When challenge spirits are enabled, only one
 				// regular secondary spirit is allowed.
 				ri := ei.Role.(*Spirit)
-				if ri.Challenge {
+				if ri.Advanced {
 					break
 				}
 				for k, sk := range g.PlayerSpirits() {
-					if k > PrimarySpiritID && !sk.Challenge {
+					if k > PrimarySpiritID && !sk.Advanced {
 						entry.Disabled = true
 						break
 					}
@@ -1565,11 +1565,11 @@ On the map, monster color may change depending on active status effects.  By def
 		st := Status(i)
 		switch st {
 		case StatusGluttony:
-			if !g.Mod(ModChallengeSpirits) || g.Mod(ModGluttonyRework) {
+			if !g.Mod(ModAdvancedSpirits) || g.Mod(ModGluttonyRework) {
 				continue
 			}
 		case StatusGardener, StatusShadow:
-			if !g.Mod(ModChallengeSpirits) {
+			if !g.Mod(ModAdvancedSpirits) {
 				continue
 			}
 		}

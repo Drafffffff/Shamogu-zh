@@ -77,7 +77,7 @@ func testGame(t *testing.T) {
 	g.rand = rand.New(rand.NewPCG(rand.Uint64(), rand.Uint64()))
 	g.Mods = make([]bool, NMods)
 	g.Mods[ModCorruptedDungeon] = true
-	g.Mods[ModChallengeSpirits] = true
+	g.Mods[ModAdvancedSpirits] = true
 	g.Init(spiritEntity(g.Mods, primarySpirits[g.rand.IntN(len(primarySpirits))]))
 	g.ComputePlayerStats()
 	g.InitLevel()
