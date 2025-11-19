@@ -94,6 +94,9 @@ func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKi
 	switch {
 	case i >= 0 && ai != nil:
 		g.logBumpDamage(i, j, ai, aj, dmg, ap)
+		if ai.Has(StatusVampirism) {
+			g.AdjustHP(i, ai, HealVampirism)
+		}
 		if ai.DoesAny(PatternSwap|PatternSwapDaze) || ai.Has(StatusShadow) || aj.Has(StatusShadow) || g.IntN(dmg) == 0 {
 			break
 		}
@@ -358,6 +361,8 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 		}
 	case ai.DoesAny(PatternCrocodile) && ai.CanMove() && !aj.ResistsMove() && ap == AttackDrag && !ai.Has(StatusPoison) && aj.IsAlive():
 		g.drag(i, j, ai, aj)
+	case ai.DoesAny(PatternBat) && ap == AttackPlain && ai.CanMove() && !ai.Has(StatusPoison):
+		g.retreat(i, j, ai, aj)
 	}
 	// Extra attack effects (shared by both player and monsters).
 	if ai.DoesAny(VenomousMelee) && (ap != AttackRanged || g.AdjacentEntities(i, j)) && g.IntN(6-dmg) < 2 {
@@ -494,10 +499,11 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 		// Gawalt monkey reduces damage of non-weak hits.
 		dmg--
 	}
-	if ai.Has(StatusDig) && (ap == AttackCharge || dmg == 0) || ap == AttackSlap {
+	if ai.Has(StatusDig) && (ap == AttackCharge || dmg == 0) || ap == AttackSlap || dmg == 0 && ai.Has(StatusVampirism) {
 		// Dig status gives extra *effective* damage on charge and
 		// ensures at least 1 damage.
 		// Crocodile's tail-slapping has extra effective damage, too.
+		// Vampirism ensures at least 1 damage.
 		dmg++
 	}
 	if ai.Has(StatusBerserk) {
@@ -514,7 +520,7 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 		}
 		// Compute reasonable maximum expected damage for “times lucky”
 		// purposes. We don't take everything into account (like fire
-		// from phoenix or lama). More than 5 damage, even from hydra,
+		// from phoenix or llama). More than 5 damage, even from hydra,
 		// is always considered unexpected.
 		maxdmg := 5
 		switch {
@@ -702,19 +708,14 @@ func (g *Game) recoil(i, j ID, ai *Actor) bool {
 	}
 	dir := toDir(ei.P.Sub(ej.P))
 	npi := ei.P.Add(dir)
-	if !g.Map.Passable(npi) {
-		return false
-	}
-	if i, _ := g.ActorAt(npi); i >= 0 {
+	if !g.IsFree(npi) {
 		return false
 	}
 	if paths.DistanceManhattan(ei.P, ej.P) == 1 {
 		p := npi.Add(dir)
-		if g.Map.Passable(p) {
-			if i, _ := g.ActorAt(p); i < 0 {
-				npi = p
-				g.MakeNoise(ei.P, NoiseWind)
-			}
+		if g.IsFree(p) {
+			npi = p
+			g.MakeNoise(ei.P, NoiseWind)
 		}
 	}
 	pi := ei.P
@@ -745,6 +746,29 @@ func (g *Game) drag(i, j ID, ai, aj *Actor) {
 	g.BumpMoveActor(i, ai, to)
 	g.MoveActor(j, aj, pi)
 	g.md.MoveAnimation(pj, pi)
+}
+
+// retreat attemps to a sneaky retreat backwards.
+func (g *Game) retreat(i, j ID, ai, aj *Actor) {
+	ei, ej := g.Entity(i), g.Entity(j)
+	dir := toDir(ei.P.Sub(ej.P))
+	from, to := ei.P, ei.P
+	for range 2 {
+		p := to.Add(dir)
+		if !g.IsFree(p) {
+			break
+		}
+		to = p
+	}
+	if from == to {
+		return
+	}
+	if g.IntN(3) == 0 {
+		// Sudden retreat may confuse foes.
+		g.PutStatus(j, aj, StatusConfusion, 2)
+	}
+	g.BumpMoveActor(i, ai, to)
+	g.md.MoveAnimation(from, to)
 }
 
 // AdjacentEntities reports whether two entities are adjacent.

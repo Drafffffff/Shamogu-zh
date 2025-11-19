@@ -131,10 +131,11 @@ func (t Traits) All(of Traits) bool {
 	return t&of == of
 }
 
-// Traits. NOTE: there shouldn't be more than 64 (remaining free: 2).
+// Traits. NOTE: there shouldn't be more than 64 (remaining free: 0).
 const (
 	Player Traits = 1 << iota
 
+	PatternBat          // sneaky attack pattern (bat)
 	PatternCatch        // unbalancing and catching attack (frog, octopode)
 	PatternCrocodile    // requires extra turn for changing directions (advanced)
 	PatternFourDirs     // four-directional attack in 4 dirs (hydra players)
@@ -201,7 +202,10 @@ const (
 	MonsImmunityLignification // immune to lignification
 	MonsImmunityPoison        // immune to poison
 
-	// We don't do descriptions for those (beyond the log messages about noise).
+	// NOTE: we don't do descriptions for the traits below (beyond the log
+	// messages about noise), so they could be moved to another struct
+	// field to make place for more traits.
+
 	MonsCreep          // creep noise (instead of footsteps)
 	MonsHeavyFootsteps // heavy footsteps
 	MonsLightFootsteps // light footsteps
@@ -216,6 +220,7 @@ func (t Traits) String() string {
 	desc := []string{}
 	desc = traitDesc(desc, t, PatternFourDirs, "four-directional attack with attack bonus per extra foe")
 	desc = traitDesc(desc, t, PatternFourDirsMons, "four-directional attack")
+	desc = traitDesc(desc, t, PatternBat, "sneaky attack pattern")
 	desc = traitDesc(desc, t, PatternCatch, "ranged catching attack that @Ounbalances@N foes")
 	desc = traitDesc(desc, t, PatternCrocodile, "unbalancing dragging attack, slow rotation (cannot turn and attack)")
 	desc = traitDesc(desc, t, PatternRampage, "rampaging charge")
@@ -310,6 +315,7 @@ const (
 	StatusShadow
 	StatusSprint
 	StatusTimeStop
+	StatusVampirism
 )
 
 // Bad reports whether the status is inherently bad.
@@ -324,7 +330,7 @@ func (st Status) Bad() bool {
 }
 
 // NStatuses is the number of different kind of statuses.
-const NStatuses = StatusTimeStop + 1
+const NStatuses = StatusVampirism + 1
 
 var statusAbbrevation = []string{
 	StatusBerserk:       "Ber",
@@ -344,6 +350,7 @@ var statusAbbrevation = []string{
 	StatusShadow:        "Sha",
 	StatusSprint:        "Spr",
 	StatusTimeStop:      "Tim",
+	StatusVampirism:     "Vam",
 }
 
 func (st Status) Abbr() string {
@@ -368,6 +375,7 @@ var statusName = []string{
 	StatusShadow:        "Shadow",
 	StatusSprint:        "Sprint",
 	StatusTimeStop:      "Time Stop",
+	StatusVampirism:     "Vampirism",
 }
 
 func (st Status) Name() string {
@@ -392,6 +400,7 @@ var statusAdjective = []string{
 	StatusShadow:        "shadowy",
 	StatusSprint:        "sprinting",
 	StatusTimeStop:      "freezing time",
+	StatusVampirism:     "vampiric",
 }
 
 func (st Status) String() string {
@@ -418,9 +427,10 @@ var statusDesc = []string{
 		LignificationDefenseBonus, DurationImbalanceLignification),
 	StatusPoison: fmt.Sprintf("Walking will hurt you for %d damage. Stinky toxins are exuded on expiration, confusing other creatures for %d turns.",
 		PoisonDamage, DurationConfusionToxins),
-	StatusShadow:   "Harmonic shadows make non-hunting monsters not notice you unless you attack them. You can move instantly through translucent walls. It makes combat silent and removes the weakening debuff.",
-	StatusSprint:   "You can move to a visible destination three times as fast on the current direction and twice as fast laterally. You can jump over foes, unbalancing them. Canceled by waiting.",
-	StatusTimeStop: "Time is frozen for everyone but you until expiration. Status effects affecting you will still progress.",
+	StatusShadow:    "Harmonic shadows make non-hunting monsters not notice you unless you attack them. You can move instantly through translucent walls. It makes combat silent and removes the weakening debuff.",
+	StatusSprint:    "You can move to a visible destination three times as fast on the current direction and twice as fast laterally. You can jump over foes, unbalancing them. Canceled by waiting.",
+	StatusTimeStop:  "Time is frozen for everyone but you until expiration. Status effects affecting you will still progress.",
+	StatusVampirism: fmt.Sprintf("Guarantees successful melee bite that restores %d HP.", HealVampirism),
 }
 
 func (st Status) Desc() string {
@@ -806,6 +816,7 @@ var sortedStatuses = []Status{
 	StatusShadow,
 	StatusSprint,
 	StatusTimeStop,
+	StatusVampirism,
 
 	StatusBerserk,       // after Poison
 	StatusLignification, // after Imbalance & Berserk

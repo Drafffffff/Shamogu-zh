@@ -137,6 +137,11 @@ var primarySpiritsAdvanced = []spiritInfo{
 		BonusAttack:  [2]int{1, 1},
 		BonusDefense: [2]int{0, 1},
 		BonusTraits:  [2]Traits{PatternCrocodile, PatternCrocodile}},
+	{
+		Name:        "Vampiric Bat",
+		MaxCharges:  [2]int{2, 4},
+		Ability:     [2]Ability{EffectVampirism{}, EffectVampirism{}},
+		BonusTraits: [2]Traits{PatternBat, PatternBat}},
 }
 
 // secondarySpirits represents the various kinds of secondary spirit totems

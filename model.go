@@ -252,7 +252,7 @@ func InitConfig() error {
 }
 
 var spiritKeys = []rune{'H', 'B', 'F', 'f', 'c'}
-var spiritKeysAdvanced = []rune{'C'}
+var spiritKeysAdvanced = []rune{'C', 'b'}
 
 func (md *model) openSpiritSelectionMenu(m mode) {
 	hstyle := gruid.Style{Fg: ColorCyan}

@@ -24,6 +24,7 @@ func init() {
 	gob.Register(EffectPushingGale{})
 	gob.Register(EffectTimeStop{})
 	gob.Register(EffectTailSlap{})
+	gob.Register(EffectVampirism{})
 	gob.Register(EffectLightning{})
 	gob.Register(EffectBark{})
 	gob.Register(EffectNoxiousSmell{})

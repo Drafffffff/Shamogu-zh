@@ -81,7 +81,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 			g.md.RangedAttackAnimation(pa, pl.P, ej.P)
 			g.BumpAttackActor(PlayerID, j, pa, aj, AttackRanged, dist, 0)
 			return true
-		case pa.DoesAny(PatternRampage) && pa.CanMove() && (pa.HP > 1 || !pa.Has(StatusPoison)):
+		case pa.DoesAny(PatternRampage|PatternBat) && pa.CanMove() && (pa.HP > 1 || !pa.Has(StatusPoison)):
 			g.Dir = dir
 			to := ej.P.Sub(dir)
 			from := pl.P

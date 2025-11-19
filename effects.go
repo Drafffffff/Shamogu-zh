@@ -60,14 +60,16 @@ const (
 	HealFirebreathPepper  = 2
 	HealFoggySkinOnion    = 3
 	HealTeleportLignified = 2
+	HealVampirism         = 1
 
-	DurationDig      = 5
-	DurationFocus    = 3
-	DurationShadow   = 8
-	DurationGarden   = 7
-	DurationGluttony = 7
-	DurationSprint   = 6
-	DurationTimeStop = 5
+	DurationDig       = 5
+	DurationFocus     = 3
+	DurationShadow    = 8
+	DurationGarden    = 7
+	DurationGluttony  = 7
+	DurationSprint    = 6
+	DurationTimeStop  = 5
+	DurationVampirism = 2
 )
 
 func newHP(a *Actor, hp int) string {
@@ -517,6 +519,35 @@ func (eff EffectTailSlap) Name() string {
 func (eff EffectTailSlap) Desc() string {
 	return fmt.Sprintf("Perform a tail-slap attack with +1 effective damage on any adjacent foes while turning around, @Ounbalancing@N them for %d turns.",
 		DurationImbalanceTailSlap)
+}
+
+type EffectVampirism struct{}
+
+func (eff EffectVampirism) Apply(g *Game) bool {
+	pa := g.PlayerActor()
+	if pa.Has(StatusDaze) {
+		g.Log("Invoking “vampirism” while dazed would be useless.")
+		return false
+	}
+	if pa.Has(StatusVampirism) {
+		g.Log("You cannot invoke “vampirism” when you’re already vampiric.")
+		return false
+	}
+	if pa.Has(StatusFear) {
+		g.Log("You cannot invoke “focus” while afraid.")
+		return false
+	}
+	g.PutStatus(PlayerID, pa, StatusVampirism, DurationVampirism)
+	g.instant = true
+	return true
+}
+
+func (eff EffectVampirism) Name() string {
+	return "vampirism"
+}
+
+func (eff EffectVampirism) Desc() string {
+	return fmt.Sprintf("@BVampirism@N for %d turns. %s @GInstant@N.", DurationVampirism, statusDesc[StatusVampirism])
 }
 
 type EffectLightning struct{}
