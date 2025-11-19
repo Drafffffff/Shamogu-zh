@@ -139,7 +139,7 @@ var primarySpiritsAdvanced = []spiritInfo{
 		BonusTraits:  [2]Traits{PatternCrocodile, PatternCrocodile}},
 	{
 		Name:        "Vampiric Bat",
-		MaxCharges:  [2]int{2, 4},
+		MaxCharges:  [2]int{1, 2},
 		Ability:     [2]Ability{EffectVampirism{}, EffectVampirism{}},
 		BonusTraits: [2]Traits{PatternBat, PatternBat}},
 }

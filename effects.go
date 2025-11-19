@@ -60,7 +60,6 @@ const (
 	HealFirebreathPepper  = 2
 	HealFoggySkinOnion    = 3
 	HealTeleportLignified = 2
-	HealVampirism         = 1
 
 	DurationDig       = 5
 	DurationFocus     = 3

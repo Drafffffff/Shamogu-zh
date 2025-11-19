@@ -34,6 +34,7 @@ const (
 	MaxAttackDamage = 3
 
 	BerserkAttackBonus            = 2
+	VampirismAttackBonus          = 2
 	ConfusedImbalanceDefenseBonus = 2
 	LignificationDefenseBonus     = 2
 )
@@ -43,6 +44,9 @@ func (a *Actor) GetAttack() int {
 	attack := a.Attack
 	if a.Has(StatusBerserk) {
 		attack += BerserkAttackBonus
+	}
+	if a.Has(StatusVampirism) {
+		attack += VampirismAttackBonus
 	}
 	if a.Has(StatusImbalance) {
 		attack /= 2
@@ -95,7 +99,7 @@ func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKi
 	case i >= 0 && ai != nil:
 		g.logBumpDamage(i, j, ai, aj, dmg, ap)
 		if ai.Has(StatusVampirism) {
-			g.AdjustHP(i, ai, HealVampirism)
+			g.AdjustHP(i, ai, dmg)
 		}
 		if ai.DoesAny(PatternSwap|PatternSwapDaze) || ai.Has(StatusShadow) || aj.Has(StatusShadow) || g.IntN(dmg) == 0 {
 			break
