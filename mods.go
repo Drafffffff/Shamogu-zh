@@ -8,6 +8,7 @@ const (
 	ModCorruptedDungeon Mod = iota // mod with lots of unusual and random stuff going on
 	ModAdvancedSpirits             // dedicated slot for challenge secondary spirits
 	ModGluttonyRework              // mod with choice-of-two gluttony rework
+	ModRecoilRework                // rework of wind fox's recoil
 
 	ModNoRecharges    // mod without spirit recharges
 	ModSmallInventory // mod limiting inventory to 3 comestible slots
@@ -21,7 +22,8 @@ const NMods = int(modCount)
 
 var gameMods = []Mod{
 	// extension mods
-	ModCorruptedDungeon, ModAdvancedSpirits, ModGluttonyRework,
+	ModCorruptedDungeon, ModAdvancedSpirits,
+	ModGluttonyRework, ModRecoilRework,
 	// challenge mods
 	ModNoRecharges, ModSmallInventory,
 	ModOrbTracking, ModMonsterRevival,
@@ -35,6 +37,8 @@ func (m Mod) String() string {
 		return "Advanced Spirits"
 	case ModGluttonyRework:
 		return "Gluttony Rework"
+	case ModRecoilRework:
+		return "Recoil Rework"
 	case ModNoRecharges:
 		return "No Recharges"
 	case ModSmallInventory:
@@ -56,6 +60,8 @@ func (m Mod) Desc() string {
 		return "Enable extra advanced secondary spirits: Gawalt Monkey, Gardening Lion, Gluttonous Bear, Stomping Elephant, Staring Owl, Runic Chicken, Dazzling Zebra.\n\nAdvanced secondaries always have strong points but also serious and quirky drawbacks.\n\nYou cannot chose more than one regular secondary spirit!"
 	case ModGluttonyRework:
 		return "Makes the Gluttonous Bear eat in pairs through a choice-of-two menu, without relying on a Gluttony status.\n\nThe Advanced Spirits mod should be enabled too for this mod to take effect."
+	case ModRecoilRework:
+		return "Makes wind fox’s recoil more deterministic: guaranteed on melee hits, half of the time on hits at range 2, never beyond."
 	case ModNoRecharges:
 		return "Spirit ability charges are doubled but don’t recharge when going to the next map level. Use them wisely!"
 	case ModSmallInventory:

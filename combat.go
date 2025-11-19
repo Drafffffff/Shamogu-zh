@@ -354,8 +354,8 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 		g.swapSpaceDistortion(i, j, ai, aj, dmg, dazed)
 	case ai.DoesAny(PatternCatch) && ap == AttackRanged && !aj.ResistsMove():
 		g.catch(i, j, ai, aj, dist)
-	case ai.DoesAny(PatternRangedRecoil) && ap != AttackCharge && ai.CanMove() && g.IntN(5-dmg) < 2:
-		if g.recoil(i, j, ai) && i != PlayerID &&
+	case ai.DoesAny(PatternRangedRecoil) && ap != AttackCharge && ai.CanMove():
+		if g.recoil(i, j, ai, dist, dmg) && i != PlayerID &&
 			ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusImbalance, 1+dmg) && g.InFOV(ei.P) {
 			g.Logf("The confused %s lost balance due to recoil!", ei.Name)
 		}
@@ -697,23 +697,26 @@ func (g *Game) swapSpaceDistortion(i, j ID, ai, aj *Actor, dmg int, dazed bool) 
 	}
 }
 
-// RecoilRange represents the maximum distance at which recoil can happen.
-const RecoilRange = 4
-
 // recoil handles extra recoil effects for actors with the PatternRangedRecoil
 // trait.
-func (g *Game) recoil(i, j ID, ai *Actor) bool {
-	ei, ej := g.Entity(i), g.Entity(j)
-	if paths.DistanceManhattan(ei.P, ej.P) > RecoilRange {
-		// Disable recoil for long distances.
-		return false
+func (g *Game) recoil(i, j ID, ai *Actor, dist, dmg int) bool {
+	switch {
+	case g.Mod(ModRecoilRework):
+		if dist > 2 || dist == 2 && g.IntN(5) > 2 {
+			return false
+		}
+	default:
+		if dist > 4 || g.IntN(5-dmg) >= 2 {
+			return false
+		}
 	}
+	ei, ej := g.Entity(i), g.Entity(j)
 	dir := toDir(ei.P.Sub(ej.P))
 	npi := ei.P.Add(dir)
 	if !g.IsFree(npi) {
 		return false
 	}
-	if paths.DistanceManhattan(ei.P, ej.P) == 1 {
+	if dist == 1 {
 		p := npi.Add(dir)
 		if g.IsFree(p) {
 			npi = p
