@@ -32,6 +32,7 @@ const (
 	DurationDazeTeleport           = 4
 	DurationFearAmbrosia           = 4
 	DurationFearBark               = 4
+	DurationFearDeathStare         = 3
 	DurationFearFakePortal         = 6
 	DurationFearRoar               = 5
 	DurationFearGrowl              = 2
@@ -937,12 +938,17 @@ func (eff EffectStomp) Desc() string {
 type EffectDeathStare struct{}
 
 func (eff EffectDeathStare) Apply(g *Game) bool {
-	pp := g.PP()
-	if j, aj := g.RangedTargetInDir(pp, g.Dir); j >= 0 {
+	pl, pa := g.Player()
+	if pa.Has(StatusFear) {
+		g.Log("You cannot invoke “death stare” while afraid.")
+		return false
+	}
+	if j, aj := g.RangedTargetInDir(pl.P, g.Dir); j >= 0 {
 		ej := g.Entity(j)
 		g.Logf("You give a deadly stare at the %s.", ej.Name)
-		g.md.RangedBeamAnimation(pp, ej.P, ColorViolet)
+		g.md.RangedBeamAnimation(pl.P, ej.P, ColorViolet)
 		g.InflictDamage(j, aj, aj.HP, AttackOther)
+		g.PutStatus1(PlayerID, pa, StatusFear, DurationFearDeathStare)
 		return true
 	}
 	g.Log("You cannot use “death stare” without a visible foe in front.")
@@ -965,7 +971,8 @@ func (eff EffectDeathStare) Name() string {
 }
 
 func (eff EffectDeathStare) Desc() string {
-	return "Kills first visible foe in front."
+	return fmt.Sprintf("Kills first visible foe in front. Gives you @OFear@N for %d turns as backlash.",
+		DurationFearDeathStare)
 }
 
 type EffectLayRune struct{}
