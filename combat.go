@@ -363,6 +363,8 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 		g.drag(i, j, ai, aj)
 	case ai.DoesAny(PatternBat) && ap == AttackPlain && ai.CanMove() && !ai.Has(StatusPoison):
 		g.retreat(i, j, ai, aj)
+	case ai.DoesAny(PatternBat) && ap == AttackCharge:
+		g.PutStatus(j, aj, StatusConfusion, 2)
 	}
 	// Extra attack effects (shared by both player and monsters).
 	if ai.DoesAny(VenomousMelee) && (ap != AttackRanged || g.AdjacentEntities(i, j)) && g.IntN(6-dmg) < 2 {
@@ -762,10 +764,6 @@ func (g *Game) retreat(i, j ID, ai, aj *Actor) {
 	}
 	if from == to {
 		return
-	}
-	if g.IntN(3) == 0 {
-		// Sudden retreat may confuse foes.
-		g.PutStatus(j, aj, StatusConfusion, 2)
 	}
 	g.BumpMoveActor(i, ai, to)
 	g.md.MoveAnimation(from, to)
