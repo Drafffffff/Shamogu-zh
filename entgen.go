@@ -315,6 +315,8 @@ var NoHealingComestibleData = []itemInfo{
 	TeleportMushroom:   {"teleport mushroom", EffectTeleportMushroom{}},
 }
 
+// GetComestibleData returns the appropiate comestible data for current mod
+// selection.
 func (g *Game) GetComestibleData() []itemInfo {
 	if g.Mod(ModNoHealingComestibles) {
 		return NoHealingComestibleData
