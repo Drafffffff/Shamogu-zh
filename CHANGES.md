@@ -5,7 +5,7 @@ New content:
 * New advanced new game settings, accessed by pressing TAB in the new game
   menu. They allow to select various game mods, as well as extra advanced
   primary spirits.
-* New advanced primary spirit: **Spinning Crocodile**. It features a
+* New advanced primary spirit: **Spinning Crocodile**. It has a
   *tail-slap* ability that hits and unbalances all adjacent foes and reverses
   the player's current direction. The crocodile's attacks are melee attacks
   that drag foes backwards, unbalancing them. The crocodile cannot rotate
@@ -15,15 +15,53 @@ New content:
   mobility restrictions, but it's still considered an *advanced* primary spirit
   (only accessible through the advanced new game settings). See design
   discussion in issue #6.
+* New advanced primary spirit: **Vampiric Bat**. It has a *vampirism*
+  ability that allows to steal life by damaging foes: the Vampirism status
+  effect is short-lived, so one has to chose foes wisely! The bat's attacks
+  follow a two-phased attack pattern: when ranged, it works as a confusing
+  rampaging attack. In melee, a plain attack is followed by quick 2-tile
+  retreat.
 * New **Corrupted Dungeon** (wip) mod: the orb's influence has scattered
   twisted surprises through the land! The mod is recommended to any player that
   wants some extra variability and surprises during their adventures. See
   design discussion in issue #6.
 * New **Challenge Spirits** (wip) mod that introduces several new kinds of
-  non-primary spirits with both heavy drawbacks and advantages, somewhat less
-  balanced than regular secondary spirits. See design discussion in issue #7.
+  secondary spirits with both significant drawbacks and advantages, somewhat
+  more quirky and less balanced than regular secondary spirits, but fun in
+  various ways! See design discussion in issue #7.
 * New **No Recharges** mod: double spirit charges but going to the next level
   doesn't recharge them anymore!
+
+The **Challenge Spirits** mod provides the following advanced secondary
+spirits:
+
+* **Dazzling Zebra**. It has a “gallop” ability that allows rampaging-like
+  movement toward a foe and then swap positions with it, leaving it dazed and
+  confused. The Zebra has a special dazzling effect on foes: it makes foes on
+  one side mistakenly hit instead any foe just behind you on the other side!
+  However, being so dazzling also means Zebra is easy to notice instantly, so
+  beware of sudden attacks while exploring!
+* **Gardening Lion**. It has a “garden” ability that allows to grow foliage
+  around you for several turns. The Lion roars loudly on sighting foes for the
+  first time, scaring them.
+* **Gawalt Monkey**. It features wall-jumping (inspired from Harmonist) and a
+  “shadows” ability that allows to move around unnoticed and go through
+  translucent walls. Stealth and mobility are the Gawalt's way, and combat is
+  more difficult, because attack damage is weakened.
+* **Gluttonous Bear**. It has a powerful “snack” ability that teleports you to
+  the nearest comestible and makes you eat it. However, the Bear needs
+  otherwise to eat comestibles in pairs!
+* **Runic Chicken**. It has a “lay rune” ability that allows to lay random
+  runes in places. The Chicken doesn't trigger traps, but cackles loudly on
+  sighting totems and portals, as it of course also does when laying runes.
+* **Staring Owl**. It has a “death stare” ability that allows to instantly kill
+  a single foe but leaves you afraid due to its backlash. The Owl flies a bit
+  over foliage, increasing visibility over it. That helps with ranged attacks
+  and foliage fires, but also makes stealth more difficult.
+* **Stomping Elephant**. It has a “stomp” ability that destroys nearby walls
+  and makes you Berserk for a short while. The Elephant is immune to Berserk
+  after-effects and can remain unnoticed in dead-ends, but it is afraid of rats
+  and cannot turn easily when facing walls!
 
 Reworked and improved content:
 
