@@ -289,7 +289,7 @@ func (g *Game) ComputePlayerStats() {
 		p.Traits |= sp.BonusTraits[sp.Level]
 	}
 	if g.Mod(ModHealFromDeaths) {
-		p.MaxHP = (1 + p.MaxHP) / 2
+		p.MaxHP = 1 + (1+p.MaxHP)/2
 	}
 	p.HP = min(p.HP, p.GetMaxHP())
 }
