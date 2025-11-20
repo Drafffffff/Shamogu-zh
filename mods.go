@@ -10,14 +10,16 @@ const (
 	ModGluttonyRework              // mod with choice-of-two gluttony rework
 	ModRecoilRework                // rework of wind fox's recoil
 
-	ModNoRecharges    // mod without spirit recharges
-	ModSmallInventory // mod limiting inventory to 3 comestible slots
-	ModOrbTracking    // mod making the orb send monsters to you more actively
-	ModMonsterRevival // mod making monster occasionally revive
+	ModSmallInventory       // mod limiting inventory to 3 comestible slots
+	ModNoRecharges          // mod without spirit recharges
+	ModNoHealingComestibles // no healing comestibles
+	ModOrbTracking          // mod making the orb send monsters to you more actively
+	ModMonsterRevival       // mod making monster occasionally revive
 
 	modCount // dummy mod (for NMods)
 )
 
+// Number of mods.
 const NMods = int(modCount)
 
 var gameMods = []Mod{
@@ -25,9 +27,13 @@ var gameMods = []Mod{
 	ModCorruptedDungeon, ModAdvancedSpirits,
 	ModGluttonyRework, ModRecoilRework,
 	// challenge mods
-	ModNoRecharges, ModSmallInventory,
+	ModSmallInventory,
+	ModNoRecharges, ModNoHealingComestibles,
 	ModOrbTracking, ModMonsterRevival,
 }
+
+// Number of extension mods (for header positioning purposes in menu).
+const NExtensions = 4
 
 func (m Mod) String() string {
 	switch m {
@@ -39,10 +45,12 @@ func (m Mod) String() string {
 		return "Gluttony Rework"
 	case ModRecoilRework:
 		return "Recoil Rework"
-	case ModNoRecharges:
-		return "No Recharges"
 	case ModSmallInventory:
 		return "Small Inventory"
+	case ModNoRecharges:
+		return "No Recharges"
+	case ModNoHealingComestibles:
+		return "No Healing Comestibles"
 	case ModOrbTracking:
 		return "Orb Tracking"
 	case ModMonsterRevival:
@@ -62,10 +70,12 @@ func (m Mod) Desc() string {
 		return "Makes the Gluttonous Bear eat in pairs through a choice-of-two menu, without relying on a Gluttony status.\n\nThe Advanced Spirits mod should be enabled too for this mod to take effect."
 	case ModRecoilRework:
 		return "Makes wind fox’s recoil more deterministic: guaranteed on melee hits, 3/5 of the time on hits at range 2, never beyond."
-	case ModNoRecharges:
-		return "Spirit ability charges are doubled but don’t recharge when going to the next map level. Use them wisely!"
 	case ModSmallInventory:
 		return "Inventory can only hold 3 comestibles."
+	case ModNoRecharges:
+		return "Spirit ability charges are doubled but don’t recharge when going to the next map level. Use them wisely!"
+	case ModNoHealingComestibles:
+		return "A comestible rework with no healing comestibles. Extra maximum HP. Be proactive about HP!"
 	case ModOrbTracking:
 		return "The orb occasionally sends your current position to wandering monsters. You need to keep moving!"
 	case ModMonsterRevival:

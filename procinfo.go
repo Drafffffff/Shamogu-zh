@@ -323,7 +323,7 @@ func (g *Game) NextMenhirKind() menhirKind {
 // comestibleProcGen creates a random sequence of comestibles kinds that still
 // ensures that all comestibles appear at least once in a while.
 func (g *Game) comestibleProcGen() {
-	g.ProcInfo.Comestibles = g.genRandomIndices(len(ComestibleData))
+	g.ProcInfo.Comestibles = g.genRandomIndices(len(g.GetComestibleData()))
 }
 
 // NextComestibleKind returns the next comestible kind (index of
@@ -336,7 +336,12 @@ func (g *Game) NextComestibleKind() comestibleKind {
 	}
 	i := gpi.Comestibles[gpi.ComestibleIdx]
 	gpi.ComestibleIdx++
-	return comestibleKind(i)
+	ck := comestibleKind(i)
+	if g.Mod(ModNoHealingComestibles) && ck == AmbrosiaBerries {
+		// No ambrosia berries with ModNoHealingComestibles.
+		return g.NextComestibleKind()
+	}
+	return ck
 }
 
 func (g *Game) comestiblesProcGen() {

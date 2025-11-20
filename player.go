@@ -278,6 +278,9 @@ func (g *Game) ComputePlayerStats() {
 	p.Attack = 2
 	p.Defense = 1
 	p.MaxHP = 9
+	if g.Mod(ModNoHealingComestibles) {
+		p.MaxHP += 3
+	}
 	p.Traits = Player
 	for _, sp := range g.PlayerSpirits() {
 		p.Attack += sp.BonusAttack[sp.Level]

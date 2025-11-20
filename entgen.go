@@ -304,6 +304,24 @@ var ComestibleData = []itemInfo{
 	TeleportMushroom:   {"teleport mushroom", EffectTeleportMushroom{}},
 }
 
+// NoHealingComestibleData provides information about the various kinds of
+// comestibles (for ModNoHealingComestibles).
+var NoHealingComestibleData = []itemInfo{
+	BerserkingFlower:   {"berserking flower", EffectBerserkingFlower{}},
+	ClarityLeaves:      {"clarity leaves", EffectClarityLeaves{NoHeal: true}},
+	FirebreathPepper:   {"firebreath pepper", EffectFirebreathPepper{NoHeal: true}},
+	FoggySkinOnion:     {"foggy-skin onion", EffectFoggySkinOnion{NoHeal: true}},
+	LignificationFruit: {"lignification fruit", EffectLignificationFruit{}},
+	TeleportMushroom:   {"teleport mushroom", EffectTeleportMushroom{}},
+}
+
+func (g *Game) GetComestibleData() []itemInfo {
+	if g.Mod(ModNoHealingComestibles) {
+		return NoHealingComestibleData
+	}
+	return ComestibleData
+}
+
 // comestibleEntity generates a new comestible Entity entity using the given
 // data.
 func comestibleEntity(ci itemInfo) *Entity {
@@ -486,7 +504,7 @@ func (g *Game) genItems(mg *MapGen) {
 	if g.Mod(ModCorruptedDungeon) && mg.theme == ThemeNone && g.IntN(3*MapLevels) == 0 {
 		if g.IntN(2) == 0 {
 			// Field of comestibles of same kind.
-			cod := ComestibleData[comestibleIdx()]
+			cod := (g.GetComestibleData())[comestibleIdx()]
 			for i := range nitems + 7 {
 				addComestible(i, cod)
 			}
@@ -508,7 +526,7 @@ func (g *Game) genItems(mg *MapGen) {
 		nitems += 4
 	}
 	for i := range nitems {
-		addComestible(i, ComestibleData[comestibleIdx()])
+		addComestible(i, (g.GetComestibleData())[comestibleIdx()])
 	}
 	// Runic traps.
 	rto, rtt := 1, 1 // runes in open areas and in tunnels

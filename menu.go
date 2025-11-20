@@ -340,7 +340,7 @@ func (md *model) updateModDesc(m Mod) {
 		enabled = "@CEnabled.@N\n"
 	}
 	l.Box = &ui.Box{Title: ui.Text(m.String())}
-	l.Content = stt.WithText(enabled + m.Desc()).Format(UIWidth/2 - 1 - 2)
+	l.Content = stt.WithText(enabled + m.Desc()).Format(UIWidth/2 - 2)
 }
 
 func (md *model) modSelectionMenu() {
@@ -356,7 +356,7 @@ func (md *model) modSelectionMenu() {
 				Text:     ui.Text("Extensions").WithStyle(hstyle),
 				Disabled: true,
 			})
-		case i == 4:
+		case i == NExtensions:
 			entries = append(entries, ui.MenuEntry{
 				Text:     ui.Text("Challenges").WithStyle(hstyle),
 				Disabled: true,
