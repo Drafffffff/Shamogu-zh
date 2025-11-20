@@ -12,6 +12,7 @@ const (
 
 	ModSmallInventory       // mod limiting inventory to 3 comestible slots
 	ModNoRecharges          // mod without spirit recharges
+	ModHealFromDeaths       // mod with healing from monster deaths
 	ModNoHealingComestibles // no healing comestibles
 	ModOrbTracking          // mod making the orb send monsters to you more actively
 	ModMonsterRevival       // mod making monster occasionally revive
@@ -28,7 +29,7 @@ var gameMods = []Mod{
 	ModGluttonyRework, ModRecoilRework,
 	// challenge mods
 	ModSmallInventory,
-	ModNoRecharges, ModNoHealingComestibles,
+	ModNoRecharges, ModHealFromDeaths, ModNoHealingComestibles,
 	ModOrbTracking, ModMonsterRevival,
 }
 
@@ -49,6 +50,8 @@ func (m Mod) String() string {
 		return "Small Inventory"
 	case ModNoRecharges:
 		return "No Recharges"
+	case ModHealFromDeaths:
+		return "Healing From Deaths"
 	case ModNoHealingComestibles:
 		return "No Healing Comestibles"
 	case ModOrbTracking:
@@ -74,6 +77,8 @@ func (m Mod) Desc() string {
 		return "Inventory can only hold 3 comestibles."
 	case ModNoRecharges:
 		return "Spirit ability charges are doubled but don’t recharge when going to the next map level. Use them wisely!"
+	case ModHealFromDeaths:
+		return "When a monster dies, you heal for 1 HP. However, you’re incredibly frail (half maximum HP)."
 	case ModNoHealingComestibles:
 		return "A comestible rework with no healing comestibles. Extra maximum HP. Be proactive about HP!"
 	case ModOrbTracking:
