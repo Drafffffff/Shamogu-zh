@@ -1088,47 +1088,55 @@ type EffectEarthMenhir struct{}
 func (eff EffectEarthMenhir) Apply(g *Game) bool {
 	const maxdist = MaxFOVRange + 4 // "earthquake" distance
 	g.menhirMsg("earth menhir")
-	// Reveal walls (but not the translucent ones) and destroy nearby ones.
-	g.MakeNoise(g.PP(), NoiseEarthMenhir)
+	pp := g.PP()
+	g.MakeNoise(pp, NoiseEarthMenhir)
 	mp := &MappingPath{passable: g.Map.NoWallAt}
-	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, unreachable)
-	var draw bool
-	var nbs paths.Neighbors
-	cost := 1
+	// Destroy nearby walls.
+	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{pp}, maxdist)
+	draw, cost := false, 1
 	for _, n := range nodes {
 		if n.Cost > cost && draw {
 			g.md.AnimationFrameFast()
-			draw = false
-			cost = n.Cost
+			draw, cost = false, n.Cost
+		}
+		t := g.Map.Terrain.At(n.P)
+		if t != Wall || n.Cost > maxdist || !g.Map.PassableNeighbor(n.P) {
+			continue
+		}
+		g.earthMenhirDig(n.P)
+		if g.Map.KnownTerrain.At(n.P) == Wall {
+			g.Map.KnownTerrain.Set(n.P, Rubble)
+		}
+		draw = true
+	}
+	g.UpdateFOV()
+	g.md.AnimationFrameFast()
+	// Reveal walls connected to interior walls (ignoring translucent
+	// ones).
+	draw, cost = false, 1
+	nodes = g.PR.BreadthFirstMap(mp, []gruid.Point{pp}, unreachable)
+	for _, n := range nodes {
+		if n.Cost > cost && draw {
+			g.md.AnimationFrameFast()
+			draw, cost = false, n.Cost
 		}
 		t := g.Map.Terrain.At(n.P)
 		if t != Wall {
 			continue
 		}
-		if n.Cost <= maxdist && g.Map.PassableNeighbor(n.P) {
-			g.earthMenhirDig(nbs, n.P)
-			if g.Map.KnownTerrain.At(n.P) == Wall {
-				g.Map.KnownTerrain.Set(n.P, Rubble)
-			} else if g.Map.revelableWallAt(n.P) {
-				g.Map.KnownTerrain.Set(n.P, t)
-			}
-			draw = true
-		} else if g.Map.KnownTerrain.At(n.P) != t && g.Map.revelableWallAt(n.P) {
-			g.Map.KnownTerrain.Set(n.P, t)
+		if g.Map.KnownTerrain.At(n.P) != Wall && g.Map.hasInteriorNeighbor(n.P) {
+			g.Map.KnownTerrain.Set(n.P, Wall)
 			draw = true
 		}
 	}
 	return true
 }
 
-// revelableWallAt reports whether there's a earth-menhir revelable wall at the
+// hasInteriorNeighbor reports whether there's a earth-menhir revelable wall at the
 // given position (wall adjacent to an interior wall).
-func (m *Map) revelableWallAt(p gruid.Point) bool {
-	if m.Terrain.At(p) != Wall {
-		return false
-	}
-	for q := range Neighbors(p) {
-		if m.interiorWallAt(q) {
+func (m *Map) hasInteriorNeighbor(p gruid.Point) bool {
+	for _, dir := range Directions {
+		if m.interiorWallAt(p.Add(dir)) {
 			return true
 		}
 	}
@@ -1151,12 +1159,19 @@ func (m *Map) interiorWallAt(p gruid.Point) bool {
 
 // earthMenhirDig is similar to dig but without the noise and extra behaviors
 // (because we want a single noise source at the "earthquake" centre).
-func (g *Game) earthMenhirDig(nbs paths.Neighbors, at gruid.Point) {
+func (g *Game) earthMenhirDig(at gruid.Point) {
 	g.Stats.Digs++
 	g.Map.Terrain.Set(at, Rubble)
-	ps := append(nbs.Cardinal(at, inMap), at)
-	for _, q := range ps {
-		g.NormalCloudAt(q, 2+g.IntN(3))
+	for q := range Neighbors(at) {
+		switch g.Map.Terrain.At(q) {
+		case Floor, Foliage:
+			g.NormalCloudAt(q, 2+g.IntN(3))
+		}
+		// We only put a cloud on floor and foliage tiles but not
+		// rubble ones, for clarity, as it doesn't change visibility,
+		// so it's almost the same (except for the very rare case of a
+		// poison cloud on rubble that would be replaced by a normal
+		// one).
 	}
 }
 

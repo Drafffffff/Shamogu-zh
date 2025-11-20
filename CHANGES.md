@@ -53,6 +53,8 @@ Fixes:
   it with a normal cloud. The cloud replacing wasn't very interesting and was
   an oversight.
 * Fix bug where you could get Imbalance despite being lignified (see #6).
+* Fix some edge-cases in earth menhir that prevented revealing some walls that
+  should've been revealed.
 * Fix small animation glitch with Clarity, where the previous last-seen
   position of a monster would be briefly shown with the wrong color (see #6).
 * Minor update in frog's catching description: it always unbalances when
