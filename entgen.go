@@ -1282,7 +1282,12 @@ func (g *Game) corruptedPortalGuardianPoint(mg *MapGen) gruid.Point {
 	if g.Map.Orb != InvalidPos {
 		p = g.Map.Orb
 	} else {
-		p = g.Map.Portal
+		ids := g.AllPortalIDs()
+		p = g.Entity(ids[g.IntN(len(ids))]).P
+		if g.IntN(3) == 0 {
+			// Higher chance of guarding the true portal.
+			p = g.Map.Portal
+		}
 	}
 	if g.IntN(4) == 0 {
 		// Occasionally guard a random non-player vault.

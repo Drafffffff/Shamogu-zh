@@ -505,3 +505,15 @@ func (g *Game) InventoryItems() iter.Seq2[ID, *Entity] {
 		}
 	}
 }
+
+// AllPortalIDs returns an iterator over portal IDs, including malfunctioning
+// ones.
+func (g *Game) AllPortalIDs() []ID {
+	var ids []ID
+	for id, e := range g.MapEntities() {
+		if _, ok := e.Role.(*Portal); ok {
+			ids = append(ids, id)
+		}
+	}
+	return ids
+}
