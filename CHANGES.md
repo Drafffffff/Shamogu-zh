@@ -90,6 +90,8 @@ Fixes:
 * A translucent wall explosion now releases a poison cloud, without replacing
   it with a normal cloud. The cloud replacing wasn't very interesting and was
   an oversight.
+* Fix bug that could make an afraid monster take a (non-attacking) step toward
+  you.
 * Fix bug where you could get Imbalance despite being lignified (see #6).
 * Fix some edge-cases in earth menhir that prevented revealing some walls that
   should've been revealed.

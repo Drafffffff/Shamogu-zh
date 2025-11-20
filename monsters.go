@@ -294,7 +294,7 @@ func (g *Game) monsterFlee(i ID, ai *Actor) bool {
 		if !g.IsFree(p) {
 			return false
 		}
-		return paths.DistanceManhattan(p, pl.P) > paths.DistanceManhattan(ei.P, p)
+		return paths.DistanceManhattan(p, pl.P) > paths.DistanceManhattan(ei.P, pl.P)
 	})
 	if len(ps) == 0 {
 		// No free positions: lose a turn doing nothing.
