@@ -611,10 +611,7 @@ func fmtTurns(turns int, n int) string {
 // HPBonus returns the amount of HP for berserk or lignification.
 func (a *Actor) HPBonus() int {
 	bonus := (2 * a.MaxHP) / 3
-	if bonus == 0 {
-		bonus = 1
-	}
-	return bonus
+	return max(1, bonus)
 }
 
 // RemoveStatus removes a status on an actor.
