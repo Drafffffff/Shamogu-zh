@@ -74,13 +74,13 @@ func (m Mod) Desc() string {
 	case ModRecoilRework:
 		return "Makes wind fox’s recoil more deterministic: guaranteed on melee hits, 3/5 of the time on hits at range 2, never beyond."
 	case ModSmallInventory:
-		return "Inventory can only hold 3 comestibles."
+		return "Inventory can only hold 3 comestibles. Choose them with care!"
 	case ModNoRecharges:
 		return "Spirit ability charges are doubled but don’t recharge when going to the next map level. Use them wisely!"
 	case ModHealFromDeaths:
-		return "When a monster dies, you heal for 1 HP. However, you’re incredibly frail (half maximum HP)."
+		return "When a monster dies, you heal for 1 HP. Reduced maximum HP. Beware of sudden damage spikes!"
 	case ModNoHealingComestibles:
-		return "A comestible rework with no healing comestibles. Extra maximum HP. Be proactive about HP!"
+		return "A comestible rework with no healing comestibles. Extra starting and maximum HP. Be proactive about HP!"
 	case ModOrbTracking:
 		return "The orb occasionally sends your current position to wandering monsters. You need to keep moving!"
 	case ModMonsterRevival:
