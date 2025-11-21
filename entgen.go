@@ -140,7 +140,7 @@ var primarySpiritsAdvanced = []spiritInfo{
 	{
 		Name:        "Vampiric Bat",
 		MaxCharges:  [2]int{1, 2},
-		Ability:     [2]Ability{EffectVampirism{}, EffectVampirism{}},
+		Ability:     [2]Ability{EffectVampirism{DurationVampirism}, EffectVampirism{DurationVampirism}},
 		BonusTraits: [2]Traits{PatternBat, PatternBat}},
 }
 
@@ -254,6 +254,10 @@ func spiritEntity(mods []bool, si spiritInfo) *Entity {
 	if HasMod(mods, ModNoRecharges) {
 		si.MaxCharges[0] *= 2
 		si.MaxCharges[1] *= 2
+	}
+	if HasMod(mods, ModNoHealingComestibles) && si.BonusTraits[0].Any(PatternBat) {
+		si.Ability[0] = EffectVampirism{DurationVampirism * 2}
+		si.Ability[1] = si.Ability[0]
 	}
 	return &Entity{
 		Name:   si.Name,

@@ -279,7 +279,10 @@ func (g *Game) ComputePlayerStats() {
 	p.Defense = 1
 	p.MaxHP = 9
 	if g.Mod(ModNoHealingComestibles) {
-		p.MaxHP += 3
+		sp := g.Entity(PrimarySpiritID).Role.(*Spirit)
+		if !sp.BonusTraits[sp.Level].Any(PatternBat) {
+			p.MaxHP += 3
+		}
 	}
 	p.Traits = Player
 	for _, sp := range g.PlayerSpirits() {

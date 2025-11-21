@@ -550,7 +550,7 @@ func (eff EffectTailSlap) Desc() string {
 		DurationImbalanceTailSlap)
 }
 
-type EffectVampirism struct{}
+type EffectVampirism struct{ Duration int }
 
 func (eff EffectVampirism) Apply(g *Game) bool {
 	pa := g.PlayerActor()
@@ -566,7 +566,7 @@ func (eff EffectVampirism) Apply(g *Game) bool {
 		g.Log("You cannot invoke “focus” while afraid.")
 		return false
 	}
-	g.PutStatus(PlayerID, pa, StatusVampirism, DurationVampirism)
+	g.PutStatus(PlayerID, pa, StatusVampirism, eff.Duration)
 	g.instant = true
 	return true
 }
@@ -576,7 +576,7 @@ func (eff EffectVampirism) Name() string {
 }
 
 func (eff EffectVampirism) Desc() string {
-	return fmt.Sprintf("@BVampirism@N for %d turns. %s @GInstant@N.", DurationVampirism, statusDesc[StatusVampirism])
+	return fmt.Sprintf("@BVampirism@N for %d turns. %s @GInstant@N.", eff.Duration, statusDesc[StatusVampirism])
 }
 
 type EffectLightning struct{}

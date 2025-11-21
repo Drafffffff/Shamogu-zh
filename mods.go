@@ -80,7 +80,7 @@ func (m Mod) Desc() string {
 	case ModHealFromDeaths:
 		return "When a monster dies, you heal for 1 HP. Reduced maximum HP. Beware of sudden damage spikes!"
 	case ModNoHealingComestibles:
-		return "A comestible rework with no healing comestibles. Extra starting and maximum HP. Be proactive about HP!"
+		return "A comestible rework with no healing comestibles. Extra starting and maximum HP. Be proactive about HP!\n\nVampiric Bat players get double @BVampirism@N duration instead of extra maximum HP."
 	case ModOrbTracking:
 		return "The orb occasionally sends your current position to wandering monsters. You need to keep moving!"
 	case ModMonsterRevival:
