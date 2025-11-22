@@ -69,7 +69,7 @@ func (m Mod) Desc() string {
 	case ModGluttonyRework:
 		return "Makes the Gluttonous Bear eat in pairs through a choice-of-two menu, without relying on a Gluttony status.\n\nThe Advanced Spirits mod should be enabled too for this mod to take effect."
 	case ModRecoilRework:
-		return "Makes wind fox’s recoil more deterministic: guaranteed on melee hits, 3/5 of the time on hits at range 2, never beyond."
+		return "Makes wind fox’s recoil more deterministic: guaranteed on melee hits, 3/4 of the time on hits at range 2, never beyond."
 	case ModSmallInventory:
 		return "Inventory can only hold 3 comestibles. Choose them with care!"
 	case ModNoRecharges:

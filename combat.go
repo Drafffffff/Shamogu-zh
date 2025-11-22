@@ -713,7 +713,7 @@ func (g *Game) swapSpaceDistortion(i, j ID, ai, aj *Actor, dmg int, dazed bool) 
 func (g *Game) recoil(i, j ID, ai *Actor, dist, dmg int) bool {
 	switch {
 	case g.Mod(ModRecoilRework):
-		if dist > 2 || dist == 2 && g.IntN(5) > 2 {
+		if dist > 2 || dist == 2 && g.IntN(4) == 0 {
 			return false
 		}
 	default:
