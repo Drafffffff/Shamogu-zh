@@ -283,7 +283,7 @@ func (eff EffectFirebreathPepper) Desc() string {
 		DurationConfusionPepperBreath, DurationFire, healMsgNH(HealFirebreathPepper, eff.NoHeal))
 }
 
-type EffectTeleportMushroom struct{}
+type EffectTeleportMushroom struct{ NoHeal bool }
 
 func (eff EffectTeleportMushroom) Apply(g *Game) bool {
 	pa := g.PlayerActor()
@@ -291,7 +291,9 @@ func (eff EffectTeleportMushroom) Apply(g *Game) bool {
 	g.eatMsg("teleport mushroom", "")
 	if !g.TeleportActor(PlayerID, pa, 1) {
 		g.Log("You resist teleport while lignified.")
-		g.AdjustHP(PlayerID, pa, HealTeleportLignified)
+		if !eff.NoHeal {
+			g.AdjustHP(PlayerID, pa, HealTeleportLignified)
+		}
 	}
 	if j >= 0 {
 		g.SenseEntity(j, "sense")
@@ -308,8 +310,12 @@ func (g *Game) teleportStatuses(i ID, ai *Actor, n int) {
 }
 
 func (eff EffectTeleportMushroom) Desc() string {
-	return fmt.Sprintf("Teleports you away and makes you sense any totemic spirit. Leaves you either @Odazed@N or @Oimbalanced@N for %d or %d turns respectively. Restores %+d HP when lignified instead.",
-		DurationDazeTeleport, DurationImbalanceTeleport, HealTeleportLignified)
+	var healMsg string
+	if !eff.NoHeal {
+		healMsg = fmt.Sprintf(" Restores %+d HP when lignified instead.", HealTeleportLignified)
+	}
+	return fmt.Sprintf("Teleports you away and makes you sense any totemic spirit. Leaves you either @Odazed@N or @Oimbalanced@N for %d or %d turns respectively.%s",
+		DurationDazeTeleport, DurationImbalanceTeleport, healMsg)
 }
 
 type EffectFocus struct{}

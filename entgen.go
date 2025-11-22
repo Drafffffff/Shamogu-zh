@@ -318,7 +318,7 @@ var NoHealingComestibleData = []itemInfo{
 	FirebreathPepper:   {"firebreath pepper", EffectFirebreathPepper{NoHeal: true}},
 	FoggySkinOnion:     {"foggy-skin onion", EffectFoggySkinOnion{NoHeal: true}},
 	LignificationFruit: {"lignification fruit", EffectLignificationFruit{}},
-	TeleportMushroom:   {"teleport mushroom", EffectTeleportMushroom{}},
+	TeleportMushroom:   {"teleport mushroom", EffectTeleportMushroom{NoHeal: true}},
 }
 
 // GetComestibleData returns the appropiate comestible data for current mod
