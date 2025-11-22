@@ -1608,6 +1608,8 @@ On the map, monster color may change depending on active status effects.  By def
 			details = "Player-only effect obtainable with the Temporal Cat spirit."
 		case StatusFocus:
 			details = "Cancels @BSprint@N. Player-only effect obtainable with the Four-Headed Hydra spirit."
+		case StatusVampirism:
+			details = "Player-only effect obtainable with the Vampiric Bat spirit."
 		}
 		if details != "" {
 			sb.WriteRune(' ')
