@@ -256,7 +256,7 @@ func spiritEntity(mods []bool, si spiritInfo) *Entity {
 		si.MaxCharges[1] *= 2
 	}
 	if HasMod(mods, ModHealingCombat) {
-		if _, ok := si.Ability[0].(*EffectVampirism); ok {
+		if _, ok := si.Ability[0].(EffectVampirism); ok {
 			si.Ability[0] = EffectVampirism{DurationVampirism * 2}
 			si.Ability[1] = si.Ability[0]
 		}
