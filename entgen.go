@@ -251,15 +251,17 @@ func spiritEntity(mods []bool, si spiritInfo) *Entity {
 		snack := EffectSnack{NoGluttonyStatus: true}
 		si.Ability[0], si.Ability[1] = snack, snack
 	}
+	if HasMod(mods, ModHealingCombat) {
+		if _, ok := si.Ability[0].(EffectVampirism); ok {
+			si.Ability[0] = EffectVampirism{DurationVampirism + 1}
+			si.Ability[1] = si.Ability[0]
+			si.MaxCharges[0]++
+			si.MaxCharges[1]++
+		}
+	}
 	if HasMod(mods, ModNoRecharges) {
 		si.MaxCharges[0] *= 2
 		si.MaxCharges[1] *= 2
-	}
-	if HasMod(mods, ModHealingCombat) {
-		if _, ok := si.Ability[0].(EffectVampirism); ok {
-			si.Ability[0] = EffectVampirism{DurationVampirism * 2}
-			si.Ability[1] = si.Ability[0]
-		}
 	}
 	return &Entity{
 		Name:   si.Name,

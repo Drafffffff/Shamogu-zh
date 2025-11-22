@@ -75,7 +75,7 @@ func (m Mod) Desc() string {
 	case ModNoRecharges:
 		return "Spirit ability charges are doubled but don’t recharge when going to the next map level. Use them wisely!"
 	case ModHealingCombat:
-		return "Healing happens through combat. When a monster dies, you may heal for 1 HP, with higher chance at low HP. However, comestibles don’t provide healing anymore.\n\nVampiric Bat players get double @BVampirism@N duration instead of healing on monster death. Less healing but better control over it!"
+		return "Healing happens through combat. When a monster dies, you may heal for 1 HP, with higher chance at low HP. However, comestibles don’t provide healing anymore.\n\nVampiric Bat players get an extra “vampirism” charge and @BVampirism@N turn instead of healing on monster death. Less frequent healing but better control over it!"
 	case ModOrbTracking:
 		return "The orb occasionally sends your current position to wandering monsters. You need to keep moving!"
 	case ModMonsterRevival:
