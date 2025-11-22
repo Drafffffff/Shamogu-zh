@@ -255,9 +255,11 @@ func spiritEntity(mods []bool, si spiritInfo) *Entity {
 		si.MaxCharges[0] *= 2
 		si.MaxCharges[1] *= 2
 	}
-	if HasMod(mods, ModNoHealingComestibles) && si.BonusTraits[0].Any(PatternBat) {
-		si.Ability[0] = EffectVampirism{DurationVampirism * 2}
-		si.Ability[1] = si.Ability[0]
+	if HasMod(mods, ModHealingCombat) {
+		if _, ok := si.Ability[0].(*EffectVampirism); ok {
+			si.Ability[0] = EffectVampirism{DurationVampirism * 2}
+			si.Ability[1] = si.Ability[0]
+		}
 	}
 	return &Entity{
 		Name:   si.Name,
@@ -322,7 +324,7 @@ var NoHealingComestibleData = []itemInfo{
 // GetComestibleData returns the appropiate comestible data for current mod
 // selection.
 func (g *Game) GetComestibleData() []itemInfo {
-	if g.Mod(ModNoHealingComestibles) {
+	if g.Mod(ModHealingCombat) {
 		return NoHealingComestibleData
 	}
 	return ComestibleData

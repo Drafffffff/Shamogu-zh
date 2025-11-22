@@ -337,7 +337,7 @@ func (g *Game) NextComestibleKind() comestibleKind {
 	i := gpi.Comestibles[gpi.ComestibleIdx]
 	gpi.ComestibleIdx++
 	ck := comestibleKind(i)
-	if g.Mod(ModNoHealingComestibles) && ck == AmbrosiaBerries {
+	if g.Mod(ModHealingCombat) && ck == AmbrosiaBerries {
 		// No ambrosia berries with ModNoHealingComestibles.
 		return g.NextComestibleKind()
 	}

@@ -10,12 +10,11 @@ const (
 	ModGluttonyRework              // mod with choice-of-two gluttony rework
 	ModRecoilRework                // rework of wind fox's recoil
 
-	ModSmallInventory       // mod limiting inventory to 3 comestible slots
-	ModNoRecharges          // mod without spirit recharges
-	ModHealFromDeaths       // mod with healing from monster deaths
-	ModNoHealingComestibles // no healing comestibles
-	ModOrbTracking          // mod making the orb send monsters to you more actively
-	ModMonsterRevival       // mod making monster occasionally revive
+	ModSmallInventory // mod limiting inventory to 3 comestible slots
+	ModNoRecharges    // mod without spirit recharges
+	ModHealingCombat  // combat-based healing system instead of comestible-based
+	ModOrbTracking    // mod making the orb send monsters to you more actively
+	ModMonsterRevival // mod making monster occasionally revive
 
 	modCount // dummy mod (for NMods)
 )
@@ -29,7 +28,7 @@ var gameMods = []Mod{
 	ModGluttonyRework, ModRecoilRework,
 	// challenge mods
 	ModSmallInventory,
-	ModNoRecharges, ModHealFromDeaths, ModNoHealingComestibles,
+	ModNoRecharges, ModHealingCombat,
 	ModOrbTracking, ModMonsterRevival,
 }
 
@@ -50,10 +49,8 @@ func (m Mod) String() string {
 		return "Small Inventory"
 	case ModNoRecharges:
 		return "No Recharges"
-	case ModHealFromDeaths:
-		return "Healing From Deaths"
-	case ModNoHealingComestibles:
-		return "No Healing Comestibles"
+	case ModHealingCombat:
+		return "Healing Combat"
 	case ModOrbTracking:
 		return "Orb Tracking"
 	case ModMonsterRevival:
@@ -77,10 +74,8 @@ func (m Mod) Desc() string {
 		return "Inventory can only hold 3 comestibles. Choose them with care!"
 	case ModNoRecharges:
 		return "Spirit ability charges are doubled but don’t recharge when going to the next map level. Use them wisely!"
-	case ModHealFromDeaths:
-		return "When a monster dies, you heal for 1 HP. Reduced maximum HP. Beware of sudden damage spikes!"
-	case ModNoHealingComestibles:
-		return "A comestible rework with no healing comestibles. Extra starting and maximum HP. Be proactive about HP!\n\nVampiric Bat players get double @BVampirism@N duration instead of extra maximum HP."
+	case ModHealingCombat:
+		return "Healing happens through combat. When a monster dies, you may heal for 1 HP, with higher chance at low HP. However, comestibles don’t provide healing anymore.\n\nVampiric Bat players get double @BVampirism@N duration instead of healing on monster death. Less healing but better control over it!"
 	case ModOrbTracking:
 		return "The orb occasionally sends your current position to wandering monsters. You need to keep moving!"
 	case ModMonsterRevival:
@@ -88,4 +83,11 @@ func (m Mod) Desc() string {
 	default:
 		return "(unknown mod)"
 	}
+}
+
+// HasVampirism reports whether the player has a vampirism ability.
+func (g *Game) HasVampirism() bool {
+	sp := g.Entity(PrimarySpiritID).Role.(*Spirit)
+	_, ok := sp.Ability[sp.Level].(*EffectVampirism)
+	return ok
 }

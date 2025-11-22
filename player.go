@@ -278,21 +278,12 @@ func (g *Game) ComputePlayerStats() {
 	p.Attack = 2
 	p.Defense = 1
 	p.MaxHP = 9
-	if g.Mod(ModNoHealingComestibles) {
-		sp := g.Entity(PrimarySpiritID).Role.(*Spirit)
-		if !sp.BonusTraits[sp.Level].Any(PatternBat) {
-			p.MaxHP += 3
-		}
-	}
 	p.Traits = Player
 	for _, sp := range g.PlayerSpirits() {
 		p.Attack += sp.BonusAttack[sp.Level]
 		p.Defense += sp.BonusDefense[sp.Level]
 		p.MaxHP += sp.BonusHP[sp.Level]
 		p.Traits |= sp.BonusTraits[sp.Level]
-	}
-	if g.Mod(ModHealFromDeaths) {
-		p.MaxHP = 1 + (1+p.MaxHP)/2
 	}
 	p.HP = min(p.HP, p.GetMaxHP())
 }

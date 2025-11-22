@@ -231,9 +231,12 @@ func (g *Game) monsterDeath(i, j ID, aj *Actor) {
 		// might not see it later otherwise.
 		aj.KnownDead = true
 	}
-	if g.Mod(ModHealFromDeaths) {
-		aj.KnownDead = true // You feel the monster's death as you heal.
-		g.AdjustHP(PlayerID, g.PlayerActor(), 1)
+	if g.Mod(ModHealingCombat) && !g.HasVampirism() {
+		pa := g.PlayerActor()
+		if pa.HP < pa.GetMaxHP() && g.IntN(pa.HP) < 4 {
+			aj.KnownDead = true // You feel the monster's death as you heal.
+			g.AdjustHP(PlayerID, g.PlayerActor(), 1)
+		}
 	}
 	if !aj.DoesAny(MonsExplodingDeath) {
 		return
