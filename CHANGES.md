@@ -65,6 +65,12 @@ spirits:
 
 Reworked and improved content:
 
+* Wind Fox's recoil has been reworked: guaranteed on hits in melee, 2/3 chance
+  on hits at distance 2, and never beyond. Pushing gale's damage in melee is
+  now 1-2, so often 2 damage instead of 1. The idea behind those changes is to
+  make monsters more likely to reach the player, but help the player a bit once
+  it is in melee, to make Wind Fox less extreme in making easy situations
+  easier and hard situations harder.
 * Eating clarity leaves and foggy-skin onion while Clarity or Foggy-Skin is
   active now extends the beneficial status by the remaining duration, instead
   of losing remaining turns. Eating a berserking flower or lignification fruit

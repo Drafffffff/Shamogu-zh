@@ -450,17 +450,22 @@ func (g *Game) pushingGale(from, dir gruid.Point) {
 		at = p
 		n++
 	}
+	pp := g.PP()
 	for ; at != from; at = at.Sub(dir) {
 		i, ai := g.ActorAt(at)
 		if i < 0 {
 			continue
 		}
 		ei := g.Entity(i)
-		g.InflictDamage(i, ai, 1, AttackGale)
+		dmg := AttackGale
+		if paths.DistanceManhattan(ei.P, pp) == 1 && g.IntN(3) > 0 {
+			dmg++
+		}
+		g.InflictDamage(i, ai, 1, dmg)
 		if ai.IsDead() {
 			continue
 		}
-		g.MonsterUpdateTarget(i, ai, g.PP(), g.InFOV(ei.P)) // alert monster toward wind origin
+		g.MonsterUpdateTarget(i, ai, pp, g.InFOV(ei.P)) // alert monster toward wind origin
 		g.PutStatus(i, ai, StatusImbalance, DurationImbalanceGale)
 		to := at.Add(dir)
 		n := 0
@@ -494,7 +499,7 @@ func (eff EffectPushingGale) Name() string {
 }
 
 func (eff EffectPushingGale) Desc() string {
-	return fmt.Sprintf("Hurt foes in the four cardinal directions for 1 damage, pushing them away and @Ounbalancing@N them for %d turns. Dissipates clouds except foliage fires that propagate instead.",
+	return fmt.Sprintf("Hurt foes in the four cardinal directions for 1 damage when ranged and 1-2 in melee. Pushes foes away and @Ounbalances@N them for %d turns. Dissipates clouds except foliage fires that propagate instead.",
 		DurationImbalanceGale)
 }
 

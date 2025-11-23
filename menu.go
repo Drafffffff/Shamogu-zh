@@ -353,10 +353,10 @@ func (md *model) modSelectionMenu() {
 		switch {
 		case i == 0:
 			entries = append(entries, ui.MenuEntry{
-				Text:     ui.Text("Extensions").WithStyle(hstyle),
+				Text:     ui.Text("Expansions").WithStyle(hstyle),
 				Disabled: true,
 			})
-		case i == NExtensions:
+		case i == NExpansions:
 			entries = append(entries, ui.MenuEntry{
 				Text:     ui.Text("Challenges").WithStyle(hstyle),
 				Disabled: true,

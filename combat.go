@@ -366,7 +366,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 	case ai.DoesAny(PatternCatch) && ap == AttackRanged && !aj.ResistsMove():
 		g.catch(i, j, ai, aj, dist)
 	case ai.DoesAny(PatternRangedRecoil) && ap != AttackCharge && ai.CanMove():
-		if g.recoil(i, j, ai, dist, dmg) && i != PlayerID &&
+		if g.recoil(i, j, ai, dist) && i != PlayerID &&
 			ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusImbalance, 1+dmg) && g.InFOV(ei.P) {
 			g.Logf("The confused %s lost balance due to recoil!", ei.Name)
 		}
@@ -710,16 +710,9 @@ func (g *Game) swapSpaceDistortion(i, j ID, ai, aj *Actor, dmg int, dazed bool) 
 
 // recoil handles extra recoil effects for actors with the PatternRangedRecoil
 // trait.
-func (g *Game) recoil(i, j ID, ai *Actor, dist, dmg int) bool {
-	switch {
-	case g.Mod(ModRecoilRework):
-		if dist > 2 || dist == 2 && g.IntN(4) == 0 {
-			return false
-		}
-	default:
-		if dist > 4 || g.IntN(5-dmg) >= 2 {
-			return false
-		}
+func (g *Game) recoil(i, j ID, ai *Actor, dist int) bool {
+	if dist > 2 || dist == 2 && g.IntN(3) == 0 {
+		return false
 	}
 	ei, ej := g.Entity(i), g.Entity(j)
 	dir := toDir(ei.P.Sub(ej.P))

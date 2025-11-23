@@ -8,7 +8,6 @@ const (
 	ModCorruptedDungeon Mod = iota // mod with lots of unusual and random stuff going on
 	ModAdvancedSpirits             // dedicated slot for challenge secondary spirits
 	ModGluttonyRework              // mod with choice-of-two gluttony rework
-	ModRecoilRework                // rework of wind fox's recoil
 
 	ModSmallInventory // mod limiting inventory to 3 comestible slots
 	ModNoRecharges    // mod without spirit recharges
@@ -23,17 +22,17 @@ const (
 const NMods = int(modCount)
 
 var gameMods = []Mod{
-	// extension mods
+	// expansion mods
 	ModCorruptedDungeon, ModAdvancedSpirits,
-	ModGluttonyRework, ModRecoilRework,
+	ModGluttonyRework,
 	// challenge mods
 	ModSmallInventory,
 	ModNoRecharges, ModHealingCombat,
 	ModOrbTracking, ModMonsterRevival,
 }
 
-// Number of extension mods (for header positioning purposes in menu).
-const NExtensions = 4
+// Number of expansion mods (for header positioning purposes in menu).
+const NExpansions = 3
 
 func (m Mod) String() string {
 	switch m {
@@ -43,8 +42,6 @@ func (m Mod) String() string {
 		return "Advanced Spirits"
 	case ModGluttonyRework:
 		return "Gluttony Rework"
-	case ModRecoilRework:
-		return "Recoil Rework"
 	case ModSmallInventory:
 		return "Small Inventory"
 	case ModNoRecharges:
@@ -68,8 +65,6 @@ func (m Mod) Desc() string {
 		return "Enable extra advanced secondary spirits: Dazzling Zebra, Gardening Lion, Gawalt Monkey, Gluttonous Bear, Runic Chicken, Staring Owl, Stomping Elephant.\n\nAdvanced secondaries always have strong points but also serious and quirky drawbacks.\n\nYou cannot chose more than one regular secondary spirit!"
 	case ModGluttonyRework:
 		return "Makes the Gluttonous Bear eat in pairs through a choice-of-two menu, without relying on a Gluttony status.\n\nThe Advanced Spirits mod should be enabled too for this mod to take effect."
-	case ModRecoilRework:
-		return "Makes wind fox’s recoil more deterministic: guaranteed on melee hits, 3/4 of the time on hits at range 2, never beyond."
 	case ModSmallInventory:
 		return "Inventory can only hold 3 comestibles. Choose them with care!"
 	case ModNoRecharges:
