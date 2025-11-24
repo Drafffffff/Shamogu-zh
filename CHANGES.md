@@ -105,6 +105,7 @@ Fixes:
   should've been revealed.
 * Fix small animation glitch with Clarity, where the previous last-seen
   position of a monster would be briefly shown with the wrong color (see #6).
+* Fix off-by-one mistake for duration in description of lignification rune.
 * Minor update in frog's catching description: it always unbalances when
   ranged, but description said "may".
 * Fix translucent-wall related cases of auto-explore saying you couldn't
