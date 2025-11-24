@@ -27,6 +27,8 @@ func (g *Game) UpdateFOV() {
 	g.Map.FOVPts = g.Map.FOV.SSCVisionMap(pp, g.MaxFOVRange(), passable, false)
 }
 
+// MaxFOVRange returns the maximum FOV range adjusted for special traits (like
+// nocturnal flying).
 func (g *Game) MaxFOVRange() int {
 	if g.PlayerActor().DoesAny(NocturnalFlying) {
 		return MaxFOVRange - 3

@@ -56,8 +56,8 @@ spirits:
   sighting totems and portals, as it of course also does when laying runes.
 * **Staring Owl**. It has a “death stare” ability that allows to instantly kill
   a single foe but leaves you afraid due to its backlash. The Owl flies a bit
-  over foliage, increasing visibility over it. That helps with ranged attacks
-  and foliage fires, but also makes stealth more difficult.
+  over foliage, increasing visibility over it, but with the Owl comes the
+  Night, reducing maximum view range.
 * **Stomping Elephant**. It has a “stomp” ability that destroys nearby walls
   and makes you Berserk for a short while. The Elephant is immune to Berserk
   after-effects and can remain unnoticed in dead-ends, but it is afraid of rats
