@@ -83,6 +83,8 @@ Reworked and improved content:
 * Monster fear is now somewhat biased toward going in the opposite direction
   from the player, instead of fleeing laterally, so that non-Hydra players get
   more offensive use from Fear.
+* Reduce Lignification duration from lignification fruit from 12 to 10 to make
+  it a bit less risky (discussed in issue #7).
 
 UI, graphics, QoL:
 

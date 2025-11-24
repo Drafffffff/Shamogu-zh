@@ -45,7 +45,7 @@ const (
 	DurationImbalanceSprint        = 5
 	DurationImbalanceTailSlap      = 4
 	DurationImbalanceTeleport      = 5
-	DurationLignification          = 12
+	DurationLignification          = 10
 	DurationLignificationHit       = 6
 	DurationLignificationRoots     = 6
 	DurationLignificationSpores    = 6
