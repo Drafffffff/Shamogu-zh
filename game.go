@@ -289,7 +289,8 @@ func (g *Game) ComputeNoise() {
 	dij := &MapPath{passable: g.Map.Passable}
 	goodhearing := pa.DoesAny(GoodHearing) && !pa.DoesAny(BadHearing)
 	badhearing := !pa.DoesAny(GoodHearing) && pa.DoesAny(BadHearing)
-	const maxdist = MaxFOVRange + 5
+	maxFOVRange := g.MaxFOVRange()
+	maxdist := maxFOVRange + 5
 	g.PRnoise.BreadthFirstMap(dij, []gruid.Point{g.PP()}, maxdist)
 	nheard := 0  // number of heard monsters
 	var a *Actor // actor corresponding to heard monster (when there's only one)
@@ -308,7 +309,7 @@ func (g *Game) ComputeNoise() {
 		switch {
 		case goodhearing:
 			// Good hearing generally increases noise hearing range by 2.
-			dist -= 2
+			dist -= maxFOVRange / 4
 		case badhearing && ai.DoesAny(MonsCreep|MonsWingFlap) && dist > 2:
 			// Wing flapping and creeping can't be heard well with
 			// bad (mostly ground vibration-based) hearing.
@@ -320,7 +321,7 @@ func (g *Game) ComputeNoise() {
 			case goodhearing:
 				// Good hearing allows to hear almost silent
 				// monsters like spiders, but not too far.
-				dist += 4
+				dist += maxFOVRange / 2
 			default:
 				// Silent monsters like spiders cannot be
 				// heared without good hearing.
@@ -332,9 +333,9 @@ func (g *Game) ComputeNoise() {
 		case ai.DoesAny(MonsLightFootsteps | MonsCreep):
 			// Light footsteps and creeping are slightly harder to
 			// hear.
-			dist += 2
+			dist += maxFOVRange / 4
 		}
-		if ei.Noise = dist <= MaxFOVRange; !ei.Noise {
+		if ei.Noise = dist <= maxFOVRange; !ei.Noise {
 			continue
 		}
 		g.SensePassable(ei.P)

@@ -32,10 +32,9 @@ const (
 	DurationDazeTeleport           = 4
 	DurationFearAmbrosia           = 4
 	DurationFearBark               = 4
-	DurationFearDeathStare         = 3
+	DurationFearDeathStare         = 4
 	DurationFearFakePortal         = 6
 	DurationFearRoar               = 5
-	DurationFearGrowl              = 2
 	DurationFearUndead             = 3
 	DurationFire                   = 3
 	DurationFoggySkin              = 10

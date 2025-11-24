@@ -19,21 +19,32 @@ func (g *Game) UpdateFOV() {
 		return t != Wall && t != Rubble
 	}
 	pa := g.PlayerActor()
-	lt := &lighter{g: g, flying: pa.DoesAny(OwlFlying) && !pa.Has(StatusLignification)}
+	lt := &lighter{
+		g:      g,
+		flying: pa.DoesAny(NocturnalFlying) && !pa.Has(StatusLignification),
+	}
 	g.Map.FOV.VisionMap(lt, pp)
-	g.Map.FOVPts = g.Map.FOV.SSCVisionMap(pp, MaxFOVRange, passable, false)
+	g.Map.FOVPts = g.Map.FOV.SSCVisionMap(pp, g.MaxFOVRange(), passable, false)
+}
+
+func (g *Game) MaxFOVRange() int {
+	if g.PlayerActor().DoesAny(NocturnalFlying) {
+		return MaxFOVRange - 3
+	}
+	return MaxFOVRange
 }
 
 // UpdateKnowledge updates player's knowledge based on FOV. It has to be called at
 // the end of each turn.
 func (g *Game) UpdateKnowledge() {
 	pp := g.PP()
+	maxRange := g.MaxFOVRange()
 	for _, p := range g.Map.FOVPts {
-		if paths.DistanceManhattan(p, pp) > MaxFOVRange {
+		if paths.DistanceManhattan(p, pp) > maxRange {
 			continue
 		}
 		cost, ok := g.Map.FOV.At(p)
-		if !ok || cost > MaxFOVRange {
+		if !ok || cost > maxRange {
 			continue
 		}
 		g.SeeTerrain(p)
@@ -194,7 +205,7 @@ func (g *Game) ResetKnowledge() {
 // InFOV reports whether p is in the player's field of view.
 func (g *Game) InFOV(p gruid.Point) bool {
 	cost, ok := g.Map.FOV.At(p)
-	return ok && cost <= MaxFOVRange && g.Map.FOV.Visible(p)
+	return ok && cost <= g.MaxFOVRange() && g.Map.FOV.Visible(p)
 }
 
 // DangerInFOV reports whether there is a foe in the player's field of view.
@@ -235,6 +246,9 @@ type lighter struct {
 }
 
 func (lt *lighter) MaxCost(src gruid.Point) int {
+	if lt.flying {
+		return MaxFOVRange - 2
+	}
 	return MaxFOVRange + 1
 }
 
@@ -250,8 +264,6 @@ func (lt *lighter) Cost(src, from, to gruid.Point) int {
 			return wallcost
 		case Fuzzy:
 			return wallcost - 1
-		case Unclear:
-			return paths.DistanceManhattan(to, from) + 1
 		default:
 			return paths.DistanceManhattan(to, from)
 		}
@@ -273,20 +285,13 @@ func (lt *lighter) Cost(src, from, to gruid.Point) int {
 	if clk != NoCloud {
 		return wallcost + paths.DistanceManhattan(to, from) - 3
 	}
-	if t == Foliage {
-		if !lt.flying {
-			return wallcost + paths.DistanceManhattan(to, from) - 3
-		}
-		if vis != Fuzzy {
-			return 1 + paths.DistanceManhattan(to, from)
-		}
+	if t == Foliage && !lt.flying {
+		return wallcost + paths.DistanceManhattan(to, from) - 3
 	}
 	switch vis {
 	case Fuzzy:
 		cost := wallcost - paths.DistanceManhattan(from, src) - 1
 		return max(cost, 1)
-	case Unclear:
-		return 1 + paths.DistanceManhattan(to, from)
 	default:
 		return paths.DistanceManhattan(to, from)
 	}
@@ -295,10 +300,9 @@ func (lt *lighter) Cost(src, from, to gruid.Point) int {
 type visibility uint32
 
 const (
-	Opaque  visibility = 0b000
-	Fuzzy   visibility = 0b001
-	Unclear visibility = 0b011
-	Clear   visibility = 0b111
+	Opaque visibility = 0b00
+	Fuzzy  visibility = 0b01
+	Clear  visibility = 0b11
 )
 
 func (lt *lighter) diagonalVisibility(from, to gruid.Point) visibility {
@@ -335,10 +339,9 @@ func (lt *lighter) diagonalVisibility(from, to gruid.Point) visibility {
 		case Wall, Rubble:
 		case Foliage:
 			if lt.flying {
-				vis |= Unclear
-			} else {
-				vis |= Fuzzy
+				return Clear
 			}
+			vis |= Fuzzy
 		default:
 			if clk != NoCloud {
 				vis |= Fuzzy

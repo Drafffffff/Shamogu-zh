@@ -146,23 +146,23 @@ const (
 	PatternSwap         // swapping-attack (crazy druid)
 	PatternSwapDaze     // dazing swapping-attack (temporal cat)
 
-	BadHearing    // worse hearing of noise (footsteps)
-	BurningHits   // hits may burn
-	Dazzling      // zebra's camouflage
-	DazingSpines  // body covered in dazing spines (porcupine)
-	Gawalt        // wall-jumping, weakened attacks, menhir sensing and hiding
-	Gluttony      // gluttony status after eating
-	GoodHearing   // better hearing of noise (footsteps)
-	GoodSmell     // smell food from a distance
-	Pushing       // unbalancing pushing (earth-dragon)
-	PushingCharge // unbalancing pushing when charging (boar)
-	ScaryRoar     // intimidating roar on first sight
-	Elephanty     // rat phobia, difficult rotation when facing a wall, immune to berserk after-effects
-	OwlFlying     // flying a bit above the ground like an owl
-	RunicChicken  // doesn't trigger traps, cackles loudly on sighting a portal or totem
-	TrailingCloud // leave dust behind after moving (on floor tiles)
-	VenomousMelee // (non-ranged) attacks may poison foes
-	WoodyLegs     // can move while lignified
+	BadHearing      // worse hearing of noise (footsteps)
+	BurningHits     // hits may burn
+	Dazzling        // zebra's camouflage
+	DazingSpines    // body covered in dazing spines (porcupine)
+	Gawalt          // wall-jumping, weakened attacks, menhir sensing and hiding
+	Gluttony        // gluttony status after eating
+	GoodHearing     // better hearing of noise (footsteps)
+	GoodSmell       // smell food from a distance
+	NocturnalFlying // flying a bit above the ground like an owl
+	Pushing         // unbalancing pushing (earth-dragon)
+	PushingCharge   // unbalancing pushing when charging (boar)
+	ScaryRoar       // intimidating roar on first sight
+	Elephanty       // rat phobia, difficult rotation when facing a wall, immune to berserk after-effects
+	RunicChicken    // doesn't trigger traps, cackles loudly on sighting a portal or totem
+	TrailingCloud   // leave dust behind after moving (on floor tiles)
+	VenomousMelee   // (non-ranged) attacks may poison foes
+	WoodyLegs       // can move while lignified
 
 	VulnerabilityFire // increases duration of fire status
 
@@ -238,7 +238,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, Gluttony, "gluttony (needs to eat in pairs)")
 	desc = traitDesc(desc, t, ScaryRoar, "scary roar on first sight")
 	desc = traitDesc(desc, t, Elephanty, "rat phobia, difficult rotation when facing a wall, unnoticed in dead-ends, immune to berserk after-effects")
-	desc = traitDesc(desc, t, OwlFlying, "flies over foliage")
+	desc = traitDesc(desc, t, NocturnalFlying, "nocturnal (reduced view range), flies over foliage")
 	desc = traitDesc(desc, t, Dazzling, "dazzling (redirect attacks just behind you, easily noticed)")
 	desc = traitDesc(desc, t, DazingSpines, "spines may @Odaze@N foes in melee")
 	switch {
