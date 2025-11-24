@@ -131,8 +131,17 @@ func (g *Game) MoveEntity(i ID, to gruid.Point) {
 }
 
 // MoveActor moves an actor to the given position. It updates the actor
-// position cache as necessary.
+// position cache as necessary. The movement isn't considered as first
+// bump-movement: it may be a teleport or an extra movement, so extra effects
+// aren't applied.
 func (g *Game) MoveActor(i ID, ai *Actor, to gruid.Point) {
+	g.moveActor(i, ai, to, false)
+}
+
+// moveActor moves an actor to the given position. It updates the actor
+// position cache as necessary. It may apply extra bump-movement effects if
+// bumpmove is true.
+func (g *Game) moveActor(i ID, ai *Actor, to gruid.Point, bumpmove bool) {
 	ei := g.Entity(i)
 	if ei.P == to {
 		return
@@ -169,6 +178,9 @@ func (g *Game) MoveActor(i ID, ai *Actor, to gruid.Point) {
 	if i != PlayerID && g.InFOV(ei.P) {
 		g.SenseEntity(i, "see")
 	}
+	if bumpmove {
+		g.ApplyBumpMoveEffects(i, ai)
+	}
 	if i != PlayerID || !ai.DoesAny(RunicChicken) {
 		g.TriggerTrapAt(to)
 	}
@@ -192,12 +204,11 @@ func (g *Game) BumpMoveActor(i ID, ai *Actor, to gruid.Point) {
 		}
 		g.digAt(to)
 	}
-	g.MoveActor(i, ai, to)
-	g.ApplyBumpMoveEffects(i, ai)
+	g.moveActor(i, ai, to, true)
 }
 
 // ApplyBumpMoveEffects applies effects that happen after moving to a new
-// position through normal movement.
+// position through normal movement (but before triggering any traps).
 func (g *Game) ApplyBumpMoveEffects(i ID, ai *Actor) {
 	switch {
 	case ai.Has(StatusPoison):

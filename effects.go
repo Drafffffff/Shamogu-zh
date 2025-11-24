@@ -49,7 +49,7 @@ const (
 	DurationLignificationHit       = 6
 	DurationLignificationRoots     = 6
 	DurationLignificationSpores    = 6
-	DurationLignificationTrap      = 8
+	DurationLignificationTrap      = 7
 	DurationPoisonBerserk          = 5
 	DurationPoisonBite             = 4
 	DurationPoisonCloud            = 3
