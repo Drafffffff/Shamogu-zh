@@ -52,13 +52,6 @@ func (g *Game) GenEntities(mg *MapGen) {
 // genPlayerOnNewLevel places the player in the map with replenished charges and HP.
 func (g *Game) genPlayerOnNewLevel(mg *MapGen) {
 	p := g.PlayerEntity()
-	// Sort vaults by distance to center.
-	// center := gruid.Point{MapWidth / 2, MapHeight / 2}
-	// slices.SortFunc(mg.vaults, func(vi, vj *vault) int {
-	// 	pi := vi.p.Add(gruid.Point{vi.w / 2, vi.h / 2})
-	// 	pj := vj.p.Add(gruid.Point{vj.w / 2, vj.h / 2})
-	// 	return cmp.Compare(paths.DistanceManhattan(center, pi), paths.DistanceManhattan(center, pj))
-	// })
 	// Chose player's vault.
 	var pvi int // player's vault index
 	pvi, p.P = mg.RandomVaultsPlace(mg.vaults, PlaceWaypoint)
@@ -72,6 +65,14 @@ func (g *Game) genPlayerOnNewLevel(mg *MapGen) {
 	}
 	p.KnownP = p.P
 	g.Map.ActorCache.SetU(p.P, PlayerID)
+	if g.Mod(ModHealingCombat) && g.Map.Level == 5 {
+		sp := g.Entity(PrimarySpiritID).Role.(*Spirit)
+		if _, ok := sp.Ability[sp.Level].(EffectVampirism); ok {
+			sp.MaxCharges[0]++
+			sp.MaxCharges[1]++
+			sp.Charges++
+		}
+	}
 	if !g.Mod(ModNoRecharges) {
 		for _, sp := range g.PlayerSpirits() {
 			sp.Charges = sp.MaxCharges[sp.Level]
@@ -253,8 +254,6 @@ func spiritEntity(mods []bool, si spiritInfo) *Entity {
 	}
 	if HasMod(mods, ModHealingCombat) {
 		if _, ok := si.Ability[0].(EffectVampirism); ok {
-			si.Ability[0] = EffectVampirism{DurationVampirism + 1}
-			si.Ability[1] = si.Ability[0]
 			si.MaxCharges[0]++
 			si.MaxCharges[1]++
 		}

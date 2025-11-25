@@ -12,8 +12,6 @@ const (
 	ModSmallInventory // mod limiting inventory to 3 comestible slots
 	ModNoRecharges    // mod without spirit recharges
 	ModHealingCombat  // combat-based healing system instead of comestible-based
-	ModOrbTracking    // mod making the orb send monsters to you more actively
-	ModMonsterRevival // mod making monster occasionally revive
 
 	modCount // dummy mod (for NMods)
 )
@@ -28,7 +26,6 @@ var gameMods = []Mod{
 	// challenge mods
 	ModSmallInventory,
 	ModNoRecharges, ModHealingCombat,
-	ModOrbTracking, ModMonsterRevival,
 }
 
 // Number of expansion mods (for header positioning purposes in menu).
@@ -48,10 +45,6 @@ func (m Mod) String() string {
 		return "No Recharges"
 	case ModHealingCombat:
 		return "Healing Combat"
-	case ModOrbTracking:
-		return "Orb Tracking"
-	case ModMonsterRevival:
-		return "Monster Revival"
 	default:
 		return "(unknown mod)"
 	}
@@ -70,11 +63,7 @@ func (m Mod) Desc() string {
 	case ModNoRecharges:
 		return "Spirit ability charges are doubled but don’t recharge when going to the next map level. Use them wisely!"
 	case ModHealingCombat:
-		return "Healing happens through combat. When a monster dies, you may heal for 1 HP, with higher chance at low HP. However, comestibles don’t provide healing anymore.\n\nVampiric Bat players get an extra “vampirism” charge and @BVampirism@N turn instead of healing on monster death. Less frequent healing but better control over it!"
-	case ModOrbTracking:
-		return "The orb occasionally sends your current position to wandering monsters. You need to keep moving!"
-	case ModMonsterRevival:
-		return "The orb revives monsters after a random delay. You cannot kill them all!"
+		return "Healing happens through combat. When a monster dies, you may heal for 1 HP, with higher chance at low HP. However, comestibles don’t provide healing anymore.\n\nVampiric Bat players start with an extra “vampirism” charge and get another one at map level 5, instead of healing on monster death. Less frequent healing but better tactical control over it!\n\n@MNote.@N This mod is playable but lacks polish and balance with respect to the default experience."
 	default:
 		return "(unknown mod)"
 	}

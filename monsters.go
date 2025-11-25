@@ -50,8 +50,6 @@ func (g *Game) HandleMonsterTurn(i ID, ai *Actor) {
 		}
 		if maxdist < unreachable {
 			beh.Target = g.RandomPassableWithin(from, maxdist)
-		} else if g.Mod(ModOrbTracking) && g.IntN(5) == 0 {
-			beh.Target = pl.P
 		} else {
 			beh.Target = g.RandomPassableNearbyTarget(from)
 		}
