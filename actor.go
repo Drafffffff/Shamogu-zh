@@ -303,6 +303,7 @@ const (
 	StatusConfusion
 	StatusDaze
 	StatusDig
+	StatusDisorient
 	StatusFear
 	StatusFire
 	StatusFocus
@@ -338,6 +339,7 @@ var statusAbbrevation = []string{
 	StatusConfusion:     "Con",
 	StatusDaze:          "Daz",
 	StatusDig:           "Dig",
+	StatusDisorient:     "Dis",
 	StatusFear:          "Fea",
 	StatusFire:          "Fir",
 	StatusFocus:         "Foc",
@@ -363,6 +365,7 @@ var statusName = []string{
 	StatusConfusion:     "Confusion",
 	StatusDaze:          "Daze",
 	StatusDig:           "Dig",
+	StatusDisorient:     "Disorient",
 	StatusFear:          "Fear",
 	StatusFire:          "Fire",
 	StatusFocus:         "Focus",
@@ -388,6 +391,7 @@ var statusAdjective = []string{
 	StatusConfusion:     "confused",
 	StatusDaze:          "dazed",
 	StatusDig:           "digging",
+	StatusDisorient:     "disorienting",
 	StatusFear:          "afraid",
 	StatusFire:          "on fire",
 	StatusFocus:         "focusing",
@@ -415,6 +419,7 @@ var statusDesc = []string{
 	StatusConfusion: "Using spirit abilities will hurt you for 1 damage. Doubles duration of new @OImbalance@N, @ODaze@N and @OFear@N effects.",
 	StatusDaze:      "Forbids all actions except waiting or eating until you’re hurt or it expires.",
 	StatusDig:       "Allows walking into walls. Gives +1 effective damage when charging and guarantees pushing hits (even in melee).",
+	StatusDisorient: "Makes any foes in view move in the opposite direction with respect to your current direction. Monsters may mistakenly attack any monster on the way while doing so. Disoriented monsters do not perform four-directional charges.",
 	StatusFear:      "Forbids attacking and walking toward foes.",
 	StatusFire:      fmt.Sprintf("Remaining in place or moving into a cloud of fire will burn you for %d damage. When first catching @OFire@N, you also get burned once immediately.", FireDamage),
 	StatusFocus:     "Attack frontally with all four heads.",
@@ -821,6 +826,7 @@ var sortedStatuses = []Status{
 	StatusConfusion,
 	StatusDaze,
 	StatusDig,
+	StatusDisorient,
 	StatusFear,
 	StatusFire,
 	StatusFocus,

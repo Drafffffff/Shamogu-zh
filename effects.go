@@ -22,13 +22,11 @@ const (
 	DurationConfusionHit           = 6
 	DurationConfusionPepperBreath  = 2
 	DurationConfusionSkunk         = 5
-	DurationConfusionGallop        = 5
 	DurationConfusionToxins        = 4
 	DurationDazeFall               = 1
 	DurationDazeJump               = 4
 	DurationDazeLightning          = 4
 	DurationDazeSpines             = 2
-	DurationDazeGallop             = 2
 	DurationDazeTeleport           = 4
 	DurationFearAmbrosia           = 4
 	DurationFearBark               = 4
@@ -40,7 +38,6 @@ const (
 	DurationFoggySkin              = 10
 	DurationImbalanceDragging      = 2
 	DurationImbalanceGale          = 5
-	DurationImbalanceGallop        = 5
 	DurationImbalanceLignification = 5
 	DurationImbalanceSprint        = 5
 	DurationImbalanceTailSlap      = 4
@@ -61,6 +58,7 @@ const (
 	HealTeleportLignified = 2
 
 	DurationDig       = 5
+	DurationDisorient = 5
 	DurationFocus     = 3
 	DurationShadow    = 8
 	DurationGarden    = 7
@@ -1073,54 +1071,21 @@ func (eff EffectLayRune) Desc() string {
 	return "Lay a random runic trap on current floor tile."
 }
 
-type EffectGallop struct{}
+type EffectDisorient struct{}
 
-func (eff EffectGallop) Apply(g *Game) bool {
-	pl, pa := g.Player()
-	if !pa.CanMove() {
-		g.Log("You cannot gallop while lignified.")
-		return false
-	}
-	if pa.HP == 1 && pa.Has(StatusPoison) {
-		g.Log("You cannot gallop while poisoned and almost dead.")
-		return false
-	}
-	j, aj := g.RangedTargetInDir(pl.P, g.Dir)
-	if j < 0 {
-		g.Log("There’s no foe you can gallop towards.")
-		return false
-	}
-	ej := g.Entity(j)
-	dist := paths.DistanceManhattan(pl.P, ej.P)
-	if dist == 1 && aj.ResistsMove() {
-		g.Logf("You cannot swap positions with the %s.", ej.Name)
-		return false
-	}
-	g.Log("You gallop.")
-	from, to := pl.P, ej.P.Sub(g.Dir)
-	if dist > 1 {
-		g.BumpMoveActor(PlayerID, pa, to)
-		g.md.MoveAnimation(from, to)
-	}
-	if !aj.ResistsMove() {
-		g.MoveActor(PlayerID, pa, ej.P)
-		g.PutStatus(j, aj, StatusDaze, DurationDazeGallop)
-		g.PutStatus(j, aj, StatusConfusion, DurationConfusionGallop)
-	}
-	if pa.Has(StatusFire) {
-		g.RemoveStatus(PlayerID, pa, StatusFire)
-		g.PutStatus1(PlayerID, pa, StatusImbalance, DurationImbalanceGallop)
-	}
+func (eff EffectDisorient) Apply(g *Game) bool {
+	pa := g.PlayerActor()
+	g.PutStatus(PlayerID, pa, StatusDisorient, DurationDisorient+pa.Statuses[StatusDisorient])
+	g.instant = true
 	return true
 }
 
-func (eff EffectGallop) Name() string {
-	return "gallop"
+func (eff EffectDisorient) Name() string {
+	return "disorient"
 }
 
-func (eff EffectGallop) Desc() string {
-	return fmt.Sprintf("Move next to nearest foe in current direction and then swap positions, leaving it @Odazed@N behind for %d turns and @Oconfused@N for %d turns. Replaces @OFire@N with @OImbalance@N for %d turns.",
-		DurationDazeGallop, DurationConfusionGallop, DurationImbalanceGallop)
+func (eff EffectDisorient) Desc() string {
+	return fmt.Sprintf("@BDisorient@N for %d turns. %s @GInstant@N.", DurationDisorient, statusDesc[StatusDisorient])
 }
 
 type EffectEarthMenhir struct{}

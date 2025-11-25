@@ -239,7 +239,7 @@ var challengeSpirits = []spiritInfo{
 	{
 		Name:         "Dazzling Zebra",
 		MaxCharges:   [2]int{1, 3},
-		Ability:      [2]Ability{EffectGallop{}, EffectGallop{}},
+		Ability:      [2]Ability{EffectDisorient{}, EffectDisorient{}},
 		BonusDefense: [2]int{1, 1},
 		BonusTraits:  [2]Traits{Dazzling, Dazzling},
 		Advanced:     true},

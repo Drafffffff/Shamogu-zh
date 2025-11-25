@@ -61,22 +61,13 @@ func (g *Game) HandleMonsterTurn(i ID, ai *Actor) {
 		}
 		return
 	}
-	if beh.State == Wandering && len(beh.Path) >= 2 && beh.Path[0] == ei.P && beh.Path[len(beh.Path)-1] == ai.Behavior.Target {
-		// The monster is wandering and is still on the previously
-		// computed path, so we try to continue on the cached path.
-		g.monsterBumpTo(i, ai, beh.Path[1])
+	if pa.Has(StatusDisorient) && g.monsterBumpDisoriented(i, ai) {
 		return
 	}
-	// Monster is hunting or was moved from its old path position,
-	// so we recompute the current best path.
-	beh.Path = g.MonPath(i, ai, ei.P, beh.Target)
-	if beh.State != Hunting {
-		// A wandering monster spends a turn updating its path.
+	if g.monsterFlee(i, ai) {
 		return
 	}
-	if len(beh.Path) >= 2 {
-		g.monsterBumpTo(i, ai, beh.Path[1])
-	}
+	g.monsterBumpNext(i, ai)
 }
 
 // monsterDiscord makes a confused monster possibly attack a random adjacent
@@ -100,6 +91,50 @@ func (g *Game) monsterDiscord(i ID, ai *Actor) bool {
 	}
 	k := g.IntN(len(ids))
 	g.BumpAttackActor(i, ids[k], ai, actors[k], AttackPlain, 1, 0)
+	return true
+}
+
+// monsterBumpDisoriented handles movement for a monster disoriented by the
+// dazzling zebra. It assumes the monster is in view. It reports whether the
+// turn was consumed.
+func (g *Game) monsterBumpDisoriented(i ID, ai *Actor) bool {
+	ei := g.Entity(i)
+	if !g.InFOV(ei.P) {
+		// Monsters cannot be disoriented by the dazzling zebra outside
+		// of view.
+		return false
+	}
+	if ai.Behavior.State != Hunting && g.PlayerIsHidden() {
+		// Wandering monsters that haven't noticed the player aren't
+		// affected by disorientation (should be very rare with
+		// the zebra, but can happen in combination with gawalt).
+		return false
+	}
+	pl := g.PlayerEntity()
+	to := ei.P.Add(g.Dir.Mul(-1)) // redirection target due to disorientation
+	if to == pl.P || paths.DistanceManhattan(pl.P, to) < paths.DistanceManhattan(pl.P, ei.P) &&
+		g.ActorInRange(to, pl.P) == PlayerID {
+		if ai.Has(StatusFear) || (ai.DoesAny(MonsMusic) && !ai.Has(StatusBerserk)) {
+			// The disoriented and afraid monster loses a turn when
+			// it wants to go toward the player.
+			return true
+		}
+		// The direction is the player's, so the monster can act as
+		// usual.
+		return false
+	}
+	if !g.Map.Passable(to) && !g.Dig(i, ai, to) {
+		// The disoriented monster is facing a wall: lose a turn or dig
+		// (if possible).
+		return true
+	}
+	if j, aj := g.ActorAt(to); j >= 0 {
+		// The disoriented monster may attack other adjacent monsters.
+		g.BumpAttackActor(i, j, ai, aj, AttackPlain, 1, 0)
+		return true
+	}
+	// We move to the free tile, without performing any charge.
+	g.BumpMoveActor(i, ai, to)
 	return true
 }
 
@@ -185,21 +220,31 @@ func (g *Game) releaseSpores(i ID) {
 	}
 }
 
-// monsterBumpTo handles movement or attack for a monster actor. The position
-// should be adjacent to the monster's (the next position in the movement
-// path).
-func (g *Game) monsterBumpTo(i ID, ai *Actor, to gruid.Point) {
-	if g.monsterFlee(i, ai) {
-		return
+// monsterBumpNext handles movement of a monster actor toward the next position
+// in the precomputed path. It assumes the monster isn't afraid to go in that
+// direction.
+func (g *Game) monsterBumpNext(i ID, ai *Actor) {
+	ei, beh := g.Entity(i), ai.Behavior
+	if beh.State != Wandering || len(beh.Path) < 2 || beh.Path[0] != ei.P || beh.Path[len(beh.Path)-1] != ai.Behavior.Target {
+		// Monster is hunting or was moved from its old path position,
+		// so we recompute the current best path.
+		beh.Path = g.MonPath(i, ai, ei.P, beh.Target)
+		if beh.State != Hunting || len(beh.Path) < 2 {
+			// A wandering monster spends a turn updating its path.
+			// A path should always exist but, if for some reason
+			// we don't find a path, lose a turn and try again on
+			// next turn.
+			return
+		}
 	}
-	ei := g.Entity(i)
+	to := beh.Path[1] // next position in path
 	pl, pa := g.Player()
 	dist := paths.DistanceManhattan(ei.P, pl.P)
 	// We consider the player is unnoticeable if distance is beyond FOV
 	// range (to avoid redundant computations for monsters outside of view)
 	// or if the monster is not hunting and the player is hidden.
 	// Extra visibility considerations apply then in various cases.
-	unnoticeable := dist > MaxFOVRange || ai.Behavior.State != Hunting && g.PlayerIsHidden()
+	unnoticeable := dist > MaxFOVRange || beh.State != Hunting && g.PlayerIsHidden()
 	if pl.P == to || dist == 1 && !unnoticeable {
 		g.BumpAttackActor(i, PlayerID, ai, pa, AttackPlain, dist, 0)
 		return
@@ -249,14 +294,17 @@ func (g *Game) monsterBumpTo(i ID, ai *Actor, to gruid.Point) {
 		return
 	}
 	// Next position is obstructed by another monster.
-	if g.InFOV(ei.P) {
+	if g.InFOV(ei.P) && !unnoticeable {
 		return
 	}
-	// Outside of player's LOS, we simplify logic: they may lose a turn or
-	// swap positions (if both want to exchange their positions or 1/5 of
-	// the time). This is cheaper and avoids the need for complex logic to
-	// prevent blockages.
-	if aj.CanMove() && !aj.Behavior.SkipTurn && (len(aj.Behavior.Path) >= 2 && aj.Behavior.Path[1] == ei.P || g.IntN(5) == 0) {
+	// For out of view monsters and wandering monsters in view but that
+	// haven't noticed the player, we simplify logic: they may lose a turn
+	// or swap positions (if both want to exchange their positions or a
+	// random roll decides it). This is cheaper and avoids the need for
+	// complex logic to prevent blockages.
+	ej := g.Entity(j)
+	if aj.CanMove() && !aj.Behavior.SkipTurn && (aj.Behavior.State != Hunting || !g.InFOV(ej.P)) &&
+		(len(aj.Behavior.Path) >= 2 && aj.Behavior.Path[1] == ei.P || g.IntN(5) == 0) {
 		// Swap monster positions and skip next turn.
 		g.BumpMoveActor(i, ai, to)
 		g.ApplyBumpMoveEffects(j, aj)

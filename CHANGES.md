@@ -35,12 +35,12 @@ New content:
 The **Challenge Spirits** mod provides the following advanced secondary
 spirits:
 
-* **Dazzling Zebra**. It has a “gallop” ability that allows rampaging-like
-  movement toward a foe and then swap positions with it, leaving it dazed and
-  confused. The Zebra has a special dazzling effect on foes: it makes foes on
-  one side mistakenly hit instead any foe just behind you on the other side!
-  However, being so dazzling also means Zebra is easy to notice instantly, so
-  beware of sudden attacks while exploring!
+* **Dazzling Zebra**. It has a “disorient” ability that makes foes move in the
+  opposite direction with respect to your current direction. The Zebra has a
+  special dazzling passive effect on foes: it makes foes on one side mistakenly
+  hit instead any foe just behind you on the other side!  However, being so
+  dazzling also means Zebra is easy to notice instantly, so beware of sudden
+  attacks while exploring!
 * **Gardening Lion**. It has a “garden” ability that allows to grow foliage
   around you for several turns. The Lion roars loudly on sighting foes for the
   first time, scaring them.
