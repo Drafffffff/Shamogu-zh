@@ -423,7 +423,7 @@ var statusDesc = []string{
 	StatusGluttony:  fmt.Sprintf("Unless you eat before expiration, you’ll eat a random comestible without taking a turn. If there is no food, you’ll become confused for %d turns.", DurationConfusionGluttony),
 	StatusImbalance: fmt.Sprintf("Halves attack. When also confused, gives %+d Defense.", ConfusedImbalanceDefenseBonus),
 	StatusLignification: fmt.Sprintf(
-		"Gives %+d Defense with an extra +1 against ranged attacks. Caps incoming attack damage at 1. Provides temporary HP bonus. Protects from @OPoison@N and @OImbalance@N. Prevents movement. Increases @OFire@N duration by 2. Followed by @OImbalance@N for you and any adjacent actors on expiration for %d turns.",
+		"Gives %+d Defense with an extra +1 against ranged attacks. Caps incoming attack damage at 1. Provides temporary HP bonus. Protects from @OPoison@N and @OImbalance@N. Delays burning. Prevents movement. When @Oafraid@N, getting hit makes you @BBerserk@N. Followed by @OImbalance@N for you and any adjacent actors on expiration for %d turns.",
 		LignificationDefenseBonus, DurationImbalanceLignification),
 	StatusPoison: fmt.Sprintf("Walking will hurt you for %d damage. Stinky toxins are exuded on expiration, confusing other creatures for %d turns.",
 		PoisonDamage, DurationConfusionToxins),
@@ -483,12 +483,13 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 		if ai.Has(StatusFoggySkin) || ai.DoesAny(MonsImmunityFire) {
 			return false
 		}
-		if ai.DoesAny(VulnerabilityFire) || ai.Has(StatusLignification) {
+		if ai.DoesAny(VulnerabilityFire) {
 			turns += 2
 		}
-		if active || ai.DoesAny(ResistanceFire) {
-			// If Fire is already active or we have fire
-			// resistance, we skip extra damage at onset.
+		if active || ai.DoesAny(ResistanceFire) || ai.Has(StatusLignification) && !ai.DoesAny(WoodyLegs) {
+			// If Fire is already active or we have fire resistance
+			// or Lignification without woody legs, we skip extra
+			// damage at onset.
 			break
 		}
 		g.InflictDamage(i, ai, FireDamage, AttackFireCatch)
@@ -548,6 +549,24 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 		return false
 	}
 	turns += n
+	animateStatus := func() {
+		if i == PlayerID && !active {
+			// Alert the player with a short animation when a new status
+			// becomes active.
+			if st.Bad() {
+				g.md.BadStatusAnimation()
+			} else {
+				g.md.GoodStatusAnimation()
+			}
+		}
+	}
+	if n >= 1 {
+		// We animate before getting the status, as n >= 1 currently
+		// means the status is gained during the actor's turn (n == 1),
+		// so showing it after would briefly show duration+1, which is
+		// a bit unexpected.
+		animateStatus()
+	}
 	if !ai.Statuses.Put(st, turns) {
 		return false
 	}
@@ -591,14 +610,8 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 	case StatusFocus:
 		g.RemoveStatus(i, ai, StatusSprint)
 	}
-	if i == PlayerID && !active {
-		// Alert the player with a short animation when a new status
-		// becomes active.
-		if st.Bad() {
-			g.md.BadStatusAnimation()
-		} else {
-			g.md.GoodStatusAnimation()
-		}
+	if n == 0 {
+		animateStatus()
 	}
 	return true
 }
@@ -642,7 +655,11 @@ func (g *Game) RemoveStatus(i ID, ai *Actor, st Status) {
 			g.PutStatus(i, ai, StatusPoison, DurationPoisonBerserk)
 		}
 	case StatusLignification:
-		g.AdjustHPWithMin(i, ai, -ai.HPBonus(), 3)
+		floor := 3
+		if i != PlayerID {
+			floor = 1
+		}
+		g.AdjustHPWithMin(i, ai, -ai.HPBonus(), floor)
 		if !ai.DoesAny(WoodyLegs) {
 			g.PutStatus(i, ai, StatusImbalance, DurationImbalanceLignification)
 		}

@@ -353,6 +353,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 		}
 		return
 	}
+	afraid := aj.Has(StatusFear)
 	// Extra effects by attack pattern.
 	switch {
 	case ai.DoesAny(Pushing|PushingCharge) && ai.CanMove() && !aj.ResistsMove() &&
@@ -439,6 +440,10 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 	switch {
 	case aj.DoesAny(DazingSpines) && (ap != AttackRanged || g.AdjacentEntities(i, j)) && g.IntN(5-dmg) == 0:
 		g.PutStatus1(i, ai, StatusDaze, DurationDazeSpines)
+	}
+	if afraid && aj.Has(StatusFear) && aj.Has(StatusLignification) && !aj.DoesAny(WoodyLegs) {
+		// When hurt, afraid lignified actors become berserk.
+		g.PutStatus(j, aj, StatusBerserk, DurationBerserkAfraid)
 	}
 }
 

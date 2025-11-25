@@ -65,6 +65,26 @@ spirits:
 
 Reworked and improved content:
 
+* Rework Lignification's balance following a discussion in issue #7.
+  + Reduce Lignification duration from lignification fruit from 12 to 10 to
+    make it a bit less risky. Now it's a +2 duration with respect to Berserk
+    from the berserking flower, the same difference as the one between
+    lignification and berserk runes.
+  + Getting hit while lignified and afraid now makes you Berserk, like in
+    cornered situations, unless you have “woody legs”. You still need to take
+    an actual hit. Misses don't count.
+  + Fire vulnerability from Lignification has been removed. Due to the high
+    moisture levels coming from the ground, actors without “woody legs” now
+    even get delayed burning from Lignification. Not being able to move is
+    already a big enough vulnerability to Fire. Fire is still dangerous for
+    lignified actors, as getting on fire means 3 total damage over 3 turns, but
+    it should be more survivable now.
+  + To compensate for the Fire-related buffs and preserve Fire+Lignification
+    offensive tactics, HP floor for lignified monsters is now only 1, unlike
+    for the player. That was in some ways an oversight, anyway, as an HP floor
+    of 3 was quite bizarre for monsters, given how 3 HP is actually a lot for
+    most of them, and sometimes higher than the maximum. Thematically, we may
+    think that corrupted monsters don't benefit as much from nature's healing.
 * Wind Fox's recoil has been reworked: guaranteed on hits in melee, 2/3 chance
   on hits at distance 2, and never beyond. Pushing gale's damage in melee is
   now 1-2, so often 2 damage instead of 1. The idea behind those changes is to
@@ -83,8 +103,6 @@ Reworked and improved content:
 * Monster fear is now somewhat biased toward going in the opposite direction
   from the player, instead of fleeing laterally, so that non-Hydra players get
   more offensive use from Fear.
-* Reduce Lignification duration from lignification fruit from 12 to 10 to make
-  it a bit less risky (discussed in issue #7).
 
 UI, graphics, QoL:
 
