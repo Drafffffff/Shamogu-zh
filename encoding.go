@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	// Effects.
+	// Comestible Effects.
 	gob.Register(EffectAmbrosiaBerries{})
 	gob.Register(EffectBerserkingFlower{})
 	gob.Register(EffectLignificationFruit{})
@@ -18,6 +18,7 @@ func init() {
 	gob.Register(EffectFirebreathPepper{})
 	gob.Register(EffectTeleportMushroom{})
 
+	// Primary Spirit Effects.
 	gob.Register(EffectFocus{})
 	gob.Register(EffectDig{})
 	gob.Register(EffectJump{})
@@ -25,6 +26,8 @@ func init() {
 	gob.Register(EffectTimeStop{})
 	gob.Register(EffectTailSlap{})
 	gob.Register(EffectVampirism{})
+
+	// Secondary Spirit Effects.
 	gob.Register(EffectLightning{})
 	gob.Register(EffectBark{})
 	gob.Register(EffectNoxiousSmell{})
@@ -32,14 +35,17 @@ func init() {
 	gob.Register(EffectPoisonCloud{})
 	gob.Register(EffectSprint{})
 	gob.Register(EffectFireRetreat{})
+
+	// Advanced Secondary Spirit Effects.
 	gob.Register(EffectShadows{})
 	gob.Register(EffectSnack{})
-	gob.Register(EffectStomp{})
 	gob.Register(EffectGarden{})
+	gob.Register(EffectStomp{})
 	gob.Register(EffectDeathStare{})
 	gob.Register(EffectLayRune{})
 	gob.Register(EffectDisorient{})
 
+	// Menhir Effects.
 	gob.Register(EffectEarthMenhir{})
 	gob.Register(EffectWarpingMenhir{})
 	gob.Register(EffectPoisonMenhir{})
@@ -73,12 +79,12 @@ func init() {
 
 	// Items.
 	gob.Register(&Spirit{})
+	gob.Register(&EmptyTotem{})
 	gob.Register(&Comestible{})
 	gob.Register(&Menhir{})
 	gob.Register(&Portal{})
 	gob.Register(&CorruptionOrb{})
 	gob.Register(&RunicTrap{})
-	gob.Register(&EmptyTotem{})
 
 	// Other roles.
 	gob.Register(&Actor{})
