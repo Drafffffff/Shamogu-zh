@@ -700,7 +700,7 @@ func (g *Game) ProgressStatus(i ID, ai *Actor, st Status) {
 		return
 	}
 	ai.Statuses[st]--
-	if turns > 2 {
+	if turns > 2 || i != PlayerID || !GameConfig.WarningsExtra {
 		return
 	}
 	switch st {
