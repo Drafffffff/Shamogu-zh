@@ -293,7 +293,7 @@ func (g *Game) KnownActorAt(p gruid.Point) (ID, *Actor) {
 			continue
 		}
 		if a, ok := e.Role.(*Actor); ok && !a.KnownDead {
-			return ID(i + FirstMapID), a
+			return ID(i) + FirstMapID, a
 		}
 	}
 	return -1, nil
@@ -307,7 +307,7 @@ func (g *Game) SensedActorAt(p gruid.Point) (ID, *Actor) {
 			continue
 		}
 		if a, ok := e.Role.(*Actor); ok && !a.KnownDead {
-			return ID(i + FirstMapID), a
+			return ID(i) + FirstMapID, a
 		}
 	}
 	return -1, nil
@@ -321,7 +321,7 @@ func (g *Game) ItemAt(p gruid.Point) (ID, Item) {
 			continue
 		}
 		if it, ok := e.Role.(Item); ok {
-			return ID(i + FirstMapID + 1), it
+			return ID(i) + FirstMapID + 1, it
 		}
 	}
 	return -1, nil
@@ -335,7 +335,7 @@ func (g *Game) KnownItemAt(p gruid.Point) (ID, Item) {
 			continue
 		}
 		if it, ok := e.Role.(Item); ok {
-			return ID(i + FirstMapID + 1), it
+			return ID(i) + FirstMapID + 1, it
 		}
 	}
 	return -1, nil
@@ -346,7 +346,7 @@ func (g *Game) Actors() iter.Seq2[ID, *Actor] {
 	return func(yield func(ID, *Actor) bool) {
 		for i, e := range g.Entities[FirstMapID:] {
 			if a, ok := e.Role.(*Actor); ok && a.IsAlive() {
-				if !yield(ID(i+FirstMapID), a) {
+				if !yield(ID(i)+FirstMapID, a) {
 					return
 				}
 			}
@@ -383,7 +383,7 @@ func (g *Game) AdjacentActors(p gruid.Point) iter.Seq2[ID, *Actor] {
 func (g *Game) NPMapEntities() iter.Seq2[ID, *Entity] {
 	return func(yield func(ID, *Entity) bool) {
 		for i, e := range g.Entities[FirstMapID+1:] {
-			if !yield(ID(i+FirstMapID+1), e) {
+			if !yield(ID(i)+FirstMapID+1, e) {
 				return
 			}
 		}
@@ -394,7 +394,7 @@ func (g *Game) NPMapEntities() iter.Seq2[ID, *Entity] {
 func (g *Game) MapEntities() iter.Seq2[ID, *Entity] {
 	return func(yield func(ID, *Entity) bool) {
 		for i, e := range g.Entities[FirstMapID:] {
-			if !yield(ID(i+FirstMapID), e) {
+			if !yield(ID(i)+FirstMapID, e) {
 				return
 			}
 		}
@@ -486,7 +486,7 @@ func (g *Game) PlayerSpirits() iter.Seq2[ID, *Spirit] {
 func (g *Game) PlayerComestibles() iter.Seq2[ID, *Comestible] {
 	to := g.InventoryEnd()
 	return func(yield func(ID, *Comestible) bool) {
-		for i := ID(PrimarySpiritID + NSpirits); i < to; i++ {
+		for i := PrimarySpiritID + NSpirits; i < to; i++ {
 			if sp, ok := g.Entity(i).Role.(*Comestible); ok {
 				if !yield(i, sp) {
 					return
@@ -510,7 +510,7 @@ func (g *Game) InventoryItems() iter.Seq2[ID, *Entity] {
 	to := g.InventoryEnd()
 	return func(yield func(ID, *Entity) bool) {
 		for i, e := range g.Entities[PrimarySpiritID:to] {
-			if !yield(ID(i+PrimarySpiritID), e) {
+			if !yield(ID(i)+PrimarySpiritID, e) {
 				return
 			}
 		}

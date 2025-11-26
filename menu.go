@@ -121,7 +121,7 @@ func (md *model) equipItemID(it Item, idx int) ID {
 		return md.equipSpiritID(idx)
 	default:
 		// Comestible.
-		return ID(idx + NSpirits + PrimarySpiritID)
+		return ID(idx) + NSpirits + PrimarySpiritID
 	}
 }
 
@@ -152,7 +152,7 @@ func (md *model) inventoryItemID(i int) ID {
 		if n < i {
 			continue
 		}
-		return ID(j + PrimarySpiritID)
+		return ID(j) + PrimarySpiritID
 	}
 	id, _ := g.ItemAt(g.PP())
 	return id // should be positive
@@ -164,11 +164,10 @@ func (md *model) inventoryComestibleID(i int) ID {
 	// NOTE: this function assumes there are 3 headers before the first
 	// comestible in the inventory menu; if that ever changes, this should
 	// be updated.
-	g := md.g
-	n := i - 3
-	if n < FirstMapID {
-		return ID(n)
+	if n := ID(i - 3); n < FirstMapID {
+		return n
 	}
+	g := md.g
 	id, _ := g.ItemAt(g.PP())
 	return id // should be positive
 }
