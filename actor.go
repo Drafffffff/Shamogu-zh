@@ -581,7 +581,7 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 		if st.Bad() {
 			g.StoryLogf("Got %s (%s)", st, fmtTurns(turns, n))
 			style = logHurtPlayer
-			if GameConfig.WarnFirePoison && (st == StatusFire || st == StatusPoison) {
+			if !active && GameConfig.WarningsExtra && (st == StatusFire || st == StatusPoison) {
 				g.md.mode = modeCritical
 			}
 		} else if st == StatusLignification || st == StatusBerserk || st == StatusFoggySkin {
@@ -657,7 +657,11 @@ func (g *Game) RemoveStatus(i ID, ai *Actor, st Status) {
 	case StatusBerserk:
 		g.AdjustHP(i, ai, -ai.HPBonus())
 		if !ai.DoesAny(Elephanty) {
+			mode := g.md.mode
 			g.PutStatus(i, ai, StatusPoison, DurationPoisonBerserk)
+			// No warning from Berserk's Poison (got warned on
+			// previous turn already).
+			g.md.mode = mode
 		}
 	case StatusLignification:
 		floor := 3
@@ -690,10 +694,20 @@ func (g *Game) randomComestible() (ID, *Comestible) {
 
 // ProgressStatus reduces the number of remaining turns for a status by one.
 func (g *Game) ProgressStatus(i ID, ai *Actor, st Status) {
-	if ai.Statuses[st] <= 1 {
+	turns := ai.Statuses[st]
+	if turns <= 1 {
 		g.RemoveStatus(i, ai, st)
-	} else {
-		ai.Statuses[st]--
+		return
+	}
+	ai.Statuses[st]--
+	if turns > 2 {
+		return
+	}
+	switch st {
+	case StatusBerserk, StatusLignification, StatusDisorient, StatusGluttony, StatusShadow:
+		// For statuses where that matters, warn when there's
+		// only one turn remaining after progression.
+		g.md.mode = modeCritical
 	}
 }
 

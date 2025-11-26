@@ -1019,7 +1019,7 @@ func (a ActionToggleDarkLight) String() string {
 type ActionToggleWarningFirePois struct{}
 
 func (a ActionToggleWarningFirePois) Handle(md *model) (gruid.Effect, bool) {
-	GameConfig.WarnFirePoison = !GameConfig.WarnFirePoison
+	GameConfig.WarningsExtra = !GameConfig.WarningsExtra
 	err := SaveConfig()
 	if err != nil {
 		log.Printf("saving config: %v", err)
@@ -1032,10 +1032,10 @@ func (a ActionToggleWarningFirePois) Handle(md *model) (gruid.Effect, bool) {
 }
 
 func (a ActionToggleWarningFirePois) String() string {
-	if GameConfig.WarnFirePoison {
-		return "Disable warning on Fire/Poison"
+	if GameConfig.WarningsExtra {
+		return "Disable extra warnings"
 	}
-	return "Enable warning on Fire/Poison"
+	return "Enable extra warnings"
 }
 
 // ActionSetKeys opens the keymap settings.
@@ -1754,8 +1754,16 @@ Monsters usually give up quickly their search once they don’t see you: use fol
 
 Watch out for @Mfootstep noise@N: while going through dense foliage, it can be very helpful to avoid unwanted encounters.
 
+@YCONFIGURATION TIPS@N
+
+If you often get surprised by @OFire@N or @OPoison@N and get hurt by mistake, you may want to enable extra warnings in configuration options. Those warnings also stop you when @BBerserk@N or @BLignification@N is about to expire.
+
 @YWIZARD MODE@N
 
 While the recommended way to discover the game is to progressively improve your skills by analyzing and enjoying your previous deaths, frustrated casual players should consider enabling @MWizard Mode@N(W) before giving up. Without further enabling extra cheats, it works as a kind of “adventure mode” that simply resurrects you each time you die. Resurrections are recorded in the game’s timeline, so you can check later how many lives you spent and try to do better next time until you can win in the default permadeath mode.
+
+@YCHALLENGE TIPS@N
+
+If, on the contrary, you find Shamogu too easy, you’re encouraged to try the various mods and advanced primary spirits accessible after pressing TAB in the new game menu!
 `)
 }

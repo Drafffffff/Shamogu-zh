@@ -113,7 +113,7 @@ type Config struct {
 	NormalModeKeys  map[gruid.Key]Action // custom normal mode keys
 	Tiles           bool                 // whether to use Tiles or Unicode
 	Version         string               // config's game version
-	WarnFirePoison  bool                 // whether to stop and warn about fire/poison
+	WarningsExtra   bool                 // whether to stop and warn about fire/poison and some statuses about to expire
 }
 
 // ConfigSave returns encoded config data for saving.

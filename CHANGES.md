@@ -110,6 +110,10 @@ UI, graphics, QoL:
   height scaling factors (see issue #8). Results may look ugly for non-integer
   factors. At the very least, using multiples of 0.25 seems better (some other
   values result in visual glitches).
+* Improved “extra warnings” configuration option. It now also warns when
+  some particular statuses like Berserk or Lignification are about to expire.
+  It doesn't warn anymore for Poison after Berserk, given you got warned on the
+  previous turn.
 
 Fixes:
 
