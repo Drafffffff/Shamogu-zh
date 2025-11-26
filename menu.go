@@ -274,8 +274,12 @@ func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
 	if msgkey, ok := msg.(gruid.MsgKeyDown); ok {
 		switch msgkey.Key {
 		case gruid.KeyEscape:
-			md.openSpiritSelectionMenu(modeNewGame)
-			clear(md.g.Mods)
+			if GameConfig.AdvancedNewGame {
+				md.openSpiritSelectionMenu(modeNewGameAdvanced)
+			} else {
+				md.openSpiritSelectionMenu(modeNewGame)
+				clear(md.g.Mods)
+			}
 			return nil
 		case gruid.KeySpace:
 			md.openSpiritSelectionMenu(modeNewGameAdvanced)

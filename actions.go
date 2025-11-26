@@ -951,9 +951,10 @@ var configActions = []Action{
 	ActionSetKeys{},
 	ActionToggleDarkLight{},
 	ActionToggleWarningFirePois{},
+	ActionToggleAdvancedNewGame{},
 }
 
-var configKeys = []rune{':', 'c', 'w', 't'}
+var configKeys = []rune{':', 'c', 'w', 'n', 't'}
 
 func (a ActionConfig) Handle(md *model) (gruid.Effect, bool) {
 	md.menuActions = configActions
@@ -978,7 +979,7 @@ func (a ActionConfig) String() string {
 	return "Configure settings"
 }
 
-// ActionToggleDarkLight enters keyboard targeting mode.
+// ActionToggleDarkLight toggles dark/light mode.
 type ActionToggleDarkLight struct{}
 
 func (a ActionToggleDarkLight) Handle(md *model) (gruid.Effect, bool) {
@@ -1001,7 +1002,7 @@ func (a ActionToggleDarkLight) String() string {
 	return "Switch to dark color theme"
 }
 
-// ActionToggleWarningFirePois enters keyboard targeting mode.
+// ActionToggleWarningFirePois enables/disables extra warnings.
 type ActionToggleWarningFirePois struct{}
 
 func (a ActionToggleWarningFirePois) Handle(md *model) (gruid.Effect, bool) {
@@ -1022,6 +1023,30 @@ func (a ActionToggleWarningFirePois) String() string {
 		return "Disable extra warnings"
 	}
 	return "Enable extra warnings"
+}
+
+// ActionToggleAdvancedNewGame enables/disables advanced new game menu (by
+// default).
+type ActionToggleAdvancedNewGame struct{}
+
+func (a ActionToggleAdvancedNewGame) Handle(md *model) (gruid.Effect, bool) {
+	GameConfig.AdvancedNewGame = !GameConfig.AdvancedNewGame
+	err := SaveConfig()
+	if err != nil {
+		log.Printf("saving config: %v", err)
+		md.g.Log(err.Error())
+	}
+	clearCache()
+	eff := gruid.Cmd(func() gruid.Msg { return gruid.MsgScreen{} })
+	md.mode = modeNormal
+	return eff, false
+}
+
+func (a ActionToggleAdvancedNewGame) String() string {
+	if GameConfig.AdvancedNewGame {
+		return "Default to simple new game menu"
+	}
+	return "Default to advanced new game menu"
 }
 
 // ActionSetKeys opens the keymap settings.

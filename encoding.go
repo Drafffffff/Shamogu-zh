@@ -107,6 +107,7 @@ func (g *Game) GameSave() ([]byte, error) {
 
 // Config describes available configuration options.
 type Config struct {
+	AdvancedNewGame bool                 // whether to go to advanced new game menu directly
 	DarkColors      bool                 // whether to use a dark color theme
 	ExamineModeKeys map[gruid.Key]Action // custom examine mode keys
 	Mods            []bool               // selected mods (in previous advanced game)

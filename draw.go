@@ -543,11 +543,15 @@ func (md *model) drawSpiritSelection() {
 	md.desc.Draw(gdslice.Slice(gdslice.Range().Columns(UIWidth/2, UIWidth)))
 	ui.Textf("Shamanic Mountain Guardian - Shamogu %s", Version).WithStyle(gruid.Style{}.WithFg(ColorMagenta)).
 		Draw(md.gd.Slice(gruid.NewRange(-25+UIWidth/2, 3, UIWidth, UIHeight)))
+	y := 13
+	if md.mode == modeNewGameAdvanced {
+		y += len(primarySpiritsAdvanced)
+	}
+	ui.Text(`(TAB for advanced new game settings)`).WithStyle(gruid.Style{Fg: ColorGreen}).
+		Draw(md.gd.Slice(gruid.NewRange(0, y, UIWidth/2, y+1)))
 	if md.mode == modeNewGameAdvanced {
 		return
 	}
-	ui.Text(`(TAB for advanced new game settings)`).WithStyle(gruid.Style{Fg: ColorGreen}).
-		Draw(md.gd.Slice(gruid.NewRange(0, 13, UIWidth/2, 14)))
 	ui.Text(`All life in your mountain is being corrupted. Beasts are losing their minds and ` +
 		`becoming aggressive. These disturbing events started to happen after a dungeon portal suddenly ` +
 		`appeared at the top of the mountain. As the guardian, you decide to explore ` +
