@@ -1583,7 +1583,7 @@ On the map, monster color may change depending on active status effects.  By def
 		case StatusClarity:
 			details = "Player-only effect obtainable by eating clarity leaves. May be removed by eating a berserking flower for half the @BBerserk@N duration."
 		case StatusLignification:
-			details = "The player’s HP never falls below 3 for after losing bonus HP. Monsters’ HP floor is only 1, like for @BBerserk@N. Duration and HP bonus may be renewed by eating a lignification fruit. Cancels @BSprint@N. Actors with “woody legs” don’t have delayed burning but can move while @Blignified@N at the cost of reducing the duration by an extra turn. "
+			details = "The player’s HP never falls below 3 for after losing bonus HP. Monsters’ HP floor is only 1, like for @BBerserk@N. Duration and HP bonus may be renewed by eating a lignification fruit. Cancels @BSprint@N. Actors with “woody legs” don’t have delayed burning but can move while lignified at the cost of reducing the duration by an extra turn. "
 		case StatusConfusion:
 			details = "Confused monsters will attack other monsters too when adjacent. Some monsters may even hurt or affect themselves when performing special actions like digging, spitting fire, barking, or pushing."
 		case StatusDisorient:

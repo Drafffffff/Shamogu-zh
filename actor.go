@@ -428,7 +428,7 @@ var statusDesc = []string{
 	StatusGluttony:  fmt.Sprintf("Unless you eat before expiration, you’ll eat a random comestible without taking a turn. If there is no food, you’ll become confused for %d turns.", DurationConfusionGluttony),
 	StatusImbalance: fmt.Sprintf("Halves attack. When also confused, gives %+d Defense.", ConfusedImbalanceDefenseBonus),
 	StatusLignification: fmt.Sprintf(
-		"Gives %+d Defense with an extra +1 against ranged attacks. Caps incoming attack damage at 1. Provides temporary HP bonus. Protects from @OPoison@N and @OImbalance@N. Delays burning. Prevents movement. When @Oafraid@N, getting hit makes you @BBerserk@N. Followed by @OImbalance@N for you and any adjacent actors on expiration for %d turns.",
+		"Gives %+d Defense with an extra +1 against ranged attacks. Caps incoming attack damage at 1. Provides temporary HP bonus. Protects from @OPoison@N and @OImbalance@N. Delays burning. Prevents movement. Followed by @OImbalance@N for you and any adjacent actors on expiration for %d turns.",
 		LignificationDefenseBonus, DurationImbalanceLignification),
 	StatusPoison: fmt.Sprintf("Walking will hurt you for %d damage. Stinky toxins are exuded on expiration, confusing other creatures for %d turns.",
 		PoisonDamage, DurationConfusionToxins),
