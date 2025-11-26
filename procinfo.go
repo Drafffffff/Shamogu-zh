@@ -1,5 +1,12 @@
 package main
 
+import (
+	"fmt"
+	"os"
+	"slices"
+	"strings"
+)
+
 // MapLevels is the total number of map levels in the dungeon.
 const MapLevels = 9
 
@@ -199,91 +206,92 @@ func (g *Game) spiritProcGen() {
 			extras[i], extras[j] = extras[j], extras[i]
 		})
 	}
-	// mapSpirits maps dungeon levels to the index of the totemic spirit
-	// they contain.
-	mapSpirits := make([]spiritProcInfo, MapLevels)
-	for i := range mapSpirits {
-		// We use -1 to represent the absence of totemic spirit in a
-		// level.
-		mapSpirits[i].Idx = -1
-	}
-	g.ProcInfo.Spirits = mapSpirits
-	// Games generate 6 totems per game.
+	// ts contains information about generated totemic spirits.
+	// There are 6 generated non-empty totems per game.
+	ts := make([]spiritProcInfo, 6)
 	if len(extras) > 0 {
 		// Extra totems: generate 3 of each kind.
 		for i := range 3 {
-			mapSpirits[i].Idx = extras[i]
-			mapSpirits[i].Advanced = true
+			ts[i].Idx = extras[i]
+			ts[i].Advanced = true
 		}
 		for i := range 3 {
-			mapSpirits[i+3].Idx = spirits[i]
+			ts[i+3].Idx = spirits[i]
 		}
-		// Shuffle totems of both kinds. We ensure the first totem is a
-		// challenge one with higher chance by not shuffling the first
-		// one half of the time.
-		i0 := 1
-		if g.IntN(2) == 0 {
-			i0 = 0
+		// We move up to 2 regular spirit totems to the first 3 ones.
+		n := 1
+		switch g.IntN(10) {
+		case 0, 1:
+			// Sometimes, we allow 2 regular spirit totems early
+			// on.
+			n++
+		case 2:
+			// More rarely, we put only advanced spirit totems
+			// early on.
+			n--
 		}
-		s := mapSpirits[i0:6]
-		g.rand.Shuffle(len(s), func(i, j int) {
-			s[i], s[j] = s[j], s[i]
-		})
+		pi := -1 // previous index
+		for k := range n {
+			// We put 1 regular spirits among the first
+			// 3 ones, with some positioning bias away from first
+			// map level.
+			i, j := max(g.IntN(3), k+g.IntN(2)), 3+g.IntN(3)
+			if pi == i {
+				if i < 2 {
+					i++
+				} else {
+					i--
+				}
+			}
+			ts[i], ts[j] = ts[j], ts[i]
+			pi = i
+		}
 	} else {
 		// Generate 6 regular secondary spirits.
-		for i := range 6 {
-			mapSpirits[i].Idx = spirits[i]
+		for i := range ts {
+			ts[i].Idx = spirits[i]
 		}
 	}
-	// We shuffle totems in map levels 2-8. The first level always contains
-	// a totem, and levels 2-8 contain five totems and two empty ones. The
-	// ninth level never contains a totem.
-	s := mapSpirits[1:8]
-	g.rand.Shuffle(len(s), func(i, j int) {
-		s[i], s[j] = s[j], s[i]
-	})
-	if s[0].Idx == -1 && s[1].Idx == -1 && g.IntN(3) > 0 {
+	// We randomly insert empty totems in map levels 2-8. The first level
+	// always contains a totem, and levels 2-8 contain five totems and two
+	// empty ones. The ninth level never contains a totem.
+	i0 := 1 + g.IntN(len(ts)) // index of first empty totem
+	ts = slices.Insert(ts, i0, spiritProcInfo{Idx: -1})
+	var i1 int // index of second empty totem
+	if (i0 == 1 || i0 == 2) && g.IntN(4) > 0 {
 		// Make two successive empty totems as second and third ones
 		// more unlikely, as that's a bit too disappointing when it
-		// happens.
-		i, j := g.IntN(2), 2+g.IntN(len(s)-2)
-		s[i], s[j] = s[j], s[i]
+		// happens. Should still be possible enough so that the player
+		// can't assume there's a non-empty totem.
+		i1 = i0 + 2 + g.IntN(len(ts)-1-i0)
+	} else {
+		i1 = 1 + g.IntN(len(ts))
 	}
-	if len(extras) == 0 {
-		return
-	}
-	for needsShuffling(mapSpirits) {
-		// When challenge totems are enabled, we want to ensure totem
-		// distribution is never split into two 3-sized groups of the
-		// same kind, so we simply shuffle again in such cases.
-		g.rand.Shuffle(len(s), func(i, j int) {
-			s[i], s[j] = s[j], s[i]
-		})
-	}
+	ts = slices.Insert(ts, i1, spiritProcInfo{Idx: -1})
+	// PrintGeneratedTotems(ts)
+	// Last level always corresponds to an empty totem (that isn't even
+	// generated).
+	ts = append(ts, spiritProcInfo{Idx: -1})
+	g.ProcInfo.Spirits = ts
 }
 
-// needsShuffling reports whether the first three non-empty totems aren't all
-// of the same kind.
-func needsShuffling(s []spiritProcInfo) bool {
-	nk := 0               // same-kind totems seen
-	kind := s[0].Advanced // first totem's kind
-	for _, sk := range s[1:] {
-		if sk.Idx < 0 {
-			continue
+// PrintGeneratedTotems prints the given totem procgen info for debug purposes.
+func PrintGeneratedTotems(ts []spiritProcInfo) {
+	var sb strings.Builder
+	for i, spi := range ts {
+		if i > 0 {
+			sb.WriteByte(' ')
 		}
-		if sk.Advanced != kind {
-			// Seen distinct kinds of totems among first 3 ones, so
-			// no shuffling is necessary.
-			return false
-		}
-		nk++
-		if nk == 2 {
-			// Next 2 non-empty totems are of the same kind as the
-			// first one, so we need to shuffle again.
-			break
+		switch {
+		case spi.Idx == -1:
+			sb.WriteString("--")
+		case spi.Advanced:
+			fmt.Fprintf(&sb, "A%d", spi.Idx)
+		default:
+			fmt.Fprintf(&sb, "R%d", spi.Idx)
 		}
 	}
-	return true
+	fmt.Fprintln(os.Stderr, sb.String())
 }
 
 // menhirProcGen creates a random sequence of menhir kinds that still ensures

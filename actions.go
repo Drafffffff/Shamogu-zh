@@ -599,23 +599,9 @@ func equipItem(md *model, i ID) bool {
 		entry.Disabled = j < from || j >= to
 		if !entry.Disabled {
 			rj, ok := ej.Role.(*Spirit)
-			switch {
-			case ok && rj.Level >= 1:
+			if ok && rj.Level >= 1 {
 				// Cannot upgrade a spirit more than once.
 				entry.Disabled = true
-			case g.Mod(ModAdvancedSpirits) && !ok && spirit:
-				// When challenge spirits are enabled, only one
-				// regular secondary spirit is allowed.
-				ri := ei.Role.(*Spirit)
-				if ri.Advanced {
-					break
-				}
-				for k, sk := range g.PlayerSpirits() {
-					if k > PrimarySpiritID && !sk.Advanced {
-						entry.Disabled = true
-						break
-					}
-				}
 			}
 			if entry.Disabled && j == from {
 				from++
