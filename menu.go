@@ -54,6 +54,7 @@ func (md *model) updateMainMenu(msg gruid.Msg) {
 		}
 		switch md.menu.mode {
 		case modeGameMenu, modeConfigMenu, modeHelpMenu:
+			md.updateMenuActionDesc(idx)
 			if act != ui.MenuInvoke {
 				break
 			}
@@ -110,6 +111,21 @@ func (md *model) updateMainMenu(msg gruid.Msg) {
 			}
 			md.action = ActionEquipItemAt{ID: j}
 		}
+	}
+}
+
+// updateMenuActionDesc updates the description label for the menu action of
+// given index in the current menu.
+func (md *model) updateMenuActionDesc(idx int) {
+	if idx < 0 || idx >= len(md.menuActions) {
+		md.desc.Content = ui.StyledText{}
+		return
+	}
+	a := md.menuActions[idx]
+	if ad, ok := a.(ActionDesc); ok {
+		md.updateActionDesc(ad)
+	} else {
+		md.desc.Content = ui.StyledText{}
 	}
 }
 
@@ -334,7 +350,7 @@ func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
 	return nil
 }
 
-// updateItemDesc updates the description label with text for the given entity.
+// updateModDesc updates the description label with text for the given entity.
 func (md *model) updateModDesc(m Mod) {
 	l := md.desc
 	stt := ui.StyledText{}.WithMarkups(Markups)

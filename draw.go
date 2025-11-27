@@ -116,6 +116,9 @@ func (md *model) Draw() gruid.Grid {
 			md.drawInventory()
 		case modeGameMenu, modeConfigMenu, modeHelpMenu:
 			md.gd.Copy(md.menu.main.Draw())
+			if md.desc.Content.Text() != "" {
+				md.desc.Draw(md.gd.Slice(md.gd.Range().Columns(UIWidth/2, UIWidth)))
+			}
 		case modeKeysView, modeKeysChange:
 			md.drawKeySettings()
 		}

@@ -25,6 +25,21 @@ type Action interface {
 	Handle(*model) (gruid.Effect, bool)
 }
 
+// ActionDesc is a named action with a description.
+type ActionDesc interface {
+	Action
+	String() string
+	Desc() string
+}
+
+// updateActionDesc updates the description label for the given described action.
+func (md *model) updateActionDesc(a ActionDesc) {
+	l := md.desc
+	stt := ui.StyledText{}.WithMarkups(Markups)
+	l.Box = &ui.Box{Title: ui.Text(a.String())}
+	l.Content = stt.WithText(a.Desc()).Format(UIWidth/2 - 2)
+}
+
 // ActionNone does nothing.
 type ActionNone struct{}
 
@@ -775,6 +790,10 @@ func (a ActionInventory) String() string {
 	return "Open inventory"
 }
 
+func (a ActionInventory) Desc() string {
+	return "Shows your spirits and comestibles. Selecting a spirit will use a charge, while selecting a comestible makes you eat it."
+}
+
 // ActionUseItem uses an item.
 type ActionUseItem struct {
 	ID ID
@@ -935,6 +954,7 @@ func (a ActionMenu) Handle(md *model) (gruid.Effect, bool) {
 	md.menu.main.SetBox(&ui.Box{Title: ui.Text("Menu").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
 	md.menu.main.SetEntries(entries)
 	md.menu.main.SetActiveInvokable(0)
+	md.updateMenuActionDesc(0)
 	md.mode = modeMenu
 	md.menu.mode = modeGameMenu
 	return nil, false
@@ -950,7 +970,7 @@ type ActionConfig struct{}
 var configActions = []Action{
 	ActionSetKeys{},
 	ActionToggleDarkLight{},
-	ActionToggleWarningFirePois{},
+	ActionToggleExtraWarnings{},
 	ActionToggleAdvancedNewGame{},
 }
 
@@ -970,6 +990,7 @@ func (a ActionConfig) Handle(md *model) (gruid.Effect, bool) {
 	md.menu.main.SetBox(&ui.Box{Title: ui.Text("Config").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
 	md.menu.main.SetEntries(entries)
 	md.menu.main.SetActiveInvokable(0)
+	md.updateMenuActionDesc(0)
 	md.mode = modeMenu
 	md.menu.mode = modeConfigMenu
 	return nil, false
@@ -977,6 +998,10 @@ func (a ActionConfig) Handle(md *model) (gruid.Effect, bool) {
 
 func (a ActionConfig) String() string {
 	return "Configure settings"
+}
+
+func (a ActionConfig) Desc() string {
+	return "Opens a configuration menu with various options."
 }
 
 // ActionToggleDarkLight toggles dark/light mode.
@@ -1002,10 +1027,10 @@ func (a ActionToggleDarkLight) String() string {
 	return "Switch to dark color theme"
 }
 
-// ActionToggleWarningFirePois enables/disables extra warnings.
-type ActionToggleWarningFirePois struct{}
+// ActionToggleExtraWarnings enables/disables extra warnings.
+type ActionToggleExtraWarnings struct{}
 
-func (a ActionToggleWarningFirePois) Handle(md *model) (gruid.Effect, bool) {
+func (a ActionToggleExtraWarnings) Handle(md *model) (gruid.Effect, bool) {
 	GameConfig.WarningsExtra = !GameConfig.WarningsExtra
 	err := SaveConfig()
 	if err != nil {
@@ -1018,11 +1043,19 @@ func (a ActionToggleWarningFirePois) Handle(md *model) (gruid.Effect, bool) {
 	return eff, false
 }
 
-func (a ActionToggleWarningFirePois) String() string {
+func (a ActionToggleExtraWarnings) String() string {
 	if GameConfig.WarningsExtra {
 		return "Disable extra warnings"
 	}
 	return "Enable extra warnings"
+}
+
+func (a ActionToggleExtraWarnings) Desc() string {
+	verb := "enables"
+	if GameConfig.WarningsExtra {
+		verb = "disables"
+	}
+	return fmt.Sprintf("This option %s extra confirmation prompt warnings.\n\nThose are triggered when getting @OFire@N or @OPoison@N, but also when some specific statuses like @BBerserk@N or @BLignification@N only have one turn remaining.", verb)
 }
 
 // ActionToggleAdvancedNewGame enables/disables advanced new game menu (by
@@ -1044,9 +1077,16 @@ func (a ActionToggleAdvancedNewGame) Handle(md *model) (gruid.Effect, bool) {
 
 func (a ActionToggleAdvancedNewGame) String() string {
 	if GameConfig.AdvancedNewGame {
-		return "Default to simple new game menu"
+		return "Default to classic new game menu"
 	}
 	return "Default to advanced new game menu"
+}
+
+func (a ActionToggleAdvancedNewGame) Desc() string {
+	if GameConfig.AdvancedNewGame {
+		return "This option makes the “classic” new game menu the default on game startup. It only has an effect when starting a new game.\n\nThe classic new game menu only gives access to the core primary spirits and disables all mods.\n\nYou can still access “advanced” new game settings by pressing TAB there."
+	}
+	return "This option makes the “advanced” new game menu the default on game startup. It only has an effect when starting a new game.\n\nThe advanced new game menu gives access to extra advanced primary spirits (Spinning Crocodile, Vampiric Bat) and makes use of any enabled mods.\n\nYou can still go back to the “classic” menu through the mods menu."
 }
 
 // ActionSetKeys opens the keymap settings.
@@ -1170,6 +1210,10 @@ func (a ActionViewMessages) String() string {
 	return "View messages"
 }
 
+func (a ActionViewMessages) Desc() string {
+	return "Opens a pager with previous message logs. The pager supports page-up/page-down, mouse scrolling, and other basic less-like keybindings."
+}
+
 // ActionDump writes a dump with game statistics.
 type ActionDump struct{}
 
@@ -1184,6 +1228,13 @@ func (a ActionDump) Handle(md *model) (gruid.Effect, bool) {
 
 func (a ActionDump) String() string {
 	return "Dump game statistics"
+}
+
+func (a ActionDump) Desc() string {
+	if runtime.GOOS == "js" {
+		return "Writes game statistics below."
+	}
+	return "Writes game statistics to a dump.txt file in the game’s data directory."
 }
 
 // ActionSaveQuit asks for quitting the game after saving.
@@ -1202,6 +1253,10 @@ func (a ActionSaveQuit) String() string {
 	return "Save and Quit"
 }
 
+func (a ActionSaveQuit) Desc() string {
+	return "Saves current progress and quits the game. The next time you start the game, it will directly resume from here."
+}
+
 // ActionQuit asks for quitting the game, without saving.
 type ActionQuit struct{}
 
@@ -1213,6 +1268,10 @@ func (a ActionQuit) Handle(md *model) (gruid.Effect, bool) {
 
 func (a ActionQuit) String() string {
 	return "Quit (without saving)"
+}
+
+func (a ActionQuit) Desc() string {
+	return "Deletes any saved progress for current playthrough and quits the game."
 }
 
 // ActionQuitConfirm quits the game.
@@ -1463,6 +1522,7 @@ func (a ActionHelp) Handle(md *model) (gruid.Effect, bool) {
 	md.menu.main.SetBox(&ui.Box{Title: ui.Text("Help Menu").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
 	md.menu.main.SetEntries(entries)
 	md.menu.main.SetActiveInvokable(0)
+	md.updateMenuActionDesc(0)
 	md.mode = modeMenu
 	md.menu.mode = modeHelpMenu
 	return nil, false
@@ -1470,6 +1530,10 @@ func (a ActionHelp) Handle(md *model) (gruid.Effect, bool) {
 
 func (a ActionHelp) String() string {
 	return "Help"
+}
+
+func (a ActionHelp) Desc() string {
+	return "Opens a menu leading to various help topics."
 }
 
 // ActionHelpDefaultKeys enters a help menu.
@@ -1482,6 +1546,10 @@ func (a ActionHelpDefaultKeys) Handle(md *model) (gruid.Effect, bool) {
 
 func (a ActionHelpDefaultKeys) String() string {
 	return "Keybindings (default values)"
+}
+
+func (a ActionHelpDefaultKeys) Desc() string {
+	return "Shows a short one-page summary with most default keybindings."
 }
 
 func (md *model) updateKeysDescription(title string, actions []string) {
@@ -1560,6 +1628,10 @@ func (a ActionHelpStatuses) Handle(md *model) (gruid.Effect, bool) {
 
 func (a ActionHelpStatuses) String() string {
 	return "Statuses"
+}
+
+func (a ActionHelpStatuses) Desc() string {
+	return "Explains in detail how the various status effects work, as well as the color conventions."
 }
 
 func statusesHelpText(g *Game) string {
@@ -1645,6 +1717,10 @@ func (a ActionHelpCombat) String() string {
 	return "Combat"
 }
 
+func (a ActionHelpCombat) Desc() string {
+	return "Explains how various combat-related features work, including attack patterns and noise."
+}
+
 func combatHelpText() string {
 	return strings.TrimSpace(`
 @YTURN-BASED SYSTEM@N
@@ -1709,6 +1785,10 @@ func (a ActionHelpItems) String() string {
 	return "Items"
 }
 
+func (a ActionHelpItems) Desc() string {
+	return "Gives an overview about the various kinds of items found in the game."
+}
+
 func itemHelpText() string {
 	return strings.TrimSpace(`
 @CComestibles@N are found in every level. When the player is over them, pressing the @MInteract Key@N(e) allows to pick them. When your inventory is full, you’ll have to select a comestible to leave on the ground. Opening the @MInventory@N(i) allows to eat an equipped comestible or any comestible on the ground.
@@ -1733,6 +1813,10 @@ func (a ActionHelpTips) Handle(md *model) (gruid.Effect, bool) {
 
 func (a ActionHelpTips) String() string {
 	return "Tips"
+}
+
+func (a ActionHelpTips) Desc() string {
+	return "Provides various tips for new players."
 }
 
 func tipsHelpText() string {
@@ -1775,6 +1859,6 @@ While the recommended way to discover the game is to progressively improve your 
 
 @YCHALLENGE TIPS@N
 
-If, on the contrary, you find Shamogu too easy, you’re encouraged to try the various mods and advanced primary spirits accessible after pressing TAB in the new game menu!
+If, on the contrary, you find Shamogu too easy, you’re encouraged to try the various mods and advanced primary spirits accessible after pressing TAB in the classic new game menu!
 `)
 }

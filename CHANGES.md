@@ -2,11 +2,12 @@
 
 New content:
 
-* New advanced new game settings, accessed by pressing TAB in the new game
-  menu. They allow to select various game mods, as well as extra advanced
-  primary spirits.
-* New advanced primary spirit: **Spinning Crocodile**. It has a
-  *tail-slap* ability that hits and unbalances all adjacent foes and reverses
+* New advanced new game settings and menu, accessed by pressing TAB in the
+  default new game menu. They allow to select various game mods and extra
+  advanced primary spirits. A new configuration option allows to make the game
+  start by default with the advanced new game menu.
+* New advanced primary spirit: **Spinning Crocodile**. It has a *tail-slap*
+  ability that hits and unbalances all adjacent foes and reverses
   the player's current direction. The crocodile's attacks are melee attacks
   that drag foes backwards, unbalancing them. The crocodile cannot rotate
   easily: it needs a turn to reverse current direction, and while it can move
@@ -19,18 +20,26 @@ New content:
   ability that allows to steal life by damaging foes: the Vampirism status
   effect is short-lived, so one has to chose foes wisely! The bat's attacks
   follow a two-phased attack pattern: when ranged, it works as a confusing
-  rampaging attack. In melee, a plain attack is followed by quick 2-tile
+  rampaging attack. In melee, a plain attack is followed by a quick 2-tile
   retreat.
-* New **Corrupted Dungeon** (wip) mod: the orb's influence has scattered
-  twisted surprises through the land! The mod is recommended to any player that
-  wants some extra variability and surprises during their adventures. See
-  design discussion in issue #6.
-* New **Challenge Spirits** (wip) mod that introduces several new kinds of
-  secondary spirits with both significant drawbacks and advantages, somewhat
-  more quirky and less balanced than regular secondary spirits, but fun in
-  various ways! See design discussion in issue #7.
-* New **No Recharges** mod: double spirit charges but going to the next level
-  doesn't recharge them anymore!
+* New expansion mod: **Corrupted Dungeon**. The orb's influence has scattered
+  twisted surprises through the dungeon! The mod is recommended to any player
+  that wants more unpredictability and variability  during their adventures.
+  See design discussion in issue #6.
+* New expansion mod: **Advanced Spirits**. It introduces 7 new advanced
+  secondary spirits with peculiar strong points but also serious and quirky
+  drawbacks! See design discussion in issue #7.
+* New challenge mod: **Small Inventory**. Inventory can only hold 3
+  comestibles. Choose them with care!
+* New challenge mod: **No Recharges**. Spirit ability charges are doubled but
+  don’t recharge when going to the next map level. Use them wisely!
+* New experimental challenge mod: **Healing Combat**. Healing happens through
+  combat.  When a monster dies, you may heal for 1 HP, with higher chance at
+  low HP.  However, comestibles don’t provide healing anymore. Vampiric Bat
+  players start with an extra “vampirism” charge and get another one at map
+  level 5, instead of healing on monster death. Less frequent healing but
+  better tactical control over it! This experimental mod is playable but still
+  lacks polish with respect to the default experience.
 
 The **Challenge Spirits** mod provides the following advanced secondary
 spirits:
@@ -85,12 +94,6 @@ Reworked and improved content:
     of 3 was quite bizarre for monsters, given how 3 HP is actually a lot for
     most of them, and sometimes higher than the maximum. Thematically, we may
     think that corrupted monsters don't benefit as much from nature's healing.
-* Wind Fox's recoil has been reworked: guaranteed on hits in melee, 2/3 chance
-  on hits at distance 2, and never beyond. Pushing gale's damage in melee is
-  now 1-2, so often 2 damage instead of 1. The idea behind those changes is to
-  make monsters more likely to reach the player, but help the player a bit once
-  it is in melee, to make Wind Fox less extreme in making easy situations
-  easier and hard situations harder.
 * Eating clarity leaves and foggy-skin onion while Clarity or Foggy-Skin is
   active now extends the beneficial status by the remaining duration, instead
   of losing remaining turns. Eating a berserking flower or lignification fruit
@@ -100,6 +103,12 @@ Reworked and improved content:
   of doing nothing, and firebreath pepper now extends Fire and Confusion by the
   remaining duration, so that using it on foes that already have those statuses
   still has some useful effect.
+* Wind Fox's recoil has been reworked: guaranteed on hits in melee, 2/3 chance
+  on hits at distance 2, and never beyond. Pushing gale's damage in melee is
+  now 1-2, so often 2 damage instead of 1. The idea behind those changes is to
+  make monsters more likely to reach the player, but help the player a bit once
+  it is in melee, to make Wind Fox less extreme in making easy situations
+  easier and hard situations harder.
 * Monster fear is now somewhat biased toward going in the opposite direction
   from the player, instead of fleeing laterally, so that non-Hydra players get
   more offensive use from Fear.
@@ -114,6 +123,7 @@ UI, graphics, QoL:
   some particular statuses like Berserk or Lignification are about to expire.
   It doesn't warn anymore for Poison after Berserk, given you got warned on the
   previous turn.
+* Added detailed descriptions for various menu entries.
 
 Fixes:
 
