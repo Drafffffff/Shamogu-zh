@@ -1,5 +1,11 @@
 # v? ?
 
+This is a quite significant release with two new advanced primary spirits,
+two new expansions featuring many surprises and seven new advanced secondary
+spirits, as well as various others novelties and improvements, including some
+important Lignification adjustments. The design of most new and reworked
+content was discussed in issues #6 and #7 of Shamogu's codeberg repository.
+
 New content:
 
 * New advanced new game settings and menu, accessed by pressing TAB in the
@@ -41,13 +47,13 @@ New content:
   better tactical control over it! This experimental mod is playable but still
   lacks polish with respect to the default experience.
 
-The **Challenge Spirits** mod provides the following advanced secondary
-spirits:
+The **Advanced Spirits** expansion mod provides the following advanced
+secondary spirits:
 
 * **Dazzling Zebra**. It has a “disorient” ability that makes foes move in the
   opposite direction with respect to your current direction. The Zebra has a
   special dazzling passive effect on foes: it makes foes on one side mistakenly
-  hit instead any foe just behind you on the other side!  However, being so
+  hit instead any foe just behind you on the other side. However, being so
   dazzling also means Zebra is easy to notice instantly, so beware of sudden
   attacks while exploring!
 * **Gardening Lion**. It has a “garden” ability that allows to grow foliage
@@ -56,7 +62,8 @@ spirits:
 * **Gawalt Monkey**. It features wall-jumping (inspired from Harmonist) and a
   “shadows” ability that allows to move around unnoticed and go through
   translucent walls. Stealth and mobility are the Gawalt's way, and combat is
-  more difficult, because attack damage is weakened.
+  more difficult, because attack damage is weakened. The Gawalt can sense
+  menhirs and hide in them.
 * **Gluttonous Bear**. It has a powerful “snack” ability that teleports you to
   the nearest comestible and makes you eat it. However, the Bear needs
   otherwise to eat comestibles in pairs!
@@ -119,9 +126,9 @@ UI, graphics, QoL:
   height scaling factors (see issue #8). Results may look ugly for non-integer
   factors. At the very least, using multiples of 0.25 seems better (some other
   values result in visual glitches).
-* Improved “extra warnings” configuration option. It now also warns when
-  some particular statuses like Berserk or Lignification are about to expire.
-  It doesn't warn anymore for Poison after Berserk, given you got warned on the
+* Improved “extra warnings” configuration option. It now also warns when some
+  particular statuses like Berserk or Lignification are about to expire.  It
+  doesn't warn anymore for Poison after Berserk, given you got warned on the
   previous turn.
 * Added detailed descriptions for various menu entries.
 
