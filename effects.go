@@ -916,7 +916,7 @@ func (eff EffectSnack) Name() string {
 }
 
 func (eff EffectSnack) Desc() string {
-	desc := "You teleport to nearest comestible, if any, and eat it."
+	desc := "You teleport to the nearest comestible, if any, and eat it."
 	if eff.NoGluttonyStatus {
 		return desc
 	}

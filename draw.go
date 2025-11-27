@@ -552,15 +552,16 @@ func (md *model) drawSpiritSelection() {
 	}
 	ui.Text(`(TAB for advanced new game settings)`).WithStyle(gruid.Style{Fg: ColorGreen}).
 		Draw(md.gd.Slice(gruid.NewRange(0, y, UIWidth/2, y+1)))
+	y = 16
 	if md.mode == modeNewGameAdvanced {
-		return
+		y += len(primarySpiritsAdvanced) - 1
 	}
 	ui.Text(`All life in your mountain is being corrupted. Beasts are losing their minds and ` +
 		`becoming aggressive. These disturbing events started to happen after a dungeon portal suddenly ` +
 		`appeared at the top of the mountain. As the guardian, you decide to explore ` +
 		`that dungeon in order to find and destroy the source of corruption… ` +
 		`You hope luck will be on your side!`).Format(72).
-		Draw(md.gd.Slice(gruid.NewRange(4, 16, UIWidth-4, UIHeight)))
+		Draw(md.gd.Slice(gruid.NewRange(4, y, UIWidth-4, UIHeight)))
 }
 
 func (md *model) drawModSelection() {
