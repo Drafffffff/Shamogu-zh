@@ -375,6 +375,11 @@ func (md *model) modSelectionMenu() {
 				Text:     ui.Text("Expansions").WithStyle(hstyle),
 				Disabled: true,
 			})
+		case i == 2:
+			entries = append(entries, ui.MenuEntry{
+				Text:     ui.Text("Small Mods").WithStyle(hstyle),
+				Disabled: true,
+			})
 		case i == NExpansions:
 			entries = append(entries, ui.MenuEntry{
 				Text:     ui.Text("Challenges").WithStyle(hstyle),
