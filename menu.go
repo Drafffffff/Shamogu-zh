@@ -250,7 +250,7 @@ func (md *model) updateSpiritSelectionMenu(msg gruid.Msg) gruid.Effect {
 		msgmouse.P.Y -= spiritSelectionMargin
 		msg = msgmouse
 	}
-	if msgkey, ok := msg.(gruid.MsgKeyDown); ok && msgkey.Key == gruid.KeyTab {
+	if msgkey, ok := msg.(gruid.MsgKeyDown); ok && (msgkey.Key == gruid.KeyTab || msgkey.Key == gruid.KeySpace) {
 		if md.mode == modeNewGame && len(GameConfig.Mods) == NMods {
 			md.g.Mods = slices.Clone(GameConfig.Mods)
 		}
@@ -260,7 +260,12 @@ func (md *model) updateSpiritSelectionMenu(msg gruid.Msg) gruid.Effect {
 	md.menu.main.Update(msg)
 	switch act := md.menu.main.Action(); act {
 	case ui.MenuQuit:
-		return gruid.End()
+		if _, ok := msg.(gruid.MsgMouse); !ok {
+			// Only quit spirit selection menu if it was requested
+			// through a key, as it's a bit strange to quit the
+			// game just because we clicked outside the menu.
+			return gruid.End()
+		}
 	case ui.MenuMove, ui.MenuInvoke:
 		idx := md.menu.main.ActiveInvokable()
 		if idx < 0 {
@@ -287,30 +292,26 @@ func (md *model) startNewGame(spe *Entity) {
 }
 
 func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
-	if msgkey, ok := msg.(gruid.MsgKeyDown); ok {
-		switch msgkey.Key {
-		case gruid.KeyEscape:
-			if GameConfig.AdvancedNewGame {
-				if len(GameConfig.Mods) == NMods {
-					md.g.Mods = slices.Clone(GameConfig.Mods)
-				} else {
-					clear(md.g.Mods)
-				}
-				md.openSpiritSelectionMenu(modeNewGameAdvanced)
-			} else {
-				md.openSpiritSelectionMenu(modeNewGame)
-				clear(md.g.Mods)
-			}
-			return nil
-		case gruid.KeySpace:
-			md.openSpiritSelectionMenu(modeNewGameAdvanced)
-			return nil
-		}
-	}
 	md.menu.main.Update(msg)
 	switch act := md.menu.main.Action(); act {
 	case ui.MenuQuit:
-		return gruid.End()
+		if msgkey, ok := msg.(gruid.MsgKeyDown); ok && msgkey.Key == gruid.KeySpace {
+			// Disable Space in mods menu to force more explicit
+			// Escape or s or q.
+			return nil
+		}
+		if GameConfig.AdvancedNewGame {
+			if len(GameConfig.Mods) == NMods {
+				md.g.Mods = slices.Clone(GameConfig.Mods)
+			} else {
+				clear(md.g.Mods)
+			}
+			md.openSpiritSelectionMenu(modeNewGameAdvanced)
+		} else {
+			md.openSpiritSelectionMenu(modeNewGame)
+			clear(md.g.Mods)
+		}
+		return nil
 	case ui.MenuMove, ui.MenuInvoke:
 		idx := md.menu.main.ActiveInvokable()
 		if idx < 0 {
@@ -320,7 +321,7 @@ func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
 		if idx == len(g.Mods) {
 			l := md.desc
 			l.Box = &ui.Box{Title: ui.Text("Save and continue")}
-			l.Content = ui.Text("Save mod selection and continue to advanced primary spirit selection screen").
+			l.Content = ui.Text("Save mod selection and continue to advanced primary spirit selection screen.").
 				Format(UIWidth/2 - 1 - 2)
 			if act == ui.MenuInvoke {
 				if !slices.Equal(GameConfig.Mods, g.Mods) {
