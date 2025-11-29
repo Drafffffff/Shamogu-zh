@@ -62,7 +62,8 @@ bindings for SDL2. You need to install
 [SDL2](https://libsdl.org/download-2.0.php) first.
 
 You should now have a working `shamogu` executable in the current directory.
-Use the `-help` option for command-line usage.
+Use the `-help` option for command-line usage. In particular, `-noaccel`
+disables graphic acceleration in case it cause issues.
 
 ### Browser (Tiles or ASCII)
 

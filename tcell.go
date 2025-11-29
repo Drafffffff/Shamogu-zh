@@ -12,7 +12,7 @@ const Tiles = false
 
 var driver gruid.Driver
 
-func initDriver(_ bool, _, _ float64) {
+func initDriver(_ bool, _, _ float64, _ bool) {
 	st := styler{}
 	dr := tcell.NewDriver(tcell.Config{StyleManager: st})
 	//dr.PreventQuit()

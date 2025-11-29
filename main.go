@@ -28,10 +28,11 @@ func main() {
 	opt16colors := new(bool)
 	opt256colors := new(bool)
 	optTrueColor := new(bool)
-	optFullscreen := new(bool)
+	optFullscreen, optNoAcceleration := new(bool), new(bool)
 	optWidthScale, optHeightScale := new(float64), new(float64)
 	if Tiles {
 		optFullscreen = flag.Bool("F", false, "fullscreen")
+		optNoAcceleration = flag.Bool("noaccel", false, "disable graphic acceleration")
 		optWidthScale = flag.Float64("w", 1.0, "window width scale factor (default: 1.0, examples: 0.75, 1.25)")
 		optHeightScale = flag.Float64("h", 1.0, "window height scale factor (default: 1.0, examples: 0.75, 1.25)")
 	} else {
@@ -67,7 +68,7 @@ func main() {
 	if err != nil {
 		log.Print(err)
 	}
-	initDriver(*optFullscreen, *optWidthScale, *optHeightScale)
+	initDriver(*optFullscreen, *optWidthScale, *optHeightScale, *optNoAcceleration)
 	if *optReplay != "" {
 		RunReplay(*optReplay)
 	} else {

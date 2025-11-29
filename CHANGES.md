@@ -122,10 +122,13 @@ Reworked and improved content:
 
 UI, graphics, QoL:
 
+* SDL2 version: graphic acceleration is now enabled by default and there is a
+  new `-noaccel` flag for disabling it.
 * SDL2 version: new command-line options `-w` and `-h` to set window width and
   height scaling factors (see issue #8). Results may look ugly for non-integer
-  factors. At the very least, using multiples of 0.25 seems better (some other
-  values result in visual glitches).
+  factors. At the very least, using multiples of 0.25 seems better with
+  software rendering when `-noaccel` is provided (some other values result in
+  visual glitches).
 * Improved “extra warnings” configuration option. It now also warns when some
   particular statuses like Berserk or Lignification are about to expire.  It
   doesn't warn anymore for Poison after Berserk, given you got warned on the
