@@ -25,7 +25,7 @@ func (g *Game) InitPlayer(spe *Entity) {
 
 func (g *Game) debugBuild() {
 	// g.Entities[PrimarySpiritID+1] = spiritEntity(g.Mods, challengeSpirits[4])
-	// g.Entities[PrimarySpiritID+1] = spiritEntity(g.Mods, challengeSpirits[6])
+	// g.Entities[PrimarySpiritID+2] = spiritEntity(g.Mods, challengeSpirits[2])
 	// g.Entities[PrimarySpiritID+4] = comestibleEntity(ComestibleData[BerserkingFlower])
 	// g.Entities[PrimarySpiritID+5] = comestibleEntity(ComestibleData[ClarityLeaves])
 	// g.Entities[PrimarySpiritID+6] = comestibleEntity(ComestibleData[FirebreathPepper])
