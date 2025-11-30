@@ -295,14 +295,24 @@ func (md *model) BadStatusAnimation() {
 	md.PlayerAnimation(ColorMagenta, AnimDurShortMedium)
 }
 
-// NoiseAnimation animates noise (like barking) at the given point.
-func (md *model) NoiseAnimation(p gruid.Point) {
+// BarkAnimation animates noise (like barking) at the given point.
+func (md *model) BarkAnimation(p gruid.Point) {
 	if DisableAnimations {
 		return
 	}
 	md.startAnimSeq()
 	md.anims.DrawRune(p, '♪')
 	md.anims.Frame(AnimDurLong)
+}
+
+// RoarAnimation animates noise (like barking) at the given point.
+func (md *model) RoarAnimation(p gruid.Point) {
+	if DisableAnimations {
+		return
+	}
+	md.startAnimSeq()
+	md.anims.DrawRune(p, '♪')
+	md.anims.Frame(AnimDurMediumLong)
 }
 
 // FloodAnimation alerts the player they got lignified.

@@ -123,7 +123,9 @@ func (g *Game) SenseEntity(i ID, verb string) {
 				// happen several times in a turn if
 				// you see several monsters at once.
 				g.Logf("You roar at the %s", ei.Name)
-				g.MakeNoise(g.PP(), NoiseRoar)
+				pp := g.PP()
+				g.md.RoarAnimation(pp)
+				g.MakeNoise(pp, NoiseRoar)
 				g.PutStatus(i, ri, StatusFear, DurationFearRoar)
 			}
 		case *Comestible:
