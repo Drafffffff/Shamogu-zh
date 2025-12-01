@@ -1084,9 +1084,9 @@ func (a ActionToggleAdvancedNewGame) String() string {
 
 func (a ActionToggleAdvancedNewGame) Desc() string {
 	if GameConfig.AdvancedNewGame {
-		return "This option makes the “classic” new game menu the default on game startup. It only has an effect when starting a new game.\n\nThe classic new game menu only gives access to the core primary spirits and disables all mods.\n\nYou can still access “advanced” new game settings by pressing TAB there."
+		return "This option makes the “classic” new game menu the default on game startup. It only has an effect when starting a new game.\n\nThe classic new game menu only gives access to the core primary spirits and disables all mods.\n\nYou can still access “advanced” new game settings by pressing TAB or SPACE there."
 	}
-	return "This option makes the “advanced” new game menu the default on game startup. It only has an effect when starting a new game.\n\nThe advanced new game menu gives access to extra advanced primary spirits (Spinning Crocodile, Vampiric Bat) and makes use of any enabled mods.\n\nYou can still go back to the “classic” menu through the mods menu."
+	return "This option makes the “advanced” new game menu the default on game startup. It only has an effect when starting a new game.\n\nThe advanced new game menu gives access to extra advanced primary spirits (Spinning Crocodile, Vampiric Bat) and makes use of any enabled mods."
 }
 
 // ActionSetKeys opens the keymap settings.

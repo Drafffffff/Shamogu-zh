@@ -293,6 +293,13 @@ func (md *model) startNewGame(spe *Entity) {
 
 func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
 	md.menu.main.Update(msg)
+	resetChanges := func() {
+		if len(GameConfig.Mods) == NMods {
+			md.g.Mods = slices.Clone(GameConfig.Mods)
+		} else {
+			clear(md.g.Mods)
+		}
+	}
 	switch act := md.menu.main.Action(); act {
 	case ui.MenuQuit:
 		if msgkey, ok := msg.(gruid.MsgKeyDown); ok && msgkey.Key == gruid.KeySpace {
@@ -300,12 +307,13 @@ func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
 			// Escape or s or q.
 			return nil
 		}
+		if _, ok := msg.(gruid.MsgMouse); ok {
+			// Don't quit menu just because the user clicked
+			// outside the mod menu.
+			return nil
+		}
 		if GameConfig.AdvancedNewGame {
-			if len(GameConfig.Mods) == NMods {
-				md.g.Mods = slices.Clone(GameConfig.Mods)
-			} else {
-				clear(md.g.Mods)
-			}
+			resetChanges()
 			md.openSpiritSelectionMenu(modeNewGameAdvanced)
 		} else {
 			md.openSpiritSelectionMenu(modeNewGame)
@@ -318,42 +326,58 @@ func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
 			break
 		}
 		g := md.g
-		if idx == len(g.Mods) {
-			l := md.desc
-			l.Box = &ui.Box{Title: ui.Text("Save and continue")}
-			l.Content = ui.Text("Save mod selection and continue to advanced primary spirit selection screen.").
-				Format(UIWidth/2 - 1 - 2)
-			if act == ui.MenuInvoke {
-				if !slices.Equal(GameConfig.Mods, g.Mods) {
-					GameConfig.Mods = slices.Clone(g.Mods)
-					if err := SaveConfig(); err != nil {
-						md.g.Logf("Error saving mod config changes: %v", err)
-					}
-				}
-				md.openSpiritSelectionMenu(modeNewGameAdvanced)
+		switch {
+		case idx == len(g.Mods):
+			var msg string
+			if GameConfig.AdvancedNewGame {
+				msg = "Save mod selection and return to advanced primary spirit selection screen."
+			} else {
+				msg = "Save mod selection and continue to advanced primary spirit selection screen."
 			}
-			break
-		}
-		if idx > len(g.Mods) {
-			l := md.desc
-			l.Box = &ui.Box{Title: ui.Text("Quit menu and disable mods")}
-			l.Content = ui.Text("Disable any mods and return to classic primary spirit selection menu.").
-				Format(UIWidth/2 - 1 - 2)
-			if act == ui.MenuInvoke {
+			md.desc.Box = &ui.Box{Title: ui.Text("Save and continue")}
+			md.desc.Content = ui.Text(msg).Format(UIWidth/2 - 1 - 2)
+			if act != ui.MenuInvoke {
+				break
+			}
+			if !slices.Equal(GameConfig.Mods, g.Mods) {
+				GameConfig.Mods = slices.Clone(g.Mods)
+				if err := SaveConfig(); err != nil {
+					md.g.Logf("Error saving mod config changes: %v", err)
+				}
+			}
+			md.openSpiritSelectionMenu(modeNewGameAdvanced)
+		case idx > len(g.Mods):
+			var title, content string
+			if GameConfig.AdvancedNewGame {
+				title = "Quit menu without saving"
+				content = "Disable any mod changes and return to advanced primary spirit selection menu."
+			} else {
+				title = "Quit menu and disable mods"
+				content = "Disable any mods and return to classic primary spirit selection menu."
+			}
+			md.desc.Box = &ui.Box{Title: ui.Text(title)}
+			md.desc.Content = ui.Text(content).Format(UIWidth/2 - 1 - 2)
+			if act != ui.MenuInvoke {
+				break
+			}
+			if GameConfig.AdvancedNewGame {
+				resetChanges()
+				md.openSpiritSelectionMenu(modeNewGameAdvanced)
+			} else {
 				md.openSpiritSelectionMenu(modeNewGame)
 				clear(md.g.Mods)
 			}
-			break
-		}
-		m := gameMods[idx]
-		if act != ui.MenuInvoke {
+		default:
+			m := gameMods[idx]
+			if act != ui.MenuInvoke {
+				md.updateModDesc(m)
+				break
+			}
+			g.Mods[m] = !g.Mods[m]
+			md.modSelectionMenu()
+			md.menu.main.SetActiveInvokable(idx)
 			md.updateModDesc(m)
-			break
 		}
-		g.Mods[m] = !g.Mods[m]
-		md.modSelectionMenu()
-		md.menu.main.SetActiveInvokable(idx)
-		md.updateModDesc(m)
 	}
 	return nil
 }
@@ -420,8 +444,12 @@ func (md *model) modSelectionMenu() {
 		Text: ui.Text("s - Save and continue"),
 		Keys: []gruid.Key{gruid.Key('s'), gruid.Key('S')},
 	})
+	qtext := "q - Quit menu and disable mods"
+	if GameConfig.AdvancedNewGame {
+		qtext = "q - Quit menu without saving"
+	}
 	entries = append(entries, ui.MenuEntry{
-		Text: ui.Text("q - Quit menu and disable mods"),
+		Text: ui.Text(qtext),
 		Keys: []gruid.Key{gruid.Key('q'), gruid.Key('Q')},
 	})
 	altBgEntries(entries)
