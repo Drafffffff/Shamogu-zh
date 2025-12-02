@@ -1496,11 +1496,12 @@ var helpActions = []Action{
 	ActionHelpDefaultKeys{},
 	ActionHelpCombat{},
 	ActionHelpItems{},
+	ActionHelpMods{},
 	ActionHelpStatuses{},
 	ActionHelpTips{},
 }
 
-var helpKeys = []rune{'?', 'c', 'i', 's', 't'}
+var helpKeys = []rune{'?', 'c', 'i', 'm', 's', 't'}
 
 func init() {
 	if len(helpActions) != len(helpKeys) {
@@ -1618,93 +1619,6 @@ func (md *model) helpTopic(title, content string) {
 	md.pager.pg.SetBox(&ui.Box{Title: ui.Text(title).WithStyle(gruid.Style{}.WithFg(ColorYellow))})
 }
 
-// ActionHelpStatuses opens the log message viewer.
-type ActionHelpStatuses struct{}
-
-func (a ActionHelpStatuses) Handle(md *model) (gruid.Effect, bool) {
-	md.helpTopic("Statuses (Help)", statusesHelpText(md.g))
-	return nil, false
-}
-
-func (a ActionHelpStatuses) String() string {
-	return "Statuses"
-}
-
-func (a ActionHelpStatuses) Desc() string {
-	return "Explains in detail how the various status effects work, as well as the color conventions."
-}
-
-func statusesHelpText(g *Game) string {
-	var sb strings.Builder
-	sb.WriteString(`@YCOLORS@N
-
-In the status bar and descriptions, positive status effects are shown as @BBlue@N and negative ones are @OOrange@N.
-
-On the map, monster color may change depending on active status effects.  By default, status-free wandering monsters are @OOrange@N and hunting monsters are @ORed@N. @MMagenta@N indicates a positive status. @YYellow@N indicates both positive and negative statuses. @GGreen@N indicates a negative status. @CCyan@N indicates two or more negative statuses.`)
-	sb.WriteString("\n\n")
-	sb.WriteString(`@YSTATUSES@N`)
-	sb.WriteString("\n\n")
-	for i, desc := range statusDesc {
-		st := Status(i)
-		switch st {
-		case StatusGluttony:
-			if !g.Mod(ModAdvancedSpirits) || g.Mod(ModGluttonyRework) {
-				continue
-			}
-		case StatusGardener, StatusShadow, StatusDisorient:
-			if !g.Mod(ModAdvancedSpirits) {
-				continue
-			}
-		}
-		color := statusColor(st, 42)
-		fmt.Fprintf(&sb, "@%c%s@N (@%c%s@N). ", color, st.Name(), color, st.Abbr())
-		sb.WriteString(desc)
-		var details string
-		switch st {
-		case StatusBerserk:
-			details = "HP never falls below 1 after losing bonus HP. Duration and HP bonus may be renewed by eating a berserking flower."
-		case StatusClarity:
-			details = "Player-only effect obtainable by eating clarity leaves. May be removed by eating a berserking flower for half the @BBerserk@N duration."
-		case StatusLignification:
-			details = "The player’s HP never falls below 3 for after losing bonus HP. Monsters’ HP floor is only 1, like for @BBerserk@N. Duration and HP bonus may be renewed by eating a lignification fruit. Cancels @BSprint@N. Actors with “woody legs” don’t have delayed burning but can move while lignified at the cost of reducing the duration by an extra turn. "
-		case StatusConfusion:
-			details = "Confused monsters will attack other monsters too when adjacent. Some monsters may even hurt or affect themselves when performing special actions like digging, spitting fire, barking, or pushing."
-		case StatusDisorient:
-			details = "Player-only effect obtainable with the Dazzling Zebra spirit."
-		case StatusFear:
-			details = "Monsters will flee when facing you. Ambushing charges against unseen foes can still happen. At the end of a turn, a cornered and afraid actor with no possible escape will become berserk. When lignified and afraid, getting hit makes you berserk, too."
-		case StatusFire:
-			details = "Players with “fire resistance” from the upgraded Fire Salamander don’t take that extra immediate damage."
-		case StatusGardener:
-			details = "Player-only effect obtainable with the Gardening Lion spirit."
-		case StatusGluttony:
-			details = "Player-only effect obtainable with the Gluttonous Bear spirit."
-		case StatusImbalance:
-			details = "Sprinting or jumping while imbalanced may sometimes lead to a @Odazing@N fall."
-		case StatusPoison:
-			details = "Watch out for confusion if any monsters survive poisoning!"
-		case StatusFoggySkin:
-			details = "Player-only effect obtainable by eating a foggy-skin onion. May be removed by eating a lignification fruit for half the @BLignification@N duration."
-		case StatusShadow:
-			details = "Player-only effect obtainable with the Gawalt Monkey spirit."
-		case StatusSprint:
-			details = "Disables normal attack. Player-only effect obtainable with the Sprinting Gazelle spirit."
-		case StatusTimeStop:
-			details = "Player-only effect obtainable with the Temporal Cat spirit."
-		case StatusFocus:
-			details = "Cancels @BSprint@N. Player-only effect obtainable with the Four-Headed Hydra spirit."
-		case StatusVampirism:
-			details = "Player-only effect obtainable with the Vampiric Bat spirit."
-		}
-		if details != "" {
-			sb.WriteRune(' ')
-			sb.WriteString(details)
-		}
-		sb.WriteString("\n\n")
-	}
-	return sb.String()
-}
-
 // ActionHelpCombat opens the log message viewer.
 type ActionHelpCombat struct{}
 
@@ -1803,6 +1717,127 @@ func itemHelpText() string {
 `)
 }
 
+// ActionHelpMods opens the log message viewer.
+type ActionHelpMods struct{}
+
+func (a ActionHelpMods) Handle(md *model) (gruid.Effect, bool) {
+	title := "Mods (Help)"
+	n := md.g.modCount()
+	if n == 0 {
+		md.helpTopic(title, "You haven’t enabled any expansion or challenge mods. You’re playing the vanilla game.\n\nMods are enabled through the advanced new game settings. You can access those from the new game menu by pressing TAB or SPACE.")
+		return nil, false
+	}
+	var sb strings.Builder
+	if n == 1 {
+		fmt.Fprintf(&sb, "You have enabled the mod below.", n)
+	} else {
+		fmt.Fprintf(&sb, "You have enabled the %d mods below.", n)
+	}
+	for _, m := range gameMods {
+		if !md.g.Mod(m) {
+			continue
+		}
+		fmt.Fprintf(&sb, "\n\n@Y%s@N\n\n%s", m.String(), m.Desc())
+	}
+	md.helpTopic(title, sb.String())
+	return nil, false
+}
+
+func (a ActionHelpMods) String() string {
+	return "Mods"
+}
+
+func (a ActionHelpMods) Desc() string {
+	return "Lists enabled mods along with their descriptions."
+}
+
+// ActionHelpStatuses opens the log message viewer.
+type ActionHelpStatuses struct{}
+
+func (a ActionHelpStatuses) Handle(md *model) (gruid.Effect, bool) {
+	md.helpTopic("Statuses (Help)", statusesHelpText(md.g))
+	return nil, false
+}
+
+func (a ActionHelpStatuses) String() string {
+	return "Statuses"
+}
+
+func (a ActionHelpStatuses) Desc() string {
+	return "Explains in detail how the various status effects work, as well as the color conventions."
+}
+
+func statusesHelpText(g *Game) string {
+	var sb strings.Builder
+	sb.WriteString(`@YCOLORS@N
+
+In the status bar and descriptions, positive status effects are shown as @BBlue@N and negative ones are @OOrange@N.
+
+On the map, monster color may change depending on active status effects.  By default, status-free wandering monsters are @OOrange@N and hunting monsters are @ORed@N. @MMagenta@N indicates a positive status. @YYellow@N indicates both positive and negative statuses. @GGreen@N indicates a negative status. @CCyan@N indicates two or more negative statuses.`)
+	sb.WriteString("\n\n")
+	sb.WriteString(`@YSTATUSES@N`)
+	sb.WriteString("\n\n")
+	for i, desc := range statusDesc {
+		st := Status(i)
+		switch st {
+		case StatusGluttony:
+			if !g.Mod(ModAdvancedSpirits) || g.Mod(ModGluttonyRework) {
+				continue
+			}
+		case StatusGardener, StatusShadow, StatusDisorient:
+			if !g.Mod(ModAdvancedSpirits) {
+				continue
+			}
+		}
+		color := statusColor(st, 42)
+		fmt.Fprintf(&sb, "@%c%s@N (@%c%s@N). ", color, st.Name(), color, st.Abbr())
+		sb.WriteString(desc)
+		var details string
+		switch st {
+		case StatusBerserk:
+			details = "HP never falls below 1 after losing bonus HP. Duration and HP bonus may be renewed by eating a berserking flower."
+		case StatusClarity:
+			details = "Player-only effect obtainable by eating clarity leaves. May be removed by eating a berserking flower for half the @BBerserk@N duration."
+		case StatusLignification:
+			details = "The player’s HP never falls below 3 for after losing bonus HP. Monsters’ HP floor is only 1, like for @BBerserk@N. Duration and HP bonus may be renewed by eating a lignification fruit. Cancels @BSprint@N. Actors with “woody legs” don’t have delayed burning but can move while lignified at the cost of reducing the duration by an extra turn. "
+		case StatusConfusion:
+			details = "Confused monsters will attack other monsters too when adjacent. Some monsters may even hurt or affect themselves when performing special actions like digging, spitting fire, barking, or pushing."
+		case StatusDisorient:
+			details = "Player-only effect obtainable with the Dazzling Zebra spirit."
+		case StatusFear:
+			details = "Monsters will flee when facing you. Ambushing charges against unseen foes can still happen. At the end of a turn, a cornered and afraid actor with no possible escape will become berserk. When lignified and afraid, getting hit makes you berserk, too."
+		case StatusFire:
+			details = "Players with “fire resistance” from the upgraded Fire Salamander don’t take that extra immediate damage."
+		case StatusGardener:
+			details = "Player-only effect obtainable with the Gardening Lion spirit."
+		case StatusGluttony:
+			details = "Player-only effect obtainable with the Gluttonous Bear spirit."
+		case StatusImbalance:
+			details = "Sprinting or jumping while imbalanced may sometimes lead to a @Odazing@N fall."
+		case StatusPoison:
+			details = "Watch out for confusion if any monsters survive poisoning!"
+		case StatusFoggySkin:
+			details = "Player-only effect obtainable by eating a foggy-skin onion. May be removed by eating a lignification fruit for half the @BLignification@N duration."
+		case StatusShadow:
+			details = "Player-only effect obtainable with the Gawalt Monkey spirit."
+		case StatusSprint:
+			details = "Disables normal attack. Player-only effect obtainable with the Sprinting Gazelle spirit."
+		case StatusTimeStop:
+			details = "Player-only effect obtainable with the Temporal Cat spirit."
+		case StatusFocus:
+			details = "Cancels @BSprint@N. Player-only effect obtainable with the Four-Headed Hydra spirit."
+		case StatusVampirism:
+			details = "Player-only effect obtainable with the Vampiric Bat spirit."
+		}
+		if details != "" {
+			sb.WriteRune(' ')
+			sb.WriteString(details)
+		}
+		sb.WriteString("\n\n")
+	}
+	return sb.String()
+}
+
 // ActionHelpTips opens the log message viewer.
 type ActionHelpTips struct{}
 
@@ -1859,6 +1894,6 @@ While the recommended way to discover the game is to progressively improve your 
 
 @YCHALLENGE TIPS@N
 
-If, on the contrary, you find Shamogu too easy, you’re encouraged to try the various mods and advanced primary spirits accessible after pressing TAB in the classic new game menu!
+If, on the contrary, you find Shamogu too easy, you’re encouraged to try the various mods and advanced primary spirits accessible after pressing TAB or SPACE in the classic new game menu!
 `)
 }
