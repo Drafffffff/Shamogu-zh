@@ -1729,7 +1729,7 @@ func (a ActionHelpMods) Handle(md *model) (gruid.Effect, bool) {
 	}
 	var sb strings.Builder
 	if n == 1 {
-		fmt.Fprintf(&sb, "You have enabled the mod below.", n)
+		sb.WriteString("You have enabled the mod below.")
 	} else {
 		fmt.Fprintf(&sb, "You have enabled the %d mods below.", n)
 	}
@@ -1738,6 +1738,9 @@ func (a ActionHelpMods) Handle(md *model) (gruid.Effect, bool) {
 			continue
 		}
 		fmt.Fprintf(&sb, "\n\n@Y%s@N\n\n%s", m.String(), m.Desc())
+		if m == ModAdvancedSpirits {
+			sb.WriteString("\n\n@CExtra Info@N\n\nSome advanced secondary spirit traits are a bit tricky to use or understand.\n\nZebra’s “dazzling” trait means that any attack directed at you will be redirected to any monster just on your other side. It hence encourages weird positioning tactics. Also, with Zebra, monsters notice you instantly, without losing a turn, so beware of sudden ranged attacks during exploration.\n\nThe Lion’s roaring happens on first sight, but detecting a monster first beyond view with @BClarity@N will prevent the roaring.\n\nWhen the Elephant is in a dead-end or the Gawalt is on a menhir tile, wandering monsters don’t notice you, but hunting monsters still see you.\n\nThe Chicken not triggering traps is as simple as it sounds, but given how wandering monsters avoid traps, it has subtle stealth implications.")
+		}
 	}
 	md.helpTopic(title, sb.String())
 	return nil, false
