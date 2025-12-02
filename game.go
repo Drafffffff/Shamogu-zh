@@ -163,11 +163,11 @@ func (g *Game) HandleTurnCount() {
 		} else {
 			g.LogStyled("You need to hurry!", logSpecial)
 		}
-		g.md.mode = modeCritical
+		g.WarningPrompt()
 	case 1000:
 		g.LogStyled("You've been found by the dungeon core!", logSpecial)
 		g.StoryLog("Found by the dungeon core!")
-		g.md.mode = modeCritical
+		g.WarningPrompt()
 		g.genMonster(BlazingGolem)
 		g.genMonster(BlazingGolem)
 	}
@@ -563,4 +563,9 @@ func HasMod(mods []bool, m Mod) bool {
 		return false
 	}
 	return mods[m]
+}
+
+// WarningPrompt enters critical confirmation prompt mode.
+func (g *Game) WarningPrompt() {
+	g.md.mode = modeCritical
 }

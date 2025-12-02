@@ -28,6 +28,11 @@ const (
 	autoExplore
 )
 
+// StopAuto halts automatic movement.
+func (md *model) StopAuto() {
+	md.auto.mode = noAuto
+}
+
 // UpdateAutoMode updates auto mode if current player status allows it.
 func (md *model) UpdateAutoMode(eff gruid.Effect, m autoMode) gruid.Effect {
 	pa := md.g.PlayerActor()
@@ -35,7 +40,7 @@ func (md *model) UpdateAutoMode(eff gruid.Effect, m autoMode) gruid.Effect {
 		md.auto.mode = m
 		return gruid.Batch(eff, md.autoCmd())
 	}
-	md.auto.mode = noAuto
+	md.StopAuto()
 	return eff
 }
 

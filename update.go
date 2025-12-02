@@ -48,7 +48,7 @@ func (md *model) Update(msg gruid.Msg) gruid.Effect {
 			md.anims.Finish()
 			anims = false
 		}
-		md.auto.mode = noAuto
+		md.StopAuto()
 	}
 	eff := md.update(msg)
 	if cmd := md.AnimCmd(); !anims && cmd != nil {

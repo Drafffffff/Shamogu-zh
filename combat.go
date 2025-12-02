@@ -164,14 +164,14 @@ func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKi
 		if g.Wizard.Mode != WizardNone && aj.IsDead() {
 			aj.HP = aj.GetMaxHP()
 			g.LogStyled("*** Wizard mode resurrects you! ***", logSpecial)
-			g.md.mode = modeCritical
+			g.WarningPrompt()
 			g.StoryLog("Resurrected by the Wizard!")
 			g.Wizard.Resurrections++
 		}
 		if aj.HP+dmg > HPCritical && aj.HP <= HPCritical {
-			g.md.mode = modeCritical
+			g.WarningPrompt()
 		}
-		g.md.auto.mode = noAuto
+		g.md.StopAuto()
 	case aj.IsDead():
 		g.monsterDeath(i, j, aj)
 	}

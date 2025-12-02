@@ -1421,27 +1421,27 @@ func (a actionAuto) Handle(md *model) (gruid.Effect, bool) {
 	switch md.auto.mode {
 	case autoRun:
 		if !md.KeepRunning() {
-			md.auto.mode = noAuto
+			md.StopAuto()
 			return nil, false
 		}
 		bump := ActionBump{Delta: md.auto.delta}
 		eff, done := bump.Handle(md)
 		if !done {
-			md.auto.mode = noAuto
+			md.StopAuto()
 			return eff, false
 		}
 		md.UpdateRun(md.auto.delta)
 		return md.UpdateAutoMode(eff, autoRun), true
 	case autoTravel:
 		if !md.KeepTraveling() {
-			md.auto.mode = noAuto
+			md.StopAuto()
 			return nil, false
 		}
 		next := md.auto.path[1]
 		bump := ActionBump{Delta: next.Sub(g.PP())}
 		eff, done := bump.Handle(md)
 		if !done {
-			md.auto.mode = noAuto
+			md.StopAuto()
 			return eff, false
 		}
 		if g.PP() == next {
@@ -1451,13 +1451,13 @@ func (a actionAuto) Handle(md *model) (gruid.Effect, bool) {
 	case autoExplore:
 		n, ok := md.UpdateAutoExplore()
 		if !ok {
-			md.auto.mode = noAuto
+			md.StopAuto()
 			return nil, false
 		}
 		bump := ActionBump{Delta: n.Sub(g.PP())}
 		eff, done := bump.Handle(md)
 		if !done {
-			md.auto.mode = noAuto
+			md.StopAuto()
 			return eff, false
 		}
 		return md.UpdateAutoMode(eff, autoExplore), true

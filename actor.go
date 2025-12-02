@@ -582,13 +582,13 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 			g.StoryLogf("Got %s (%s)", st, fmtTurns(turns, n))
 			style = logHurtPlayer
 			if !active && GameConfig.WarningsExtra && (st == StatusFire || st == StatusPoison) {
-				g.md.mode = modeCritical
+				g.WarningPrompt()
 			}
 		} else if st == StatusLignification || st == StatusBerserk || st == StatusFoggySkin {
 			g.StoryLogf("Became %s (%s)", st, fmtTurns(turns, n))
 		}
 		g.LogfStyled("You’re %s (%s).", style, st, fmtTurns(turns, n))
-		g.md.auto.mode = noAuto
+		g.md.StopAuto()
 	} else if ei := g.Entity(i); g.InFOV(ei.P) {
 		g.Logf("The %s is %s (%s).", ei.Name, st, fmtTurns(turns, n))
 	}
@@ -643,7 +643,7 @@ func (g *Game) RemoveStatus(i ID, ai *Actor, st Status) {
 	ai.Statuses[st] = 0
 	if i == PlayerID {
 		g.LogfStyled("You’re no longer %s.", logStatusEnd, Status(st))
-		g.md.auto.mode = noAuto
+		g.md.StopAuto()
 	}
 	switch st {
 	case StatusPoison:
@@ -707,7 +707,7 @@ func (g *Game) ProgressStatus(i ID, ai *Actor, st Status) {
 	case StatusBerserk, StatusLignification, StatusDisorient, StatusGluttony, StatusShadow:
 		// For statuses where that matters, warn when there's
 		// only one turn remaining after progression.
-		g.md.mode = modeCritical
+		g.WarningPrompt()
 	}
 }
 
