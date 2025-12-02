@@ -194,6 +194,7 @@ func (md *model) initKeys() {
 		"#":                 ActionDump{},
 		"S":                 ActionSaveQuit{},
 		"C":                 ActionConfig{},
+		gruid.KeyTab:        ActionConfig{},
 		":":                 ActionSetKeys{},
 		"m":                 ActionViewMessages{},
 		"Q":                 ActionQuit{},
