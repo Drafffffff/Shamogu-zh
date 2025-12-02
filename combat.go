@@ -164,6 +164,7 @@ func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKi
 		if g.Wizard.Mode != WizardNone && aj.IsDead() {
 			aj.HP = aj.GetMaxHP()
 			g.LogStyled("*** Wizard mode resurrects you! ***", logSpecial)
+			g.md.mode = modeCritical
 			g.StoryLog("Resurrected by the Wizard!")
 			g.Wizard.Resurrections++
 		}
