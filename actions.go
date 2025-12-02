@@ -1894,6 +1894,6 @@ While the recommended way to discover the game is to progressively improve your 
 
 @YCHALLENGE TIPS@N
 
-If, on the contrary, you find Shamogu too easy, you’re encouraged to try the various mods and advanced primary spirits accessible after pressing TAB or SPACE in the classic new game menu!
+If, on the contrary, you find Shamogu too easy, you’re encouraged to try the various expansion and challenge mods accessible after pressing TAB or SPACE in the classic new game menu!
 `)
 }
