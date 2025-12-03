@@ -78,7 +78,6 @@ func testGame(t *testing.T) {
 	g.Mods = make([]bool, NMods)
 	g.Mods[ModCorruptedDungeon] = true
 	g.Mods[ModAdvancedSpirits] = true
-	// g.Mods[ModNoHealingComestibles] = true
 	g.Init(spiritEntity(g.Mods, primarySpirits[g.rand.IntN(len(primarySpirits))]))
 	g.ComputePlayerStats()
 	g.InitLevel()

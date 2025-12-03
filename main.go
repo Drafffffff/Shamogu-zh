@@ -25,9 +25,7 @@ func main() {
 	optReplay := flag.String("r", "", "path to replay file (_ means default location)")
 	optGameLogs := flag.Bool("l", false, "write game logs to log file")
 	optVersion := flag.Bool("version", false, "print build info")
-	opt16colors := new(bool)
-	opt256colors := new(bool)
-	optTrueColor := new(bool)
+	opt16colors, opt256colors, optTrueColor := new(bool), new(bool), new(bool)
 	optFullscreen, optNoAcceleration := new(bool), new(bool)
 	optWidthScale, optHeightScale := new(float64), new(float64)
 	if Tiles {
