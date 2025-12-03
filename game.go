@@ -9,7 +9,7 @@ import (
 )
 
 // Version is the game's version string of the last release.
-const Version = "v1.2.0-dev"
+const Version = "v1.2.0"
 
 // InvalidPos is a special variable containing an invalid position.
 var InvalidPos = gruid.Point{-1, -1}

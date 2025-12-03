@@ -1,4 +1,4 @@
-# v? ?
+# v1.2.0 2025-12-03
 
 This is a quite significant release with two new advanced primary spirits,
 two new expansions featuring many surprises and seven new advanced secondary
