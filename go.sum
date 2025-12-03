@@ -2,8 +2,8 @@ codeberg.org/anaseto/gruid v0.25.0 h1:Y+9jENZ+rZqEoawv33oyM+58Yd8WnmDwWSEnvk0uvD
 codeberg.org/anaseto/gruid v0.25.0/go.mod h1:3wznR6TXEiDqoWoxHk00Z3dWqXMHO5Kmn/Qu3SA6wjQ=
 codeberg.org/anaseto/gruid-js v0.3.0 h1:0kEqBM0z7+YLve7g2LcgWOqTryJ/aQyWvKnFryauuCM=
 codeberg.org/anaseto/gruid-js v0.3.0/go.mod h1:26jxYu+oSY7QmNCVwX5HS49AVeXVtkxP6NxTM2GQhsM=
-codeberg.org/anaseto/gruid-sdl v0.7.0 h1:WgfQYJSHXUJFOHG9ZD5XQJXjkgguozhvAmlrnmNHJH8=
-codeberg.org/anaseto/gruid-sdl v0.7.0/go.mod h1:JQs3rHaCKzj6eFp/wqdx42xEy1VkguROdpz36O+TJVo=
+codeberg.org/anaseto/gruid-sdl v0.8.0 h1:cgbmnRe7rNQ8qwgxG5XoPQihW7s4aDrLnuBu3bYmr4Q=
+codeberg.org/anaseto/gruid-sdl v0.8.0/go.mod h1:JQs3rHaCKzj6eFp/wqdx42xEy1VkguROdpz36O+TJVo=
 codeberg.org/anaseto/gruid-tcell v0.4.0 h1:9RnnqNTdERZp7AAuIZUpyDU1z5426FSaZQ6m/oUf6cM=
 codeberg.org/anaseto/gruid-tcell v0.4.0/go.mod h1:0Tv2UZGVbHjAJaj8wx1KBx6FUYSQKWdMkEN/Rrmm1dQ=
 github.com/gdamore/encoding v1.0.1 h1:YzKZckdBL6jVt2Gc+5p82qhrGiqMdG/eNs6Wy0u3Uhw=

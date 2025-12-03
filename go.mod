@@ -5,7 +5,7 @@ go 1.23.0
 require (
 	codeberg.org/anaseto/gruid v0.25.0
 	codeberg.org/anaseto/gruid-js v0.3.0
-	codeberg.org/anaseto/gruid-sdl v0.7.0
+	codeberg.org/anaseto/gruid-sdl v0.8.0
 	codeberg.org/anaseto/gruid-tcell v0.4.0
 	github.com/gdamore/tcell/v2 v2.8.1
 )
