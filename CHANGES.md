@@ -30,7 +30,7 @@ New content:
   retreat.
 * New expansion mod: **Corrupted Dungeon**. The orb's influence has scattered
   twisted surprises through the dungeon! The mod is recommended to any player
-  that wants more unpredictability and variability  during their adventures.
+  that wants more unpredictability and variability during their adventures.
   See design discussion in issue #6.
 * New expansion mod: **Advanced Spirits**. It introduces 7 new advanced
   secondary spirits with peculiar strong points but also serious and quirky
@@ -45,7 +45,8 @@ New content:
   players start with an extra “vampirism” charge and get another one at map
   level 5, instead of healing on monster death. Less frequent healing but
   better tactical control over it! This experimental mod is playable but still
-  lacks polish with respect to the default experience.
+  lacks polish with respect to the default experience. It will be reworked in a
+  future version.
 
 The **Advanced Spirits** expansion mod provides the following advanced
 secondary spirits:
@@ -116,9 +117,9 @@ Reworked and improved content:
   make monsters more likely to reach the player, but help the player a bit once
   it is in melee, to make Wind Fox less extreme in making easy situations
   easier and hard situations harder.
-* Monster fear is now somewhat biased toward going in the opposite direction
-  from the player, instead of fleeing laterally, so that non-Hydra players get
-  more offensive use from Fear.
+* Afraid monsters are now somewhat biased toward going in the opposite
+  direction from the player, instead of fleeing laterally, so that non-Hydra
+  players get more offensive use from Fear.
 
 UI, graphics, QoL:
 

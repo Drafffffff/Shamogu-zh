@@ -11,7 +11,7 @@
 .\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-.Dd September 28, 2025
+.Dd December 3, 2025
 .Dt SHAMOGU 6
 .Os
 .Sh NAME
@@ -25,8 +25,11 @@
 .Op Fl s
 .Op Fl t
 .Op Fl x
-.Op Fl version
+.Op Fl h Ar scale
+.Op Fl w Ar scale
 .Op Fl r Ar file
+.Op Fl noaccel
+.Op Fl version
 .Sh DESCRIPTION
 Shamogu is a coffee-break roguelike game with a focus on tactical movement and
 careful timing of totemic spirit invocation and comestible consumption.
@@ -43,7 +46,7 @@ You hope luck will be on your side!”
 The options are as follows:
 .Bl -tag -width Ds
 .It Fl F
-Launch game in fullscreen (SDL version only).
+Launch game in fullscreen (SDL2 version only).
 .It Fl l
 Write game logs to logs file.
 .It Fl n
@@ -76,6 +79,16 @@ Use the 16-color simple palette (terminal version only).
 Use the “true color” selenized palette (terminal version only).
 .It Fl x
 Use xterm 256-color palette (solarized approximation, terminal version only).
+.It Fl h Ar scale
+Use the given window height scale factor (SDL2 version only). The default is 
+.Cm 1.0 .
+Integer values work better.
+.It Fl w Ar scale
+Use the given window width scale factor (SDL2 version only). The default is 
+.Cm 1.0 .
+Integer values work better.
+.It Fl noaccel
+Disable graphic acceleration and use software rendering (SDL2 version only).
 .It Fl version
 Prints build information.
 .El

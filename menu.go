@@ -330,9 +330,9 @@ func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
 		case idx == len(g.Mods):
 			var msg string
 			if GameConfig.AdvancedNewGame {
-				msg = "Save mod selection and return to advanced primary spirit selection screen."
+				msg = "Save mod selection and return to advanced primary spirit selection menu."
 			} else {
-				msg = "Save mod selection and continue to advanced primary spirit selection screen."
+				msg = "Save mod selection and continue to advanced primary spirit selection menu."
 			}
 			md.desc.Box = &ui.Box{Title: ui.Text("Save and continue")}
 			md.desc.Content = ui.Text(msg).Format(UIWidth/2 - 1 - 2)
@@ -350,10 +350,10 @@ func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
 			var title, content string
 			if GameConfig.AdvancedNewGame {
 				title = "Quit menu without saving"
-				content = "Disable any mod changes and return to advanced primary spirit selection menu."
+				content = "Revert any mod changes and return to advanced primary spirit selection menu."
 			} else {
 				title = "Quit menu and disable mods"
-				content = "Disable any mods and return to classic primary spirit selection menu."
+				content = "Disable all mods and return to classic primary spirit selection menu."
 			}
 			md.desc.Box = &ui.Box{Title: ui.Text(title)}
 			md.desc.Content = ui.Text(content).Format(UIWidth/2 - 1 - 2)
