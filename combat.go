@@ -34,7 +34,7 @@ const (
 	MaxAttackDamage = 3
 
 	BerserkAttackBonus            = 2
-	VampirismAttackBonus          = 2
+	VampirismAttackBonus          = 3
 	ConfusedImbalanceDefenseBonus = 2
 	LignificationDefenseBonus     = 2
 )
