@@ -68,9 +68,13 @@ func (g *Game) genPlayerOnNewLevel(mg *MapGen) {
 	if g.Mod(ModHealingCombat) && g.Map.Level == 5 {
 		sp := g.Entity(PrimarySpiritID).Role.(*Spirit)
 		if _, ok := sp.Ability[sp.Level].(EffectVampirism); ok {
-			sp.MaxCharges[0]++
-			sp.MaxCharges[1]++
-			sp.Charges++
+			n := 1
+			if g.Mod(ModNoRecharges) {
+				n *= 2
+			}
+			sp.MaxCharges[0] += n
+			sp.MaxCharges[1] += n
+			sp.Charges += n
 		}
 	}
 	if !g.Mod(ModNoRecharges) {
