@@ -389,6 +389,7 @@ func (md *model) dump(msg string, err error) {
 		details = msg
 	}
 	stts = append(stts, ui.Text(details))
+	md.pager.pg.SetBox(&ui.Box{Title: ui.Text("Game Summary").WithStyle(gruid.Style{Fg: ColorYellow})})
 	md.pager.pg.SetLines(stts)
 	md.pager.pg.SetCursor(gruid.Point{0, 0})
 }
