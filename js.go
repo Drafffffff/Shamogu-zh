@@ -335,7 +335,7 @@ func LoadConfig() (bool, error) {
 func (g *Game) WriteDump() (string, error) {
 	pre := js.Global().Get("document").Call("getElementById", "dump")
 	pre.Set("innerHTML", g.Dump())
-	return "Game statistics written below.", nil
+	return "Full statistics written below.", nil
 }
 
 // subSig is define here for build compatibility purposes, it is not used for

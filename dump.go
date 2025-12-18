@@ -108,9 +108,6 @@ func (g *Game) DumpSummary() string {
 		}
 		sb.WriteString(").\n")
 	}
-	if nmods := g.modCount(); nmods > 0 {
-		fmt.Fprintf(&sb, "ENABLED %d MODS.\n", nmods)
-	}
 	pa := g.PlayerActor()
 	if g.win {
 		fmt.Fprintf(&sb, "You destroyed the Orb of Corruption!\n")
@@ -122,6 +119,11 @@ func (g *Game) DumpSummary() string {
 	fmt.Fprintf(&sb, "You spent %d turns in the dungeon.\n", g.Turn)
 	fmt.Fprintf(&sb, "Your adventure resulted in %d monster %s.\n",
 		g.Stats.NDeaths, Countable("death", g.Stats.NDeaths))
+	if g.modCount() > 0 {
+		sb.WriteString("\nMods:\n")
+		g.dumpMods(&sb)
+	}
+	g.dumpPlayer(&sb)
 	return sb.String()
 }
 
@@ -140,11 +142,11 @@ func (g *Game) Dump() string {
 	var sb strings.Builder
 	summary := g.DumpSummary()
 	sb.WriteString(summary)
-	if g.modCount() > 0 {
-		sb.WriteString("\nMods:\n")
-		g.dumpMods(&sb)
+	sb.WriteString("\nComestibles:\n")
+	for i := range g.PlayerComestibles() {
+		ei := g.Entity(i)
+		fmt.Fprintf(&sb, "- %s\n", ei.Name)
 	}
-	g.dumpPlayer(&sb)
 	sb.WriteString("\nLast messages:\n")
 	for _, e := range g.Logs.Entries[max(0, len(g.Logs.Entries)-20):] {
 		fmt.Fprintf(&sb, "%s\n", e.dumpString())
@@ -198,11 +200,6 @@ func (g *Game) dumpPlayer(sb *strings.Builder) {
 			ei.Name, sp.Ability[sp.Level].Name(),
 			sp.Charges, sp.MaxCharges[sp.Level],
 			sp.Uses, times(sp.Uses))
-	}
-	sb.WriteString("\nComestibles:\n")
-	for i := range g.PlayerComestibles() {
-		ei := g.Entity(i)
-		fmt.Fprintf(sb, "- %s\n", ei.Name)
 	}
 }
 

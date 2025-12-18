@@ -1,3 +1,13 @@
+# v? ?
+
+* Improve end-of-game summary and fix its title in the pager. The summary now
+  includes the detailed information about mods and spirits, as there's always
+  enough screen space for those without need for scrolling, and it's nice to
+  see them without having to look at the full game statistics (for example when
+  sharing a screenshot or only the replay instead of the full dump).
+* Vampiric Bat has now +2 charges at level 5 if the No Recharges mod is
+  enabled, instead of +1. This was an oversight (see issue #11).
+
 # v1.2.0 2025-12-03
 
 This is a quite significant release with two new advanced primary spirits,
