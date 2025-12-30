@@ -1216,7 +1216,8 @@ type ActionDump struct{}
 
 func (a ActionDump) Handle(md *model) (gruid.Effect, bool) {
 	if msg, err := md.g.WriteDump(); err != nil {
-		md.g.LogfStyled("Error: %v.", logError, err)
+		log.Printf("error writing dump: %v", err)
+		md.g.LogStyled("Error writing statistics.", logError)
 	} else {
 		md.g.Log(msg)
 	}

@@ -3,7 +3,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"strings"
 
@@ -384,7 +383,8 @@ func (md *model) dump(msg string, err error) {
 	}
 	var details string
 	if err != nil {
-		details = fmt.Sprintf("Error writing dump: %v.", err)
+		log.Printf("error writing dump: %v", err)
+		details = "Error writing statistics."
 	} else {
 		details = msg
 	}
