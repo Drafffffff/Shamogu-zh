@@ -28,7 +28,7 @@ func (a ActionToggleTiles) Handle(md *model) (gruid.Effect, bool) {
 	GameConfig.Tiles = !GameConfig.Tiles
 	err := SaveConfig()
 	if err != nil {
-		md.g.Logf("Error saving config changes: %v", err)
+		log.Printf("error saving config: %v", err)
 	}
 	clearCache()
 	eff := gruid.Cmd(func() gruid.Msg { return gruid.MsgScreen{} })

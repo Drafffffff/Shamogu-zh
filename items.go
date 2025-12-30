@@ -346,7 +346,7 @@ func (p *Portal) Use(g *Game, i ID) bool {
 		return true
 	}
 	if err := g.Save(); err != nil {
-		log.Printf("saving game before new level: %v", err)
+		log.Printf("error saving game before new level: %v", err)
 	}
 	g.StoryLog("Entered a magical portal!")
 	g.LogStyled("You enter the portal.", logSpecial)

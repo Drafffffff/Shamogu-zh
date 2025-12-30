@@ -1011,8 +1011,7 @@ func (a ActionToggleDarkLight) Handle(md *model) (gruid.Effect, bool) {
 	GameConfig.DarkColors = !GameConfig.DarkColors
 	err := SaveConfig()
 	if err != nil {
-		log.Printf("saving config: %v", err)
-		md.g.Log(err.Error())
+		log.Printf("error saving config: %v", err)
 	}
 	clearCache()
 	eff := gruid.Cmd(func() gruid.Msg { return gruid.MsgScreen{} })
@@ -1034,8 +1033,7 @@ func (a ActionToggleExtraWarnings) Handle(md *model) (gruid.Effect, bool) {
 	GameConfig.WarningsExtra = !GameConfig.WarningsExtra
 	err := SaveConfig()
 	if err != nil {
-		log.Printf("saving config: %v", err)
-		md.g.Log(err.Error())
+		log.Printf("error saving config: %v", err)
 	}
 	clearCache()
 	eff := gruid.Cmd(func() gruid.Msg { return gruid.MsgScreen{} })
@@ -1066,8 +1064,7 @@ func (a ActionToggleAdvancedNewGame) Handle(md *model) (gruid.Effect, bool) {
 	GameConfig.AdvancedNewGame = !GameConfig.AdvancedNewGame
 	err := SaveConfig()
 	if err != nil {
-		log.Printf("saving config: %v", err)
-		md.g.Log(err.Error())
+		log.Printf("error saving config: %v", err)
 	}
 	clearCache()
 	eff := gruid.Cmd(func() gruid.Msg { return gruid.MsgScreen{} })
@@ -1242,7 +1239,7 @@ type ActionSaveQuit struct{}
 
 func (a ActionSaveQuit) Handle(md *model) (gruid.Effect, bool) {
 	if err := md.g.Save(); err != nil {
-		md.g.LogStyled("Error while saving game.", logError)
+		log.Printf("error saving game: %v", err)
 		return nil, false
 	}
 	md.mode = modeQuitting

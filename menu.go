@@ -213,8 +213,8 @@ func (md *model) resetKeys() {
 	GameConfig.ExamineModeKeys = md.keysTarget
 	err := SaveConfig()
 	if err != nil {
-		log.Printf("error resetting config changes: %v", err)
-		md.g.LogStyled("Error while resetting config changes.", logError)
+		log.Printf("error saving config: %v", err)
+		md.g.LogStyled("Error resetting config changes.", logError)
 	}
 }
 
@@ -238,8 +238,7 @@ func (md *model) updateKeysChange(msg gruid.Msg) {
 		GameConfig.ExamineModeKeys = md.keysTarget
 		err := SaveConfig()
 		if err != nil {
-			log.Printf("error saving config changes: %v", err)
-			md.g.LogStyled("Error while saving config changes.", logError)
+			log.Printf("error saving config: %v", err)
 		}
 		md.action = ActionSetKeys{}
 	}
@@ -342,7 +341,7 @@ func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
 			if !slices.Equal(GameConfig.Mods, g.Mods) {
 				GameConfig.Mods = slices.Clone(g.Mods)
 				if err := SaveConfig(); err != nil {
-					md.g.Logf("Error saving mod config changes: %v", err)
+					log.Printf("error saving config: %v", err)
 				}
 			}
 			md.openSpiritSelectionMenu(modeNewGameAdvanced)

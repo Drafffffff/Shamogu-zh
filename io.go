@@ -64,14 +64,9 @@ func SaveFile(filename string, data []byte) error {
 func (g *Game) Save() error {
 	data, err := g.GameSave()
 	if err != nil {
-		g.Log(err.Error())
 		return err
 	}
-	err = SaveFile("save", data)
-	if err != nil {
-		g.Log(err.Error())
-	}
-	return err
+	return SaveFile("save", data)
 }
 
 // RemoveSaveFile removes the save file if it exists.
