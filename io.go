@@ -181,5 +181,5 @@ func (g *Game) WriteDump() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("Full statistics written to %s.", path), nil
+	return fmt.Sprintf("Full game statistics at %s.", path), nil
 }
