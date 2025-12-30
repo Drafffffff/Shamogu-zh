@@ -179,7 +179,7 @@ func (g *Game) WriteDump() (string, error) {
 	path := filepath.Join(dataDir, "dump.txt")
 	err = os.WriteFile(path, []byte(g.Dump()), 0644)
 	if err != nil {
-		return "", fmt.Errorf("writing game statistics: %v", err)
+		return "", err
 	}
 	return fmt.Sprintf("Full statistics written to %s.", path), nil
 }
