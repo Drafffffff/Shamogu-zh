@@ -57,10 +57,10 @@ command:
 
 	go build -tags sdl
 
-This will install the [go-sdl2](https://github.com/veandco/go-sdl2) Go bindings
-for SDL2. You need to install [SDL2](https://wiki.libsdl.org/SDL2/Installation)
-first (notice you need SDL2, not SDL3). It may take a few minutes the first
-time.
+This will install the [gruid-sdl](https://codeberg.org/anaseto/gruid-sdl) Go
+bindings for SDL2. You need to install
+[SDL2](https://wiki.libsdl.org/SDL2/Installation) first (notice you need SDL2,
+not SDL3).
 
 You should now have a working `shamogu` executable in the current directory.
 Use the `-help` option for command-line usage. In particular, `-noaccel`

@@ -11,7 +11,7 @@
 .\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-.Dd December 3, 2025
+.Dd January 2, 2026
 .Dt SHAMOGU 6
 .Os
 .Sh NAME
@@ -28,7 +28,6 @@
 .Op Fl h Ar scale
 .Op Fl w Ar scale
 .Op Fl r Ar file
-.Op Fl noaccel
 .Op Fl version
 .Sh DESCRIPTION
 Shamogu is a coffee-break roguelike game with a focus on tactical movement and
@@ -87,8 +86,6 @@ Integer values work better.
 Use the given window width scale factor (SDL2 version only). The default is
 .Cm 1.0 .
 Integer values work better.
-.It Fl noaccel
-Disable graphic acceleration and use software rendering (SDL2 version only).
 .It Fl version
 Prints build information.
 .El

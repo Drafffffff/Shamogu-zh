@@ -26,11 +26,10 @@ func main() {
 	optGameLogs := flag.Bool("l", false, "write game logs to log file")
 	optVersion := flag.Bool("version", false, "print build info")
 	opt16colors, opt256colors, optTrueColor := new(bool), new(bool), new(bool)
-	optFullscreen, optNoAcceleration := new(bool), new(bool)
+	optFullscreen := new(bool)
 	optWidthScale, optHeightScale := new(float64), new(float64)
 	if Tiles {
 		optFullscreen = flag.Bool("F", false, "fullscreen")
-		optNoAcceleration = flag.Bool("noaccel", false, "disable graphic acceleration")
 		optWidthScale = flag.Float64("w", 1.0, "window width scale factor (default: 1.0, examples: 0.75, 1.25)")
 		optHeightScale = flag.Float64("h", 1.0, "window height scale factor (default: 1.0, examples: 0.75, 1.25)")
 	} else {
@@ -66,7 +65,7 @@ func main() {
 	if err != nil {
 		log.Print(err)
 	}
-	initDriver(*optFullscreen, *optWidthScale, *optHeightScale, *optNoAcceleration)
+	initDriver(*optFullscreen, *optWidthScale, *optHeightScale)
 	if *optReplay != "" {
 		RunReplay(*optReplay)
 	} else {
