@@ -7,6 +7,8 @@
   sharing a screenshot or only the replay instead of the full dump).
 * Vampiric Bat has now +2 charges at level 5 if the No Recharges mod is
   enabled, instead of +1. This was an oversight (see issue #11).
+* SDL2 version: remove `-noaccel` option, but replace old bindings by new
+  dedicated ones that are simpler and compile faster.
 
 # v1.2.0 2025-12-03
 
