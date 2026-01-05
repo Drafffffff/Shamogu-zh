@@ -26,7 +26,7 @@ ramblings](https://anaseto.codeberg.page/games/shamogu/design.html) article.
 Install from Sources
 --------------------
 
-First, you need to install the [go compiler](https://golang.org/) (Go 1.23 or
+First, you need to install the [go compiler](https://golang.org/) (Go 1.24 or
 later), so that the `go` command is available.
 
 Shamogu uses the [gruid](https://codeberg.org/anaseto/gruid) library for
@@ -63,7 +63,8 @@ bindings for SDL2. You need to install
 not SDL3).
 
 You should now have a working `shamogu` executable in the current directory.
-Use the `-help` option for command-line usage.
+Use the `-help` option for command-line usage. For example, `-F` launches the
+game in fullscreen.
 
 ### Browser (Tiles or ASCII)
 

@@ -7,8 +7,11 @@
   sharing a screenshot or only the replay instead of the full dump).
 * Vampiric Bat has now +2 charges at level 5 if the No Recharges mod is
   enabled, instead of +1. This was an oversight (see issue #11).
-* SDL2 version: remove `-noaccel` option, but replace old bindings by new
-  dedicated ones that are simpler and compile faster.
+* Require Go 1.24 or later and update some dependencies.
+* SDL2 version: the old bindings were replaced by new dedicated ones that are
+  simpler and compile faster. The `-noaccel` option was removed, making
+  accelerated build the default and only option, which is hopefully ok nowadays
+  (the software rendering mode wasn't really tested properly anyway).
 
 # v1.2.0 2025-12-03
 
