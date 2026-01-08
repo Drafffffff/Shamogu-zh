@@ -1,5 +1,10 @@
-# v? ?
+# v1.3.0 2026-01-08
 
+This release is a maintenance one with a few small fixes, mostly about UI, and
+updated backend dependencies.
+
+* Require Go 1.24 or later and update gruid-tcell, gruid-sdl and gruid-js
+  dependencies.
 * Improve end-of-game summary and fix its title in the pager. The summary now
   includes the detailed information about mods and spirits, as there's always
   enough screen space for those without need for scrolling, and it's nice to
@@ -7,11 +12,19 @@
   sharing a screenshot or only the replay instead of the full dump).
 * Vampiric Bat has now +2 charges at level 5 if the No Recharges mod is
   enabled, instead of +1. This was an oversight (see issue #11).
-* Require Go 1.24 or later and update some dependencies.
-* SDL2 version: the old bindings were replaced by new dedicated ones that are
-  simpler and compile faster. The `-noaccel` option was removed, making
-  accelerated build the default and only option, which is hopefully ok nowadays
-  (the software rendering mode wasn't really tested properly anyway).
+* SDL2 version (gruid-sdl): the old bindings were replaced by new dedicated
+  ones that are simpler and compile much faster. The `-noaccel` option was
+  removed, making accelerated build the default and only option, which is
+  hopefully ok nowadays (the software rendering mode wasn't really tested
+  properly anyway).
+* SDL2 version (gruid-sdl): fix coordinate issue with mouse in fullscreen, due
+  to scaling not being updated correctly (possibly a regression from
+  enabling accelerated rendering in the previous release).
+* README: updated SDL2 build instructions (explicitly mention we need SDL2 and
+  not SDL3, and update link to the SDL2 installation page directly).
+* Browser version (gruid-js): fixed Backspace key reading (usable in the pager
+  as an alternative to `u` for half-page up).
+* A couple of minor log message fixes and improvements.
 
 # v1.2.0 2025-12-03
 
