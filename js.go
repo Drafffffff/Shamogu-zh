@@ -22,7 +22,6 @@ func initDriver() {
 	dr := jsd.NewDriver(jsd.Config{
 		TileManager: &monochromeTileManager{},
 		AppCanvasId: "gamecanvas",
-		AppDivId:    "gamediv",
 	})
 	driver = dr
 }
