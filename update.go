@@ -217,6 +217,9 @@ func (md *model) updateMouse(msg gruid.MsgMouse) {
 			md.action = ActionExamine{Target: p}
 		}
 	case gruid.MouseSecondary:
+		if !md.targ.kb {
+			md.targ.CancelExamine()
+		}
 		md.action = ActionMenu{}
 	case gruid.MouseMain:
 		if !inMap(p) {
