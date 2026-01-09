@@ -102,52 +102,44 @@ func (g *Game) NoTrapAt(p gruid.Point) bool {
 	return g.Map.RuneCache.At(p) <= 0
 }
 
-// TriggerTrapAt triggers any runic traps at the given point.
-func (g *Game) TriggerTrapAt(p gruid.Point) {
-	i := g.Map.RuneCache.At(p)
-	if i <= 0 {
+// TriggerTrap makes the given actor trigger a runic trap at its current
+// position, if any.
+func (g *Game) TriggerTrap(i ID, ai *Actor) {
+	pi := g.Entity(i).P
+	j := g.Map.RuneCache.At(pi)
+	if j <= 0 {
 		return
 	}
-	ei := g.Entity(i)
+	ei := g.Entity(j)
 	rt, ok := ei.Role.(*RunicTrap)
 	if !ok || rt.Used {
 		return
 	}
-	if j, _ := g.ActorAt(p); j >= 0 {
-		if j == PlayerID {
-			g.LogfStyled("You trigger the %s.", logSpecial, rt.Rune.String())
-			g.StoryLogf("Triggered %s", One(rt.Rune.String()))
-			g.Stats.PlayerTrapTriggers++
-		} else if g.InFOV(p) {
-			g.LogfStyled("The %s triggers the %s.", logSpecial, g.Entity(j).Name, rt.Rune.String())
-			g.Stats.MonsterTrapTriggers++
-		}
-		g.Stats.MapTriggeredTraps[g.Map.Level-1]++
+	if i == PlayerID {
+		g.LogfStyled("You trigger the %s.", logSpecial, rt.Rune.String())
+		g.StoryLogf("Triggered %s", One(rt.Rune.String()))
+		g.Stats.PlayerTrapTriggers++
+	} else if g.InFOV(pi) {
+		g.LogfStyled("The %s triggers the %s.", logSpecial, g.Entity(i).Name, rt.Rune.String())
+		g.Stats.MonsterTrapTriggers++
 	}
+	g.Stats.MapTriggeredTraps[g.Map.Level-1]++
 	switch rt.Rune {
 	case RuneBerserk:
-		if i, ai := g.ActorAt(p); i >= 0 {
-			g.PutStatus1(i, ai, StatusBerserk, DurationBerserkTrap)
-		}
+		g.PutStatus1(i, ai, StatusBerserk, DurationBerserkTrap)
 	case RuneFire:
-		if i, ai := g.ActorAt(p); i >= 0 {
-			g.PutStatus1(i, ai, StatusConfusion, DurationConfusionFireTrap)
-		}
-		g.FireCloudAt(p)
+		g.PutStatus1(i, ai, StatusConfusion, DurationConfusionFireTrap)
+		g.FireCloudAt(pi)
 	case RuneLignification:
-		if i, ai := g.ActorAt(p); i >= 0 {
-			g.PutStatus1(i, ai, StatusLignification, DurationLignificationTrap)
-		}
+		g.PutStatus1(i, ai, StatusLignification, DurationLignificationTrap)
 	case RunePoison:
-		g.PoisonCloudAt(p)
+		g.PoisonCloudAt(pi)
 	case RuneWarp:
-		if i, ai := g.ActorAt(p); i >= 0 {
-			g.TeleportActor(i, ai, 1)
-		}
+		g.TeleportActor(i, ai, 1)
 	}
 	rt.Used = true
-	if g.InFOV(p) {
+	if g.InFOV(pi) {
 		rt.KnownUsed = true
 	}
-	g.Map.RuneCache.SetU(p, 0)
+	g.Map.RuneCache.SetU(pi, 0)
 }

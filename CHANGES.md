@@ -1,3 +1,8 @@
+# v? ?
+
+* Temporal Cat swapping with Runic Chicken on top of a trap now makes the
+  target swapped monster trigger the trap (see issue #13).
+
 # v1.3.0 2026-01-08
 
 This release is a maintenance one with a few small fixes, mostly about UI, and

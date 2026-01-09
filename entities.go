@@ -147,7 +147,7 @@ func (g *Game) moveActor(i ID, ai *Actor, to gruid.Point, bumpmove bool) {
 		return
 	}
 	g.Map.ActorCache.SetU(ei.P, 0)
-	if j, _ := g.ActorAt(to); j >= 0 {
+	if j, aj := g.ActorAt(to); j >= 0 {
 		// Swap actor positions.
 		ej := g.Entity(j)
 		ej.P = ei.P
@@ -155,9 +155,15 @@ func (g *Game) moveActor(i ID, ai *Actor, to gruid.Point, bumpmove bool) {
 		if j == PlayerID {
 			ej.KnownP = ej.P
 		}
+		ei.P = to
+		g.Map.ActorCache.SetU(to, i)
+		if !aj.DoesAny(RunicChicken) {
+			g.TriggerTrap(j, aj)
+		}
+	} else {
+		ei.P = to
+		g.Map.ActorCache.SetU(to, i)
 	}
-	ei.P = to
-	g.Map.ActorCache.SetU(to, i)
 	switch {
 	case ai.IsPlayer():
 		ei.KnownP = ei.P
@@ -181,8 +187,8 @@ func (g *Game) moveActor(i ID, ai *Actor, to gruid.Point, bumpmove bool) {
 	if bumpmove {
 		g.ApplyBumpMoveEffects(i, ai)
 	}
-	if i != PlayerID || !ai.DoesAny(RunicChicken) {
-		g.TriggerTrapAt(to)
+	if !ai.DoesAny(RunicChicken) {
+		g.TriggerTrap(i, ai)
 	}
 }
 
