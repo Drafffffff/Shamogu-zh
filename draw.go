@@ -375,6 +375,7 @@ func (md *model) drawStatusDesc() {
 
 // Markups contains the styling markup-characters we use for StyledText.
 var Markups = map[rune]gruid.Style{
+	'S': {Fg: ColorForegroundSecondary},
 	'B': {Fg: ColorBlue},
 	'C': {Fg: ColorCyan},
 	'G': {Fg: ColorGreen},

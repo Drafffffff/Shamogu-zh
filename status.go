@@ -142,7 +142,24 @@ func statusColor(st Status, turns int) rune {
 		return 'O'
 	}
 	if turns <= 1 {
-		return 'C'
+		switch st {
+		case StatusDisorient:
+			// Disorient is special in that it only has an effect
+			// during the monster's turn, so it is completely
+			// useless on the last turn.
+			return 'S'
+		case StatusBerserk, StatusLignification, StatusShadow, StatusFoggySkin, StatusClarity:
+			// Some statuses have both an effect during the
+			// player's turn and the monsters' turn, so only
+			// the effect during the former remains relevant.
+			return 'C'
+		default:
+			// Other statuses don't have an effect during the
+			// monsters' turn (except in Confusion+Imbalance that
+			// has minimal impact with respect to last turn
+			// considerations).
+			return 'V'
+		}
 	}
 	return 'B'
 }
