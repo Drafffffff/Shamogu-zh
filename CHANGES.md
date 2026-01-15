@@ -1,5 +1,8 @@
 # v? ?
 
+* Improve coloring of last turn for player status effects in the status bar:
+  now the color is different depending on whether the status effect is relevant
+  during the player's turn, the monsters', or both.
 * Temporal Cat swapping with Runic Chicken on top of a trap now makes the
   target swapped monster trigger the trap (see issue #13).
 
