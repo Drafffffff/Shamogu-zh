@@ -1003,7 +1003,7 @@ func (g *Game) genMonsters(mg *MapGen) {
 		} else if g.IntN(6) == 0 {
 			// Occasionally spawn extra uniques or guardians
 			// (possibly not unique anymore).
-			nE, nM, nL = g.genMonstersCorrupted(mg, nE, nM, nL)
+			nE, nM, nL = g.genMonstersCorrupted(nE, nM, nL)
 		}
 	}
 	// Generate remaining monsters randomly from each category.
@@ -1196,7 +1196,7 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 		}
 	}
 	if g.ProcInfo.GuardianPortal2 == g.Map.Level {
-		p := g.corruptedPortalGuardianPoint(mg)
+		p := g.corruptedPortalGuardianPoint()
 		if g.IntN(3) > 0 {
 			g.genMonsterGuardian(MadOctopode, p)
 		} else {
@@ -1208,7 +1208,7 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 		}
 	}
 	if g.ProcInfo.GuardianTotem1 == g.Map.Level {
-		p := g.corruptedTotemGuardianPoint(mg)
+		p := g.corruptedTotemGuardianPoint()
 		if g.IntN(3) > 0 {
 			g.genMonsterGuardian(CrazyDruid, p)
 		} else {
@@ -1224,7 +1224,7 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 		if g.IntN(3) > 0 {
 			g.genMonster(WalkingMushroom)
 		} else {
-			p := g.corruptedPortalGuardianPoint(mg)
+			p := g.corruptedPortalGuardianPoint()
 			g.genMonsterGuardian(WalkingMushroom, p)
 		}
 	}
@@ -1233,13 +1233,13 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 		if g.IntN(3) > 0 {
 			g.genMonster(NoisyImp)
 		} else {
-			p := g.corruptedPortalGuardianPoint(mg)
+			p := g.corruptedPortalGuardianPoint()
 			g.genMonsterGuardian(NoisyImp, p)
 		}
 	}
 	if g.ProcInfo.GuardianTotem2 == g.Map.Level {
 		nE--
-		p := g.corruptedTotemGuardianPoint(mg)
+		p := g.corruptedTotemGuardianPoint()
 		if g.IntN(3) > 0 {
 			g.genMonsterGuardian(TotemWasp, p)
 			g.genMonsterGuardian(TotemWasp, p)
@@ -1260,7 +1260,7 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 		if g.IntN(5) == 0 {
 			mk = WarpingWraith
 		}
-		p := g.corruptedPortalGuardianPoint(mg)
+		p := g.corruptedPortalGuardianPoint()
 		if g.IntN(3) > 0 {
 			g.genMonsterGuardian(mk, p)
 			g.genMonsterGuardian(mk, p)
@@ -1314,7 +1314,7 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 	return nE, nM, nL
 }
 
-func (g *Game) corruptedPortalGuardianPoint(mg *MapGen) gruid.Point {
+func (g *Game) corruptedPortalGuardianPoint() gruid.Point {
 	var p gruid.Point
 	if g.Map.Orb != InvalidPos {
 		p = g.Map.Orb
@@ -1336,15 +1336,15 @@ func (g *Game) corruptedPortalGuardianPoint(mg *MapGen) gruid.Point {
 	return p
 }
 
-func (g *Game) corruptedTotemGuardianPoint(mg *MapGen) gruid.Point {
+func (g *Game) corruptedTotemGuardianPoint() gruid.Point {
 	if g.IntN(3) > 0 {
 		return g.Map.Totem
 	}
-	return g.corruptedPortalGuardianPoint(mg)
+	return g.corruptedPortalGuardianPoint()
 }
 
 // genMonstersCorrupted may generate extra special wandering monsters.
-func (g *Game) genMonstersCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int) {
+func (g *Game) genMonstersCorrupted(nE, nM, nL int) (int, int, int) {
 	// Special early monsters.
 	if g.IntN(3) == 0 {
 		nEs := min(nE, 1+g.IntN(3))
@@ -1368,7 +1368,7 @@ func (g *Game) genMonstersCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int) 
 		nLs := min(nL, 1+g.IntN(2))
 		if g.IntN(3) == 0 && g.Map.Level < MapLevels {
 			for range nLs {
-				p := g.corruptedTotemGuardianPoint(mg)
+				p := g.corruptedTotemGuardianPoint()
 				g.genMonsterGuardian(FearsomeLich, p)
 			}
 		} else {

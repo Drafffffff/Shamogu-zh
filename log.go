@@ -115,17 +115,17 @@ func (g *Game) LogStyled(s string, style logStyle) {
 	g.LogEntry(e)
 }
 
-func (g *Game) Logf(format string, a ...interface{}) {
+func (g *Game) Logf(format string, a ...any) {
 	e := logEntry{Text: UpperFirst(fmt.Sprintf(format, a...)), Index: g.Logs.Index}
 	g.LogEntry(e)
 }
 
-func (g *Game) LogfStyled(format string, style logStyle, a ...interface{}) {
+func (g *Game) LogfStyled(format string, style logStyle, a ...any) {
 	e := logEntry{Text: UpperFirst(fmt.Sprintf(format, a...)), Index: g.Logs.Index, Style: style}
 	g.LogEntry(e)
 }
 
-func (g *Game) Debug(format string, a ...interface{}) {
+func (g *Game) Debug(format string, a ...any) {
 	g.LogfStyled(format, logError, a...)
 }
 
@@ -133,7 +133,7 @@ func (g *Game) StoryLog(s string) {
 	g.Logs.Story = append(g.Logs.Story, fmt.Sprintf("Level %d|Turn %5d| %s", g.Map.Level, g.Turn, s))
 }
 
-func (g *Game) StoryLogf(format string, a ...interface{}) {
+func (g *Game) StoryLogf(format string, a ...any) {
 	g.Logs.Story = append(g.Logs.Story, fmt.Sprintf("Level %d|Turn %5d| %s", g.Map.Level, g.Turn, fmt.Sprintf(format, a...)))
 }
 

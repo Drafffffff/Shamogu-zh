@@ -176,10 +176,7 @@ func statusHPColor(hp, hpmax int) rune {
 }
 
 func (a *Actor) fmtHP() string {
-	hp := a.HP
-	if hp < 0 {
-		hp = 0
-	}
+	hp := max(0, a.HP)
 	debt := 0
 	m := 1 // minimum return HP after bonus expiration (if above)
 	if a.Has(StatusLignification) {

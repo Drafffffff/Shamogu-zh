@@ -19,6 +19,7 @@ const (
 	Unknown         // cell is unknown (for KnownTerrain field of Map)
 )
 
+// TerrainName returns the name of the terrain.
 func TerrainName(t rl.Cell) string {
 	switch t {
 	case Wall:
@@ -38,6 +39,7 @@ func TerrainName(t rl.Cell) string {
 	}
 }
 
+// TerrainDesc returns a description of the terrain.
 func TerrainDesc(t rl.Cell) string {
 	switch t {
 	case Wall:

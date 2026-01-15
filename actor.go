@@ -479,12 +479,12 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 		return false
 	}
 	active := ai.Has(st) // whether the status is already active
-	switch {
-	case st == StatusBerserk:
+	switch st {
+	case StatusBerserk:
 		if active || ai.Has(StatusClarity) {
 			return false
 		}
-	case st == StatusFire:
+	case StatusFire:
 		if ai.Has(StatusFoggySkin) || ai.DoesAny(MonsImmunityFire) {
 			return false
 		}
@@ -501,7 +501,7 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 		if ai.IsDead() {
 			return false
 		}
-	case st == StatusFear:
+	case StatusFear:
 		if ai.Has(StatusBerserk) || ai.DoesAny(MonsImmunityFear) {
 			return false
 		}
@@ -511,14 +511,14 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 		if ai.Has(StatusConfusion) {
 			turns *= 2
 		}
-	case st == StatusDaze:
+	case StatusDaze:
 		if ai.Has(StatusClarity) || ai.DoesAny(MonsImmunityDaze) {
 			return false
 		}
 		if ai.Has(StatusConfusion) {
 			turns *= 2
 		}
-	case st == StatusConfusion:
+	case StatusConfusion:
 		if ai.Has(StatusClarity) || ai.DoesAny(MonsImmunityConfusion) {
 			return false
 		}
@@ -528,7 +528,7 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 		if ai.DoesAny(ResistanceConfusion) {
 			turns = (turns + 1) / 2
 		}
-	case st == StatusImbalance:
+	case StatusImbalance:
 		if ai.Has(StatusLignification) || ai.DoesAny(MonsImmunityImbalance) {
 			return false
 		}
@@ -538,11 +538,11 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 		if ai.Has(StatusConfusion) {
 			turns *= 2
 		}
-	case st == StatusLignification:
+	case StatusLignification:
 		if ai.DoesAny(MonsImmunityLignification) || active || ai.Has(StatusFoggySkin) {
 			return false
 		}
-	case st == StatusPoison:
+	case StatusPoison:
 		if ai.Has(StatusLignification) || ai.DoesAny(MonsImmunityPoison) {
 			return false
 		}

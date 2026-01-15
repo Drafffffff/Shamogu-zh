@@ -309,10 +309,9 @@ func (g *Game) getMonsterTargIDs() []ID {
 			continue
 		}
 		var b bool // whether monster is examinable
-		switch {
-		case g.Wizard.Mode == WizardReveal:
+		if g.Wizard.Mode == WizardReveal {
 			b = ai.IsAlive()
-		default:
+		} else {
 			b = ei.KnownP != InvalidPos && !ai.KnownDead
 		}
 		if b {

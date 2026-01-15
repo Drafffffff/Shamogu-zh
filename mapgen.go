@@ -369,7 +369,7 @@ func (mg *MapGen) genVaults(templates []string, n int, pl Placement) (ps []gruid
 		return nil, false
 	}
 	ok = true
-	for i := 0; i < n; i++ {
+	for range n {
 		var vi *vault
 		var p gruid.Point
 		var tpl string

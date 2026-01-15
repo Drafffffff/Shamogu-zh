@@ -361,9 +361,9 @@ func (md *model) FirebreathAnimation(from, dir gruid.Point) {
 	}
 	md.startAnimSeq()
 	g := md.g
-	for k := 0; k < 4; k++ {
+	for range 4 {
 		p := from
-		for i := 0; i < MaxFOVRange; i++ {
+		for range MaxFOVRange {
 			t := g.Map.Terrain.At(p)
 			if !Passable(t) {
 				break
@@ -392,7 +392,7 @@ func (md *model) LightningAnimation(ps []paths.Node) {
 	}
 	md.startAnimSeq()
 	g := md.g
-	for k := 0; k < 4; k++ {
+	for range 4 {
 		for _, n := range ps {
 			p := n.P
 			if !g.InFOV(p) {
@@ -418,7 +418,7 @@ func (md *model) ExplosionAnimation(ps []gruid.Point) {
 	}
 	md.startAnimSeq()
 	g := md.g
-	for k := 0; k < 4; k++ {
+	for range 4 {
 		for _, p := range ps {
 			if !g.InFOV(p) {
 				continue
@@ -450,7 +450,7 @@ func (md *model) OrbDestructionAnimation() {
 	c := gruid.Cell{
 		Rune:  '♣',
 		Style: gruid.Style{Fg: ColorGreen, Bg: ColorBackground, Attrs: AttrInMap}}
-	for k := 0; k < 7; k++ {
+	for k := range 7 {
 		for p := range g.Map.Terrain.Points() {
 			switch g.rand.IntN(4) {
 			case 0:

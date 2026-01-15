@@ -35,8 +35,8 @@ const FirstMapID ID = InventorySize + PrimarySpiritID
 const PlayerID ID = FirstMapID
 
 // Game represents information relevant the current Game's state. It contains
-// all the information to map entities, as well as other relevant informations,
-// such as statistics.
+// all the information about map entities, as well as other relevant
+// informations, including statistics.
 type Game struct {
 	Entities []*Entity        // entity ID index: entity components
 	Map      *Map             // current level's map

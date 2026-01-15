@@ -375,7 +375,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 	case ai.DoesAny(PatternCrocodile) && ai.CanMove() && !aj.ResistsMove() && ap == AttackDrag && !ai.Has(StatusPoison) && aj.IsAlive():
 		g.drag(i, j, ai, aj)
 	case ai.DoesAny(PatternBat) && ap == AttackPlain && ai.CanMove() && !ai.Has(StatusPoison):
-		g.retreat(i, j, ai, aj)
+		g.retreat(i, j, ai)
 	case ai.DoesAny(PatternBat) && ap == AttackCharge:
 		g.PutStatus(j, aj, StatusConfusion, 2)
 	}
@@ -764,7 +764,7 @@ func (g *Game) drag(i, j ID, ai, aj *Actor) {
 }
 
 // retreat attemps to a sneaky retreat backwards.
-func (g *Game) retreat(i, j ID, ai, aj *Actor) {
+func (g *Game) retreat(i, j ID, ai *Actor) {
 	ei, ej := g.Entity(i), g.Entity(j)
 	dir := toDir(ei.P.Sub(ej.P))
 	from, to := ei.P, ei.P

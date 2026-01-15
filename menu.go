@@ -400,18 +400,18 @@ func (md *model) modSelectionMenu() {
 	title := "Mod Selection"
 	r := 'a'
 	for i, m := range mods {
-		switch {
-		case i == 0:
+		switch i {
+		case 0:
 			entries = append(entries, ui.MenuEntry{
 				Text:     ui.Text("Expansions").WithStyle(hstyle),
 				Disabled: true,
 			})
-		case i == 2:
+		case 2:
 			entries = append(entries, ui.MenuEntry{
 				Text:     ui.Text("Small Mods").WithStyle(hstyle),
 				Disabled: true,
 			})
-		case i == NExpansions:
+		case NExpansions:
 			entries = append(entries, ui.MenuEntry{
 				Text:     ui.Text("Challenges").WithStyle(hstyle),
 				Disabled: true,
