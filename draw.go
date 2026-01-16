@@ -364,8 +364,8 @@ func (md *model) drawStatusDesc() {
 	sz := md.status.desc.Content.Size()
 	w, h := sz.X, sz.Y
 	x -= w / 2
-	if x+w > UIWidth {
-		x = UIWidth - w
+	if x+w > UIWidth-2 {
+		x = UIWidth - w - 2
 	}
 	if x < 0 {
 		x = 0
