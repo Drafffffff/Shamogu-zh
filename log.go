@@ -99,7 +99,7 @@ func (st logStyle) Rune() rune {
 // UpperFirst returns a string with its first letter in upper case.
 func UpperFirst(s string) string {
 	r, _ := utf8.DecodeRuneInString(s)
-	if r == utf8.RuneError {
+	if r == utf8.RuneError || unicode.IsUpper(r) {
 		return s
 	}
 	return string(unicode.ToUpper(r)) + s[utf8.RuneLen(r):]
