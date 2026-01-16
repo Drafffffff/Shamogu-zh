@@ -2,9 +2,14 @@
 
 * Improve coloring of last turn for player status effects in the status bar:
   now the color is different depending on whether the status effect is relevant
-  during the player's turn, the monsters', or both.
+  during the player's turn, the monsters', or both. In particular, Disorient
+  now shows in grey when only one turn remains, which makes it clearer that it
+  has no effect on the last player's turn (see issue #13 for context).
 * Temporal Cat swapping with Runic Chicken on top of a trap now makes the
   target swapped monster trigger the trap (see issue #13).
+* Fix minor error in label size computation of status description on mouse
+  hover in some edge cases (that maybe did not actually happen in Shamogu
+  practice, as this issue was catched for similar code in Harmonist). 
 
 # v1.3.0 2026-01-08
 
