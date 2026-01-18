@@ -161,7 +161,7 @@ func (md *model) equipSpiritID(idx int) ID {
 func (md *model) inventoryItemID(i int) ID {
 	g := md.g
 	n := -1
-	for j, e := range g.Entities[:InventorySize] {
+	for j, e := range g.Entities[:g.InventoryEnd()] {
 		if e.Role != nil {
 			n++
 		}
@@ -180,10 +180,10 @@ func (md *model) inventoryComestibleID(i int) ID {
 	// NOTE: this function assumes there are 3 headers before the first
 	// comestible in the inventory menu; if that ever changes, this should
 	// be updated.
-	if n := ID(i - 3); n < FirstMapID {
+	g := md.g
+	if n := ID(i - 3); n < g.InventoryEnd() {
 		return n
 	}
-	g := md.g
 	id, _ := g.ItemAt(g.PP())
 	return id // should be positive
 }

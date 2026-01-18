@@ -712,7 +712,12 @@ func (md *model) openInventory(bound ID) (gruid.Effect, bool) {
 	}
 	md.menu.bound = bound
 	md.menu.main.SetActiveInvokable(0)
-	e := md.g.Entity(PrimarySpiritID)
+	var e *Entity
+	if bound == -1 {
+		e = md.g.Entity(PrimarySpiritID)
+	} else {
+		e = md.g.Entity(md.inventoryComestibleID(md.menu.main.Active()))
+	}
 	md.updateItemDesc(e)
 	return nil, false
 }

@@ -7,9 +7,14 @@
   has no effect on the last player's turn (see issue #13 for context).
 * Temporal Cat swapping with Runic Chicken on top of a trap now makes the
   target swapped monster trigger the trap (see issue #13).
+* Fix mod conflict issue between “Gluttony Rework” and “Small Inventory” mods
+  when choosing first comestible from the inventory and second comestible from
+  the ground (see issue #14). Also, ensure that comestible description is
+  immediately updated to reflect selected second comestible after choosing the
+  first one.
 * Fix minor error in label size computation of status description on mouse
   hover in some edge cases (that maybe did not actually happen in Shamogu
-  practice, as this issue was catched for similar code in Harmonist). 
+  practice, as this issue was catched for similar code in Harmonist).
 
 # v1.3.0 2026-01-08
 
