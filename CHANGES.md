@@ -14,7 +14,7 @@
   first one.
 * Fix minor error in label size computation of status description on mouse
   hover in some edge cases (that maybe did not actually happen in Shamogu
-  practice, as this issue was catched for similar code in Harmonist).
+  in practice, as this issue was caught for similar code in Harmonist).
 
 # v1.3.0 2026-01-08
 
