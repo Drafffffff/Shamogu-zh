@@ -119,7 +119,7 @@ func (g *Game) TriggerTrap(i ID, ai *Actor) {
 		g.LogfStyled("You trigger the %s.", logSpecial, rt.Rune.String())
 		g.StoryLogf("Triggered %s", One(rt.Rune.String()))
 		g.Stats.PlayerTrapTriggers++
-	} else if g.InFOV(pi) {
+	} else {
 		g.LogfStyled("The %s triggers the %s.", logSpecial, g.Entity(i).Name, rt.Rune.String())
 		g.Stats.MonsterTrapTriggers++
 	}
