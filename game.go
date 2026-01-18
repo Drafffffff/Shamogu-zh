@@ -19,16 +19,13 @@ var InvalidPos = gruid.Point{-1, -1}
 // existed. The first IDs get some special use, see FirstMapID.
 type ID int32
 
-// PrimarySpiritID is the ID of the first item in the inventory.
-const PrimarySpiritID ID = 0
-
 // InventorySize defines the size of the inventory, accounting for different
 // kind of items.
 const InventorySize = NSpirits + NComestibles
 
 // FirstMapID gives the first identifier that corresponds to a non-inventory
 // entity. All the IDs preceding FirstMapID are reserved for inventory items.
-const FirstMapID ID = InventorySize + PrimarySpiritID
+const FirstMapID ID = InventorySize
 
 // PlayerID is the player's entity index in game.Entities. This convention is
 // enforced for convenience.

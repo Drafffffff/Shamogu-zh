@@ -595,15 +595,15 @@ func equipItem(md *model, i ID) bool {
 	switch ei.Role.(type) {
 	case *Spirit:
 		spirit = true
-		from, to = PrimarySpiritID, PrimarySpiritID+NSpirits
+		from, to = ID(0), ID(NSpirits)
 	case *Comestible:
-		for i, e := range g.Entities[PrimarySpiritID+NSpirits : g.InventoryEnd()] {
+		for i, e := range g.Entities[NSpirits:g.InventoryEnd()] {
 			if !e.IsItem() {
 				// Equip on first empty slot.
 				return g.EquipItemAt(ID(i + NSpirits))
 			}
 		}
-		from, to = PrimarySpiritID+NSpirits, FirstMapID
+		from, to = NSpirits, FirstMapID
 	}
 	entries := []ui.MenuEntry{}
 	r := 'a'
@@ -714,7 +714,7 @@ func (md *model) openInventory(bound ID) (gruid.Effect, bool) {
 	md.menu.main.SetActiveInvokable(0)
 	var e *Entity
 	if bound == -1 {
-		e = md.g.Entity(PrimarySpiritID)
+		e = md.g.Entity(0)
 	} else {
 		e = md.g.Entity(md.inventoryComestibleID(md.menu.main.Active()))
 	}
@@ -736,22 +736,22 @@ func nextRuneKey(r rune) rune {
 func appendMenuHeader(entries []ui.MenuEntry, i ID) []ui.MenuEntry {
 	hstyle := gruid.Style{}.WithFg(ColorCyan)
 	switch i {
-	case PrimarySpiritID:
+	case 0:
 		entries = append(entries, ui.MenuEntry{
 			Text:     ui.Text("Primary Spirit").WithStyle(hstyle),
 			Disabled: true,
 		})
-	case PrimarySpiritID + 1:
+	case 1:
 		entries = append(entries, ui.MenuEntry{
 			Text:     ui.Text("Secondary Spirits").WithStyle(hstyle),
 			Disabled: true,
 		})
-	case PrimarySpiritID + NSpirits:
+	case NSpirits:
 		entries = append(entries, ui.MenuEntry{
 			Text:     ui.Text("Comestibles").WithStyle(hstyle),
 			Disabled: true,
 		})
-	case PrimarySpiritID + NSpirits + NComestibles:
+	case NSpirits + NComestibles:
 		entries = append(entries, ui.MenuEntry{
 			Text:     ui.Text("Comestible on the floor").WithStyle(hstyle),
 			Disabled: true,

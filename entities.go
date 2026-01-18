@@ -478,9 +478,9 @@ func (g *Game) TotemID() ID {
 // PlayerSpirits returns an iterator over player's primary and secondary spirits.
 func (g *Game) PlayerSpirits() iter.Seq2[ID, *Spirit] {
 	return func(yield func(ID, *Spirit) bool) {
-		for i := PrimarySpiritID; i < PrimarySpiritID+NSpirits; i++ {
-			if sp, ok := g.Entity(ID(i)).Role.(*Spirit); ok {
-				if !yield(ID(i), sp) {
+		for i := range ID(NSpirits) {
+			if sp, ok := g.Entity(i).Role.(*Spirit); ok {
+				if !yield(i, sp) {
 					return
 				}
 			}
@@ -492,7 +492,7 @@ func (g *Game) PlayerSpirits() iter.Seq2[ID, *Spirit] {
 func (g *Game) PlayerComestibles() iter.Seq2[ID, *Comestible] {
 	to := g.InventoryEnd()
 	return func(yield func(ID, *Comestible) bool) {
-		for i := PrimarySpiritID + NSpirits; i < to; i++ {
+		for i := ID(NSpirits); i < to; i++ {
 			if sp, ok := g.Entity(i).Role.(*Comestible); ok {
 				if !yield(i, sp) {
 					return
@@ -515,8 +515,8 @@ func (g *Game) InventoryEnd() ID {
 func (g *Game) InventoryItems() iter.Seq2[ID, *Entity] {
 	to := g.InventoryEnd()
 	return func(yield func(ID, *Entity) bool) {
-		for i, e := range g.Entities[PrimarySpiritID:to] {
-			if !yield(ID(i)+PrimarySpiritID, e) {
+		for i, e := range g.Entities[:to] {
+			if !yield(ID(i), e) {
 				return
 			}
 		}

@@ -15,21 +15,21 @@ func (g *Game) InitPlayer(spe *Entity) {
 		Rune: '@',
 		Role: NewActor(2, 1, 9, Player),
 	}
-	for i := PrimarySpiritID; i < FirstMapID; i++ {
+	for i := range FirstMapID {
 		g.Entities[i] = emptySlot()
 	}
-	g.Entities[PrimarySpiritID] = spe
+	g.Entities[0] = spe
 	// g.debugBuild()
 	g.ComputePlayerStats()
 }
 
 func (g *Game) debugBuild() {
-	// g.Entities[PrimarySpiritID+1] = spiritEntity(g.Mods, challengeSpirits[4])
-	// g.Entities[PrimarySpiritID+2] = spiritEntity(g.Mods, challengeSpirits[2])
-	// g.Entities[PrimarySpiritID+4] = comestibleEntity(ComestibleData[BerserkingFlower])
-	// g.Entities[PrimarySpiritID+5] = comestibleEntity(ComestibleData[ClarityLeaves])
-	// g.Entities[PrimarySpiritID+6] = comestibleEntity(ComestibleData[FirebreathPepper])
-	// g.Entities[PrimarySpiritID+7] = comestibleEntity(ComestibleData[FoggySkinOnion])
+	// g.Entities[1] = spiritEntity(g.Mods, challengeSpirits[4])
+	// g.Entities[2] = spiritEntity(g.Mods, challengeSpirits[2])
+	// g.Entities[4] = comestibleEntity(ComestibleData[BerserkingFlower])
+	// g.Entities[5] = comestibleEntity(ComestibleData[ClarityLeaves])
+	// g.Entities[6] = comestibleEntity(ComestibleData[FirebreathPepper])
+	// g.Entities[7] = comestibleEntity(ComestibleData[FoggySkinOnion])
 }
 
 func emptySlot() *Entity {
@@ -66,7 +66,7 @@ func (g *Game) genPlayerOnNewLevel(mg *MapGen) {
 	p.KnownP = p.P
 	g.Map.ActorCache.SetU(p.P, PlayerID)
 	if g.Mod(ModHealingCombat) && g.Map.Level == 5 {
-		sp := g.Entity(PrimarySpiritID).Role.(*Spirit)
+		sp := g.Entity(0).Role.(*Spirit)
 		if _, ok := sp.Ability[sp.Level].(EffectVampirism); ok {
 			n := 1
 			if g.Mod(ModNoRecharges) {

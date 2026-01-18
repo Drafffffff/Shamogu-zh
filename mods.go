@@ -71,7 +71,7 @@ func (m Mod) Desc() string {
 
 // HasVampirism reports whether the player has a vampirism ability.
 func (g *Game) HasVampirism() bool {
-	sp := g.Entity(PrimarySpiritID).Role.(*Spirit)
+	sp := g.Entity(0).Role.(*Spirit)
 	_, ok := sp.Ability[sp.Level].(EffectVampirism)
 	return ok
 }

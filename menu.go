@@ -137,7 +137,7 @@ func (md *model) equipItemID(it Item, idx int) ID {
 		return md.equipSpiritID(idx)
 	default:
 		// Comestible.
-		return ID(idx) + NSpirits + PrimarySpiritID
+		return ID(idx) + NSpirits
 	}
 }
 
@@ -168,7 +168,7 @@ func (md *model) inventoryItemID(i int) ID {
 		if n < i {
 			continue
 		}
-		return ID(j) + PrimarySpiritID
+		return ID(j)
 	}
 	id, _ := g.ItemAt(g.PP())
 	return id // should be positive
@@ -474,10 +474,10 @@ func (md *model) modSelectionMenu() {
 // 				i--
 // 			}
 // 		}
-// 		return int(i - PrimarySpiritID)
+// 		return int(i)
 // 	default:
 // 		// Comestible.
-// 		return int(i - NSpirits - PrimarySpiritID)
+// 		return int(i - NSpirits)
 // 	}
 // }
 //
@@ -492,9 +492,9 @@ func (md *model) modSelectionMenu() {
 // 				i--
 // 			}
 // 		}
-// 		return int(i - PrimarySpiritID)
+// 		return int(i)
 // 	default:
 // 		// Comestible.
-// 		return int(i - NSpirits - PrimarySpiritID)
+// 		return int(i - NSpirits)
 // 	}
 // }
