@@ -181,5 +181,16 @@ func (g *Game) WriteDump() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("Full game statistics at %s.", path), nil
+	return fmt.Sprintf("Full game statistics at %s.", dumpPath()), nil
+}
+
+// dumpPath returns an anonymized path to the dump.txt file.
+func dumpPath() string {
+	if runtime.GOOS == "windows" {
+		return `%LOCALAPPDATA%\shamogu\dump.txt`
+	}
+	if xdg := os.Getenv("XDG_DATA_HOME"); xdg != "" {
+		return `$XDG_DATA_HOME/shamogu/dump.txt`
+	}
+	return `~/.local/share/shamogu/dump.txt`
 }
