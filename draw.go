@@ -331,7 +331,7 @@ func (g *Game) drawTerrainRuneAt(gd gruid.Grid, r rune, p gruid.Point) {
 
 func drawCloud(gd gruid.Grid, cl Cloud) {
 	c := gd.At(cl.P)
-	c.Rune = '§'
+	c.Rune = '≡'
 	c.Style.Fg = cl.Kind.Color()
 	gd.Set(cl.P, c)
 }

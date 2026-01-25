@@ -150,7 +150,8 @@ var MapNames = map[rune]string{
 	'@': "player",
 	'^': "rubble",
 	'¤': "frontier",
-	'§': "cloud",
+	'§': "cloud", // replay compatibility
+	'≡': "cloud",
 	'Φ': "magic",
 	'√': "hit",
 	'∞': "kill",
@@ -193,7 +194,8 @@ var LetterNames = map[rune]string{
 	'}':  "rbrace",
 	'~':  "tilde",
 	'¤':  "frontier",
-	'§':  "cloud",
+	'§':  "cloud", // replay compatibility
+	'≡':  "cloud",
 	'«':  "ldiag",
 	'»':  "rdiag",
 	'×':  "times",

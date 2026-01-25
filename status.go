@@ -116,15 +116,15 @@ func (md *model) updateStatus() {
 		case NoCloud:
 		case CloudPoison:
 			entries = append(entries, ui.MenuEntry{
-				Text:     stt.WithText("@g§@N "),
+				Text:     stt.WithText("@g≡@N "),
 				Disabled: true})
 		case CloudFire:
 			entries = append(entries, ui.MenuEntry{
-				Text:     stt.WithText("@r§@N "),
+				Text:     stt.WithText("@r≡@N "),
 				Disabled: true})
 		case CloudNormal:
 			entries = append(entries, ui.MenuEntry{
-				Text:     stt.WithText("§ ").WithStyle(gruid.Style{Attrs: AttrInMap}),
+				Text:     stt.WithText("≡ ").WithStyle(gruid.Style{Attrs: AttrInMap}),
 				Disabled: true})
 		}
 		if md.targ.kb {

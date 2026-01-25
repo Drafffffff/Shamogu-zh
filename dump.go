@@ -248,7 +248,7 @@ func (g *Game) dumpDungeon(sb *strings.Builder) {
 			continue
 		}
 		if g.Map.Clouds.At(p).Kind != NoCloud && (r == '.' || r == '"' || r == '^') {
-			r = '§'
+			r = '≡'
 		}
 		if i := ids.At(p); i > 0 {
 			r = g.Entity(i).Rune
