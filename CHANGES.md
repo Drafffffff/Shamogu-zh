@@ -1,12 +1,23 @@
 # v? ?
 
-* Improve coloring of last turn for player status effects in the status bar:
-  now the color is different depending on whether the status effect is relevant
-  during the player's turn, the monsters', or both. In particular, Disorient
-  now shows in grey when only one turn remains, which makes it clearer that it
-  has no effect on the last player's turn (see issue #13 for context).
+* Improve coloring during last turn for player status effects in the status
+  bar: now the color is different depending on whether the status effect is
+  relevant during the player's turn, the monsters', or both. In particular,
+  Disorient now shows in grey when only one turn remains, which makes it
+  clearer that it has no effect on the last player's turn (see issue #13 for
+  context).
 * Temporal Cat swapping with Runic Chicken on top of a trap now makes the
   target swapped monster trigger the trap (see issue #13).
+* Mention in help that cat attacks swap clouds, but not terrain.
+* Native versions: make *path* in “Full game statistics at *path*” abbreviate
+  the game’s data directory to avoid mentioning the username, so that replay
+  files don’t contain any personal data and can be shared anonymously if
+  desired. The browser version didn't have this issue, as it just says “Full
+  game statistics written below”.
+* ASCII versions: update cloud letter to `≡` instead of `§`, as it matches
+  better the tiles version and mostly looks like the standard symbol for fog.
+  Compatibility is preserved for replays of old games, as both characters
+  render to the same tile.
 * Fix mod conflict issue between “Gluttony Rework” and “Small Inventory” mods
   when choosing first comestible from the inventory and second comestible from
   the ground (see issue #14). Also, ensure that comestible description is
