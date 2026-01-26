@@ -1212,7 +1212,7 @@ func (a ActionViewMessages) String() string {
 }
 
 func (a ActionViewMessages) Desc() string {
-	return "Opens a pager with previous message logs. The pager supports page-up/page-down, mouse scrolling, and other basic less-like keybindings."
+	return "Opens a pager with previous message logs. The pager supports page up/down, mouse scrolling, and other basic less-like keybindings."
 }
 
 // ActionDump writes a dump with game statistics.
