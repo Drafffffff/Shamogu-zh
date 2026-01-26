@@ -401,10 +401,14 @@ func (md *model) drawTargInfo() {
 		p.X += MapWidth/2 + 1
 	}
 	info := md.targ.info
-
+	n := md.targ.scroll
 	y := 2
 	stt := ui.StyledText{}.WithMarkups(Markups)
 	formatBox := func(title, s string, fg gruid.Color) {
+		if n > 0 {
+			n--
+			return
+		}
 		md.desc.Content = stt.WithText(s).Format(MapWidth/2 - 3)
 		if md.desc.Content.Size().Y+y > MapHeight {
 			md.desc.Box = &ui.Box{Title: stt.WithText(title).WithStyle(gruid.Style{Fg: fg}),
@@ -446,7 +450,7 @@ func (md *model) drawTargInfo() {
 	if info.cloud != NoCloud {
 		desc += "\n" + info.cloud.Desc()
 	}
-	if noise, ok := g.Map.Noise[md.targ.p]; ok && !g.InFOV(md.targ.p) && !md.targ.scroll {
+	if noise, ok := g.Map.Noise[md.targ.p]; ok && !g.InFOV(md.targ.p) {
 		msg := "noise"
 		switch noise {
 		case NoiseBark:
@@ -470,11 +474,9 @@ func (md *model) drawTargInfo() {
 		}
 		formatBox("noise", fmt.Sprintf("You heard %s around there.", msg), ColorCyan)
 	}
-	if !md.targ.scroll {
-		formatBox(t, desc, fg)
-	}
+	formatBox(t, desc, fg)
 	for i, id := range info.entities {
-		if md.targ.scroll && i < len(info.entities)-1 {
+		if i < len(info.entities)-1 {
 			continue
 		}
 		e := g.Entity(id)

@@ -18,6 +18,11 @@
   better the tiles version and mostly looks like the standard symbol for fog.
   Compatibility is preserved for replays of old games, as both characters
   render to the same tile.
+* More flexible target description scrolling (with mouse or page up/down). Each
+  scroll down now removes one box, eventually removing all of them. Scrolling
+  up restores all boxes. This is useful if one wants to see only the map while
+  targeting, for example when doing long travel and wanting to see the
+  highlighted path without any description boxes hiding part of it.
 * Fix mod conflict issue between “Gluttony Rework” and “Small Inventory” mods
   when choosing first comestible from the inventory and second comestible from
   the ground (see issue #14). Also, ensure that comestible description is

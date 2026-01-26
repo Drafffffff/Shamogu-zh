@@ -9,7 +9,7 @@ type targeting struct {
 	info   targInfo    // information about target position
 	kb     bool        // using keyboard examine mode
 	p      gruid.Point // target
-	scroll bool        // scroll target description
+	scroll int         // scrolling amount (description boxes)
 }
 
 // targInfo contains information about target position.
@@ -64,7 +64,7 @@ func (md *model) examine(p gruid.Point) {
 		md.auto.path = append(md.auto.path, p)
 	}
 	md.updateTargInfo()
-	md.targ.scroll = false
+	md.targ.scroll = 0
 }
 
 func (md *model) updateTargInfo() {

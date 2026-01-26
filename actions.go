@@ -543,11 +543,11 @@ func (a ActionScroll) Handle(md *model) (gruid.Effect, bool) {
 	switch a.Delta {
 	case gruid.Point{0, 1}:
 		if md.targ.p != InvalidPos {
-			md.targ.scroll = false
+			md.targ.scroll = 0
 		}
 	case gruid.Point{0, -1}:
 		if md.targ.p != InvalidPos {
-			md.targ.scroll = true
+			md.targ.scroll++
 		}
 	}
 	return nil, false
