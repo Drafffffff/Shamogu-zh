@@ -1,11 +1,12 @@
 # v? ?
 
-* Improve coloring during last turn for player status effects in the status
-  bar: now the color is different depending on whether the status effect is
-  relevant during the player's turn, the monsters', or both. In particular,
-  Disorient now shows in grey when only one turn remains, which makes it
-  clearer that it has no effect on the last player's turn (see issue #13 for
-  context).
+This release is a maintenance one with a few minor fixes and UI improvements.
+
+* Improve coloring during last turn of player status effects in the status bar:
+  now the color is different depending on whether the status effect is relevant
+  during the player's turn, the monsters', or both. In particular, Disorient
+  now shows in grey when only one turn remains, which makes it clearer that it
+  has no effect on the last player's turn (see issue #13 for context).
 * Temporal Cat swapping with Runic Chicken on top of a trap now makes the
   target swapped monster trigger the trap (see issue #13).
 * Mention in help that cat attacks swap clouds, but not terrain.
