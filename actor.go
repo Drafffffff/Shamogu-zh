@@ -623,7 +623,7 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 
 func fmtTurns(turns int, n int) string {
 	turns -= n
-	return fmt.Sprintf("%d %s", turns, Countable("turn", turns))
+	return CountNoun("turn", turns)
 }
 
 // HPBonus returns the amount of HP for berserk or lignification.

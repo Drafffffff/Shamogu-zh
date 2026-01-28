@@ -101,8 +101,8 @@ func (g *Game) DumpSummary() string {
 	}
 	fmt.Fprintf(&sb, " ♣ Game Summary — Shamogu %s ♣\n\n", version)
 	if g.Wizard.Mode != WizardNone {
-		fmt.Fprintf(&sb, "ENABLED WIZARD MODE (%d %s",
-			g.Wizard.Resurrections, Countable("resurrection", g.Wizard.Resurrections))
+		fmt.Fprintf(&sb, "ENABLED WIZARD MODE (%s",
+			CountNoun("resurrection", g.Wizard.Resurrections))
 		if g.Wizard.Extra {
 			sb.WriteString(" & EXTRA CHEATS")
 		}
@@ -117,8 +117,7 @@ func (g *Game) DumpSummary() string {
 		fmt.Fprintf(&sb, "You are exploring level %d of the dungeon.\n", g.Map.Level)
 	}
 	fmt.Fprintf(&sb, "You spent %d turns in the dungeon.\n", g.Turn)
-	fmt.Fprintf(&sb, "Your adventure resulted in %d monster %s.\n",
-		g.Stats.NDeaths, Countable("death", g.Stats.NDeaths))
+	fmt.Fprintf(&sb, "Your adventure resulted in %s.\n", CountNoun("monster death", g.Stats.NDeaths))
 	if g.modCount() > 0 {
 		sb.WriteString("\nMods:\n")
 		g.dumpMods(&sb)
@@ -196,10 +195,10 @@ func (g *Game) dumpPlayer(sb *strings.Builder) {
 	sb.WriteString("\nSpirits:\n")
 	for i, sp := range g.PlayerSpirits() {
 		ei := g.Entity(i)
-		fmt.Fprintf(sb, "- %s (%s %d/%d, used %d %s)\n",
+		fmt.Fprintf(sb, "- %s (%s %d/%d, used %s)\n",
 			ei.Name, sp.Ability[sp.Level].Name(),
 			sp.Charges, sp.MaxCharges[sp.Level],
-			sp.Uses, times(sp.Uses))
+			times(sp.Uses))
 	}
 }
 
@@ -278,29 +277,29 @@ func (g *Game) dumpStatistics(sb *strings.Builder) {
 	// triggers including out of view ones you might not still be aware
 	// of). Avoiding those is not worth the effort.
 	timesPer100 := func(n int) string {
-		return fmt.Sprintf("%d %s (%.1f per 100 turns)",
-			n, times(n), float64(n)*100/float64(max(1, g.Turn)))
+		return fmt.Sprintf("%s (%.1f per 100 turns)",
+			times(n), float64(n)*100/float64(max(1, g.Turn)))
 	}
-	fmt.Fprintf(sb, "You used spirits %d %s, ate %d %s, activated %d %s.\n",
-		g.Stats.SpiritUses, times(g.Stats.SpiritUses),
-		g.Stats.EatenComestibles, Countable("comestible", g.Stats.EatenComestibles),
-		g.Stats.ActivatedMenhirs, Countable("menhir", g.Stats.ActivatedMenhirs))
-	fmt.Fprintf(sb, "You triggered %d %s.\n", g.Stats.PlayerTrapTriggers, Countable("trap", g.Stats.PlayerTrapTriggers))
+	fmt.Fprintf(sb, "You used spirits %s, ate %s, activated %s.\n",
+		times(g.Stats.SpiritUses),
+		CountNoun("comestible", g.Stats.EatenComestibles),
+		CountNoun("menhir", g.Stats.ActivatedMenhirs))
+	fmt.Fprintf(sb, "You triggered %s.\n", CountNoun("trap", g.Stats.PlayerTrapTriggers))
 	fmt.Fprintf(sb, "You hit foes %s.\n", timesPer100(g.Stats.Hits))
 	fmt.Fprintf(sb, "You missed foes %s.\n", timesPer100(g.Stats.Misses))
-	fmt.Fprintf(sb, "You got hurt %d %s and endured %d damage.\n", g.Stats.Hurt, times(g.Stats.Hurt), g.Stats.Damage)
-	fmt.Fprintf(sb, "You were lucky %d %s.\n", g.Stats.Lucky, times(g.Stats.Lucky))
+	fmt.Fprintf(sb, "You got hurt %s and endured %d damage.\n", times(g.Stats.Hurt), g.Stats.Damage)
+	fmt.Fprintf(sb, "You were lucky %s.\n", times(g.Stats.Lucky))
 	for i, n := range g.Stats.Statuses {
 		st := Status(i)
 		if n > 0 {
-			fmt.Fprintf(sb, "You were %s %d %s.\n", st, n, times(n))
+			fmt.Fprintf(sb, "You were %s %s.\n", st, times(n))
 		}
 	}
-	fmt.Fprintf(sb, "There were %d fire %s and %d poison %s.\n",
-		g.Stats.FireClouds, Countable("cloud", g.Stats.FireClouds),
-		g.Stats.PoisonClouds, Countable("cloud", g.Stats.PoisonClouds))
-	fmt.Fprintf(sb, "There were %d destroyed walls.\n", g.Stats.Digs)
-	fmt.Fprintf(sb, "There were %d traps triggered by monsters.\n", g.Stats.MonsterTrapTriggers)
+	fmt.Fprintf(sb, "There were %s and %s.\n",
+		CountNoun("fire cloud", g.Stats.FireClouds),
+		CountNoun("poison cloud", g.Stats.PoisonClouds))
+	fmt.Fprintf(sb, "%s.\n", there("destroyed wall", g.Stats.Digs))
+	fmt.Fprintf(sb, "%s triggered by monsters.\n", there("trap", g.Stats.MonsterTrapTriggers))
 	// Statistics per map level.
 	levels := g.Map.Level - 1
 	if g.win || g.PlayerActor().IsDead() {
@@ -333,9 +332,13 @@ func (g *Game) dumpStatistics(sb *strings.Builder) {
 	perLevel("Triggered traps", g.Stats.MapTriggeredTraps[:levels])
 }
 
-func times(n int) string {
+func there(s string, n int) string {
 	if n == 1 {
-		return "time"
+		return "There was " + CountNoun(s, n)
 	}
-	return "times"
+	return "There were " + CountNoun(s, n)
+}
+
+func times(n int) string {
+	return CountNoun("time", n)
 }

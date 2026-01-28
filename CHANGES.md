@@ -24,6 +24,9 @@ This release is a maintenance one with a few minor fixes and UI improvements.
   up restores all boxes. This is useful if one wants to see only the map while
   targeting, for example when doing long travel and wanting to see the
   highlighted path without any description boxes hiding part of it.
+* A couple of improvements in singular/plural handling with a prefix count in
+  text (like “for 1 turn” instead of “for 1 turns” in status description on
+  mouse hover).
 * Fix mod conflict issue between “Gluttony Rework” and “Small Inventory” mods
   when choosing first comestible from the inventory and second comestible from
   the ground (see issue #14). Also, ensure that comestible description is

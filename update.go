@@ -322,8 +322,8 @@ func (md *model) updateStatusMouse(msg gruid.MsgMouse) {
 			}
 			turns := pa.Statuses[st]
 			title := ui.StyledText{}.WithMarkups(Markups).
-				WithTextf("@%c%s@N (for %d %s)",
-					statusColor(st, turns), st.Name(), turns, Countable("turns", turns))
+				WithTextf("@%c%s@N (for %s)",
+					statusColor(st, turns), st.Name(), CountNoun("turn", turns))
 			md.status.desc.Box = &ui.Box{Title: title}
 			md.status.desc.SetText(st.Desc())
 			md.status.desc.Content = md.status.desc.Content.Format(UIWidth - 2)
