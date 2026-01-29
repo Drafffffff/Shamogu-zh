@@ -52,6 +52,7 @@ type ActionWait struct{}
 
 func (a ActionWait) Handle(md *model) (gruid.Effect, bool) {
 	md.g.stopSprint()
+	md.g.Stats.Waits++
 	return nil, true
 }
 

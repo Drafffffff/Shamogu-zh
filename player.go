@@ -224,6 +224,7 @@ func (g *Game) WallThrough(dir, at gruid.Point) bool {
 	from := g.PP()
 	g.BumpMoveActor(PlayerID, g.PlayerActor(), to)
 	g.md.MoveAnimation(from, to)
+	g.Stats.WallThroughs++
 	return true
 }
 
@@ -268,6 +269,7 @@ func (g *Game) WallJump(dir gruid.Point) bool {
 		g.Log("You fall due to imbalance.")
 		g.PutStatus(PlayerID, pa, StatusDaze, DurationDazeFall)
 	}
+	g.Stats.WallJumps++
 	return true
 }
 

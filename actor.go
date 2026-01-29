@@ -929,6 +929,7 @@ func (g *Game) handleCornered(i ID, ai *Actor) {
 	// The actor is afraid and cornered: become berserk for a short while.
 	if i == PlayerID {
 		g.Log("You feel cornered.")
+		g.Stats.Cornered++
 	} else if g.InFOV(from) {
 		g.LogfStyled("The afraid %s feels cornered.", logSpecial, ei.Name)
 	}
@@ -956,6 +957,7 @@ func (g *Game) handleCorneredWithRatPhobia() {
 	}
 	// You feel cornered: become berserk for a short while.
 	g.Log("You feel cornered.")
+	g.Stats.Cornered++
 	g.PutStatus1(PlayerID, pa, StatusBerserk, DurationBerserkAfraid)
 }
 

@@ -24,6 +24,8 @@ This release is a maintenance one with a few minor fixes and UI improvements.
   up restores all boxes. This is useful if one wants to see only the map while
   targeting, for example when doing long travel and wanting to see the
   highlighted path without any description boxes hiding part of it.
+* Record a few extra statistics (number of waits, times you felt cornered,
+  jumpings off walls, passings through translucent walls).
 * A couple of improvements in singular/plural handling with a prefix count in
   text (like “for 1 turn” instead of “for 1 turns” in status description on
   mouse hover).

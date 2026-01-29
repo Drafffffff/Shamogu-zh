@@ -445,6 +445,9 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 	if afraid && aj.Has(StatusFear) && aj.Has(StatusLignification) && !aj.DoesAny(WoodyLegs) {
 		// When hurt, afraid lignified actors become berserk.
 		g.PutStatus(j, aj, StatusBerserk, DurationBerserkAfraid)
+		if j == PlayerID {
+			g.Stats.Cornered++
+		}
 	}
 }
 

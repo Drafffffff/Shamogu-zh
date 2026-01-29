@@ -11,23 +11,28 @@ import (
 
 // Stats gathers various game statistics from a run.
 type Stats struct {
-	Lucky               int            // number of times you were lucky (could die to bad roll but got lucky roll)
-	NDeaths             int            // number of monster deaths
-	Deaths              map[string]int // monster deaths by name
-	Statuses            []int          // times you got each status
-	Hits                int            // number of times you hit with a bump-attack
-	Misses              int            // number of times you missed a bump-attack
-	Hurt                int            // number of times you got hurt
+	ActivatedMenhirs    int            // number of activated menhirs
+	Comestibles         map[string]int // number of eaten comestibles (per type)
+	Cornered            int            // number of times you felt cornered
 	Damage              int            // total damage you got
+	Deaths              map[string]int // monster deaths by name
+	Digs                int            // number of digs (destroyed walls)
+	EatenComestibles    int            // number of eaten comestibles
 	FireClouds          int            // number of spawn fire clouds
+	Hits                int            // number of times you hit with a bump-attack
+	Hurt                int            // number of times you got hurt
+	Lucky               int            // number of times you were lucky (could die to bad roll but got lucky roll)
+	Misses              int            // number of times you missed a bump-attack
+	MonsterTrapTriggers int            // number of triggered traps by the monsters
+	NDeaths             int            // number of monster deaths
+	PlayerTrapTriggers  int            // number of triggered traps by the player
 	PoisonClouds        int            // number of spawn poison clouds
 	SpiritUses          int            // number of ability uses
-	Comestibles         map[string]int // number of eaten comestibles (per type)
-	EatenComestibles    int            // number of eaten comestibles
-	ActivatedMenhirs    int            // number of activated menhirs
-	MonsterTrapTriggers int            // number of triggered traps by the monsters
-	PlayerTrapTriggers  int            // number of triggered traps by the player
-	Digs                int            // number of digs (destroyed walls)
+	Statuses            []int          // times you got each status
+	Waits               int            // number of times you waited
+	WallJumps           int            // number of jumps off walls (Gawalt Monkey spirit)
+	WallThroughs        int            // number of translucent walls passed (Gawalt Monkey spirit)
+
 	MapTurns            [MapLevels]int // number of turns per level
 	MapExplorePerc      [MapLevels]int // exploration percent per level
 	MapDeathPerc        [MapLevels]int // monster death percent per level
@@ -287,8 +292,18 @@ func (g *Game) dumpStatistics(sb *strings.Builder) {
 	fmt.Fprintf(sb, "You triggered %s.\n", CountNoun("trap", g.Stats.PlayerTrapTriggers))
 	fmt.Fprintf(sb, "You hit foes %s.\n", timesPer100(g.Stats.Hits))
 	fmt.Fprintf(sb, "You missed foes %s.\n", timesPer100(g.Stats.Misses))
+	fmt.Fprintf(sb, "You waited %s.\n", timesPer100(g.Stats.Waits))
 	fmt.Fprintf(sb, "You got hurt %s and endured %d damage.\n", times(g.Stats.Hurt), g.Stats.Damage)
 	fmt.Fprintf(sb, "You were lucky %s.\n", times(g.Stats.Lucky))
+	if g.Stats.Cornered > 0 {
+		fmt.Fprintf(sb, "You felt cornered %s.\n", times(g.Stats.Cornered))
+	}
+	if g.Stats.WallJumps > 0 {
+		fmt.Fprintf(sb, "You jumped %s by propelling yourself against a wall.\n", times(g.Stats.WallJumps))
+	}
+	if g.Stats.WallThroughs > 0 {
+		fmt.Fprintf(sb, "You passed %s through a translucent wall.\n", times(g.Stats.WallThroughs))
+	}
 	for i, n := range g.Stats.Statuses {
 		st := Status(i)
 		if n > 0 {
