@@ -534,8 +534,8 @@ func (a ActionExamineModeToggle) String() string {
 	return "Examine (keyboard mode)"
 }
 
-// ActionScroll represents a vertical scrolling action (only usable for target
-// examination currently).
+// ActionScroll represents a vertical scrolling action (usable for scrolling
+// examine description boxes).
 type ActionScroll struct {
 	Delta gruid.Point
 }
@@ -552,6 +552,15 @@ func (a ActionScroll) Handle(md *model) (gruid.Effect, bool) {
 		}
 	}
 	return nil, false
+}
+
+func (a ActionScroll) String() string {
+	switch a.Delta {
+	case gruid.Point{0, 1}:
+		return "Scroll description boxes up"
+	default:
+		return "Scroll description boxes down"
+	}
 }
 
 // ActionInteract interacts with items on current cell.
@@ -1598,6 +1607,7 @@ func (md *model) KeysHelp() {
 		"Close menu, inventory…", "SPACE or ESC or mouse left outside",
 		"Advanced Game Actions", "",
 		"View previous messages", "m",
+		"Scroll description boxes up/down", "u/d or page up/down or mouse scroll",
 		"Examine next portal/menhir/rune", "> & =",
 		"Examine next totem/comestible", "! %",
 		"Examine previous/next monster", "- +",

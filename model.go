@@ -200,7 +200,9 @@ func (md *model) initKeys() {
 		"Q":                 ActionQuit{},
 		"W":                 ActionWizard{},
 		gruid.KeyPageDown:   ActionScroll{Delta: gruid.Point{0, -1}},
+		"d":                 ActionScroll{Delta: gruid.Point{0, -1}},
 		gruid.KeyPageUp:     ActionScroll{Delta: gruid.Point{0, 1}},
+		"u":                 ActionScroll{Delta: gruid.Point{0, 1}},
 	}
 	md.keysTarget = map[gruid.Key]Action{
 		gruid.KeyArrowLeft:  ActionCursorBump{Delta: gruid.Point{-1, 0}},
