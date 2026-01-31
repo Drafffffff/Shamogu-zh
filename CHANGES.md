@@ -29,6 +29,8 @@ This release is a maintenance one with a few minor fixes and UI improvements.
 * A couple of improvements in singular/plural handling with a prefix count in
   text (like “for 1 turn” instead of “for 1 turns” in status description on
   mouse hover).
+* When attacked by a rat while lignified with the Stomping Elephant, the player
+  now becomes Berserk (like when afraid).
 * Fix mod conflict issue between “Gluttony Rework” and “Small Inventory” mods
   when choosing first comestible from the inventory and second comestible from
   the ground (see issue #14). Also, ensure that comestible description is
