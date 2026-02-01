@@ -50,7 +50,7 @@ func One(s string) (text string) {
 	return text
 }
 
-// CountNoun adds an "s" depending on quantity n.
+// CountNoun adds a counter and an "s" depending on quantity n.
 func CountNoun(s string, n int) string {
 	return fmt.Sprintf("%d %s", n, Countable(s, n))
 }
