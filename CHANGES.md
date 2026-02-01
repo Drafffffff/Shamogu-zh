@@ -1,4 +1,4 @@
-# v? ?
+# v1.4.0 2026-02-01
 
 This release is a maintenance one with a few minor fixes and UI improvements.
 
