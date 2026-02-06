@@ -1,3 +1,10 @@
+# v? ?
+
+* Fix regression in examine mode that would prevent showing more than one
+  entity description box at once (see issue #15). The regression was introduced
+  when the new box scrolling improvements from Harmonist were adapted to
+  Shamogu.
+
 # v1.4.0 2026-02-01
 
 This release is a maintenance one with a few minor fixes and UI improvements.

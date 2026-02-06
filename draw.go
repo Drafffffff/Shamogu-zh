@@ -475,10 +475,7 @@ func (md *model) drawTargInfo() {
 		formatBox("noise", fmt.Sprintf("You heard %s around there.", msg), ColorCyan)
 	}
 	formatBox(t, desc, fg)
-	for i, id := range info.entities {
-		if i < len(info.entities)-1 {
-			continue
-		}
+	for _, id := range info.entities {
 		e := g.Entity(id)
 		if !info.sees && e.Noise && e.P == md.targ.p && !g.Wizard.Mode.Reveal() {
 			noise := "footsteps"
