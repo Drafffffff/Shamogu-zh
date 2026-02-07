@@ -1793,6 +1793,7 @@ On the map, monster color may change depending on active status effects.  By def
 	sb.WriteString("\n\n")
 	sb.WriteString(`@YSTATUSES@N`)
 	sb.WriteString("\n\n")
+	pa := g.PlayerActor()
 	for i, desc := range statusDesc {
 		st := Status(i)
 		switch st {
@@ -1806,45 +1807,9 @@ On the map, monster color may change depending on active status effects.  By def
 			}
 		}
 		color := statusColor(st, 42)
-		fmt.Fprintf(&sb, "@%c%s@N (@%c%s@N). ", color, st.Name(), color, st.Abbr())
+		fmt.Fprintf(&sb, "@%c%s@N (@%c%s@N). ", color, st.Name(), color, g.StatusAbbr(pa, st))
 		sb.WriteString(desc)
-		var details string
-		switch st {
-		case StatusBerserk:
-			details = "HP never falls below 1 after losing bonus HP. Duration and HP bonus may be renewed by eating a berserking flower."
-		case StatusClarity:
-			details = "Player-only effect obtainable by eating clarity leaves. May be removed by eating a berserking flower for half the @BBerserk@N duration."
-		case StatusLignification:
-			details = "The player’s HP never falls below 3 for after losing bonus HP. Monsters’ HP floor is only 1, like for @BBerserk@N. Duration and HP bonus may be renewed by eating a lignification fruit. Cancels @BSprint@N. Actors with “woody legs” don’t have delayed burning but can move while lignified at the cost of reducing the duration by an extra turn. "
-		case StatusConfusion:
-			details = "Confused monsters will attack other monsters too when adjacent. Some monsters may even hurt or affect themselves when performing special actions like digging, spitting fire, barking, or pushing."
-		case StatusDisorient:
-			details = "Player-only effect obtainable with the Dazzling Zebra spirit."
-		case StatusFear:
-			details = "Monsters will flee when facing you. Ambushing charges against unseen foes can still happen. At the end of a turn, a cornered and afraid actor with no possible escape will become berserk. When lignified and afraid, getting hit makes you berserk, too."
-		case StatusFire:
-			details = "Players with “fire resistance” from the upgraded Fire Salamander don’t take that extra immediate damage."
-		case StatusGardener:
-			details = "Player-only effect obtainable with the Gardening Lion spirit."
-		case StatusGluttony:
-			details = "Player-only effect obtainable with the Gluttonous Bear spirit."
-		case StatusImbalance:
-			details = "Sprinting or jumping while imbalanced may sometimes lead to a @Odazing@N fall."
-		case StatusPoison:
-			details = "Watch out for confusion if any monsters survive poisoning!"
-		case StatusFoggySkin:
-			details = "Player-only effect obtainable by eating a foggy-skin onion. May be removed by eating a lignification fruit for half the @BLignification@N duration."
-		case StatusShadow:
-			details = "Player-only effect obtainable with the Gawalt Monkey spirit."
-		case StatusSprint:
-			details = "Disables normal attack. Player-only effect obtainable with the Sprinting Gazelle spirit."
-		case StatusTimeStop:
-			details = "Player-only effect obtainable with the Temporal Cat spirit."
-		case StatusFocus:
-			details = "Cancels @BSprint@N. Player-only effect obtainable with the Four-Headed Hydra spirit."
-		case StatusVampirism:
-			details = "Player-only effect obtainable with the Vampiric Bat spirit."
-		}
+		details := st.Details()
 		if details != "" {
 			sb.WriteRune(' ')
 			sb.WriteString(details)

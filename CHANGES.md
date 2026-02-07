@@ -1,5 +1,12 @@
 # v? ?
 
+* Lignification and Daze now show as `Lig*` and `Daz*` for players with “woody
+  legs” or “daze resistance” respectively (see comments in issue #15 for
+  context). That should make it easier for the player to recall that those
+  statuses have looser constraints in those special cases. Status descriptions
+  have been updated to explain this. Also, descriptions on mouse hover are now
+  the same detailed ones that appear in the help, and not the shortened ones
+  that appear in ability and comestible descriptions.
 * Fix regression in examine mode that would prevent showing more than one
   entity description box at once (see issue #15). The regression was introduced
   when the new box scrolling improvements from Harmonist were adapted to

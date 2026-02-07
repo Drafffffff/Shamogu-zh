@@ -325,7 +325,11 @@ func (md *model) updateStatusMouse(msg gruid.MsgMouse) {
 				WithTextf("@%c%s@N (for %s)",
 					statusColor(st, turns), st.Name(), CountNoun("turn", turns))
 			md.status.desc.Box = &ui.Box{Title: title}
-			md.status.desc.SetText(st.Desc())
+			desc := st.Desc()
+			if details := st.Details(); details != "" {
+				desc += " " + details
+			}
+			md.status.desc.SetText(desc)
 			md.status.desc.Content = md.status.desc.Content.Format(UIWidth - 2)
 			md.status.focus = true
 		}

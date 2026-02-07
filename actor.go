@@ -359,6 +359,17 @@ func (st Status) Abbr() string {
 	return statusAbbrevation[st]
 }
 
+// StatusAbbr is like Abbr but accounts for actor-specific resistances.
+func (g *Game) StatusAbbr(ai *Actor, st Status) string {
+	switch {
+	case st == StatusLignification && ai.DoesAny(WoodyLegs) ||
+		st == StatusDaze && ai.DoesAny(ResistanceDaze):
+		return statusAbbrevation[st] + "*"
+	default:
+		return statusAbbrevation[st]
+	}
+}
+
 var statusName = []string{
 	StatusBerserk:       "Berserk",
 	StatusClarity:       "Clarity",
@@ -439,8 +450,55 @@ var statusDesc = []string{
 		VampirismAttackBonus),
 }
 
+// Desc returns a description of the status, without extra details, as shown in
+// ability and comestible descriptions.
 func (st Status) Desc() string {
 	return statusDesc[st]
+}
+
+// Details returns extra description details about the status that appear in
+// help and status mouse hover.
+func (st Status) Details() string {
+	var details string
+	switch st {
+	case StatusBerserk:
+		details = "HP never falls below 1 after losing bonus HP. Duration and HP bonus may be renewed by eating a berserking flower."
+	case StatusClarity:
+		details = "Player-only effect obtainable by eating clarity leaves. May be removed by eating a berserking flower for half the @BBerserk@N duration."
+	case StatusDaze:
+		details = fmt.Sprintf("Players with “daze resistance” can still invoke spirits; status shows as @O%s*@N for them.", StatusDaze.Abbr())
+	case StatusLignification:
+		details = fmt.Sprintf("The player’s HP never falls below 3 for after losing bonus HP. Monsters’ HP floor is only 1, like for @BBerserk@N. Duration and HP bonus may be renewed by eating a lignification fruit. Cancels @BSprint@N. Actors with “woody legs” aren’t rooted, so they lack delayed burning protection but can move while lignified at the cost of reducing the duration by an extra turn; status shows as @B%s*@N for them, and there is no @OImbalance@N on expiration, because no root withdrawing happens. ", StatusLignification.Abbr())
+	case StatusConfusion:
+		details = "Confused monsters will attack other monsters too when adjacent. Some monsters may even hurt or affect themselves when performing special actions like digging, spitting fire, barking, or pushing."
+	case StatusDisorient:
+		details = "Player-only effect obtainable with the Dazzling Zebra spirit."
+	case StatusFear:
+		details = "Monsters will flee when facing you. Ambushing charges against unseen foes can still happen. At the end of a turn, a cornered and afraid actor with no possible escape will become berserk. When lignified and afraid, getting hit makes you berserk, too."
+	case StatusFire:
+		details = "Players with “fire resistance” from the upgraded Fire Salamander don’t take that extra immediate damage."
+	case StatusGardener:
+		details = "Player-only effect obtainable with the Gardening Lion spirit."
+	case StatusGluttony:
+		details = "Player-only effect obtainable with the Gluttonous Bear spirit."
+	case StatusImbalance:
+		details = "Sprinting or jumping while imbalanced may sometimes lead to a @Odazing@N fall."
+	case StatusPoison:
+		details = "Watch out for confusion if any monsters survive poisoning!"
+	case StatusFoggySkin:
+		details = "Player-only effect obtainable by eating a foggy-skin onion. May be removed by eating a lignification fruit for half the @BLignification@N duration."
+	case StatusShadow:
+		details = "Player-only effect obtainable with the Gawalt Monkey spirit."
+	case StatusSprint:
+		details = "Disables normal attack. Player-only effect obtainable with the Sprinting Gazelle spirit."
+	case StatusTimeStop:
+		details = "Player-only effect obtainable with the Temporal Cat spirit."
+	case StatusFocus:
+		details = "Cancels @BSprint@N. Player-only effect obtainable with the Four-Headed Hydra spirit."
+	case StatusVampirism:
+		details = "Player-only effect obtainable with the Vampiric Bat spirit."
+	}
+	return details
 }
 
 // Statuses maps ongoing statuses to their remaining turns. Slices of that type should be created with NStatuses elements.

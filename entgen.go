@@ -19,11 +19,13 @@ func (g *Game) InitPlayer(spe *Entity) {
 		g.Entities[i] = emptySlot()
 	}
 	g.Entities[0] = spe
-	// g.debugBuild()
+	g.debugBuild()
 	g.ComputePlayerStats()
 }
 
 func (g *Game) debugBuild() {
+	g.Entities[1] = spiritEntity(g.Mods, secondarySpirits[0])
+	g.Entities[2] = spiritEntity(g.Mods, secondarySpirits[3])
 	// g.Entities[1] = spiritEntity(g.Mods, challengeSpirits[4])
 	// g.Entities[2] = spiritEntity(g.Mods, challengeSpirits[2])
 	// g.Entities[4] = comestibleEntity(ComestibleData[BerserkingFlower])

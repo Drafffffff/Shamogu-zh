@@ -90,7 +90,7 @@ func (md *model) updateStatus() {
 		}
 		st := Status(i)
 		entries = append(entries, ui.MenuEntry{
-			Text:     stt.WithTextf("@%c%s(%d)@N ", statusColor(st, turns), st.Abbr(), turns),
+			Text:     stt.WithTextf("@%c%s(%d)@N ", statusColor(st, turns), g.StatusAbbr(pa, st), turns),
 			Disabled: true})
 	}
 	switch {

@@ -194,7 +194,7 @@ func (g *Game) dumpPlayer(sb *strings.Builder) {
 		}
 		sb.WriteByte(' ')
 		st := Status(i)
-		fmt.Fprintf(sb, "%s(%d)", st.Abbr(), turns)
+		fmt.Fprintf(sb, "%s(%d)", g.StatusAbbr(pa, st), turns)
 	}
 	sb.WriteByte('\n')
 	sb.WriteString("\nSpirits:\n")
