@@ -499,7 +499,7 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 		// Ensure at least 1 offense.
 		attack = 1
 	}
-	if ap == AttackRanged && (aj.Has(StatusLignification) || aj.DoesAny(MonsLignify|MonsScales)) {
+	if ap == AttackRanged && aj.DoesAny(MonsScales) {
 		defense++
 	}
 	if ai.DoesAny(MonsIgnoreDefense) {
