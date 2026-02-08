@@ -75,12 +75,12 @@ func (rt RunicTrap) Desc() string {
 	}
 	switch rt.Rune {
 	case RuneBerserk:
-		return fmt.Sprintf("Applies @BBerserk@N status for %d turns when stepped on.", DurationBerserkTrap)
+		return fmt.Sprintf("Applies @BBerserk@N status for %d turns when stepped on, unless already berserk.", DurationBerserkTrap)
 	case RuneFire:
 		return fmt.Sprintf("Inflicts @OConfusion@N for %d turns and spawns a fire cloud lasting 6-12 turns when stepped on.",
 			DurationConfusionFireTrap)
 	case RuneLignification:
-		return fmt.Sprintf("Applies @BLignification@N status for %d turns when stepped on.", DurationLignificationTrap)
+		return fmt.Sprintf("Applies @BLignification@N status for %d turns when stepped on, unless already lignified.", DurationLignificationTrap)
 	case RunePoison:
 		return "Spawns a poison cloud lasting 7-11 turns when stepped on."
 	case RuneWarp:
