@@ -468,7 +468,7 @@ func (st Status) Details() string {
 	case StatusDaze:
 		details = fmt.Sprintf("Players with “daze resistance” can still invoke spirits; status shows as @O%s*@N for them.", StatusDaze.Abbr())
 	case StatusLignification:
-		details = fmt.Sprintf("The player’s HP never falls below 3 for after losing bonus HP. Monsters’ HP floor is only 1, like for @BBerserk@N. Duration and HP bonus may be renewed by eating a lignification fruit. Cancels @BSprint@N. Actors with “woody legs” aren’t rooted, so they lack delayed burning protection but can move while lignified at the cost of reducing the duration by an extra turn; status shows as @B%s*@N for them, and there is no @OImbalance@N on expiration, because no root withdrawing happens. ", StatusLignification.Abbr())
+		details = fmt.Sprintf("The player’s HP never falls below 3 after losing bonus HP. Monsters’ HP floor is only 1, like for @BBerserk@N. Duration and HP bonus may be renewed by eating a lignification fruit. Cancels @BSprint@N. Actors with “woody legs” aren’t rooted, so they lack delayed burning protection but can move while lignified at the cost of reducing the duration by an extra turn; status shows as @B%s*@N for them, and there is no @OImbalance@N on expiration, because no root withdrawing happens. ", StatusLignification.Abbr())
 	case StatusConfusion:
 		details = "Confused monsters will attack other monsters too when adjacent. Some monsters may even hurt or affect themselves when performing special actions like digging, spitting fire, barking, or pushing."
 	case StatusDisorient:
