@@ -157,9 +157,7 @@ func (g *Game) moveActor(i ID, ai *Actor, to gruid.Point, bumpmove bool) {
 		}
 		ei.P = to
 		g.Map.ActorCache.SetU(to, i)
-		if !aj.DoesAny(RunicChicken) {
-			g.TriggerTrap(j, aj)
-		}
+		g.TriggerTrap(j, aj)
 	} else {
 		ei.P = to
 		g.Map.ActorCache.SetU(to, i)
@@ -187,9 +185,7 @@ func (g *Game) moveActor(i ID, ai *Actor, to gruid.Point, bumpmove bool) {
 	if bumpmove {
 		g.ApplyBumpMoveEffects(i, ai)
 	}
-	if !ai.DoesAny(RunicChicken) {
-		g.TriggerTrap(i, ai)
-	}
+	g.TriggerTrap(i, ai)
 }
 
 // BumpMoveActor is like MoveActor but with extra effects specific to

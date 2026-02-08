@@ -105,6 +105,9 @@ func (g *Game) NoTrapAt(p gruid.Point) bool {
 // TriggerTrap makes the given actor trigger a runic trap at its current
 // position, if any.
 func (g *Game) TriggerTrap(i ID, ai *Actor) {
+	if ai.DoesAny(RunicChicken) {
+		return
+	}
 	pi := g.Entity(i).P
 	j := g.Map.RuneCache.At(pi)
 	if j <= 0 {
@@ -113,6 +116,14 @@ func (g *Game) TriggerTrap(i ID, ai *Actor) {
 	ei := g.Entity(j)
 	rt, ok := ei.Role.(*RunicTrap)
 	if !ok || rt.Used {
+		return
+	}
+	switch {
+	case rt.Rune == RuneLignification && (ai.Has(StatusLignification) || ai.DoesAny(MonsLignify)):
+		// Do not trigger lignification traps while lignified.
+		return
+	case rt.Rune == RuneBerserk && ai.Has(StatusBerserk):
+		// Do not trigger berserk traps while berserk.
 		return
 	}
 	if i == PlayerID {
