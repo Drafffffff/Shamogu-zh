@@ -1,7 +1,7 @@
 codeberg.org/anaseto/gruid v0.25.0 h1:Y+9jENZ+rZqEoawv33oyM+58Yd8WnmDwWSEnvk0uvDc=
 codeberg.org/anaseto/gruid v0.25.0/go.mod h1:3wznR6TXEiDqoWoxHk00Z3dWqXMHO5Kmn/Qu3SA6wjQ=
-codeberg.org/anaseto/gruid-js v0.4.0 h1:P6IptUtGR2DHHC1EH+9YZpVFeK/nnkB/ONgMcLKGxhw=
-codeberg.org/anaseto/gruid-js v0.4.0/go.mod h1:Boj8M6jAcIo+T+j5VoMnHZRUDpH9jOM9jgiAyE5R21M=
+codeberg.org/anaseto/gruid-js v0.5.0 h1:1A2OSbZtCWBnoZboueYswX9RH1EP/njCrKm2/59oa1M=
+codeberg.org/anaseto/gruid-js v0.5.0/go.mod h1:Boj8M6jAcIo+T+j5VoMnHZRUDpH9jOM9jgiAyE5R21M=
 codeberg.org/anaseto/gruid-sdl v0.10.1 h1:LM+vmeBAQ+m1PY7Ro3VU/jeST2H2MIADGgq/0FtpGjY=
 codeberg.org/anaseto/gruid-sdl v0.10.1/go.mod h1:yOYGK+U3TBek4dSdnaEFvvmXX3csj/OBEDLft70R/RQ=
 codeberg.org/anaseto/gruid-tcell v0.5.0 h1:GqeBlUy/C854eKUzCERUehS9/YBPlXUscZs+PCLtqOU=
