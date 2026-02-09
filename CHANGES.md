@@ -12,6 +12,8 @@
   tree balance is less important now, in particular with advanced spirits (see
   issue #15 for context). That simplifies Lignification a bit, as its
   description was becoming quite long.
+* Lignified monsters are no longer moved by Wind Fox's “pushing gale” (see
+  issue #15).
 * Fix regression in examine mode that would prevent showing more than one
   entity description box at once (see issue #15). The regression was introduced
   when the new box scrolling improvements from Harmonist were adapted to

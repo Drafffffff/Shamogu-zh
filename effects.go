@@ -463,6 +463,9 @@ func (g *Game) pushingGale(from, dir gruid.Point) {
 			continue
 		}
 		g.MonsterUpdateTarget(i, ai, pp, g.InFOV(ei.P)) // alert monster toward wind origin
+		if ai.ResistsMove() {
+			continue
+		}
 		g.PutStatus(i, ai, StatusImbalance, DurationImbalanceGale)
 		to := at.Add(dir)
 		n := 0
