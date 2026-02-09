@@ -462,7 +462,6 @@ func (g *Game) pushingGale(from, dir gruid.Point) {
 		if ai.IsDead() {
 			continue
 		}
-		g.MonsterUpdateTarget(i, ai, pp, g.InFOV(ei.P)) // alert monster toward wind origin
 		if ai.ResistsMove() {
 			continue
 		}
