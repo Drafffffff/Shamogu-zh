@@ -463,6 +463,7 @@ func (g *Game) pushingGale(from, dir gruid.Point) {
 			continue
 		}
 		if ai.ResistsMove() {
+			g.md.HitAnimation(at)
 			continue
 		}
 		g.PutStatus(i, ai, StatusImbalance, DurationImbalanceGale)
@@ -476,6 +477,8 @@ func (g *Game) pushingGale(from, dir gruid.Point) {
 			from := ei.P
 			g.MoveActor(i, ai, to)
 			g.md.MoveAnimation(from, to)
+		} else {
+			g.md.HitAnimation(at)
 		}
 	}
 }
