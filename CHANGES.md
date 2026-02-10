@@ -1,4 +1,7 @@
-# v? ?
+# v1.4.1 2026-02-10
+
+Patch release with small improvements related to Lignification and a fix for an
+UI regression when examining monsters on top of items.
 
 * Lignification and Daze now show as `Lig*` and `Daz*` for players with “woody
   legs” or “daze resistance” respectively (see comments in issue #15 for
@@ -8,12 +11,13 @@
   the same detailed ones that appear in the help, and not the shortened ones
   that appear in ability and comestible descriptions.
 * Lignification no longer gives extra defense against ranged attacks, as the
-  other buffs are much better, scales already do the same, and wind fox against
-  tree balance is less important now, in particular with advanced spirits (see
-  issue #15 for context). That simplifies Lignification a bit, as its
-  description was becoming quite long.
+  other recent buffs are much better, scales already did the same, and wind fox
+  against tree balance is less important now, in particular with advanced
+  spirits (see issue #15 for context). That simplifies Lignification a bit, as
+  its description was becoming quite long.
 * Lignified monsters are no longer moved by Wind Fox's “pushing gale” (see
-  issue #15).
+  issue #15). In particular, walking trees aren't moved by pushing gale
+  anymore.
 * Fix regression in examine mode that would prevent showing more than one
   entity description box at once (see issue #15). The regression was introduced
   when the new box scrolling improvements from Harmonist were adapted to
@@ -427,7 +431,7 @@ Reworked and improved content:
   leaves”.
 * Unlike plain clouds of fog, dust or smoke, dangerous clouds of fire and
   poison are now only difficult to see through, like foliage (suggested by
-  @mlochbaum in issue #1). This should make menhir usage obstruct vision less,
+  @mlochbaum in issue #1). This should make menhir usage obstruct vision less,
   as well as allow for things like jumping over a fire tile with the Frog or
   Gazelle spirits. It also allows ranged attacks to reach just behind a fire
   or poison cloud (which is both good and bad for different reasons).
