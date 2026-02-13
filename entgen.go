@@ -962,7 +962,7 @@ func (g *Game) genMonsters(mg *MapGen) {
 			nM = 1
 		}
 	}
-	if g.Map.Level == g.ProcInfo.MonsMidLate {
+	if g.Map.Level == g.ProcInfo.MonsMidLate && nM > 1 {
 		// Special level with a smaller selection of mid monsters.
 		md := g.monsterSelection(monsMid, 4)
 		for range nM - 1 {
@@ -1156,7 +1156,7 @@ func (g *Game) genGuardians(nE, nM, nL int) (int, int, int) {
 		g.genMonsterGuardian(BlazingGolem, p)
 		g.genMonsterGuardian(BlazingGolem, p)
 	}
-	return nE, nM, nL
+	return max(0, nE), max(0, nM), max(0, nL)
 }
 
 // genGuardiansCorrupted generates any monster guardians and special
@@ -1172,21 +1172,21 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 					g.genMonsterGuardian(g.randMonsKind(monsLate), p)
 				}
 				g.genMonsterGuardian(g.randMonsKind(monsEarly), p)
-				nL = max(0, nL-2)
-				nE = max(0, nE-1)
+				nL -= 2
+				nE--
 			case 1:
 				for range 2 {
 					g.genMonsterGuardian(CrazyDruid, p)
 				}
 				g.genMonsterGuardian(BlazingGolem, p)
-				nL = max(0, nL-2)
-				nM = max(0, nM-1)
+				nL -= 2
+				nM--
 			case 2:
 				for range 2 {
 					g.genMonsterGuardian(MadOctopode, p)
 				}
-				nL = max(0, nL-2)
-				nE = max(0, nE-1)
+				nL -= 2
+				nE--
 			case 3:
 				// Rare chance of annoying guardians.
 				if g.IntN(2) == 0 {
@@ -1197,13 +1197,13 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 					g.genMonsterGuardian(WalkingMushroom, p)
 					g.genMonsterGuardian(BurningPhoenix, p)
 				}
-				nL = max(0, nL-2)
+				nL -= 2
 			default:
 				mk := g.randMonsKind(monsMid)
 				for range 4 {
 					g.genMonsterGuardian(mk, p)
 				}
-				nM = max(0, nM-4)
+				nM -= 4
 			}
 			g.genMonster(FearsomeLich)
 			g.genMonster(UndeadKnight)
@@ -1220,8 +1220,8 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 				g.genMonsterGuardian(g.randMonsKind(monsLate), p)
 				g.genMonsterGuardian(g.randMonsKind(monsEarly), p)
 			}
-			nL = max(0, nL-1)
-			nE = max(0, nE-1)
+			nL--
+			nE--
 			if g.IntN(4) == 0 {
 				g.genMonsterGuardian(UndeadKnight, p)
 				g.genMonster(FearsomeLich)
@@ -1236,25 +1236,37 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 	}
 	if g.ProcInfo.GuardianPortal2 == g.Map.Level {
 		p := g.corruptedPortalGuardianPoint()
-		if g.IntN(3) > 0 {
+		if g.IntN(4) > 0 {
 			g.genMonsterGuardian(MadOctopode, p)
 		} else {
 			g.genMonster(MadOctopode)
-			if nL > 0 && g.IntN(2) == 0 {
+			switch g.IntN(3) {
+			case 0:
+				mk := g.randMonsKind(monsMid)
+				for range 3 {
+					g.genMonsterGuardian(mk, p)
+				}
+				nM -= 3
+			case 1:
 				g.genMonsterGuardian(g.randMonsKind(monsLate), p)
+				g.genMonsterGuardian(g.randMonsKind(monsEarly), p)
 				nL--
+				nE--
 			}
 		}
 	}
 	if g.ProcInfo.GuardianTotem1 == g.Map.Level {
 		p := g.corruptedTotemGuardianPoint()
-		if g.IntN(3) > 0 {
+		if g.IntN(4) > 0 {
 			g.genMonsterGuardian(CrazyDruid, p)
 		} else {
 			g.genMonster(CrazyDruid)
-			if nM > 0 && g.IntN(2) == 0 {
-				g.genMonsterGuardian(g.randMonsKind(monsMid), p)
-				nM--
+			if g.IntN(3) > 0 {
+				mk := g.randMonsKind(monsEarly)
+				for range 3 {
+					g.genMonsterGuardian(mk, p)
+				}
+				nE -= 3
 			}
 		}
 	}
@@ -1279,13 +1291,13 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 	if g.ProcInfo.GuardianTotem2 == g.Map.Level {
 		nE--
 		p := g.corruptedTotemGuardianPoint()
-		if g.IntN(3) > 0 {
+		if g.IntN(4) > 0 {
 			g.genMonsterGuardian(TotemWasp, p)
 			g.genMonsterGuardian(TotemWasp, p)
 		} else {
 			g.genMonster(TotemWasp)
 			g.genMonster(TotemWasp)
-			if nE >= 2 && g.IntN(3) == 0 {
+			if g.IntN(3) > 0 {
 				nmk := g.randMonsKind(monsEarly)
 				g.genMonsterGuardian(nmk, p)
 				g.genMonsterGuardian(nmk, p)
@@ -1300,13 +1312,13 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 			mk = WarpingWraith
 		}
 		p := g.corruptedPortalGuardianPoint()
-		if g.IntN(3) > 0 {
+		if g.IntN(4) > 0 {
 			g.genMonsterGuardian(mk, p)
 			g.genMonsterGuardian(mk, p)
 		} else {
 			g.genMonster(mk)
 			g.genMonster(mk)
-			if nM >= 2 && g.IntN(2) == 0 {
+			if g.IntN(3) > 0 {
 				nmk := g.randMonsKind(monsMid)
 				g.genMonsterGuardian(nmk, p)
 				g.genMonsterGuardian(nmk, p)
@@ -1314,7 +1326,7 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 			}
 		}
 	}
-	if g.IntN(2*MapLevels) == 0 && nE > 2 && nM > 2 {
+	if g.IntN(2*MapLevels) == 0 && nE >= 2 && nM >= 2 {
 		switch g.IntN(2) {
 		case 0:
 			p := g.RandomWaypoint()
@@ -1350,7 +1362,7 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 			nM -= 2
 		}
 	}
-	return nE, nM, nL
+	return max(0, nE), max(0, nM), max(0, nL)
 }
 
 func (g *Game) corruptedPortalGuardianPoint() gruid.Point {
