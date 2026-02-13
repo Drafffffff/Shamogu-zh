@@ -1171,11 +1171,14 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 				for range 2 {
 					g.genMonsterGuardian(g.randMonsKind(monsLate), p)
 				}
+				g.genMonsterGuardian(g.randMonsKind(monsEarly), p)
 				nL = max(0, nL-2)
+				nE = max(0, nE-1)
 			case 1:
-				for range 3 {
+				for range 2 {
 					g.genMonsterGuardian(CrazyDruid, p)
 				}
+				g.genMonsterGuardian(BlazingGolem, p)
 				nL = max(0, nL-2)
 				nM = max(0, nM-1)
 			case 2:
@@ -1183,6 +1186,7 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 					g.genMonsterGuardian(MadOctopode, p)
 				}
 				nL = max(0, nL-2)
+				nE = max(0, nE-1)
 			default:
 				mk := g.randMonsKind(monsMid)
 				for range 4 {
@@ -1203,7 +1207,8 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 				g.genMonsterGuardian(g.randMonsKind(monsLate), p)
 				g.genMonsterGuardian(g.randMonsKind(monsEarly), p)
 			}
-			nL--
+			nL = max(0, nL-1)
+			nE = max(0, nE-1)
 			if g.IntN(4) == 0 {
 				g.genMonsterGuardian(UndeadKnight, p)
 				g.genMonster(FearsomeLich)
