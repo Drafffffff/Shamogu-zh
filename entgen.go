@@ -1163,38 +1163,57 @@ func (g *Game) genGuardians(nE, nM, nL int) (int, int, int) {
 // wandering uniques with special adjustments to account for extra corruption.
 func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int) {
 	if g.Map.Orb != InvalidPos {
+		p := g.corruptedPortalGuardianPoint()
 		switch g.IntN(9) {
 		case 0, 1:
-			switch g.IntN(3) {
+			switch g.IntN(6) {
 			case 0:
-				n := min(nL, 2)
-				for range n {
-					g.genMonsterGuardian(g.randMonsKind(monsLate), g.Map.Orb)
+				for range 2 {
+					g.genMonsterGuardian(g.randMonsKind(monsLate), p)
 				}
-				nL -= n
+				nL = max(0, nL-2)
 			case 1:
-				mk := g.randMonsKind(monsMid)
-				n := min(nM, 4)
-				for range n {
-					g.genMonsterGuardian(mk, g.Map.Orb)
+				for range 3 {
+					g.genMonsterGuardian(CrazyDruid, p)
 				}
-				nM -= n
+				nL = max(0, nL-2)
+				nM = max(0, nM-1)
+			case 2:
+				for range 2 {
+					g.genMonsterGuardian(MadOctopode, p)
+				}
+				nL = max(0, nL-2)
+			default:
+				mk := g.randMonsKind(monsMid)
+				for range 4 {
+					g.genMonsterGuardian(mk, p)
+				}
+				nM = max(0, nM-4)
 			}
 			g.genMonster(FearsomeLich)
 			g.genMonster(UndeadKnight)
 		case 2, 3, 4:
-			g.genMonsterGuardian(g.randMonsKind(monsLate), g.Map.Orb)
+			switch g.IntN(3) {
+			case 0:
+				g.genMonsterGuardian(CrazyDruid, p)
+				g.genMonsterGuardian(BlazingGolem, p)
+			case 1:
+				g.genMonsterGuardian(MadOctopode, p)
+			default:
+				g.genMonsterGuardian(g.randMonsKind(monsLate), p)
+				g.genMonsterGuardian(g.randMonsKind(monsEarly), p)
+			}
 			nL--
 			if g.IntN(4) == 0 {
-				g.genMonsterGuardian(UndeadKnight, g.Map.Orb)
+				g.genMonsterGuardian(UndeadKnight, p)
 				g.genMonster(FearsomeLich)
 			} else {
-				g.genMonsterGuardian(FearsomeLich, g.Map.Orb)
+				g.genMonsterGuardian(FearsomeLich, p)
 				g.genMonster(UndeadKnight)
 			}
 		default:
-			g.genMonsterGuardian(FearsomeLich, g.Map.Orb)
-			g.genMonsterGuardian(UndeadKnight, g.Map.Orb)
+			g.genMonsterGuardian(FearsomeLich, p)
+			g.genMonsterGuardian(UndeadKnight, p)
 		}
 	}
 	if g.ProcInfo.GuardianPortal2 == g.Map.Level {
@@ -1328,7 +1347,7 @@ func (g *Game) corruptedPortalGuardianPoint() gruid.Point {
 			p = g.Map.Portal
 		}
 	}
-	if g.IntN(4) == 0 {
+	if g.IntN(4) == 0 && (g.Map.Orb == InvalidPos || g.IntN(2) == 0) {
 		// Occasionally guard a random non-player vault.
 		p = g.RandomWaypoint()
 		if g.Map.Totem != InvalidPos && g.IntN(4) == 0 {
