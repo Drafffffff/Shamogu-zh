@@ -1243,10 +1243,12 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 			switch g.IntN(3) {
 			case 0:
 				mk := g.randMonsKind(monsMid)
-				for range 3 {
+				for range 2 {
 					g.genMonsterGuardian(mk, p)
 				}
-				nM -= 3
+				g.genMonsterGuardian(g.randMonsKind(monsEarly), p)
+				nM -= 2
+				nE--
 			case 1:
 				g.genMonsterGuardian(g.randMonsKind(monsLate), p)
 				g.genMonsterGuardian(g.randMonsKind(monsEarly), p)
