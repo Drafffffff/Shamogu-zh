@@ -1027,6 +1027,23 @@ func (g *Game) TeleportActor(i ID, ai *Actor, n int) bool {
 	}
 	from := g.Entity(i).P
 	to := g.TeleportPoint(from)
+	if i == PlayerID && g.Map.Orb != InvalidPos && (g.Mod(ModCorruptedDungeon) && g.IntN(2) == 0 ||
+		!g.Mod(ModCorruptedDungeon) && g.IntN(3) == 0) {
+		// On last level, give the orb a chance to drive the player
+		// away from it, to make teleport-based strategies less
+		// reliable (but still viable enough!). Greater chance with
+		// ModCorruptedDungeon, because even more unpredictability
+		// sounds thematic there.
+		//
+		// Result: teleport to furthest point from the orb among 3
+		// random possible teleport points.
+		for range 2 {
+			if nto := g.TeleportPoint(from); paths.DistanceManhattan(nto, g.Map.Orb) > paths.DistanceManhattan(to, g.Map.Orb) {
+				to = nto
+			}
+		}
+		g.LogStyled("A strange energy disturbs your teleportation!", logSpecial)
+	}
 	if i == PlayerID || g.InFOV(from) {
 		g.md.TeleportAnimation(from, to, i == PlayerID || g.InFOV(to))
 	}

@@ -394,7 +394,7 @@ func (o *CorruptionOrb) Desc() string {
 		// content after destroying the orb.
 		return "The source of beast corruption that you destroyed."
 	}
-	return fmt.Sprintf("@CActivable@N.\n%s", "The source of beast corruption that you need to destroy.")
+	return fmt.Sprintf("@CActivable@N.\n%s", "The source of beast corruption that you need to destroy. Beware that the Orb may sometimes actively drive you further away when you teleport.")
 }
 
 func (o *CorruptionOrb) Use(g *Game, i ID) bool {
