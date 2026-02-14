@@ -454,11 +454,11 @@ func (g *Game) pushingGale(from, dir gruid.Point) {
 			continue
 		}
 		ei := g.Entity(i)
-		dmg := AttackGale
+		dmg := 1
 		if paths.DistanceManhattan(ei.P, pp) == 1 && g.IntN(3) > 0 {
 			dmg++
 		}
-		g.InflictDamage(i, ai, 1, dmg)
+		g.InflictDamage(i, ai, dmg, AttackGale)
 		if ai.IsDead() {
 			continue
 		}
