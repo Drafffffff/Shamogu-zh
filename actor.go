@@ -1027,8 +1027,7 @@ func (g *Game) TeleportActor(i ID, ai *Actor, n int) bool {
 	}
 	from := g.Entity(i).P
 	to := g.TeleportPoint(from)
-	if i == PlayerID && g.Map.Orb != InvalidPos && (g.Mod(ModCorruptedDungeon) && g.IntN(2) == 0 ||
-		!g.Mod(ModCorruptedDungeon) && g.IntN(3) == 0) {
+	if i == PlayerID && g.Map.Orb != InvalidPos && g.IntN(2) == 0 {
 		// On last level, give the orb a chance to drive the player
 		// away from it, to make teleport-based strategies less
 		// reliable (but still viable enough!). Greater chance with
