@@ -1,3 +1,8 @@
+# v? ?
+
+* Fix an old regression from v1.2.0 with “pushing gale” in melee sometimes
+  producing the wrong log message and doing only 1 damage instead of 2
+
 # v1.4.1 2026-02-10
 
 Patch release with small improvements related to Lignification and a fix for an
