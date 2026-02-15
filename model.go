@@ -203,6 +203,7 @@ func (md *model) initKeys() {
 		"d":                 ActionScroll{Delta: gruid.Point{0, -1}},
 		gruid.KeyPageUp:     ActionScroll{Delta: gruid.Point{0, 1}},
 		"u":                 ActionScroll{Delta: gruid.Point{0, 1}},
+		"»":                 ActionWizardNextLevel{},
 	}
 	md.keysTarget = map[gruid.Key]Action{
 		gruid.KeyArrowLeft:  ActionCursorBump{Delta: gruid.Point{-1, 0}},

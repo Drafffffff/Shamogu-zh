@@ -909,7 +909,7 @@ var menuActions = []Action{
 	ActionWizardNextLevel{},
 }
 
-var menuKeys = []rune{'e', 'i', 'm', '?', '#', 'C', 'S', 'Q', '>'}
+var menuKeys = []rune{'e', 'i', 'm', '?', '#', 'C', 'S', 'Q', '»'}
 
 func init() {
 	if len(menuActions) != len(menuKeys) {
@@ -1399,6 +1399,9 @@ type ActionWizardNextLevel struct{}
 
 func (a ActionWizardNextLevel) Handle(md *model) (gruid.Effect, bool) {
 	g := md.g
+	if !g.Wizard.Extra {
+		return nil, false
+	}
 	if g.Map.Level == MapLevels {
 		g.Log("You’re already at the last level.")
 		md.mode = modeNormal
