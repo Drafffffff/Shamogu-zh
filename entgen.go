@@ -413,6 +413,12 @@ func (g *Game) genItems(mg *MapGen) {
 		g.Map.Orb = orb.P
 		portalIdxs = append(portalIdxs, i+1)
 		g.AddEntity(orb)
+		if g.Mod(ModCorruptedDungeon) && g.IntN(10) == 0 {
+			// Small extra chance of hiding the orb location
+			// (independently of whether guardians are there or
+			// not).
+			g.hideLocation(orb.P)
+		}
 	}
 	// Totemic spirit.
 	totemPoint := func() gruid.Point {
@@ -610,6 +616,10 @@ func (g *Game) randomFreeItemFloor(mg *MapGen) gruid.Point {
 		// item. We could allow items on non-floor cells, but for
 		// clarity, it's better this way.
 		g.Map.Terrain.Set(p, Floor)
+		if g.Mod(ModCorruptedDungeon) && g.IntN(10*MapLevels) == 0 {
+			// Very small chance of hiding the location.
+			g.hideLocation(p)
+		}
 		return p
 	}
 }
@@ -1152,6 +1162,10 @@ func (g *Game) genGuardians(nE, nM, nL int) (int, int, int) {
 			// Occasionally make golems guard a random non-player
 			// vault.
 			p = g.RandomWaypoint()
+			if g.IntN(3) == 0 {
+				// A chance of hiding the unguarded portal.
+				g.hideLocation(g.Map.Portal)
+			}
 		}
 		g.genMonsterGuardian(BlazingGolem, p)
 		g.genMonsterGuardian(BlazingGolem, p)
@@ -1174,6 +1188,11 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 				g.genMonsterGuardian(g.randMonsKind(monsEarly), p)
 				nL -= 2
 				nE--
+				if g.IntN(3) > 0 {
+					// High chance of hiding the orb with
+					// normal-looking guardians.
+					g.hideLocation(p)
+				}
 			case 1:
 				for range 2 {
 					g.genMonsterGuardian(CrazyDruid, p)
@@ -1386,6 +1405,14 @@ func (g *Game) corruptedPortalGuardianPoint() gruid.Point {
 			p = g.Map.Totem
 		}
 	}
+	switch {
+	case g.Map.Orb != InvalidPos && g.Map.Orb != p && g.IntN(4) > 0:
+		// Hide the orb with high chance if guardians are elsewhere.
+		g.hideLocation(g.Map.Orb)
+	case g.Map.Portal != InvalidPos && g.Map.Portal != p && g.IntN(3) == 0:
+		// Sometimes hide the portal when guardians are elsewhere.
+		g.hideLocation(g.Map.Portal)
+	}
 	return p
 }
 
@@ -1394,6 +1421,69 @@ func (g *Game) corruptedTotemGuardianPoint() gruid.Point {
 		return g.Map.Totem
 	}
 	return g.corruptedPortalGuardianPoint()
+}
+
+// hideLocation attemps to hide the given point by adding foliage or rubble
+// around in a parsimonious way.
+func (g *Game) hideLocation(at gruid.Point) {
+	Diags := []gruid.Point{
+		{1, 1},
+		{1, -1},
+		{-1, 1},
+		{-1, -1},
+	}
+	// Shuffle to avoid introducing any weird bias when placing foliage and
+	// rubble.
+	g.rand.Shuffle(len(Diags), func(i, j int) { Diags[i], Diags[j] = Diags[j], Diags[i] })
+	lt := &lighter{g: g}
+	for _, dir := range Diags {
+		g.hideFrom(lt, at, dir)
+	}
+}
+
+func (g *Game) hideFrom(lt *lighter, from, dir gruid.Point) {
+	to := from.Add(dir)
+	p, q := from.Add(gruid.Point{dir.X, 0}), from.Add(gruid.Point{0, dir.Y})
+	fill := func(p gruid.Point) {
+		if id, _ := g.ItemAt(p); id >= 0 {
+			return
+		}
+		switch g.IntN(10) {
+		case 0:
+			// Rarely: do not hide from that direction.
+		case 1, 2:
+			g.Map.Terrain.Set(p, Rubble)
+		default:
+			g.Map.Terrain.Set(p, Foliage)
+		}
+	}
+	tp, tq := g.Map.Terrain.At(p), g.Map.Terrain.At(q)
+	if tp == Floor {
+		fill(p)
+		tp = g.Map.Terrain.At(p)
+	}
+	if tq == Floor {
+		fill(q)
+		tq = g.Map.Terrain.At(q)
+	}
+	vis := lt.diagonalVisibility(from, to)
+	switch vis {
+	case Opaque:
+		// Already hidden diagonally.
+	case Fuzzy:
+		// Already fuzzy diagonally: use normal fill favoring foliage,
+		// as it's quite enough.
+		if g.Map.Terrain.At(to) == Floor {
+			fill(to)
+		}
+	default:
+		// Clear: either one or both laterals are not walls, foliage
+		// nor rubble (so floor or translucent walls). Attempt to cover
+		// a maximum by putting some rubble.
+		if id, _ := g.ItemAt(to); id < 0 && g.Map.Terrain.At(to) == Floor {
+			g.Map.Terrain.Set(to, Rubble)
+		}
+	}
 }
 
 // genMonstersCorrupted may generate extra special wandering monsters.

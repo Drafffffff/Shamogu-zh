@@ -316,22 +316,11 @@ func (lt *lighter) diagonalVisibility(from, to gruid.Point) visibility {
 	// allows diagonals for light rays in normal circumstances.
 	var ps [2]gruid.Point
 	delta := to.Sub(from)
-	switch delta {
-	case gruid.Point{1, -1}:
-		ps[0] = from.Shift(1, 0)
-		ps[1] = from.Shift(0, -1)
-	case gruid.Point{-1, -1}:
-		ps[0] = from.Shift(-1, 0)
-		ps[1] = from.Shift(0, -1)
-	case gruid.Point{-1, 1}:
-		ps[0] = from.Shift(-1, 0)
-		ps[1] = from.Shift(0, 1)
-	case gruid.Point{1, 1}:
-		ps[0] = from.Shift(1, 0)
-		ps[1] = from.Shift(0, 1)
-	default:
+	if delta.X == 0 || delta.Y == 0 {
 		return Clear
 	}
+	ps[0] = from.Shift(delta.X, 0)
+	ps[1] = from.Shift(0, delta.Y)
 	vis := Opaque
 	g := lt.g
 	for _, p := range ps {

@@ -100,16 +100,19 @@ func testGame(t *testing.T) {
 		b := map[gruid.Point]bool{}
 		for i := range g.ItemEntities() {
 			p := g.Entity(i).P
-			if i >= FirstMapID && b[p] {
-				t.Errorf("Two items in same place: %d", p)
+			if b[p] {
+				t.Errorf("Two items in same place: %v", p)
+			}
+			if g.Map.Terrain.At(p) != Floor {
+				t.Errorf("Item %s, on non-floor tile: %v", g.Entity(i).Name, p)
 			}
 			b[p] = true
 		}
 		clear(b)
 		for i := range g.Actors() {
 			p := g.Entity(i).P
-			if i >= FirstMapID && b[p] {
-				t.Errorf("Two actors in same place: %d", p)
+			if b[p] {
+				t.Errorf("Two actors in same place: %v", p)
 			}
 			b[p] = true
 		}
