@@ -131,8 +131,10 @@ func (g *Game) monsterBumpDisoriented(i ID, ai *Actor) bool {
 		g.BumpAttackActor(i, j, ai, aj, AttackPlain, 1, 0)
 		return true
 	}
-	// We move to the free tile, without performing any charge.
-	g.BumpMoveActor(i, ai, to)
+	if ai.CanMove() {
+		// We move to the free tile, without performing any charge.
+		g.BumpMoveActor(i, ai, to)
+	}
 	return true
 }
 
