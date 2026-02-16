@@ -1,7 +1,9 @@
 # v? ?
 
+* Ensure lignified monsters cannot move while disoriented (see issue #15).
 * Fix an old regression from v1.2.0 with “pushing gale” in melee sometimes
-  producing the wrong log message and doing only 1 damage instead of 2
+  producing the wrong log message and doing only 1 damage instead of 2 (see
+  issue #11).
 
 # v1.4.1 2026-02-10
 
