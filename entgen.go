@@ -461,6 +461,9 @@ func (g *Game) genItems(mg *MapGen) {
 	menhirIdxs := []menhirKind{}
 	menhirIdx := func() menhirKind {
 		idx := g.NextMenhirKind()
+		if mg.theme == ThemeLignification && idx == MenhirWarping {
+			return MenhirEarth
+		}
 		if !g.Mod(ModCorruptedDungeon) || g.IntN(50) > 0 {
 			for slices.Contains(menhirIdxs, idx) {
 				// Never generate twice the same menhir in a given level.
@@ -474,6 +477,8 @@ func (g *Game) genItems(mg *MapGen) {
 		menhirIdx = func() menhirKind { return MenhirWarping }
 	case ThemeFire:
 		menhirIdx = func() menhirKind { return MenhirFire }
+	case ThemePoison:
+		menhirIdx = func() menhirKind { return MenhirPoison }
 	}
 	for range min(nmenhirs, len(MenhirData)) {
 		idx := menhirIdx()
@@ -520,6 +525,13 @@ func (g *Game) genItems(mg *MapGen) {
 		comestibleIdx = func() comestibleKind { return FirebreathPepper }
 	case ThemeLignification:
 		comestibleIdx = func() comestibleKind { return LignificationFruit }
+	case ThemePoison:
+		comestibleIdx = func() comestibleKind {
+			if g.IntN(2) == 0 {
+				return LignificationFruit
+			}
+			return BerserkingFlower
+		}
 	case ThemeWarp:
 		comestibleIdx = func() comestibleKind { return TeleportMushroom }
 	}
@@ -582,6 +594,8 @@ func (g *Game) genItems(mg *MapGen) {
 		trapRune = func() MagicRune { return RuneFire }
 	case ThemeLignification:
 		trapRune = func() MagicRune { return RuneLignification }
+	case ThemePoison:
+		trapRune = func() MagicRune { return RunePoison }
 	case ThemeWarp:
 		trapRune = func() MagicRune { return RuneWarp }
 	}
@@ -1118,6 +1132,64 @@ func (g *Game) genThemedMonsters(mg *MapGen, nE, nM, nL int) {
 			// Fill if necessary with late monsters whose attack
 			// pattern is neutralized by lignification.
 			g.genMonster(g.randMonsKind(mksLate))
+		}
+	case ThemePoison:
+		switch g.IntN(4) {
+		case 0:
+			// Rare very annoying phoenix.
+			g.genMonster(BurningPhoenix)
+			nL--
+			nE++
+		case 1:
+			// Rare annoying llama.
+			g.genMonster(FireLlama)
+		case 2:
+			// Rare annoying nadre.
+			g.genMonster(ExplodingNadre)
+		default:
+			// Rare very annoying crazy druid.
+			g.genMonster(CrazyDruid)
+			nE--
+		}
+		switch g.IntN(5) {
+		case 0:
+			// Rarely, no lignifying monster.
+		case 1, 2:
+			g.genMonster(WalkingTree)
+			nL--
+		default:
+			g.genMonster(WalkingMushroom)
+			nM--
+		}
+		n := 2 + g.IntN(2)
+		for range n {
+			// Confusion-resistant monster.
+			g.genMonster(ConfusingEye)
+		}
+		mks := []monsterKind{BerserkingSpider, TotemWasp}
+		for range 4 + nE - n {
+			// Poisonous early monsters.
+			g.genMonster(g.randMonsKind(mks))
+		}
+		n = (1 + nM) / 2
+		for range n {
+			// A fair amount of annoying vipers that are immune to
+			// poison, but not to the confusion effects.
+			g.genMonster(VenomousViper)
+		}
+		for range nM - n {
+			// Poison-vulnerable monster that can still be annoying
+			// at range.
+			g.genMonster(RampagingBoar)
+		}
+		for range 2 {
+			// A strong but not immune venomous monster.
+			g.genMonster(MadOctopode)
+		}
+		for range nL {
+			// Dangerous late monster vulnerable to poison, and a
+			// digging one, like boars.
+			g.genMonster(EarthDragon)
 		}
 	case ThemeWarp:
 		for range nE {

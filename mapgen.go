@@ -49,6 +49,7 @@ const (
 	ThemeBerserk
 	ThemeFire
 	ThemeLignification
+	ThemePoison
 	ThemeWarp
 )
 
@@ -147,13 +148,15 @@ func (g *Game) generateMap(ml MapLayout) (*MapGen, bool) {
 // choseTheme choses the theme for thematic levels.
 func (g *Game) choseTheme(mg *MapGen) {
 	if g.ProcInfo.ThemedLevel == g.Map.Level {
-		switch g.IntN(5) {
-		case 0:
+		switch g.IntN(11) {
+		case 0, 1:
 			mg.theme = ThemeBerserk
-		case 1:
+		case 2, 3:
 			mg.theme = ThemeFire
-		case 2:
+		case 4, 5:
 			mg.theme = ThemeLignification
+		case 6, 7:
+			mg.theme = ThemePoison
 		default:
 			// Double chance for the warp theme.
 			mg.theme = ThemeWarp
@@ -895,7 +898,7 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 		}
 	}
 
-	if g.IntN(occasionally) == 0 || mg.theme == ThemeWarp && g.IntN(2) == 0 {
+	if g.IntN(occasionally) == 0 || (mg.theme == ThemeWarp || mg.theme == ThemePoison) && g.IntN(2) == 0 {
 		terrain := getTerrain()
 		// Put many translucent walls.
 		n := 5
