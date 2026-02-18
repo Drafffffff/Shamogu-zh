@@ -1078,23 +1078,45 @@ func (g *Game) genThemedMonsters(mg *MapGen, nE, nM, nL int) {
 			g.genMonster(WalkingTree)
 		}
 	case ThemeLignification:
-		mks := []monsterKind{RampagingBoar, BlinkButterfly, TemporalCat, LashingFrog, AcidMound}
-		for range nM + nE {
-			g.genMonster(g.randMonsKind(mks))
-		}
 		switch g.IntN(4) {
 		case 0:
+			// Rare annoying phoenix.
 			g.genMonster(BurningPhoenix)
+			nL--
+			nM++
 		case 1:
+			// Rare annoying llama.
 			g.genMonster(FireLlama)
 		default:
+			// Annoying nadre.
 			g.genMonster(ExplodingNadre)
 		}
+		if g.IntN(3) > 0 {
+			// Often, add walking mushroom.
+			g.genMonster(WalkingMushroom)
+			nM--
+		}
+		n := 1 + g.IntN(2)
+		mksRanged := []monsterKind{ConfusingEye, WindFox}
+		for range n {
+			// Add 1-2 ranged mildly-annoying monsters.
+			g.genMonster(g.randMonsKind(mksRanged))
+		}
+		mks := []monsterKind{RampagingBoar, BlinkButterfly, TemporalCat, LashingFrog, AcidMound, BarkingHound}
+		for range nM + nE - n {
+			// Many mid-monsters whose attack pattern or effect is
+			// neutralized in some way by lignification.
+			g.genMonster(g.randMonsKind(mks))
+		}
 		for range 2 {
+			// A couple of walking trees, for some extra
+			// unvoluntary lignification.
 			g.genMonster(WalkingTree)
 		}
 		mksLate := []monsterKind{FourHeadedHydra, EarthDragon}
 		for range nL {
+			// Fill if necessary with late monsters whose attack
+			// pattern is neutralized by lignification.
 			g.genMonster(g.randMonsKind(mksLate))
 		}
 	case ThemeWarp:
