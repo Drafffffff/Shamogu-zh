@@ -461,14 +461,14 @@ func (g *Game) genItems(mg *MapGen) {
 	menhirIdxs := []menhirKind{}
 	menhirIdx := func() menhirKind {
 		idx := g.NextMenhirKind()
-		if mg.theme == ThemeLignification && idx == MenhirWarping {
-			return MenhirEarth
-		}
 		if !g.Mod(ModCorruptedDungeon) || g.IntN(50) > 0 {
 			for slices.Contains(menhirIdxs, idx) {
 				// Never generate twice the same menhir in a given level.
 				idx = g.NextMenhirKind()
 			}
+		}
+		if mg.theme == ThemeLignification && idx == MenhirWarping {
+			return MenhirEarth
 		}
 		return idx
 	}
@@ -525,13 +525,6 @@ func (g *Game) genItems(mg *MapGen) {
 		comestibleIdx = func() comestibleKind { return FirebreathPepper }
 	case ThemeLignification:
 		comestibleIdx = func() comestibleKind { return LignificationFruit }
-	case ThemePoison:
-		comestibleIdx = func() comestibleKind {
-			if g.IntN(2) == 0 {
-				return LignificationFruit
-			}
-			return BerserkingFlower
-		}
 	case ThemeWarp:
 		comestibleIdx = func() comestibleKind { return TeleportMushroom }
 	}
@@ -556,6 +549,11 @@ func (g *Game) genItems(mg *MapGen) {
 	case ThemeNone:
 	case ThemeWarp:
 		nitems += 6
+	case ThemePoison:
+		// Only one extra comestible, because can be sligthly more
+		// difficult than a normal level, but still has varied
+		// comestibles.
+		nitems++
 	default:
 		nitems += 4
 	}

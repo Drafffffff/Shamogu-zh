@@ -898,7 +898,7 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 		}
 	}
 
-	if g.IntN(occasionally) == 0 || (mg.theme == ThemeWarp || mg.theme == ThemePoison) && g.IntN(2) == 0 {
+	if g.IntN(occasionally) == 0 || mg.theme == ThemeWarp && g.IntN(2) == 0 {
 		terrain := getTerrain()
 		// Put many translucent walls.
 		n := 5
