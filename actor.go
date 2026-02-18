@@ -185,7 +185,7 @@ const (
 	MonsExplodingDeath // explode on death
 	MonsFear           // attack may frighten
 	MonsFourHeaded     // perform 4 attacks per attack
-	MonsHungry         // hunts you with smell, becomes berserk if you eat in view
+	MonsHungry         // hunts you by smell, becomes berserk if you eat in view
 	MonsIgnoreDefense  // attack ignores defense
 	MonsLignify        // attack may lignify you (also makes unmovable by force)
 	MonsSpores         // lignifying spores
@@ -268,7 +268,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, MonsExplodingDeath, "explodes on death")
 	desc = traitDesc(desc, t, MonsFear, "@Ofrightening@N hits")
 	desc = traitDesc(desc, t, MonsFourHeaded, "attacks with all four heads")
-	desc = traitDesc(desc, t, MonsHungry, "hunts you with smell, becomes berserk if you eat in view")
+	desc = traitDesc(desc, t, MonsHungry, "hunts you by smell, becomes berserk if you eat in view")
 	desc = traitDesc(desc, t, MonsIgnoreDefense, "attack ignores defense")
 	desc = traitDesc(desc, t, MonsLignify, "hits may @Blignify@N you briefly, woody legs, permanently @Blignified@N")
 	desc = traitDesc(desc, t, MonsMusic, "plays guitar for you, avoids fights")

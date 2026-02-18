@@ -1854,17 +1854,19 @@ Most items and abilities have several effects and can be used for several purpos
 
 Try to always get the @Mfirst hit@N against monsters. In particular, avoid moving yourself in front of ranged or rampaging monsters. Zigzag if necessary. Don’t forget that even plain melee monsters can charge frontally from one tile away!
 
-Try to learn the characteristics of each kind of monster.
+Try to learn the characteristics of each kind of monster. You can examine monsters to see their attack, defense and special traits.
+
+Remember that monsters with N attack can only hit for the minimum of N and 3 damage at most, except for burning phoenixes and ranged fire llamas that may burn you, and four-headed hydras that perform four damage-rolls per attack.
 
 Some ranged monsters, like fire llamas or lashing frogs, are more dangerous ranged than in melee. You may sometimes want to force melee even if you’re ranged too!
 
-Some monsters have special attacks, like acid mounds ignoring defense, or venomous vipers poisoning you.
+Various monsters have special attacks. For example, acid mounds ignore defense, and venomous vipers may poison you.
 
 @YSTEALTH TIPS@N
 
 Killing all the monsters does not provide any benefit. So, once you have enough food items and don’t need more totems or already found one, you can skip exploring the rest of the map and go through a portal to the next level. Also, missing a totem or two is acceptable.
 
-Monsters usually give up quickly their search once they don’t see you: use foliage and rubble to lose them.
+Monsters usually give up quickly their search once they don’t see you: use foliage and rubble to lose them. Beware of rats that hunt you by smell, though.
 
 Watch out for @Mfootstep noise@N: while going through dense foliage, it can be very helpful to avoid unwanted encounters.
 
