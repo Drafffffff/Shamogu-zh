@@ -158,7 +158,7 @@ func (g *Game) choseTheme(mg *MapGen) {
 		case 6, 7:
 			mg.theme = ThemePoison
 		default:
-			// Double chance for the warp theme.
+			// Higher chance for the warp theme.
 			mg.theme = ThemeWarp
 		}
 	}
