@@ -1330,7 +1330,6 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 				g.genMonsterGuardian(FearsomeLich, q)
 				g.genMonsterGuardian(UndeadKnight, q)
 				nL -= 2
-				nE--
 			case 2, 3, 4:
 				nE, nM, nL = g.genOrbComplementaryGuardiansAt(q, nE, nM, nL)
 				if g.IntN(4) == 0 {
@@ -1339,7 +1338,6 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 					g.genMonsterGuardian(FearsomeLich, q)
 				}
 				nL--
-				nE--
 			default:
 				nE, nM, nL = g.genOrbAlternateGuardiansAt(q, nE, nM, nL)
 			}
