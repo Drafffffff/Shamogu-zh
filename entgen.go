@@ -1312,20 +1312,7 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 			g.genMonster(FearsomeLich)
 			g.genMonster(UndeadKnight)
 		case 2, 3, 4:
-			switch g.IntN(4) {
-			case 0:
-				g.genMonsterGuardian(CrazyDruid, p)
-				g.genMonsterGuardian(BlazingGolem, p)
-			case 1:
-				g.genMonsterGuardian(MadOctopode, p)
-			case 2:
-				g.genMonsterGuardian(WarpingWraith, p)
-			default:
-				g.genMonsterGuardian(g.randMonsKind(monsLate), p)
-				g.genMonsterGuardian(g.randMonsKind(monsEarly), p)
-			}
-			nL--
-			nE--
+			nE, nM, nL = g.genOrbComplementaryGuardiansAt(p, nE, nM, nL)
 			if g.IntN(4) == 0 {
 				g.genMonsterGuardian(UndeadKnight, p)
 				g.genMonster(FearsomeLich)
@@ -1337,8 +1324,25 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 			g.genMonsterGuardian(FearsomeLich, p)
 			g.genMonsterGuardian(UndeadKnight, p)
 		}
-		if p != g.Map.Orb && g.IntN(2) == 0 {
-			nE, nM, nL = g.genOrbAlternateGuardiansAt(g.Map.Orb, nE, nM, nL)
+		if q := g.Map.Orb; p != q && g.IntN(2) == 0 {
+			switch g.IntN(9) {
+			case 0, 1:
+				g.genMonsterGuardian(FearsomeLich, q)
+				g.genMonsterGuardian(UndeadKnight, q)
+				nL -= 2
+				nE--
+			case 2, 3, 4:
+				nE, nM, nL = g.genOrbComplementaryGuardiansAt(q, nE, nM, nL)
+				if g.IntN(4) == 0 {
+					g.genMonsterGuardian(UndeadKnight, q)
+				} else {
+					g.genMonsterGuardian(FearsomeLich, q)
+				}
+				nL--
+				nE--
+			default:
+				nE, nM, nL = g.genOrbAlternateGuardiansAt(q, nE, nM, nL)
+			}
 			if g.IntN(3) > 0 {
 				// Also hide p with high chance, so that it's
 				// not obvious which guardians are guarding the
@@ -1526,6 +1530,24 @@ func (g *Game) genOrbAlternateGuardiansAt(p gruid.Point, nE, nM, nL int) (int, i
 		}
 		nM -= 4
 	}
+	return nE, nM, nL
+}
+
+func (g *Game) genOrbComplementaryGuardiansAt(p gruid.Point, nE, nM, nL int) (int, int, int) {
+	switch g.IntN(4) {
+	case 0:
+		g.genMonsterGuardian(CrazyDruid, p)
+		g.genMonsterGuardian(BlazingGolem, p)
+	case 1:
+		g.genMonsterGuardian(MadOctopode, p)
+	case 2:
+		g.genMonsterGuardian(WarpingWraith, p)
+	default:
+		g.genMonsterGuardian(g.randMonsKind(monsLate), p)
+		g.genMonsterGuardian(g.randMonsKind(monsEarly), p)
+	}
+	nL--
+	nE--
 	return nE, nM, nL
 }
 
