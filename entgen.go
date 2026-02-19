@@ -520,13 +520,40 @@ func (g *Game) genItems(mg *MapGen) {
 	comestibleIdx := g.NextComestibleKind
 	switch mg.theme {
 	case ThemeBerserk:
-		comestibleIdx = func() comestibleKind { return BerserkingFlower }
+		n := 0
+		comestibleIdx = func() comestibleKind {
+			n++
+			if n <= 1 {
+				// A single ambrosia berries on berserk levels,
+				// for recovering health when at 1 HP.
+				return AmbrosiaBerries
+			}
+			return BerserkingFlower
+		}
 	case ThemeFire:
 		comestibleIdx = func() comestibleKind { return FirebreathPepper }
 	case ThemeLignification:
-		comestibleIdx = func() comestibleKind { return LignificationFruit }
+		n := 0
+		comestibleIdx = func() comestibleKind {
+			n++
+			if n <= 1 {
+				// A single foggy-skin onion on lignification
+				// levels to recover movement early.
+				return FoggySkinOnion
+			}
+			return LignificationFruit
+		}
 	case ThemeWarp:
-		comestibleIdx = func() comestibleKind { return TeleportMushroom }
+		n := 0
+		comestibleIdx = func() comestibleKind {
+			n++
+			if n <= 1 {
+				// A single clarity leaves on warp levels to
+				// cure daze once after teleport.
+				return ClarityLeaves
+			}
+			return TeleportMushroom
+		}
 	}
 	if g.Mod(ModCorruptedDungeon) && mg.theme == ThemeNone && g.IntN(3*MapLevels) == 0 {
 		if g.IntN(2) == 0 {
@@ -550,9 +577,9 @@ func (g *Game) genItems(mg *MapGen) {
 	case ThemeWarp:
 		nitems += 6
 	case ThemePoison:
-		// Only one extra comestible, because can be sligthly more
-		// difficult than a normal level, but still has varied
-		// comestibles.
+		// Only one extra comestible, because it can be more difficult
+		// than a normal level, in particular early on, but it still
+		// has varied comestibles.
 		nitems++
 	default:
 		nitems += 4
@@ -577,10 +604,11 @@ func (g *Game) genItems(mg *MapGen) {
 		}
 	}
 	if g.Map.Level == g.ProcInfo.TrapLevel || mg.theme != ThemeNone {
-		rto += 4
+		rto += 5
 		rtt++
 		if g.Mod(ModCorruptedDungeon) {
-			rto += g.IntN(6)
+			// Some extra traps for more variability.
+			rto += g.IntN(3)
 			rtt += g.IntN(2)
 		}
 	}
@@ -593,6 +621,7 @@ func (g *Game) genItems(mg *MapGen) {
 	case ThemeLignification:
 		trapRune = func() MagicRune { return RuneLignification }
 	case ThemePoison:
+		rto += 5 // Extra poison runes, as they're usually not as strong as others.
 		trapRune = func() MagicRune { return RunePoison }
 	case ThemeWarp:
 		trapRune = func() MagicRune { return RuneWarp }
@@ -1126,9 +1155,16 @@ func (g *Game) genThemedMonsters(mg *MapGen, nE, nM, nL int) {
 			g.genMonster(WalkingTree)
 		}
 		mksLate := []monsterKind{FourHeadedHydra, EarthDragon}
-		for range nL {
-			// Fill if necessary with late monsters whose attack
-			// pattern is neutralized by lignification.
+		for i := range nL {
+			// Fill with late monsters whose attack pattern is
+			// neutralized by lignification.
+			if i < (1+nL)/2 {
+				// Ensure some hydras, as their interaction
+				// with lignification is more significant than
+				// for dragons.
+				g.genMonster(FourHeadedHydra)
+				continue
+			}
 			g.genMonster(g.randMonsKind(mksLate))
 		}
 	case ThemePoison:

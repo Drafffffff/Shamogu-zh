@@ -165,7 +165,7 @@ func (g *Game) flavoursProcGen() {
 	if gpi.MonsMidLate == gpi.MonsLateSwarm {
 		gpi.MonsMidLate-- // still > MonsMid
 	}
-	if g.Mod(ModCorruptedDungeon) && g.IntN(3) == 0 {
+	if g.Mod(ModCorruptedDungeon) && g.IntN(5) < 2 {
 		// Rare thematic level.
 		gpi.ThemedLevel = 4 + g.IntN(6)
 	}
