@@ -940,7 +940,7 @@ func (g *Game) genMonsters(mg *MapGen) {
 	nE, nM, nL := nMonsE[g.Map.Level-1], nMonsM[g.Map.Level-1], nMonsL[g.Map.Level-1]
 	// Guardians and wandering uniques.
 	if g.Mod(ModCorruptedDungeon) {
-		nE, nM, nL = g.genGuardiansCorrupted(mg, nE, nM, nL)
+		nE, nM, nL = g.genGuardiansCorrupted(nE, nM, nL)
 	} else {
 		nE, nM, nL = g.genGuardians(nE, nM, nL)
 	}
@@ -1303,55 +1303,12 @@ func (g *Game) genGuardians(nE, nM, nL int) (int, int, int) {
 
 // genGuardiansCorrupted generates any monster guardians and special
 // wandering uniques with special adjustments to account for extra corruption.
-func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int) {
+func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 	if g.Map.Orb != InvalidPos {
 		p := g.corruptedPortalGuardianPoint()
 		switch g.IntN(9) {
 		case 0, 1:
-			switch g.IntN(7) {
-			case 0:
-				for range 2 {
-					g.genMonsterGuardian(g.randMonsKind(monsLate), p)
-				}
-				g.genMonsterGuardian(g.randMonsKind(monsEarly), p)
-				nL -= 2
-				nE--
-				if g.IntN(3) > 0 {
-					// High chance of hiding the orb with
-					// normal-looking guardians.
-					g.hideLocation(p)
-				}
-			case 1:
-				for range 2 {
-					g.genMonsterGuardian(CrazyDruid, p)
-				}
-				g.genMonsterGuardian(BlazingGolem, p)
-				nL -= 2
-				nM--
-			case 2:
-				for range 2 {
-					g.genMonsterGuardian(MadOctopode, p)
-				}
-				nL -= 2
-				nE--
-			case 3:
-				// Rare chance of annoying guardians.
-				if g.IntN(2) == 0 {
-					for range 2 {
-						g.genMonsterGuardian(WarpingWraith, p)
-					}
-				} else {
-					g.genMonsterGuardian(WalkingMushroom, p)
-					g.genMonsterGuardian(BurningPhoenix, p)
-				}
-				nL -= 2
-			default:
-				mk := g.randMonsKind(monsMid)
-				for range 4 {
-					g.genMonsterGuardian(mk, p)
-				}
-				nM -= 4
-			}
+			nE, nM, nL = g.genOrbAlternateGuardiansAt(p, nE, nM, nL)
 			g.genMonster(FearsomeLich)
 			g.genMonster(UndeadKnight)
 		case 2, 3, 4:
@@ -1379,6 +1336,16 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 		default:
 			g.genMonsterGuardian(FearsomeLich, p)
 			g.genMonsterGuardian(UndeadKnight, p)
+		}
+		if p != g.Map.Orb && g.IntN(2) == 0 {
+			nE, nM, nL = g.genOrbAlternateGuardiansAt(g.Map.Orb, nE, nM, nL)
+			if g.IntN(3) > 0 {
+				// Also hide p with high chance, so that it's
+				// not obvious which guardians are guarding the
+				// orb and which ones are guarding a random
+				// vault.
+				g.hideLocation(p)
+			}
 		}
 	}
 	if g.ProcInfo.GuardianPortal2 == g.Map.Level {
@@ -1514,6 +1481,54 @@ func (g *Game) genGuardiansCorrupted(mg *MapGen, nE, nM, nL int) (int, int, int)
 	return max(0, nE), max(0, nM), max(0, nL)
 }
 
+func (g *Game) genOrbAlternateGuardiansAt(p gruid.Point, nE, nM, nL int) (int, int, int) {
+	switch g.IntN(7) {
+	case 0:
+		for range 2 {
+			g.genMonsterGuardian(g.randMonsKind(monsLate), p)
+		}
+		g.genMonsterGuardian(g.randMonsKind(monsEarly), p)
+		nL -= 2
+		nE--
+		if g.IntN(3) > 0 {
+			// High chance of hiding the orb with
+			// normal-looking guardians.
+			g.hideLocation(p)
+		}
+	case 1:
+		for range 2 {
+			g.genMonsterGuardian(CrazyDruid, p)
+		}
+		g.genMonsterGuardian(BlazingGolem, p)
+		nL -= 2
+		nM--
+	case 2:
+		for range 2 {
+			g.genMonsterGuardian(MadOctopode, p)
+		}
+		nL -= 2
+		nE--
+	case 3:
+		// Rare chance of annoying guardians.
+		if g.IntN(2) == 0 {
+			for range 2 {
+				g.genMonsterGuardian(WarpingWraith, p)
+			}
+		} else {
+			g.genMonsterGuardian(WalkingMushroom, p)
+			g.genMonsterGuardian(BurningPhoenix, p)
+		}
+		nL -= 2
+	default:
+		mk := g.randMonsKind(monsMid)
+		for range 4 {
+			g.genMonsterGuardian(mk, p)
+		}
+		nM -= 4
+	}
+	return nE, nM, nL
+}
+
 func (g *Game) corruptedPortalGuardianPoint() gruid.Point {
 	var p gruid.Point
 	if g.Map.Orb != InvalidPos {
@@ -1526,7 +1541,7 @@ func (g *Game) corruptedPortalGuardianPoint() gruid.Point {
 			p = g.Map.Portal
 		}
 	}
-	if g.IntN(4) == 0 && (g.Map.Orb == InvalidPos || g.IntN(2) == 0) {
+	if g.IntN(4) == 0 && (g.Map.Orb == InvalidPos || g.IntN(3) > 0) {
 		// Occasionally guard a random non-player vault.
 		p = g.RandomWaypoint()
 		if g.Map.Totem != InvalidPos && g.IntN(4) == 0 {
@@ -1534,7 +1549,7 @@ func (g *Game) corruptedPortalGuardianPoint() gruid.Point {
 		}
 	}
 	switch {
-	case g.Map.Orb != InvalidPos && g.Map.Orb != p && g.IntN(4) > 0:
+	case g.Map.Orb != InvalidPos && g.Map.Orb != p && g.IntN(3) > 0:
 		// Hide the orb with high chance if guardians are elsewhere.
 		g.hideLocation(g.Map.Orb)
 	case g.Map.Portal != InvalidPos && g.Map.Portal != p && g.IntN(3) == 0:
