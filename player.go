@@ -255,11 +255,11 @@ func (g *Game) WallJump(dir gruid.Point) bool {
 		return false
 	}
 	g.Dir = dir
-	ok := g.MoveActor(PlayerID, pa, to, MovJump)
+	g.MoveActor(PlayerID, pa, to, MovJump)
 	if i, ai := g.ActorAt(over); i >= 0 {
 		if pa.Has(StatusSprint) {
 			g.PutStatus(i, ai, StatusImbalance, DurationImbalanceSprint)
-		} else if ok {
+		} else {
 			g.BumpAttackActor(PlayerID, i, pa, ai, AttackPlain, 1, 0)
 		}
 	}

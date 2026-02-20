@@ -121,7 +121,7 @@ func (e *Entity) Text() string {
 	}
 }
 
-// MovementKind represents various kinds of movement.
+// movementKind represents various kinds of movement.
 type movementKind int
 
 const (
