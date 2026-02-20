@@ -84,9 +84,9 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 		case pa.DoesAny(PatternRampage|PatternBat) && pa.CanMove() && (pa.HP > 1 || !pa.Has(StatusPoison)):
 			g.Dir = dir
 			to := ej.P.Sub(dir)
-			from := pl.P
-			g.BumpMoveActor(PlayerID, pa, to)
-			g.md.MoveAnimation(from, to)
+			if !g.BumpMoveActor(PlayerID, pa, to) {
+				return true
+			}
 			g.BumpAttackActor(PlayerID, j, pa, aj, AttackCharge, dist, 0)
 			return true
 		}
@@ -122,7 +122,9 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 		}
 	}
 	g.Dir = dir
-	g.BumpMoveActor(PlayerID, pa, to)
+	if !g.BumpMoveActor(PlayerID, pa, to) {
+		return true
+	}
 	// Try charge.
 	if pa.DoesAny(PatternCrocodile) && dirChange {
 		return true
@@ -197,7 +199,7 @@ func (g *Game) Sprint(dir gruid.Point) bool {
 		return false
 	}
 	g.Dir = dir
-	g.BumpMoveActor(PlayerID, pa, to)
+	g.MoveActor(PlayerID, pa, to, MovJump)
 	if jump {
 		// Path contains a monster or two: jumping over them unbalances them.
 		for p := from; p != to; p = p.Add(dir) {
@@ -206,11 +208,11 @@ func (g *Game) Sprint(dir gruid.Point) bool {
 			}
 		}
 	}
-	g.md.MoveAnimation(from, to)
 	if n > 1 && pa.Has(StatusImbalance) && g.IntN(DurationSprint) == 0 {
 		g.Log("You fall due to imbalance.")
 		g.PutStatus(PlayerID, pa, StatusDaze, DurationDazeFall)
 	}
+	g.TriggerTrap(PlayerID, pa)
 	return true
 }
 
@@ -221,9 +223,7 @@ func (g *Game) WallThrough(dir, at gruid.Point) bool {
 		g.Log("There is no room behind the translucent wall.")
 		return false
 	}
-	from := g.PP()
 	g.BumpMoveActor(PlayerID, g.PlayerActor(), to)
-	g.md.MoveAnimation(from, to)
 	g.Stats.WallThroughs++
 	return true
 }
@@ -255,13 +255,11 @@ func (g *Game) WallJump(dir gruid.Point) bool {
 		return false
 	}
 	g.Dir = dir
-	from := pl.P
-	g.BumpMoveActor(PlayerID, pa, to)
-	g.md.MoveAnimation(from, to)
+	ok := g.MoveActor(PlayerID, pa, to, MovJump)
 	if i, ai := g.ActorAt(over); i >= 0 {
 		if pa.Has(StatusSprint) {
 			g.PutStatus(i, ai, StatusImbalance, DurationImbalanceSprint)
-		} else {
+		} else if ok {
 			g.BumpAttackActor(PlayerID, i, pa, ai, AttackPlain, 1, 0)
 		}
 	}
@@ -269,6 +267,7 @@ func (g *Game) WallJump(dir gruid.Point) bool {
 		g.Log("You fall due to imbalance.")
 		g.PutStatus(PlayerID, pa, StatusDaze, DurationDazeFall)
 	}
+	g.TriggerTrap(PlayerID, pa)
 	g.Stats.WallJumps++
 	return true
 }

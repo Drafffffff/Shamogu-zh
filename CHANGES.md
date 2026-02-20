@@ -1,6 +1,10 @@
 # v? ?
 
 * Ensure lignified monsters cannot move while disoriented (see issue #15).
+* Make charges that end up on a warp rune trigger it without completing the
+  attack. Previous behavior could lead to strange things in that edge-case,
+  like moving beyond the runic trap when pushing but still triggering the trap
+  (see issue #16).
 * Fix an old regression from v1.2.0 with “pushing gale” in melee sometimes
   producing the wrong log message and doing only 1 damage instead of 2 (see
   issue #11).

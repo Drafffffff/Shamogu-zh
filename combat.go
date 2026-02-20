@@ -645,8 +645,7 @@ func (g *Game) push(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonus int) {
 			g.Log("You’re pushed away.")
 			g.StoryLogf("Pushed away by %s", ei.Name)
 		}
-		g.MoveActor(j, aj, npj)
-		g.md.MoveAnimation(pj, npj)
+		g.MoveActor(j, aj, npj, MovPlain)
 	}
 	if i == PlayerID {
 		switch g.Map.Clouds.At(pj).Kind {
@@ -662,7 +661,7 @@ func (g *Game) push(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonus int) {
 	if ap == AttackCharge {
 		// Already bump-moved, so extra movement effects were processed
 		// already.
-		g.MoveActor(i, ai, pj)
+		g.MoveActor(i, ai, pj, MovSet)
 	} else {
 		g.BumpMoveActor(i, ai, pj)
 	}
@@ -673,9 +672,7 @@ func (g *Game) catch(i, j ID, ai, aj *Actor, dist int) {
 	ei, ej := g.Entity(i), g.Entity(j)
 	dir := toDir(ej.P.Sub(ei.P))
 	to := ei.P.Add(dir)
-	from := ej.P
-	g.MoveActor(j, aj, to)
-	g.md.MoveAnimation(from, to)
+	g.MoveActor(j, aj, to, MovPlain)
 	d := 2 + 2*(dist/5) // imbalance duration (2 for dist 2-4, 4 for dist 5-8)
 	if g.PutStatus(j, aj, StatusImbalance, d) && i != PlayerID &&
 		ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusImbalance, d) {
@@ -688,7 +685,7 @@ func (g *Game) catch(i, j ID, ai, aj *Actor, dist int) {
 func (g *Game) swapSpaceDistortion(i, j ID, ai, aj *Actor, dmg int, dazed bool) {
 	pj := g.Entity(j).P
 	g.SwapClouds(g.Entity(i).P, pj)
-	g.MoveActor(i, ai, pj) // swaps positions
+	g.MoveActor(i, ai, pj, MovSet) // swaps positions
 	if !dazed && ai.DoesAny(PatternSwapDaze) && g.IntN(6-dmg) < 2 {
 		duration := 2 + dmg/2
 		if g.PutStatus(j, aj, StatusDaze, duration) && i != PlayerID &&
@@ -706,8 +703,7 @@ func (g *Game) swapSpaceDistortion(i, j ID, ai, aj *Actor, dmg int, dazed bool) 
 				} else {
 					g.Logf("The space distortion blinks the %s away.", ek.Name)
 				}
-				g.md.TeleportAnimation(ek.P, to, true)
-				g.MoveActor(k, ak, to)
+				g.MoveActor(k, ak, to, MovTeleport)
 			}
 		}
 	}
@@ -737,9 +733,7 @@ func (g *Game) recoil(i, j ID, ai *Actor, dist int) bool {
 			g.MakeNoise(ei.P, NoiseWind)
 		}
 	}
-	pi := ei.P
-	g.MoveActor(i, ai, npi)
-	g.md.MoveAnimation(pi, npi)
+	g.MoveActor(i, ai, npi, MovPlain)
 	return true
 }
 
@@ -763,8 +757,7 @@ func (g *Game) drag(i, j ID, ai, aj *Actor) {
 	g.PutStatus(j, aj, StatusImbalance, DurationImbalanceDragging)
 	// Move backwards.
 	g.BumpMoveActor(i, ai, to)
-	g.MoveActor(j, aj, pi)
-	g.md.MoveAnimation(pj, pi)
+	g.MoveActor(j, aj, pi, MovPlain)
 }
 
 // retreat attemps to a sneaky retreat backwards.
@@ -783,7 +776,6 @@ func (g *Game) retreat(i, j ID, ai *Actor) {
 		return
 	}
 	g.BumpMoveActor(i, ai, to)
-	g.md.MoveAnimation(from, to)
 }
 
 // AdjacentEntities reports whether two entities are adjacent.
@@ -835,8 +827,7 @@ func (g *Game) blinkOther(i, j ID, ai, aj *Actor) {
 	}
 	ej := g.Entity(j)
 	if to, ok := g.BlinkPos(ej.P); ok {
-		g.md.TeleportAnimation(ej.P, to, true)
-		g.MoveActor(j, aj, to)
+		g.MoveActor(j, aj, to, MovTeleport)
 		ei := g.Entity(i)
 		if j == PlayerID {
 			g.Logf("The %s’s attack made you blink away.", ei.Name)
@@ -844,8 +835,7 @@ func (g *Game) blinkOther(i, j ID, ai, aj *Actor) {
 		}
 		if ai.Has(StatusConfusion) && !ai.ResistsMove() {
 			if to, ok := g.BlinkPos(ei.P); ok {
-				g.md.TeleportAnimation(ei.P, to, g.InFOV(to))
-				g.MoveActor(i, ai, to)
+				g.MoveActor(i, ai, to, MovTeleport)
 				g.LogfStyled("The confused %s hurt and blinked itself too!", logHurtMons, ei.Name)
 				g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
 			}
