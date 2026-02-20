@@ -397,8 +397,7 @@ func (eff EffectJump) Apply(g *Game) bool {
 		return false
 	}
 	g.Log("You jump.")
-	g.BumpMoveActor(PlayerID, pa, to)
-	g.md.MoveAnimation(from, to)
+	g.MoveActor(PlayerID, pa, to, MovJump)
 	for p := from.Add(dir); p != to; p = p.Add(dir) {
 		if i, ai := g.ActorAt(p); i >= 0 {
 			if !g.PlayerFears(i, ai) && !pa.Has(StatusDaze) {
@@ -411,6 +410,7 @@ func (eff EffectJump) Apply(g *Game) bool {
 			g.PutStatus(i, ai, StatusDaze, DurationDazeJump)
 		}
 	}
+	g.TriggerTrap(PlayerID, pa)
 	if pa.Has(StatusImbalance) && g.IntN(2) == 0 {
 		g.Log("You fall due to imbalance.")
 		g.PutStatus1(PlayerID, pa, StatusDaze, DurationDazeFall)
@@ -474,9 +474,7 @@ func (g *Game) pushingGale(from, dir gruid.Point) {
 			n++
 		}
 		if g.IsFree(to) {
-			from := ei.P
-			g.MoveActor(i, ai, to)
-			g.md.MoveAnimation(from, to)
+			g.MoveActor(i, ai, to, MovPlain)
 		} else {
 			g.md.HitAnimation(at)
 		}
@@ -848,9 +846,11 @@ func (eff EffectFireRetreat) Apply(g *Game) bool {
 		return false
 	}
 	g.Log("You retreat.")
-	g.BumpMoveActor(PlayerID, pa, to)
-	g.md.MoveAnimation(from, to)
+	g.MoveActor(PlayerID, pa, to, MovJump)
 	g.FireCloudAt(from)
+	// We used MovJump for showing the fire cloud before triggering any
+	// traps.
+	g.TriggerTrap(PlayerID, pa)
 	return true
 }
 
@@ -904,8 +904,7 @@ func (eff EffectSnack) Apply(g *Game) bool {
 	g.SenseEntity(i, "sense")
 	g.Log("You teleport for a quick snack!")
 	to := g.Entity(i).P
-	g.MoveActor(PlayerID, pa, to)
-	g.md.TeleportAnimation(pp, to, true)
+	g.MoveActor(PlayerID, pa, to, MovTeleport)
 	g.UpdateFOV()
 	g.UpdateKnowledge()
 	if !eff.NoGluttonyStatus {

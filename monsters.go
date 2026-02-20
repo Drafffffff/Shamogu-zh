@@ -264,10 +264,9 @@ func (g *Game) monsterBumpNext(i ID, ai *Actor) {
 		case ai.DoesAny(PatternRampage) && ai.CanMove():
 			dir := toDir(pl.P.Sub(ei.P))
 			to := pl.P.Sub(dir)
-			from := ei.P
-			g.BumpMoveActor(i, ai, to)
-			g.md.MoveAnimation(from, to)
-			g.BumpAttackActor(i, PlayerID, ai, pa, AttackCharge, dist, 0)
+			if g.BumpMoveActor(i, ai, to) {
+				g.BumpAttackActor(i, PlayerID, ai, pa, AttackCharge, dist, 0)
+			}
 			return
 		}
 	}
@@ -280,7 +279,9 @@ func (g *Game) monsterBumpNext(i ID, ai *Actor) {
 		// can happen and is allowed even while afraid.
 		delta := to.Sub(ei.P)
 		nto := to.Add(delta)
-		g.BumpMoveActor(i, ai, to)
+		if !g.BumpMoveActor(i, ai, to) {
+			return
+		}
 		if unnoticeable {
 			// Non-hunting monsters don't perform charge against
 			// hidden player.

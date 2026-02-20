@@ -1043,10 +1043,7 @@ func (g *Game) TeleportActor(i ID, ai *Actor, n int) bool {
 		}
 		g.LogStyled("A strange energy disturbs your teleportation!", logSpecial)
 	}
-	if i == PlayerID || g.InFOV(from) {
-		g.md.TeleportAnimation(from, to, i == PlayerID || g.InFOV(to))
-	}
-	g.MoveActor(i, ai, to)
+	g.MoveActor(i, ai, to, MovTeleport)
 	g.teleportStatuses(i, ai, n)
 	return true
 }
