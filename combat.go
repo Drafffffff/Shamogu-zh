@@ -647,14 +647,6 @@ func (g *Game) push(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonus int) {
 		}
 		g.MoveActor(j, aj, npj, MovPlain)
 	}
-	if i == PlayerID {
-		switch g.Map.Clouds.At(pj).Kind {
-		case CloudFire, CloudPoison:
-			// Player is smarter than corrupted monsters: we don't
-			// move when foe is on a dangerous cloud.
-			move = false
-		}
-	}
 	if !move || ai.IsDead() {
 		return
 	}
@@ -745,14 +737,6 @@ func (g *Game) drag(i, j ID, ai, aj *Actor) {
 	to := pi.Sub(delta)
 	if !g.IsFree(to) {
 		return
-	}
-	if i == PlayerID {
-		switch g.Map.Clouds.At(to).Kind {
-		case CloudFire, CloudPoison:
-			// Player is smarter than corrupted monsters: we don't
-			// move onto a dangerous cloud.
-			return
-		}
 	}
 	g.PutStatus(j, aj, StatusImbalance, DurationImbalanceDragging)
 	// Move backwards.
