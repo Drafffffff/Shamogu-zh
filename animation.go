@@ -440,28 +440,28 @@ func (md *model) ExplosionAnimation(ps []gruid.Point) {
 	}
 }
 
-// AnimateClouds briefly shows dangerous clouds that are hidden by a monster.
-func (md *model) AnimateClouds() {
-	if DisableAnimations {
-		return
-	}
-	g := md.g
-	draw := false
-	for i := range g.Monsters() {
-		ei := g.Entity(i)
-		if !g.InFOV(ei.P) {
-			continue
-		}
-		switch cl := g.Map.Clouds.At(ei.P); cl.Kind {
-		case CloudFire, CloudPoison:
-			md.anims.Draw(ei.P, '≡', cl.Kind.Color())
-			draw = true
-		}
-	}
-	if draw {
-		md.anims.Frame(AnimDurMediumLong)
-	}
-}
+// // AnimateClouds briefly shows dangerous clouds that are hidden by a monster.
+// func (md *model) AnimateClouds() {
+// 	if DisableAnimations {
+// 		return
+// 	}
+// 	g := md.g
+// 	draw := false
+// 	for i := range g.Monsters() {
+// 		ei := g.Entity(i)
+// 		if !g.InFOV(ei.P) {
+// 			continue
+// 		}
+// 		switch cl := g.Map.Clouds.At(ei.P); cl.Kind {
+// 		case CloudFire, CloudPoison:
+// 			md.anims.Draw(ei.P, '≡', cl.Kind.Color())
+// 			draw = true
+// 		}
+// 	}
+// 	if draw {
+// 		md.anims.Frame(AnimDurMediumLong)
+// 	}
+// }
 
 // OrbDestructionAnimation animates the destruction of the orb.
 func (md *model) OrbDestructionAnimation() {

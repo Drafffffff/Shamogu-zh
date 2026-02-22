@@ -143,7 +143,7 @@ func (g *Game) EndTurn() {
 	g.UpdateKnowledge()
 	g.ComputeNoise()
 	g.HandleTurnCount()
-	g.md.AnimateClouds()
+	// g.md.AnimateClouds()
 }
 
 // HandleTurnCount() increments the turn count and handles watching.
