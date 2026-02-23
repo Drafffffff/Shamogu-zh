@@ -738,10 +738,37 @@ func (g *Game) drag(i, j ID, ai, aj *Actor) {
 	if !g.IsFree(to) {
 		return
 	}
+	if i == PlayerID {
+		switch g.Map.Clouds.At(to).Kind {
+		case CloudFire:
+			if g.AvoidsFire(i, ai) {
+				// We don't move onto a fire cloud that could
+				// burn the crocodile's tail (unless already
+				// burning).
+				return
+			}
+		}
+	}
 	g.PutStatus(j, aj, StatusImbalance, DurationImbalanceDragging)
 	// Move backwards.
 	g.BumpMoveActor(i, ai, to)
 	g.MoveActor(j, aj, pi, MovPlain)
+}
+
+// AvoidsFire reports whether the (player) actor would avoid moving into a fire
+// cloud (currently for dragging purposes only).
+func (g *Game) AvoidsFire(i ID, ai *Actor) bool {
+	if ai.Has(StatusFire) || ai.Statuses[StatusFoggySkin] > 1 {
+		// Do not avoid fire cloud if already on fire or resistant to
+		// it.
+		return false
+	}
+	if g.Map.Clouds.At(g.Entity(i).P).Kind == CloudFire {
+		// Already a fire cloud on current position, so it doesn't make
+		// sense to avoid moving into a fire cloud.
+		return false
+	}
+	return true
 }
 
 // retreat attemps to a sneaky retreat backwards.
