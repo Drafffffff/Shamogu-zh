@@ -1,5 +1,34 @@
 # v? ?
 
+Reworked and improved content:
+
+* The Orb may now interfere with teleportation about half of the time, driving
+  the player away on the last level, making teleport-based strategies less
+  reliable as a means of progression toward the orb, but still useful otherwise
+  (see issue #11).
+* Remove safety rule for pushing into dangerous clouds (experimental, see #16),
+  because it wasn't as useful since the Boar pushing changes a few releases
+  ago, and even sometimes unwanted. Relatetdly, Crocodile's dragging may now
+  move the player into a poison cloud, and even into a fire cloud if the player
+  is already on Fire or has Foggy-Skin, following the idea that movement into a
+  dangerous cloud is ok as long as it cannot result in immediate damage.
+* Phoenixes now have only 2 attack but a higher chance of burning. The idea is
+  to make fighting phoenixes in melee a bit less dangerous, in particular with
+  Foggy-Skin or Salamander (see #17).
+* New help tips about monster examination and rats hunting by smell (see #11).
+
+Improvements in Corrupted Dungeon expansion (see issue #11):
+
+* Improved thematic levels, including a new poison themed level, and various
+  improvements in the lignification one.
+* Adjustments to guardian corruptions. Guardians are less likely to wander than
+  before, but when they do, replacements are more likely and more varied.
+  Rarely, more than one vault can be guarded.
+* The Orb or other special locations may be hidden by foliage or rubble more
+  often than before, in particular when unguarded.
+
+Fixes:
+
 * Ensure lignified monsters cannot move while disoriented (see issue #15).
 * Make charges that end up on a warp rune trigger it without completing the
   attack. Previous behavior could lead to strange things in that edge-case,
