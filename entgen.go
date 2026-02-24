@@ -1674,6 +1674,8 @@ func (g *Game) genMonstersCorrupted(nE, nM, nL int) (int, int, int) {
 	if g.IntN(rare) == 0 {
 		nLs := min(nL, 1+g.IntN(2))
 		if g.IntN(3) == 0 && g.Map.Level < MapLevels {
+			// Rare chance of special late monsters as totem
+			// guardians.
 			mks := []monsterKind{FearsomeLich, FearsomeLich, MadOctopode}
 			for range nLs {
 				p := g.corruptedTotemGuardianPoint()
@@ -1686,6 +1688,11 @@ func (g *Game) genMonstersCorrupted(nE, nM, nL int) (int, int, int) {
 			}
 		}
 		nL -= nLs
+		if nLs > 1 {
+			// Difficulty adjustment in case of two late special
+			// monsters.
+			nE--
+		}
 	}
 	return nE, nM, nL
 }
