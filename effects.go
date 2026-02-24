@@ -58,7 +58,7 @@ const (
 	HealTeleportLignified = 2
 
 	DurationDig       = 5
-	DurationDisorient = 5
+	DurationDisorient = 6
 	DurationFocus     = 3
 	DurationShadow    = 8
 	DurationGarden    = 7

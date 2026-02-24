@@ -15,6 +15,7 @@ Reworked and improved content:
 * Phoenixes now have only 2 attack but a higher chance of burning. The idea is
   to make fighting phoenixes in melee a bit less dangerous, in particular with
   Foggy-Skin or Salamander (see #17).
+* Disorient status now lasts an extra turn.
 * New help tips about monster examination and rats hunting by smell (see #11).
 
 Improvements in Corrupted Dungeon expansion (see issue #11):
