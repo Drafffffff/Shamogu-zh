@@ -1053,7 +1053,7 @@ func (g *Game) genMonsters(mg *MapGen) {
 				}
 			}
 			nE, nM, nL = 0, 0, 0
-		} else if g.IntN(6) == 0 {
+		} else {
 			// Occasionally spawn extra uniques or guardians
 			// (possibly not unique anymore).
 			nE, nM, nL = g.genMonstersCorrupted(nE, nM, nL)
@@ -1651,8 +1651,9 @@ func (g *Game) hideFrom(lt *lighter, from, dir gruid.Point) {
 
 // genMonstersCorrupted may generate extra special wandering monsters.
 func (g *Game) genMonstersCorrupted(nE, nM, nL int) (int, int, int) {
+	const rare = 18
 	// Special early monsters.
-	if g.IntN(3) == 0 {
+	if g.IntN(rare) == 0 {
 		nEs := min(nE, 1+g.IntN(3))
 		for range nEs {
 			g.genMonster(TotemWasp)
@@ -1660,7 +1661,7 @@ func (g *Game) genMonstersCorrupted(nE, nM, nL int) (int, int, int) {
 		nE -= nEs
 	}
 	// Special mid monsters.
-	if g.IntN(3) == 0 {
+	if g.IntN(rare) == 0 {
 		mks := []monsterKind{WalkingMushroom, BlazingGolem, CrazyDruid, NoisyImp}
 		nMs := min(nM, 1+g.IntN(2), len(mks))
 		monsSpecialMid := g.monsterSelection(mks, len(mks))
@@ -1670,7 +1671,7 @@ func (g *Game) genMonstersCorrupted(nE, nM, nL int) (int, int, int) {
 		nM -= nMs
 	}
 	// Special late monsters.
-	if g.IntN(3) == 0 {
+	if g.IntN(rare) == 0 {
 		nLs := min(nL, 1+g.IntN(2))
 		if g.IntN(3) == 0 && g.Map.Level < MapLevels {
 			mks := []monsterKind{FearsomeLich, FearsomeLich, MadOctopode}
