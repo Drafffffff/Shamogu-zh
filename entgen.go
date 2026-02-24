@@ -1673,12 +1673,13 @@ func (g *Game) genMonstersCorrupted(nE, nM, nL int) (int, int, int) {
 	if g.IntN(3) == 0 {
 		nLs := min(nL, 1+g.IntN(2))
 		if g.IntN(3) == 0 && g.Map.Level < MapLevels {
+			mks := []monsterKind{FearsomeLich, FearsomeLich, MadOctopode}
 			for range nLs {
 				p := g.corruptedTotemGuardianPoint()
-				g.genMonsterGuardian(FearsomeLich, p)
+				g.genMonsterGuardian(g.randMonsKind(mks), p)
 			}
 		} else {
-			mks := []monsterKind{UndeadKnight, MadOctopode}
+			mks := []monsterKind{UndeadKnight, UndeadKnight, MadOctopode}
 			for range nLs {
 				g.genMonster(g.randMonsKind(mks))
 			}
