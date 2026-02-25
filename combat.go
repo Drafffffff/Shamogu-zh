@@ -679,7 +679,7 @@ func (g *Game) swapSpaceDistortion(i, j ID, ai, aj *Actor, dmg int, dazed bool) 
 	pj := g.Entity(j).P
 	g.SwapClouds(g.Entity(i).P, pj)
 	g.MoveActor(i, ai, pj, MovSet) // swaps positions
-	if !dazed && ai.DoesAny(PatternSwapDaze) && g.IntN(6-dmg) < 2 {
+	if !dazed && ai.DoesAny(PatternSwapDaze) && g.IntN(5) < 2 {
 		duration := 2 + dmg/2
 		if g.PutStatus(j, aj, StatusDaze, duration) && i != PlayerID &&
 			ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusDaze, duration) && g.InFOV(pj) {
