@@ -14,6 +14,7 @@ type Actor struct {
 	MaxHP     int         // maximum health points
 	Defense   int         // defense (defensive potential)
 	Attack    int         // attack (offensive potential)
+	LastDaze  int         // last turn ended with Daze
 	FirePos   gruid.Point // position at start of turn while on Fire
 	KnownDead bool        // whether it's a monster known to be dead
 	Statuses  Statuses    // statuses (confused, etc.)
@@ -750,6 +751,21 @@ func (g *Game) randomComestible() (ID, *Comestible) {
 	return id, g.Entity(id).Role.(*Comestible)
 }
 
+// RememberLastDazeTurn updates the last turn the actor spent while dazed (on turn
+// start).
+func (g *Game) RememberLastDazeTurn(ai *Actor) {
+	if ai.Has(StatusDaze) {
+		ai.LastDaze = g.Turn
+	}
+}
+
+// ResistDazeRoll reports whether the actor resists Daze due to recently waking
+// up from Daze.
+func (g *Game) ResistDazeRoll(ai *Actor) bool {
+	lastdaze := g.Turn - ai.LastDaze
+	return lastdaze < 4 && g.IntN(5) > lastdaze
+}
+
 // ProgressStatus reduces the number of remaining turns for a status by one.
 func (g *Game) ProgressStatus(i ID, ai *Actor, st Status) {
 	turns := ai.Statuses[st]
@@ -816,6 +832,7 @@ func (g *Game) HandleActorTurn(i ID, ai *Actor) {
 		return
 	}
 	if ai.Behavior != nil {
+		g.RememberLastDazeTurn(ai)
 		g.UpdateFirePos(i, ai)
 		g.HandleMonsterTurn(i, ai)
 	}

@@ -143,6 +143,7 @@ func (g *Game) EndTurn() {
 	g.UpdateKnowledge()
 	g.ComputeNoise()
 	g.HandleTurnCount()
+	g.RememberLastDazeTurn(pa)
 	// g.md.AnimateClouds()
 }
 
@@ -270,6 +271,7 @@ func (g *Game) endTurnEarly() bool {
 	}
 	g.UpdateFOV()
 	g.UpdateKnowledge()
+	g.RememberLastDazeTurn(pa)
 	return true
 }
 

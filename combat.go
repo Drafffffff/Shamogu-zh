@@ -364,7 +364,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 			g.push(i, j, ai, aj, ap, dist, bonus)
 		}
 	case ai.DoesAny(PatternSwap|PatternSwapDaze) && ap != AttackCharge && !ai.Has(StatusLignification) && !aj.ResistsMove():
-		g.swapSpaceDistortion(i, j, ai, aj, dmg, dazed)
+		g.swapSpaceDistortion(i, j, ai, aj, dazed, dist)
 	case ai.DoesAny(PatternCatch) && ap == AttackRanged && !aj.ResistsMove():
 		g.catch(i, j, ai, aj, dist)
 	case ai.DoesAny(PatternRangedRecoil) && ap != AttackCharge && ai.CanMove():
@@ -441,7 +441,9 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 	// Extra defense effects.
 	switch {
 	case aj.DoesAny(DazingSpines) && (ap != AttackRanged || g.AdjacentEntities(i, j)) && g.IntN(5-dmg) == 0:
-		g.PutStatus1(i, ai, StatusDaze, DurationDazeSpines)
+		if !g.ResistDazeRoll(aj) {
+			g.PutStatus1(i, ai, StatusDaze, DurationDazeSpines)
+		}
 	}
 	if aj.Has(StatusLignification) && !aj.DoesAny(WoodyLegs) &&
 		(afraid && aj.Has(StatusFear) || aj.DoesAny(Elephanty) && ai.IsMonster(HungryRat)) {
@@ -682,13 +684,16 @@ func (g *Game) catch(i, j ID, ai, aj *Actor, dist int) {
 
 // swapSpaceDistortion handles extra swapping effects for actors with
 // PatternSwap trait, after inflicting damage on target.
-func (g *Game) swapSpaceDistortion(i, j ID, ai, aj *Actor, dmg int, dazed bool) {
+func (g *Game) swapSpaceDistortion(i, j ID, ai, aj *Actor, dazed bool, dist int) {
 	pj := g.Entity(j).P
 	g.SwapClouds(g.Entity(i).P, pj)
 	g.MoveActor(i, ai, pj, MovSet) // swaps positions
-	if !dazed && ai.DoesAny(PatternSwapDaze) && g.IntN(5) < 2 {
-		duration := 2 + dmg/2
-		if g.PutStatus(j, aj, StatusDaze, duration) && i != PlayerID &&
+	if !dazed && ai.DoesAny(PatternSwapDaze) && g.IntN(100) < 45-dist*2 {
+		duration := 2
+		if g.IntN(1+MaxFOVRange) < dist {
+			duration++
+		}
+		if !g.ResistDazeRoll(aj) && g.PutStatus(j, aj, StatusDaze, duration) && i != PlayerID &&
 			ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusDaze, duration) && g.InFOV(pj) {
 			g.LogfStyled("The confused %s dazed itself too!",
 				logHurtMons, g.Entity(i).Name)
