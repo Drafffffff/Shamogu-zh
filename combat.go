@@ -519,7 +519,7 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 		// Lignification caps attack damage at 1.
 		dmg = min(1, dmg)
 	}
-	if i == PlayerID && ai.DoesAny(Gawalt) && !ai.Has(StatusShadow) && dmg > 1 {
+	if i == PlayerID && ai.DoesAny(Gawalt) && dmg > 1 {
 		// Gawalt monkey reduces damage of non-weak hits.
 		dmg--
 	}
@@ -577,10 +577,17 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 		g.md.HitAnimation(pj)
 	}
 	dmg = g.InflictDamageGeneric(i, j, ai, aj, dmg, ap) // dmg actually remains the same
-	if aj.Behavior != nil && aj.Behavior.State != Hunting && ai.IsPlayer() {
-		// Surprise charging attacks make monsters hunt immediately.
-		aj.Behavior.State = Hunting
-		aj.Behavior.Target = g.PP()
+	if i == PlayerID && aj.Behavior != nil {
+		if ai.Has(StatusShadow) && !aj.DoesAny(MonsHungry) {
+			// Shadowy attacks make monsters lose track of you and
+			// wander again to a nearby location.
+			aj.Behavior.State = Wandering
+			aj.Behavior.Target = g.RandomPassableWithin(pj, MaxFOVRange)
+		} else if aj.Behavior.State != Hunting {
+			// Surprise charging attacks make monsters hunt immediately.
+			aj.Behavior.State = Hunting
+			aj.Behavior.Target = g.PP()
+		}
 	}
 	return dmg
 }

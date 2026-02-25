@@ -443,7 +443,7 @@ var statusDesc = []string{
 		LignificationDefenseBonus, DurationImbalanceLignification),
 	StatusPoison: fmt.Sprintf("Walking will hurt you for %d damage. Stinky toxins are exuded on expiration, confusing other creatures for %d turns.",
 		PoisonDamage, DurationConfusionToxins),
-	StatusShadow:   "Harmonic shadows make non-hunting monsters not notice you unless you attack them. You can move instantly through translucent walls. It makes combat silent and removes the weakening debuff.",
+	StatusShadow:   "Harmonic shadows make non-hunting monsters not notice you unless you attack them. You can move instantly through translucent walls. It makes combat silent and hits make monsters lose track of you.",
 	StatusSprint:   "You can move to a visible destination three times as fast on the current direction and twice as fast laterally. You can jump over foes, unbalancing them. Canceled by waiting.",
 	StatusTimeStop: "Time is frozen for everyone but you until expiration. Status effects affecting you will still progress.",
 	StatusVampirism: fmt.Sprintf("Guarantees successful melee bite that restores HP for the amount of damage you deal. Gives %+d Attack.",
