@@ -15,7 +15,17 @@ Reworked and improved content:
 * Phoenixes now have only 2 attack but a higher chance of burning. The idea is
   to make fighting phoenixes in melee a bit less dangerous, in particular with
   Foggy-Skin or Salamander (see #17).
+* Shadow now preserves the damage debuff, but makes hunting monsters wander
+  again when you hit them (see #17). This way, the ability remains more
+  pacific-oriented and helps getting unnoticed through monsters even if they
+  already were hunting you.
 * Disorient status now lasts an extra turn.
+* Cat's dazing effect on swapping happens now less often than before; it's also
+  somewhat less likely but longer on average at long distances to make distant
+  swapping by monster cats more unlikely to be undone just afterwards.
+* Various inflict-on-hit statuses from monsters on the player now use a
+  somewhat biased RNG that makes repeated application just after expiration
+  less likely, making consecutive imbalance and fire dances less likely.
 * New help tips about monster examination and rats hunting by smell (see #11).
 
 Improvements in Corrupted Dungeon expansion (see issue #11):
