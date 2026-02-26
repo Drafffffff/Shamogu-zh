@@ -581,9 +581,9 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 	}
 	dmg = g.InflictDamageGeneric(i, j, ai, aj, dmg, ap) // dmg actually remains the same
 	if i == PlayerID && aj.Behavior != nil {
-		if ai.Has(StatusShadow) && !aj.DoesAny(MonsHungry) {
-			// Shadowy attacks make monsters lose track of you and
-			// wander again to a nearby location.
+		if ai.Has(StatusShadow) && !aj.DoesAny(MonsHungry) && aj.Behavior.State == Hunting {
+			// Shadowy attacks make wandering monsters lose track
+			// of you and wander again to a nearby location.
 			aj.Behavior.State = Wandering
 			aj.Behavior.Target = g.RandomPassableWithin(pj, MaxFOVRange)
 		} else if aj.Behavior.State != Hunting {

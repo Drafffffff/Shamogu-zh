@@ -443,7 +443,7 @@ var statusDesc = []string{
 		LignificationDefenseBonus, DurationImbalanceLignification),
 	StatusPoison: fmt.Sprintf("Walking will hurt you for %d damage. Stinky toxins are exuded on expiration, confusing other creatures for %d turns.",
 		PoisonDamage, DurationConfusionToxins),
-	StatusShadow:   "Harmonic shadows make non-hunting monsters not notice you unless you attack them. You can move instantly through translucent walls. It makes combat silent and hits make monsters lose track of you.",
+	StatusShadow:   "Harmonic shadows make non-hunting monsters not notice you unless you attack them. You can move instantly through translucent walls. It makes combat silent and hits make hunting monsters lose track of you.",
 	StatusSprint:   "You can move to a visible destination three times as fast on the current direction and twice as fast laterally. You can jump over foes, unbalancing them. Canceled by waiting.",
 	StatusTimeStop: "Time is frozen for everyone but you until expiration. Status effects affecting you will still progress.",
 	StatusVampirism: fmt.Sprintf("Guarantees successful melee bite that restores HP for the amount of damage you deal. Gives %+d Attack.",
@@ -488,7 +488,7 @@ func (st Status) Details() string {
 	case StatusFoggySkin:
 		details = "Player-only effect obtainable by eating a foggy-skin onion. May be removed by eating a lignification fruit for half the @BLignification@N duration."
 	case StatusShadow:
-		details = "Player-only effect obtainable with the Gawalt Monkey spirit."
+		details = "Note that hitting a wandering monster will make it hunt you as usual. Player-only effect obtainable with the Gawalt Monkey spirit."
 	case StatusSprint:
 		details = "Disables normal attack. Player-only effect obtainable with the Sprinting Gazelle spirit."
 	case StatusTimeStop:
