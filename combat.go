@@ -636,23 +636,13 @@ func (g *Game) burningRoll(ai *Actor, dmg int) bool {
 		// Lower burning chance specifically when imbalanced, so that
 		// phoenixes are more often easier to handle by boar, frog or
 		// crocodile when properly handled.
-		return g.IntN(100) < 30
+		return g.IntN(100) < 15*(dmg+1)
 	}
 	// Otherwise, somewhat higher burning chance for phoenixes than for
 	// salamander or crazy druid. Still scaling with damage to somewhat
 	// make charge more dangerous and defense somewhat matter (which is
 	// useful with walking tree).
-	switch dmg {
-	case 1:
-		return g.IntN(100) < 45
-	case 2:
-		return g.IntN(100) < 60
-	case 3:
-		return g.IntN(100) < 75
-	default:
-		// Should not happen.
-		return g.IntN(100) < 90
-	}
+	return g.IntN(100) < 15*(dmg+2)
 }
 
 // push handles extra penetrating and pushing effects for actors with
