@@ -839,6 +839,13 @@ func (eff EffectFireRetreat) Apply(g *Game) bool {
 		if i, _ := g.ActorAt(p); i >= 0 {
 			break
 		}
+		if pa.HP <= 1 && g.Map.Clouds.At(p).Kind == CloudFire &&
+			pa.Statuses[StatusFoggySkin] <= 1 &&
+			!(pa.DoesAny(ResistanceFire) && !pa.Has(StatusFire)) {
+			// Ensure fire retreat cannot kill the player right
+			// away when there's a fire cloud behind.
+			continue
+		}
 		to = p
 	}
 	if from == to {
