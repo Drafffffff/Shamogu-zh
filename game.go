@@ -40,10 +40,11 @@ type Game struct {
 	PR       *paths.PathRange // path range for most pathfinding
 	PRnoise  *paths.PathRange // path range for noise computations (to avoid conflict with PR)
 
-	Dir            gruid.Point // last bump-direction
-	Prev           gruid.Point // previous position of player
-	Turn           int         // current game's turn
-	CorruptionTurn int         // next corruption event (corrupted dungeon mod)
+	Dir            gruid.Point    // last bump-direction
+	Prev           gruid.Point    // previous position of player
+	Turn           int            // current game's turn
+	StatusTurn     [NStatuses]int // last turn with specific status
+	CorruptionTurn int            // next corruption event (corrupted dungeon mod)
 
 	Logs     *Logs     // game log
 	Mods     []bool    // active game mods
@@ -143,7 +144,6 @@ func (g *Game) EndTurn() {
 	g.UpdateKnowledge()
 	g.ComputeNoise()
 	g.HandleTurnCount()
-	g.RememberLastDazeTurn(pa)
 	// g.md.AnimateClouds()
 }
 
@@ -170,6 +170,7 @@ func (g *Game) HandleTurnCount() {
 		g.genMonster(BlazingGolem)
 		g.genMonster(BlazingGolem)
 	}
+	g.RememberStatusTurns()
 }
 
 // handleCorruptionEvent handles a corruption event for the corrupted dungeon
@@ -271,7 +272,6 @@ func (g *Game) endTurnEarly() bool {
 	}
 	g.UpdateFOV()
 	g.UpdateKnowledge()
-	g.RememberLastDazeTurn(pa)
 	return true
 }
 

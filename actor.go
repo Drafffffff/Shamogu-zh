@@ -14,7 +14,6 @@ type Actor struct {
 	MaxHP     int         // maximum health points
 	Defense   int         // defense (defensive potential)
 	Attack    int         // attack (offensive potential)
-	LastDaze  int         // last turn ended with Daze
 	FirePos   gruid.Point // position at start of turn while on Fire
 	KnownDead bool        // whether it's a monster known to be dead
 	Statuses  Statuses    // statuses (confused, etc.)
@@ -751,19 +750,51 @@ func (g *Game) randomComestible() (ID, *Comestible) {
 	return id, g.Entity(id).Role.(*Comestible)
 }
 
-// RememberLastDazeTurn updates the last turn the actor spent while dazed (on turn
-// start).
-func (g *Game) RememberLastDazeTurn(ai *Actor) {
-	if ai.Has(StatusDaze) {
-		ai.LastDaze = g.Turn
+// RememberStatusTurns updates the last turn the player spent with each status
+// at the start of turn.
+func (g *Game) RememberStatusTurns() {
+	pa := g.PlayerActor()
+	for st, turns := range pa.Statuses {
+		if turns <= 0 {
+			continue
+		}
+		g.StatusTurn[st] = g.Turn
 	}
 }
 
-// ResistDazeRoll reports whether the actor resists Daze due to recently waking
-// up from Daze.
-func (g *Game) ResistDazeRoll(ai *Actor) bool {
-	lastdaze := g.Turn - ai.LastDaze
-	return lastdaze < 4 && g.IntN(5) > lastdaze
+// ResistStatusRoll reports whether the actor got lucky and was granted
+// resistance to the given status. The intention is similar as with lucky rolls
+// when at low HP: make it so the player feels unlucky less often. It's only
+// used for close re-applications due to some chance-based on-hit effects;
+// deterministic applications shouldn't use such a resist roll.
+func (g *Game) ResistStatusRoll(i ID, st Status) bool {
+	if i != PlayerID {
+		return false
+	}
+	switch g.Turn - g.StatusTurn[st] {
+	case 0:
+		switch st {
+		case StatusPoison, StatusDaze, StatusLignification, StatusBerserk, StatusFear:
+			// A high chance to resist re-application of some
+			// statuses if they're already active or just expired
+			// on the same turn.
+			// In particular, this reduces the likeliness of an
+			// annoying immediate re-application of Daze or a
+			// helpful Berserk or Lignification.
+			return g.IntN(3) > 0
+		}
+	case 1:
+		switch st {
+		case StatusFire, StatusImbalance, StatusDaze:
+			// A decent chance to resist re-application of some
+			// statuses that can feel annoying if repeated on the
+			// turn following expiration without a pause. In
+			// particular, this make consecutive fire or imbalance
+			// dances less likely.
+			return g.IntN(2) == 0
+		}
+	}
+	return false
 }
 
 // ProgressStatus reduces the number of remaining turns for a status by one.
@@ -832,7 +863,6 @@ func (g *Game) HandleActorTurn(i ID, ai *Actor) {
 		return
 	}
 	if ai.Behavior != nil {
-		g.RememberLastDazeTurn(ai)
 		g.UpdateFirePos(i, ai)
 		g.HandleMonsterTurn(i, ai)
 	}

@@ -360,7 +360,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 	case ai.DoesAny(Pushing|PushingCharge) && ai.CanMove() && !aj.ResistsMove() &&
 		(ap == AttackCharge || !ai.Has(StatusPoison)) && !redirected:
 		if ai.Has(StatusDig) || ai.DoesAny(PushingCharge) && ap == AttackCharge && dist > 2 ||
-			ai.DoesAny(Pushing) && g.IntN(5-dmg) < 2 {
+			ai.DoesAny(Pushing) && !g.ResistStatusRoll(j, StatusImbalance) && g.IntN(5-dmg) < 2 {
 			g.push(i, j, ai, aj, ap, dist, bonus)
 		}
 	case ai.DoesAny(PatternSwap|PatternSwapDaze) && ap != AttackCharge && !ai.Has(StatusLignification) && !aj.ResistsMove():
@@ -381,7 +381,8 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 	}
 	// Extra attack effects (shared by both player and monsters).
 	if ai.DoesAny(VenomousMelee) && (ap != AttackRanged || g.AdjacentEntities(i, j)) && g.IntN(6-dmg) < 2 {
-		if g.PutStatus(j, aj, StatusPoison, DurationPoisonBite) && i != PlayerID && ai.Has(StatusConfusion) && ai.IsAlive() {
+		if !g.ResistStatusRoll(j, StatusPoison) && g.PutStatus(j, aj, StatusPoison, DurationPoisonBite) &&
+			i != PlayerID && ai.Has(StatusConfusion) && ai.IsAlive() {
 			if g.InFOV(ei.P) {
 				g.LogfStyled("The confused %s bites itself too!", logHurtMons, ei.Name)
 			}
@@ -390,7 +391,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 	}
 	if ai.DoesAll(BurningHits) && (ai.IsMonster(BurningPhoenix) && g.IntN(3) > 0 ||
 		!ai.IsMonster(BurningPhoenix) && g.IntN(6-dmg) < 2) {
-		if g.PutStatus(j, aj, StatusFire, DurationFire) {
+		if !g.ResistStatusRoll(j, StatusFire) && g.PutStatus(j, aj, StatusFire, DurationFire) {
 			if p := ej.P; g.Map.Burnable(p) {
 				g.FireCloudAt(p)
 			}
@@ -408,7 +409,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 			}
 		}
 	case ai.DoesAll(MonsFear) && g.IntN(5-dmg) < 2:
-		if g.PutStatus(j, aj, StatusFear, DurationFearUndead) {
+		if !g.ResistStatusRoll(j, StatusFear) && g.PutStatus(j, aj, StatusFear, DurationFearUndead) {
 			if ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusFear, DurationFearUndead) && g.InFOV(ei.P) {
 				g.Logf("The confused %s frightened itself too!", ei.Name)
 			}
@@ -418,11 +419,11 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 			g.monsConfusionPenalty(i, ai)
 		}
 	case ai.DoesAny(MonsLignify) && g.IntN(6-dmg) < 2:
-		if g.PutStatus(j, aj, StatusLignification, DurationLignificationHit) {
+		if !g.ResistStatusRoll(j, StatusLignification) && g.PutStatus(j, aj, StatusLignification, DurationLignificationHit) {
 			g.monsConfusionPenalty(i, ai)
 		}
 	case ai.DoesAny(MonsBerserking) && g.IntN(6-dmg) < 2:
-		if g.PutStatus(j, aj, StatusBerserk, DurationBerserkHit) {
+		if !g.ResistStatusRoll(j, StatusBerserk) && g.PutStatus(j, aj, StatusBerserk, DurationBerserkHit) {
 			g.monsConfusionPenalty(i, ai)
 		}
 	case ai.DoesAny(MonsBlink) && aj.IsAlive():
@@ -441,7 +442,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 	// Extra defense effects.
 	switch {
 	case aj.DoesAny(DazingSpines) && (ap != AttackRanged || g.AdjacentEntities(i, j)) && g.IntN(5-dmg) == 0:
-		if !g.ResistDazeRoll(aj) {
+		if !g.ResistStatusRoll(j, StatusDaze) {
 			g.PutStatus1(i, ai, StatusDaze, DurationDazeSpines)
 		}
 	}
@@ -693,7 +694,7 @@ func (g *Game) swapSpaceDistortion(i, j ID, ai, aj *Actor, dazed bool, dist int)
 		if g.IntN(1+MaxFOVRange) < dist {
 			duration++
 		}
-		if !g.ResistDazeRoll(aj) && g.PutStatus(j, aj, StatusDaze, duration) && i != PlayerID &&
+		if !g.ResistStatusRoll(j, StatusDaze) && g.PutStatus(j, aj, StatusDaze, duration) && i != PlayerID &&
 			ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusDaze, duration) && g.InFOV(pj) {
 			g.LogfStyled("The confused %s dazed itself too!",
 				logHurtMons, g.Entity(i).Name)
