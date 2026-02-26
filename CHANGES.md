@@ -12,9 +12,9 @@ Reworked and improved content:
   move the player into a poison cloud, and even into a fire cloud if the player
   is already on Fire or has Foggy-Skin, following the idea that movement into a
   dangerous cloud is ok as long as it cannot result in immediate damage.
-* Phoenixes now have only 2 attack but a higher chance of burning. The idea is
-  to make fighting phoenixes in melee a bit less dangerous, in particular with
-  Foggy-Skin or Salamander (see #17).
+* Phoenixes now have only 2 attack but a somewhat higher chance of burning,
+  unless imbalanced. The idea is to make fighting phoenixes in melee a bit less
+  dangerous, in particular with Foggy-Skin or Salamander (see #17).
 * Shadow now preserves the damage debuff, but makes hunting monsters wander
   again when you hit them (see #17). This way, the ability remains more
   pacific-oriented and helps getting unnoticed through monsters even if they
