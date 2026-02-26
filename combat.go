@@ -389,11 +389,13 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 			g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
 		}
 	}
-	if ai.DoesAll(BurningHits) && (ai.IsMonster(BurningPhoenix) && g.IntN(3) > 0 ||
-		!ai.IsMonster(BurningPhoenix) && g.IntN(6-dmg) < 2) {
+	if ai.DoesAll(BurningHits) && g.burningRoll(ai, dmg) {
 		if !g.ResistStatusRoll(j, StatusFire) && g.PutStatus(j, aj, StatusFire, DurationFire) {
 			if p := ej.P; g.Map.Burnable(p) {
 				g.FireCloudAt(p)
+			}
+			if i != PlayerID {
+				g.monsConfusionPenalty(i, ai)
 			}
 		}
 	}
@@ -622,6 +624,34 @@ func (g *Game) monsConfusionPenalty(i ID, ai *Actor) {
 			g.LogfStyled("The confused %s hurts itself too!", logHurtMons, g.Entity(i).Name)
 		}
 		g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
+	}
+}
+
+// burningRoll reports whether burning should happen.
+func (g *Game) burningRoll(ai *Actor, dmg int) bool {
+	if !ai.IsMonster(BurningPhoenix) {
+		return g.IntN(6-dmg) < 2
+	}
+	if ai.Has(StatusImbalance) {
+		// Lower burning chance specifically when imbalanced, so that
+		// phoenixes are more often easier to handle by boar, frog or
+		// crocodile when properly handled.
+		return g.IntN(100) < 30
+	}
+	// Otherwise, somewhat higher burning chance for phoenixes than for
+	// salamander or crazy druid. Still scaling with damage to somewhat
+	// make charge more dangerous and defense somewhat matter (which is
+	// useful with walking tree).
+	switch dmg {
+	case 1:
+		return g.IntN(100) < 45
+	case 2:
+		return g.IntN(100) < 60
+	case 3:
+		return g.IntN(100) < 75
+	default:
+		// Should not happen.
+		return g.IntN(100) < 90
 	}
 }
 
