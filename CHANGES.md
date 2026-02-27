@@ -6,12 +6,13 @@ Reworked and improved content:
   the player away on the last level, making teleport-based strategies less
   reliable as a means of progression toward the orb, but still useful otherwise
   (see issue #11).
-* Remove safety rule for pushing into dangerous clouds (experimental, see #16),
-  because it wasn't as useful since the Boar pushing changes a few releases
-  ago, and even sometimes unwanted. Relatedly, Crocodile's dragging may now
-  move the player into a poison cloud, and even into a fire cloud if the player
-  is already on Fire or has Foggy-Skin, following the idea that movement into a
-  dangerous cloud is ok as long as it cannot result in immediate damage.
+* Remove safety rule for pushing into dangerous clouds (experimental, see #16)
+  or while poisoned, because it wasn't as useful since the Boar pushing changes
+  a few releases ago, and even sometimes unwanted. Relatedly, Crocodile's
+  dragging may now move the player into a poison cloud, and even into a fire
+  cloud if the player is already on Fire or has Foggy-Skin, following the idea
+  that movement into a dangerous cloud is ok as long as it cannot result in
+  immediate damage.  Bat now uses a similar safety rule for visible fires.
 * Phoenixes now have only 2 attack but a somewhat higher chance of burning,
   unless imbalanced. The idea is to make fighting phoenixes in melee a bit less
   dangerous, in particular with Foggy-Skin or Salamander (see #17), to improve
