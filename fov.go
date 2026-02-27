@@ -127,12 +127,13 @@ func (g *Game) SenseEntity(i ID, verb string) {
 				g.md.RoarAnimation(pp)
 				g.MakeNoise(pp, NoiseRoar)
 				d := DurationFearRoar
-				if g.IntN(1+MaxFOVRange) > paths.DistanceManhattan(pp, ei.P) {
-					// Bias fear duration toward d-1 the
-					// closer the target is, for balancing
-					// purposes (things look sometimes
-					// scarier from afar).
-					d--
+				if g.IntN(1+MaxFOVRange) < paths.DistanceManhattan(pp, ei.P) {
+					// Bias fear duration toward d+1 the
+					// furtherst the target is, for
+					// balancing purposes (you need to get
+					// over the fear earlier when the
+					// danger is close).
+					d++
 				}
 				g.PutStatus(i, ri, StatusFear, d)
 			}
