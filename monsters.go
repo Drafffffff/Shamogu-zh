@@ -8,19 +8,22 @@ import (
 // HandleMonsterTurn handles AI for a monster actor with given ID. The ID
 // should then correspond to a non-player actor.
 func (g *Game) HandleMonsterTurn(i ID, ai *Actor) {
+	ei := g.Entity(i)
 	beh := ai.Behavior
+	pl, pa := g.Player()
 	if beh.SkipTurn {
 		beh.SkipTurn = false
+		if g.InFOV(ei.P) && !ai.Has(StatusDaze) {
+			g.MonsterUpdateTarget(i, ai, pl.P, false)
+		}
 		return
 	}
 	if ai.Has(StatusDaze) {
 		return
 	}
-	ei := g.Entity(i)
 	if ai.Has(StatusConfusion) && g.monsterDiscord(i, ai) {
 		return
 	}
-	pl, pa := g.Player()
 	if g.InFOV(ei.P) && g.MonsterUpdateTarget(i, ai, pl.P, false) {
 		// A wandering monster spends one turn noticing the player,
 		// unless you have the Dazzling Zebra.
