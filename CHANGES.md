@@ -27,6 +27,8 @@ Reworked and improved content:
 * Various inflict-on-hit statuses from monsters on the player now use a
   somewhat biased RNG that makes repeated application just after expiration
   less likely, making consecutive imbalance and fire dances less likely.
+* Increased daze duration when falling due to using Frog's jump while
+  imbalanced by one; was a bit too short to be noticeable.
 * New help tips about monster examination and rats hunting by smell (see #11).
 
 Improvements in Corrupted Dungeon expansion (see issue #11):
@@ -49,6 +51,8 @@ Fixes:
 * Fix an old regression from v1.2.0 with “pushing gale” in melee sometimes
   producing the wrong log message and doing only 1 damage instead of 2 (see
   issue #11).
+* Mention that Disorient only affects hunting monsters, not wandering ones
+  (a nuance of little impact, except when combined with gawalt's Shadow).
 
 # v1.4.1 2026-02-10
 
