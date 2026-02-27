@@ -126,7 +126,15 @@ func (g *Game) SenseEntity(i ID, verb string) {
 				pp := g.PP()
 				g.md.RoarAnimation(pp)
 				g.MakeNoise(pp, NoiseRoar)
-				g.PutStatus(i, ri, StatusFear, DurationFearRoar)
+				d := DurationFearRoar
+				if g.IntN(1+MaxFOVRange) < paths.DistanceManhattan(pp, ei.P) {
+					// Bias fear duration toward d-1 the
+					// closer the target is, for balancing
+					// purposes (things look sometimes
+					// scarier from afar).
+					d--
+				}
+				g.PutStatus(i, ri, StatusFear, d)
 			}
 		case *Comestible:
 			g.LogfStyled("You %s %s.", logNotable, verb, One(ei.Name))
