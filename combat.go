@@ -357,8 +357,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 	afraid := aj.Has(StatusFear)
 	// Extra effects by attack pattern.
 	switch {
-	case ai.DoesAny(Pushing|PushingCharge) && ai.CanMove() && !aj.ResistsMove() &&
-		(ap == AttackCharge || !ai.Has(StatusPoison)) && !redirected:
+	case ai.DoesAny(Pushing|PushingCharge) && ai.CanMove() && !aj.ResistsMove() && !redirected:
 		if ai.Has(StatusDig) || ai.DoesAny(PushingCharge) && ap == AttackCharge && dist > 2 ||
 			ai.DoesAny(Pushing) && !g.ResistStatusRoll(j, StatusImbalance) && g.IntN(5-dmg) < 2 {
 			g.push(i, j, ai, aj, ap, dist, bonus)
@@ -678,6 +677,11 @@ func (g *Game) push(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonus int) {
 		}
 		g.MoveActor(j, aj, npj, MovPlain)
 	}
+	if i == PlayerID && ai.HP == 1 && (g.AvoidsFireAt(i, ai, pj) || ap != AttackCharge && ai.Has(StatusPoison)) {
+		// Avoid dangerous movement that could (almost certainly) kill
+		// the player.
+		move = false
+	}
 	if !move || ai.IsDead() {
 		return
 	}
@@ -772,13 +776,11 @@ func (g *Game) drag(i, j ID, ai, aj *Actor) {
 	if !g.IsFree(to) {
 		return
 	}
-	if i == PlayerID {
-		if g.AvoidsFireAt(i, ai, to) {
-			// We don't move onto a fire cloud that could
-			// burn the crocodile's tail (unless already
-			// burning).
-			return
-		}
+	if g.AvoidsFireAt(i, ai, to) {
+		// We don't move onto a fire cloud that could
+		// burn the crocodile's tail (unless already
+		// burning).
+		return
 	}
 	g.PutStatus(j, aj, StatusImbalance, DurationImbalanceDragging)
 	// Move backwards.
@@ -789,6 +791,10 @@ func (g *Game) drag(i, j ID, ai, aj *Actor) {
 // AvoidsFireAt reports whether the (player) actor would avoid moving into a
 // fire cloud at the given position (currently for dragging purposes only).
 func (g *Game) AvoidsFireAt(i ID, ai *Actor, at gruid.Point) bool {
+	if i != PlayerID {
+		// Monsters never avoid fire clouds.
+		return false
+	}
 	if g.Map.Clouds.At(at).Kind != CloudFire {
 		return false
 	}
@@ -822,6 +828,10 @@ func (g *Game) retreat(i, j ID, ai *Actor) {
 		p := to.Add(dir)
 		if !g.IsFree(p) {
 			break
+		}
+		if g.InFOV(p) && g.AvoidsFireAt(i, ai, p) {
+			// We don't move into a dangerous visible fire cloud.
+			continue
 		}
 		to = p
 	}

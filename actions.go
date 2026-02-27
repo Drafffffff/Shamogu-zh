@@ -1689,9 +1689,11 @@ In Shamogu, both the player and the monsters may use one of several attack patte
 
 @CSpace-Distorting@N attacks are ranged attacks that @Mswap positions@N on successful hits, but result in normal movement on misses. Any foes adjacent to the landing hit position are blinked away. Note that such attacks reverse your current direction. They also swap any clouds, but not the terrain.
 
-@CDragging@N attacks are melee attacks that drag foes backwards, unbalancing them. They’re performed by Spinning Crocodile players. No dragging happens if it would move you onto fire, unless the player is already on @OFire@N or would resist it.
+@CDragging@N attacks are melee attacks that drag foes backwards, unbalancing them. They’re performed by Spinning Crocodile players.
 
 @CSneak@N attacks are a two-phased attack pattern. When ranged, it works as a confusing rampaging attack. In melee, a plain attack is followed by quick 2-tile retreat. Sneak attacks are performed by Vampiric Bat players.
+
+@MNote:@N crocodile’s dragging and bat’s retreat don’t happen when @Opoisoned@N nor when they would move you onto dangerous visible fire, unless you’re already on @OFire@N or would be protected by @BFoggy-Skin@N. The boar’s pushing and wind fox’s recoil don’t have any safety rules, but because recoil is a form of unvoluntary movement, it is at least unaffected by poison.
 
 @YNOISE@N
 
