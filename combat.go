@@ -652,11 +652,18 @@ func (g *Game) push(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonus int) {
 	delta := pj.Sub(pi)
 	npj := pj.Add(delta)
 	d := 2 + 2*(dist/5) // imbalance duration (2 for dist 2-4, 4 for dist 5-8)
+	pass := g.Map.Passable(npj)
+	k, ak := g.ActorAt(npj)
+	if i == PlayerID && pass && k < 0 && ap != AttackCharge && ai.Has(StatusPoison) {
+		// No pushing if the player is poisoned and would need to move
+		// otherwise. Note that pushing a monster against a wall still
+		// happens.
+		return
+	}
 	if g.PutStatus(j, aj, StatusImbalance, d) && i != PlayerID &&
 		ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusImbalance, d) && g.InFOV(ei.P) {
 		g.Logf("The confused %s lost balance while pushing too!", ei.Name)
 	}
-	k, ak := g.ActorAt(npj)
 	if ak != nil {
 		// There's another actor behind: extra piercing attack (without
 		// extra effects, but inheriting any charge attack bonuses).
@@ -664,7 +671,7 @@ func (g *Game) push(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonus int) {
 	}
 	move := true // whether to move pushing actor to pj
 	switch {
-	case !g.Map.Passable(npj) || ak != nil && ak.IsAlive():
+	case !pass || ak != nil && ak.IsAlive():
 		// No room for pushing, so move only if the foe is dead.
 		move = aj.IsDead()
 	case aj.IsAlive():
@@ -677,9 +684,11 @@ func (g *Game) push(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonus int) {
 		}
 		g.MoveActor(j, aj, npj, MovPlain)
 	}
-	if i == PlayerID && ai.HP == 1 && (g.AvoidsFireAt(i, ai, pj) || ap != AttackCharge && ai.Has(StatusPoison)) {
+	if i == PlayerID && (ai.HP == 1 && g.AvoidsFireAt(i, ai, pj) || ap != AttackCharge && ai.Has(StatusPoison)) {
 		// Avoid dangerous movement that could (almost certainly) kill
 		// the player.
+		// Also no melee movement while poisoned even in case the
+		// monster died and made room for the player.
 		move = false
 	}
 	if !move || ai.IsDead() {

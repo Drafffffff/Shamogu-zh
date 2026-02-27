@@ -1679,7 +1679,7 @@ In Shamogu, both the player and the monsters may use one of several attack patte
 
 @CRampaging@N attacks allow to charge from as far as you can see. When charging, there is a bonus of 1 to attack, except against lignified foes that resist forced movement.
 
-@CPushing@N attacks push foes one tile away, unbalancing them. When there’s another foe just behind, you perform an extra attack on them instead. Rampaging boars, as well as Rampaging Boar spirit players, perform pushing when charging from beyond a 2-tile range, and distances beyond a 4-tile range result in double @OImbalance@N duration. Earth dragons and players with @BDig@N may push with melee attacks, too. @OPoison@N prevents pushing in melee.
+@CPushing@N attacks push foes one tile away, unbalancing them. When there’s another foe just behind, you perform an extra attack on them instead. Rampaging boars, as well as Rampaging Boar spirit players, perform pushing when charging from beyond a 2-tile range, and distances beyond a 4-tile range result in double @OImbalance@N duration. Earth dragons and players with @BDig@N may push with melee attacks, too.
 
 @CRanged@N attacks are performed without moving from as far as you can see.
 
@@ -1693,7 +1693,7 @@ In Shamogu, both the player and the monsters may use one of several attack patte
 
 @CSneak@N attacks are a two-phased attack pattern. When ranged, it works as a confusing rampaging attack. In melee, a plain attack is followed by quick 2-tile retreat. Sneak attacks are performed by Vampiric Bat players.
 
-@MNote:@N crocodile’s dragging and bat’s retreat don’t happen when @Opoisoned@N nor when they would move you onto dangerous visible fire, unless you’re already on @OFire@N or would be protected by @BFoggy-Skin@N. The boar’s pushing and wind fox’s recoil don’t have any safety rules, but because recoil is a form of unvoluntary movement, it is at least unaffected by poison.
+@MNote:@N crocodile’s dragging and bat’s retreat don’t happen when @Opoisoned@N nor when they would move you onto dangerous visible fire, unless you’re already on @OFire@N or would be protected by @BFoggy-Skin@N. The boar’s pushing charge and wind fox’s recoil don’t have any safety rules, but because recoil is a form of unvoluntary movement, it is at least unaffected by poison. Melee pushing with @BDig@N is restricted by poison when it requires player movement, but unbalancing and piercing effects still happen when there’s no room for movement, like when pushing a monster against a wall.
 
 @YNOISE@N
 
