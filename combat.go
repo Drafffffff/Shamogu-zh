@@ -776,7 +776,7 @@ func (g *Game) recoil(i, j ID, ai *Actor, dist int) bool {
 	return true
 }
 
-// drag attemps to drag a foe backwards.
+// drag attempts to drag a foe backwards.
 func (g *Game) drag(i, j ID, ai, aj *Actor) {
 	ei, ej := g.Entity(i), g.Entity(j)
 	pi, pj := ei.P, ej.P
@@ -828,7 +828,7 @@ func (g *Game) AvoidsFireAt(i ID, ai *Actor, at gruid.Point) bool {
 	return true
 }
 
-// retreat attemps to a sneaky retreat backwards.
+// retreat attempts to a sneaky retreat backwards.
 func (g *Game) retreat(i, j ID, ai *Actor) {
 	ei, ej := g.Entity(i), g.Entity(j)
 	dir := toDir(ei.P.Sub(ej.P))

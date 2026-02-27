@@ -324,11 +324,11 @@ func (g *Game) ComputeNoise() {
 				dist += maxFOVRange / 2
 			default:
 				// Silent monsters like spiders cannot be
-				// heared without good hearing.
+				// heard without good hearing.
 				continue
 			}
 		case ai.DoesAny(MonsHeavyFootsteps):
-			// Heavy footsteps can be heared from a greater distance.
+			// Heavy footsteps can be heard from a greater distance.
 			dist -= 3
 		case ai.DoesAny(MonsLightFootsteps | MonsCreep):
 			// Light footsteps and creeping are slightly harder to

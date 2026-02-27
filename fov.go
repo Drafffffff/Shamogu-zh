@@ -129,7 +129,7 @@ func (g *Game) SenseEntity(i ID, verb string) {
 				d := DurationFearRoar
 				if g.IntN(1+MaxFOVRange) < paths.DistanceManhattan(pp, ei.P) {
 					// Bias fear duration toward d+1 the
-					// furtherst the target is, for
+					// furthest the target is, for
 					// balancing purposes (you need to get
 					// over the fear earlier when the
 					// danger is close).

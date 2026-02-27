@@ -328,7 +328,7 @@ var NoHealingComestibleData = []itemInfo{
 	TeleportMushroom:   {"teleport mushroom", EffectTeleportMushroom{NoHeal: true}},
 }
 
-// GetComestibleData returns the appropiate comestible data for current mod
+// GetComestibleData returns the appropriate comestible data for current mod
 // selection.
 func (g *Game) GetComestibleData() []itemInfo {
 	if g.Mod(ModHealingCombat) {
@@ -1586,7 +1586,7 @@ func (g *Game) corruptedTotemGuardianPoint() gruid.Point {
 	return g.corruptedPortalGuardianPoint()
 }
 
-// hideLocation attemps to hide the given point by adding foliage or rubble
+// hideLocation attempts to hide the given point by adding foliage or rubble
 // around in a parsimonious way.
 func (g *Game) hideLocation(at gruid.Point) {
 	Diags := []gruid.Point{

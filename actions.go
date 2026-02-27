@@ -818,7 +818,7 @@ func (a ActionUseItem) Handle(md *model) (gruid.Effect, bool) {
 	return nil, md.g.useItem(a.ID)
 }
 
-// useItem attemps to use the entity with given ID if it's an item. It reports
+// useItem attempts to use the entity with given ID if it's an item. It reports
 // whether the attempt was a success.
 func (g *Game) useItem(id ID) bool {
 	e := g.Entity(id)
