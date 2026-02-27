@@ -412,7 +412,7 @@ func (eff EffectJump) Apply(g *Game) bool {
 	}
 	if pa.Has(StatusImbalance) && g.IntN(2) == 0 {
 		g.Log("You fall due to imbalance.")
-		g.PutStatus1(PlayerID, pa, StatusDaze, DurationDazeFall)
+		g.PutStatus1(PlayerID, pa, StatusDaze, DurationDazeFall+1)
 	}
 	g.TriggerTrap(PlayerID, pa)
 	return true
