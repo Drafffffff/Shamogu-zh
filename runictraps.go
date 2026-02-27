@@ -47,7 +47,7 @@ func (mr MagicRune) String() string {
 }
 
 // Color returns the color of the runic trap.
-func (rt RunicTrap) Color() gruid.Color {
+func (rt *RunicTrap) Color() gruid.Color {
 	if rt.KnownUsed {
 		return ColorForeground
 	}
@@ -69,7 +69,7 @@ func (rt RunicTrap) Color() gruid.Color {
 }
 
 // Desc returns the description of the runic trap.
-func (rt RunicTrap) Desc() string {
+func (rt *RunicTrap) Desc() string {
 	if rt.KnownUsed {
 		return "The rune has already been triggered."
 	}
@@ -92,7 +92,7 @@ func (rt RunicTrap) Desc() string {
 }
 
 // RunicTraps are items but they cannot be used like other items.
-func (rt RunicTrap) Use(g *Game, id ID) bool {
+func (rt *RunicTrap) Use(g *Game, id ID) bool {
 	g.Log("You cannot interact with a trap.")
 	return false
 }
@@ -109,12 +109,7 @@ func (g *Game) TriggerTrap(i ID, ai *Actor) {
 		return
 	}
 	pi := g.Entity(i).P
-	j := g.Map.RuneCache.At(pi)
-	if j <= 0 {
-		return
-	}
-	ei := g.Entity(j)
-	rt, ok := ei.Role.(*RunicTrap)
+	rt, ok := g.RunicTrapAt(pi)
 	if !ok || rt.Used {
 		return
 	}
@@ -153,4 +148,15 @@ func (g *Game) TriggerTrap(i ID, ai *Actor) {
 		rt.KnownUsed = true
 	}
 	g.Map.RuneCache.SetU(pi, 0)
+}
+
+// RunicTrapAt returns any runic trap at the given position.
+func (g *Game) RunicTrapAt(at gruid.Point) (*RunicTrap, bool) {
+	i := g.Map.RuneCache.At(at)
+	if i <= 0 {
+		return nil, false
+	}
+	ei := g.Entity(i)
+	rt, ok := ei.Role.(*RunicTrap)
+	return rt, ok
 }

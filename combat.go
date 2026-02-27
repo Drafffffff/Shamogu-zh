@@ -773,14 +773,11 @@ func (g *Game) drag(i, j ID, ai, aj *Actor) {
 		return
 	}
 	if i == PlayerID {
-		switch g.Map.Clouds.At(to).Kind {
-		case CloudFire:
-			if g.AvoidsFire(i, ai) {
-				// We don't move onto a fire cloud that could
-				// burn the crocodile's tail (unless already
-				// burning).
-				return
-			}
+		if g.AvoidsFireAt(i, ai, to) {
+			// We don't move onto a fire cloud that could
+			// burn the crocodile's tail (unless already
+			// burning).
+			return
 		}
 	}
 	g.PutStatus(j, aj, StatusImbalance, DurationImbalanceDragging)
@@ -789,17 +786,28 @@ func (g *Game) drag(i, j ID, ai, aj *Actor) {
 	g.MoveActor(j, aj, pi, MovPlain)
 }
 
-// AvoidsFire reports whether the (player) actor would avoid moving into a fire
-// cloud (currently for dragging purposes only).
-func (g *Game) AvoidsFire(i ID, ai *Actor) bool {
+// AvoidsFireAt reports whether the (player) actor would avoid moving into a
+// fire cloud at the given position (currently for dragging purposes only).
+func (g *Game) AvoidsFireAt(i ID, ai *Actor, at gruid.Point) bool {
+	if g.Map.Clouds.At(at).Kind != CloudFire {
+		return false
+	}
 	if ai.Has(StatusFire) || ai.Statuses[StatusFoggySkin] > 1 {
 		// Do not avoid fire cloud if already on fire or resistant to
 		// it.
 		return false
 	}
+	if !ai.ResistsMove() {
+		if rt, ok := g.RunicTrapAt(at); ok && !rt.Used && rt.Rune == RuneWarp {
+			// If there is a working warping rune and we're not
+			// warp-resistant, then there is no danger of immediate
+			// damage.
+			return false
+		}
+	}
 	if g.Map.Clouds.At(g.Entity(i).P).Kind == CloudFire {
 		// Already a fire cloud on current position, so it doesn't make
-		// sense to avoid moving into a fire cloud.
+		// sense to avoid moving into another fire cloud.
 		return false
 	}
 	return true
