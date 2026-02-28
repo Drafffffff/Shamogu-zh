@@ -233,8 +233,11 @@ func (g *Game) monsterDeath(i, j ID, aj *Actor) {
 		aj.KnownDead = true
 	}
 	if g.Mod(ModHealingCombat) && !g.HasVampirism() {
+		// When Healing Combat is enabled and the player is not a bat,
+		// we have a chance of healing when killing monsters.
+		// The chance is higher at low HP (guaranteed at 3 HP or less).
 		pa := g.PlayerActor()
-		if pa.HP < pa.GetMaxHP() && g.IntN(pa.HP) < 4 {
+		if pa.HP < pa.GetMaxHP() && g.IntN(pa.HP+2) < 5 {
 			aj.KnownDead = true // You feel the monster's death as you heal.
 			g.AdjustHP(PlayerID, g.PlayerActor(), 1)
 		}
