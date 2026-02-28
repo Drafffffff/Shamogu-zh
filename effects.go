@@ -101,12 +101,16 @@ func (g *Game) eatMsg(name string, hpstr string) {
 	}
 }
 
-type EffectAmbrosiaBerries struct{}
+type EffectAmbrosiaBerries struct{ HealingCombat bool }
 
 func (eff EffectAmbrosiaBerries) Apply(g *Game) bool {
 	pa := g.PlayerActor()
-	g.eatMsg("ambrosia berries", newHPMsg(pa, HealAmbrosia))
-	g.AdjustHP(PlayerID, pa, HealAmbrosia)
+	heal := HealAmbrosia
+	if eff.HealingCombat {
+		heal /= 4
+	}
+	g.eatMsg("ambrosia berries", newHPMsg(pa, heal))
+	g.AdjustHP(PlayerID, pa, heal)
 	if g.IntN(2) == 0 {
 		g.PutStatus1(PlayerID, pa, StatusConfusion, DurationConfusionAmbrosia)
 	} else {
@@ -116,8 +120,12 @@ func (eff EffectAmbrosiaBerries) Apply(g *Game) bool {
 }
 
 func (eff EffectAmbrosiaBerries) Desc() string {
+	heal := HealAmbrosia
+	if eff.HealingCombat {
+		heal /= 4
+	}
 	return fmt.Sprintf("Restores %+d HP. Leaves you either @Oconfused@N or @Oafraid@N for %d or %d turns respectively.",
-		HealAmbrosia, DurationConfusionAmbrosia, DurationFearAmbrosia)
+		heal, DurationConfusionAmbrosia, DurationFearAmbrosia)
 }
 
 type EffectBerserkingFlower struct{}
@@ -178,12 +186,12 @@ func (eff EffectLignificationFruit) Desc() string {
 		DurationLignification, statusDesc[StatusLignification])
 }
 
-type EffectClarityLeaves struct{ NoHeal bool }
+type EffectClarityLeaves struct{ HealingCombat bool }
 
 func (eff EffectClarityLeaves) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	var hpstr string
-	if eff.NoHeal {
+	if eff.HealingCombat {
 		hpstr = ""
 	} else if pa.Has(StatusBerserk) {
 		hpstr = newHPWithoutBonus(pa, 1, HealClarityLeaves)
@@ -193,7 +201,7 @@ func (eff EffectClarityLeaves) Apply(g *Game) bool {
 	extraTurns := pa.Statuses[StatusClarity]
 	g.eatMsg("clarity leaves", hpstr)
 	g.PutStatus1(PlayerID, pa, StatusClarity, DurationClarity+extraTurns)
-	if !eff.NoHeal {
+	if !eff.HealingCombat {
 		g.AdjustHP(PlayerID, pa, HealClarityLeaves)
 	}
 	return true
@@ -212,15 +220,15 @@ func newHPWithoutBonus(a *Actor, m, hp int) string {
 
 func (eff EffectClarityLeaves) Desc() string {
 	return fmt.Sprintf("Gives @BClarity@N for %d turns. %s%s",
-		DurationClarity, statusDesc[StatusClarity], healMsgNH(HealClarityLeaves, eff.NoHeal))
+		DurationClarity, statusDesc[StatusClarity], healMsgNH(HealClarityLeaves, eff.HealingCombat))
 }
 
-type EffectFoggySkinOnion struct{ NoHeal bool }
+type EffectFoggySkinOnion struct{ HealingCombat bool }
 
 func (eff EffectFoggySkinOnion) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	var hpstr string
-	if eff.NoHeal {
+	if eff.HealingCombat {
 		hpstr = ""
 	} else if pa.Has(StatusLignification) {
 		hpstr = newHPWithoutBonus(pa, 3, HealFoggySkinOnion)
@@ -230,7 +238,7 @@ func (eff EffectFoggySkinOnion) Apply(g *Game) bool {
 	extraTurns := pa.Statuses[StatusFoggySkin]
 	g.eatMsg("foggy-skin onion", hpstr)
 	g.PutStatus1(PlayerID, pa, StatusFoggySkin, DurationFoggySkin+extraTurns)
-	if !eff.NoHeal {
+	if !eff.HealingCombat {
 		g.AdjustHP(PlayerID, pa, HealFoggySkinOnion)
 	}
 	return true
@@ -238,17 +246,17 @@ func (eff EffectFoggySkinOnion) Apply(g *Game) bool {
 
 func (eff EffectFoggySkinOnion) Desc() string {
 	return fmt.Sprintf("Gives @BFoggy-Skin@N for %d turns. %s%s",
-		DurationFoggySkin, statusDesc[StatusFoggySkin], healMsgNH(HealFoggySkinOnion, eff.NoHeal))
+		DurationFoggySkin, statusDesc[StatusFoggySkin], healMsgNH(HealFoggySkinOnion, eff.HealingCombat))
 }
 
-type EffectFirebreathPepper struct{ NoHeal bool }
+type EffectFirebreathPepper struct{ HealingCombat bool }
 
 func (eff EffectFirebreathPepper) Apply(g *Game) bool {
 	pp := g.PP()
 	pa := g.PlayerActor()
-	g.eatMsg("firebreath pepper", newHPMsgNH(pa, HealFirebreathPepper, eff.NoHeal))
+	g.eatMsg("firebreath pepper", newHPMsgNH(pa, HealFirebreathPepper, eff.HealingCombat))
 	g.MakeNoise(pp, NoiseRoar)
-	if !eff.NoHeal {
+	if !eff.HealingCombat {
 		g.AdjustHP(PlayerID, pa, HealFirebreathPepper)
 	}
 	g.md.FirebreathAnimation(pp.Add(g.Dir), g.Dir)
@@ -277,10 +285,10 @@ func (eff EffectFirebreathPepper) Apply(g *Game) bool {
 
 func (eff EffectFirebreathPepper) Desc() string {
 	return fmt.Sprintf("Makes you breathe a confusing fire beam in the current direction inflicting @OConfusion@N for %d turns and @OFire@N for %d turns. Burns foliage, producing fire clouds lasting 6-12 turns. Makes walls explode.%s",
-		DurationConfusionPepperBreath, DurationFire, healMsgNH(HealFirebreathPepper, eff.NoHeal))
+		DurationConfusionPepperBreath, DurationFire, healMsgNH(HealFirebreathPepper, eff.HealingCombat))
 }
 
-type EffectTeleportMushroom struct{ NoHeal bool }
+type EffectTeleportMushroom struct{ HealingCombat bool }
 
 func (eff EffectTeleportMushroom) Apply(g *Game) bool {
 	pa := g.PlayerActor()
@@ -288,7 +296,7 @@ func (eff EffectTeleportMushroom) Apply(g *Game) bool {
 	g.eatMsg("teleport mushroom", "")
 	if !g.TeleportActor(PlayerID, pa, 1) {
 		g.Log("You resist teleport while lignified.")
-		if !eff.NoHeal {
+		if !eff.HealingCombat {
 			g.AdjustHP(PlayerID, pa, HealTeleportLignified)
 		}
 	}
@@ -308,7 +316,7 @@ func (g *Game) teleportStatuses(i ID, ai *Actor, n int) {
 
 func (eff EffectTeleportMushroom) Desc() string {
 	var healMsg string
-	if !eff.NoHeal {
+	if !eff.HealingCombat {
 		healMsg = fmt.Sprintf(" Restores %+d HP when lignified instead.", HealTeleportLignified)
 	}
 	return fmt.Sprintf("Teleports you away and makes you sense any totemic spirit. Leaves you either @Odazed@N or @Oimbalanced@N for %d or %d turns respectively.%s",
