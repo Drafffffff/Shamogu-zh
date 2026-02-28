@@ -4,15 +4,15 @@ Reworked and improved content:
 
 * The Orb may now interfere with teleportation about half of the time, driving
   the player away on the last level, making teleport-based strategies less
-  reliable as a means of progression toward the orb, but still useful otherwise
+  reliable as a means of progression toward the Orb, but still useful otherwise
   (see issue #11).
-* Remove safety rule for pushing into dangerous clouds (experimental, see #16),
-  because it wasn't as useful since the Boar pushing changes a few releases
-  ago, and even sometimes unwanted. Relatedly, Crocodile's dragging may now
-  move the player into a poison cloud, and even into a fire cloud if the player
-  is already on Fire or has Foggy-Skin, following the idea that movement into a
-  dangerous cloud is ok as long as it cannot result in immediate damage.  Bat
-  now uses a similar safety rule for visible fires.
+* Remove safety rule for pushing into dangerous clouds (see #16), because it
+  wasn't as useful since the Boar pushing changes a few releases ago, and even
+  sometimes unwanted. Relatedly, Crocodile's dragging may now move the player
+  into a poison cloud, and even into a fire cloud if the player is already on
+  Fire or has Foggy-Skin, following the idea that movement into a dangerous
+  cloud is ok as long as it cannot result in immediate damage.  Bat now uses a
+  similar safety rule for visible fires.
 * Phoenixes now have only 2 attack but a somewhat higher chance of burning,
   unless imbalanced. The idea is to make fighting phoenixes in melee a bit less
   dangerous, in particular with Foggy-Skin or Salamander (see #17), to improve
@@ -22,6 +22,11 @@ Reworked and improved content:
   pacific-oriented and helps getting unnoticed through monsters even if they
   already were hunting you.
 * Disorient status now lasts an extra turn.
+* Lion's roar now inflicts 4-5 turns of Fear, instead of 5, with 4 being more
+  likely on close targets. This change helps balance hydra+lion and
+  frog+lion+owl, as those are somewhat overpowered with respect to other
+  combinations. Thematically, we can think of it as monsters often getting over
+  their fear earlier when danger is close.
 * Cat's dazing effect on swapping happens now less often than before; it's also
   somewhat less likely but longer on average at long distances to make distant
   swapping by monster cats more unlikely to be undone just afterwards.
@@ -30,6 +35,17 @@ Reworked and improved content:
   less likely, making consecutive imbalance and fire dances less likely.
 * Increased daze duration when falling due to using Frog's jump while
   imbalanced by one; was a bit too short to be noticeable.
+* Healing Combat challenge mod: ambrosia berries have been restored but heal
+  only for 2 HP. The motivation was to simplify maintenance and compatibility
+  with other mods, like Corrupted Dungeon, that may want to generate ambrosia
+  berries (like in berserk themed levels), but the change also helps preserve
+  original comestible variety and avoid introducing comestible-frequency
+  changes.  Heal-on-kill formula has also been slightly adjusted to make it
+  smoother, while still guaranting heal at 3 HP or less.  The mod is no longer
+  considered experimental, because it's very playable despite the still present
+  comestible imbalance, which is a minor issue in practice, and provides a
+  different experience with choice considerations, so it has some charm as an
+  occasional challenge.
 * New help tips about monster examination and rats hunting by smell (see #11).
 
 Improvements in Corrupted Dungeon expansion (see issue #11):
@@ -54,6 +70,9 @@ Fixes:
   issue #11).
 * Mention that Disorient only affects hunting monsters, not wandering ones
   (a nuance of little impact, except when combined with gawalt's Shadow).
+* Make monsters on a skipped turn (due to out-of-view monster swapping) still
+  notice the player when in view during that skipped turn (see #17). Not really
+  a bug, but it could (very rarely) feel strange.
 
 # v1.4.1 2026-02-10
 
