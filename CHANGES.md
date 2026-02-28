@@ -41,11 +41,11 @@ Reworked and improved content:
   berries (like in berserk themed levels), but the change also helps preserve
   original comestible variety and avoid introducing comestible-frequency
   changes.  Heal-on-kill formula has also been slightly adjusted to make it
-  smoother, while still guaranting heal at 3 HP or less.  The mod is no longer
-  considered experimental, because it's very playable despite the still present
-  comestible imbalance, which is a minor issue in practice, and provides a
-  different experience with choice considerations, so it has some charm as an
-  occasional challenge.
+  smoother, while still guaranteeing heal at 3 HP or less.  The mod is no
+  longer considered experimental, because it's very playable despite the still
+  present comestible imbalance, which is a minor issue in practice, and
+  provides a different experience with choice considerations, so it has some
+  charm as an occasional challenge.
 * New help tips about monster examination and rats hunting by smell (see #11).
 
 Improvements in Corrupted Dungeon expansion (see issue #11):
