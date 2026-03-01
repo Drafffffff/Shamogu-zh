@@ -23,7 +23,7 @@ const (
 	DurationConfusionPepperBreath  = 2
 	DurationConfusionSkunk         = 5
 	DurationConfusionToxins        = 4
-	DurationDazeFall               = 1
+	DurationDazeFall               = 2
 	DurationDazeJump               = 4
 	DurationDazeLightning          = 4
 	DurationDazeSpines             = 2
@@ -418,9 +418,10 @@ func (eff EffectJump) Apply(g *Game) bool {
 			g.PutStatus(i, ai, StatusDaze, DurationDazeJump)
 		}
 	}
-	if pa.Has(StatusImbalance) && g.IntN(2) == 0 {
+	if pa.Has(StatusImbalance) && g.IntN(5) < 2 {
 		g.Log("You fall due to imbalance.")
-		g.PutStatus1(PlayerID, pa, StatusDaze, DurationDazeFall+1)
+		duration := DurationDazeFall + paths.DistanceManhattan(from, to)/3
+		g.PutStatus1(PlayerID, pa, StatusDaze, duration)
 	}
 	g.TriggerTrap(PlayerID, pa)
 	return true

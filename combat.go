@@ -735,10 +735,7 @@ func (g *Game) swapSpaceDistortion(i, j ID, ai, aj *Actor, dazed bool, dist int)
 	g.SwapClouds(g.Entity(i).P, pj)
 	g.MoveActor(i, ai, pj, MovSet) // swaps positions
 	if !dazed && ai.DoesAny(PatternSwapDaze) && g.IntN(100) < 45-dist*2 {
-		duration := 2
-		if g.IntN(1+MaxFOVRange) < dist {
-			duration++
-		}
+		duration := 2 + dist/3
 		if !g.ResistStatusRoll(j, StatusDaze) && g.PutStatus(j, aj, StatusDaze, duration) && i != PlayerID &&
 			ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusDaze, duration) && g.InFOV(pj) {
 			g.LogfStyled("The confused %s dazed itself too!",

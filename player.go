@@ -208,7 +208,7 @@ func (g *Game) Sprint(dir gruid.Point) bool {
 			}
 		}
 	}
-	if n > 1 && pa.Has(StatusImbalance) && g.IntN(DurationSprint) == 0 {
+	if n > 1 && pa.Has(StatusImbalance) && g.IntN(3*DurationSprint/2) == 0 {
 		g.Log("You fall due to imbalance.")
 		g.PutStatus(PlayerID, pa, StatusDaze, DurationDazeFall)
 	}
@@ -236,10 +236,6 @@ func (g *Game) WallJump(dir gruid.Point) bool {
 		g.Log("You cannot walk out of the map.")
 		return false
 	}
-	// if dir == g.Dir || dir == g.Dir.Mul(-1) {
-	// 	g.Logf("You cannot walk into the %s.", TerrainName(g.Map.Terrain.At(at)))
-	// 	return false
-	// }
 	over := pl.P.Sub(dir)
 	to := over.Sub(dir)
 	if !g.Map.Passable(over) {
@@ -263,7 +259,7 @@ func (g *Game) WallJump(dir gruid.Point) bool {
 			g.BumpAttackActor(PlayerID, i, pa, ai, AttackPlain, 1, 0)
 		}
 	}
-	if pa.Has(StatusImbalance) && g.IntN(10) == 0 {
+	if pa.Has(StatusImbalance) && g.IntN(4) == 0 {
 		g.Log("You fall due to imbalance.")
 		g.PutStatus(PlayerID, pa, StatusDaze, DurationDazeFall)
 	}
