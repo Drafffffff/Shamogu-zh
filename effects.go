@@ -52,6 +52,7 @@ const (
 	DurationPoisonCloud            = 3
 
 	HealAmbrosia          = 8
+	HealAmbrosiaHC        = 2
 	HealClarityLeaves     = 4
 	HealFirebreathPepper  = 2
 	HealFoggySkinOnion    = 3
@@ -107,7 +108,7 @@ func (eff EffectAmbrosiaBerries) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	heal := HealAmbrosia
 	if eff.HealingCombat {
-		heal /= 4
+		heal = HealAmbrosiaHC
 	}
 	g.eatMsg("ambrosia berries", newHPMsg(pa, heal))
 	g.AdjustHP(PlayerID, pa, heal)
@@ -122,7 +123,7 @@ func (eff EffectAmbrosiaBerries) Apply(g *Game) bool {
 func (eff EffectAmbrosiaBerries) Desc() string {
 	heal := HealAmbrosia
 	if eff.HealingCombat {
-		heal /= 4
+		heal = HealAmbrosiaHC
 	}
 	return fmt.Sprintf("Restores %+d HP. Leaves you either @Oconfused@N or @Oafraid@N for %d or %d turns respectively.",
 		heal, DurationConfusionAmbrosia, DurationFearAmbrosia)
