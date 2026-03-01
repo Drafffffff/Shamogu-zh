@@ -210,7 +210,7 @@ func (g *Game) Sprint(dir gruid.Point) bool {
 	}
 	if n > 1 && pa.Has(StatusImbalance) && g.IntN(3*DurationSprint/2) == 0 {
 		g.Log("You fall due to imbalance.")
-		g.PutStatus(PlayerID, pa, StatusDaze, DurationDazeFall)
+		g.PutStatus1(PlayerID, pa, StatusDaze, DurationDazeFall)
 	}
 	g.TriggerTrap(PlayerID, pa)
 	return true
@@ -261,7 +261,7 @@ func (g *Game) WallJump(dir gruid.Point) bool {
 	}
 	if pa.Has(StatusImbalance) && g.IntN(4) == 0 {
 		g.Log("You fall due to imbalance.")
-		g.PutStatus(PlayerID, pa, StatusDaze, DurationDazeFall)
+		g.PutStatus1(PlayerID, pa, StatusDaze, DurationDazeFall)
 	}
 	g.TriggerTrap(PlayerID, pa)
 	g.Stats.WallJumps++
