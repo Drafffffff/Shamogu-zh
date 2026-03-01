@@ -35,8 +35,6 @@ Reworked and improved content:
 * Various inflict-on-hit statuses from monsters on the player now use a
   somewhat biased RNG that makes repeated application just after expiration
   less likely, making consecutive imbalance and fire dances less likely.
-* Increased daze duration when falling due to using Frog's jump while
-  imbalanced by one; was a bit too short to be noticeable.
 * Healing Combat challenge mod: ambrosia berries have been restored but heal
   only for 2 HP. The motivation was to simplify maintenance and compatibility
   with other mods, like Corrupted Dungeon, that may want to generate ambrosia
