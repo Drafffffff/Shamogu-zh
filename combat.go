@@ -360,7 +360,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 	afraid := aj.Has(StatusFear)
 	// Extra effects by attack pattern.
 	switch {
-	case ai.DoesAny(Pushing|PushingCharge) && ai.CanMove() && !aj.ResistsMove() && !redirected:
+	case ai.DoesAny(Pushing|PushingCharge) && !aj.ResistsMove() && !redirected:
 		if ai.Has(StatusDig) || ai.DoesAny(PushingCharge) && ap == AttackCharge && dist > 2 ||
 			ai.DoesAny(Pushing) && !g.ResistStatusRoll(j, StatusImbalance) && g.IntN(5-dmg) < 2 {
 			g.push(i, j, ai, aj, ap, dist, bonus)
@@ -652,17 +652,26 @@ func (g *Game) burningRoll(ai *Actor, dmg int) bool {
 func (g *Game) push(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonus int) {
 	ei, ej := g.Entity(i), g.Entity(j)
 	pi, pj := ei.P, ej.P
-	delta := pj.Sub(pi)
-	npj := pj.Add(delta)
-	d := 2 + 2*(dist/5) // imbalance duration (2 for dist 2-4, 4 for dist 5-8)
+	npj := pj.Add(pj.Sub(pi)) // position behind pushed actor
+	move := ai.CanMove()      // whether to move pushing actor to pj (if appropriate)
 	pass := g.Map.Passable(npj)
 	k, ak := g.ActorAt(npj)
-	if i == PlayerID && pass && k < 0 && ap != AttackCharge && ai.Has(StatusPoison) {
-		// No pushing if the player is poisoned and would need to move
-		// otherwise. Note that pushing a monster against a wall still
-		// happens.
-		return
+	if pass && k < 0 {
+		// No wall nor monster behind.
+		if i == PlayerID && ap != AttackCharge && ai.Has(StatusPoison) {
+			// No pushing nor unbalancing effects if the pushing
+			// player is poisoned but would need to move just for
+			// the pushing (Dig in melee).
+			return
+		}
+		if !move {
+			// No pushing nor unbalancing effects if the pushing
+			// actor cannot move but would need to move. Note that
+			// pushing a monster against a wall still happens.
+			return
+		}
 	}
+	d := 2 + 2*(dist/5) // imbalance duration (2 for dist 2-4, 4 for dist 5-8)
 	if g.PutStatus(j, aj, StatusImbalance, d) && i != PlayerID &&
 		ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusImbalance, d) && g.InFOV(ei.P) {
 		g.Logf("The confused %s lost balance while pushing too!", ei.Name)
@@ -672,11 +681,11 @@ func (g *Game) push(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonus int) {
 		// extra effects, but inheriting any charge attack bonuses).
 		g.AttackDamage(i, k, ai, ak, ap, bonus)
 	}
-	move := true // whether to move pushing actor to pj
 	switch {
 	case !pass || ak != nil && ak.IsAlive():
-		// No room for pushing, so move only if the foe is dead.
-		move = aj.IsDead()
+		// No room for pushing, so move only if the foe is dead and we
+		// can move.
+		move = move && aj.IsDead()
 	case aj.IsAlive():
 		// Push.
 		if j != PlayerID && (i == PlayerID || g.InFOV(pj)) {
