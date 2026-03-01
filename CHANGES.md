@@ -30,6 +30,8 @@ Reworked and improved content:
 * Cat's dazing effect on swapping happens now less often than before; it's also
   somewhat less likely but longer on average at long distances to make distant
   swapping by monster cats more unlikely to be undone just afterwards.
+* Dazing chance and duration after falling when doing various jumps while
+  imbalanced have been adjusted so that they are more significant (see #17).
 * Various inflict-on-hit statuses from monsters on the player now use a
   somewhat biased RNG that makes repeated application just after expiration
   less likely, making consecutive imbalance and fire dances less likely.
