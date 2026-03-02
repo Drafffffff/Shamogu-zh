@@ -510,6 +510,9 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 	if ap == AttackRanged && aj.DoesAny(MonsScales) {
 		defense++
 	}
+	if ai.DoesAny(MonsLignify) && aj.Has(StatusLignification) {
+		defense -= LignificationDefenseBonus
+	}
 	if ai.DoesAny(MonsIgnoreDefense) {
 		defense = 0
 	}
