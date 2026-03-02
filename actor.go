@@ -270,7 +270,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, MonsFourHeaded, "attacks with all four heads")
 	desc = traitDesc(desc, t, MonsHungry, "hunts you by smell, becomes berserk if you eat in view")
 	desc = traitDesc(desc, t, MonsIgnoreDefense, "attack ignores defense")
-	desc = traitDesc(desc, t, MonsLignify, "hits may @Blignify@N you and then ignore the +2 defense, woody legs, permanently @Blignified@N")
+	desc = traitDesc(desc, t, MonsLignify, "hits may @Blignify@N you and then ignore the defense bonus, woody legs, permanently @Blignified@N")
 	desc = traitDesc(desc, t, MonsMusic, "plays guitar for you, avoids fights")
 	desc = traitDesc(desc, t, MonsScales, "scales (+1 Defense against ranged attacks)")
 	desc = traitDesc(desc, t, MonsSpitFire, "spites @Ofire@N from afar")
