@@ -1152,7 +1152,7 @@ func (g *Game) genThemedMonsters(mg *MapGen, nE, nM, nL int) {
 		}
 		for range 2 {
 			// A couple of walking trees, for some extra
-			// unvoluntary lignification.
+			// involuntary lignification.
 			g.genMonster(WalkingTree)
 		}
 		mksLate := []monsterKind{FourHeadedHydra, EarthDragon}

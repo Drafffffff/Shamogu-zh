@@ -430,7 +430,7 @@ New content:
   map corners on those maps (feature suggested by @mlochbaum in issue #1).
   Normal totems now become empty totems once you've picked their spirit.
 * New Clarity status effect, provided by “clarity leaves”. It protects against
-  Confusion, Daze, and unvoluntary Berserk. It can now be used as a way to exit
+  Confusion, Daze, and involuntary Berserk. It can now be used as a way to exit
   Berserk early with extra HP (healing applied after bonus is removed). Also,
   Clarity makes you sense monsters now for several turns, but in a shorter
   range (2 times view range, instead of 3).

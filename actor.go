@@ -240,7 +240,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, Elephanty, "rat phobia, difficult rotation when facing a wall, unnoticed in dead-ends, immune to berserk after-effects")
 	desc = traitDesc(desc, t, NocturnalFlying, "nocturnal (reduced view range), flies over foliage")
 	desc = traitDesc(desc, t, Dazzling, "dazzling (redirect attacks just behind you, easily noticed)")
-	desc = traitDesc(desc, t, DazingSpines, "spines may @Odaze@N foes in melee")
+	desc = traitDesc(desc, t, DazingSpines, "spines may @Odaze@N attacking foes in melee")
 	switch {
 	case t.All(GoodHearing) && !t.All(BadHearing):
 		desc = append(desc, "good hearing")
@@ -263,10 +263,10 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, MonsBarking, "barks on sight and @Ofrightens@N you")
 	desc = traitDesc(desc, t, MonsBerserking, "hits may @Bberserk@N you briefly")
 	desc = traitDesc(desc, t, MonsBlink, "hits makes you blink")
-	desc = traitDesc(desc, t, MonsConfusion, "@Oconfusing@N hits")
+	desc = traitDesc(desc, t, MonsConfusion, "hits may @Oconfuse@N you")
 	desc = traitDesc(desc, t, MonsDig, "digs walls when hunting")
 	desc = traitDesc(desc, t, MonsExplodingDeath, "explodes on death")
-	desc = traitDesc(desc, t, MonsFear, "@Ofrightening@N hits")
+	desc = traitDesc(desc, t, MonsFear, "hits may @Ofrighten@N you")
 	desc = traitDesc(desc, t, MonsFourHeaded, "attacks with all four heads")
 	desc = traitDesc(desc, t, MonsHungry, "hunts you by smell, becomes berserk if you eat in view")
 	desc = traitDesc(desc, t, MonsIgnoreDefense, "attack ignores defense")

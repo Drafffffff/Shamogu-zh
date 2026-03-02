@@ -1693,7 +1693,15 @@ In Shamogu, both the player and the monsters may use one of several attack patte
 
 @CSneak@N attacks are a two-phased attack pattern. When ranged, it works as a confusing rampaging attack. In melee, a plain attack is followed by quick 2-tile retreat. Sneak attacks are performed by Vampiric Bat players.
 
-@MNote:@N crocodile’s dragging and bat’s retreat don’t happen when @Opoisoned@N nor when they would move you onto dangerous visible fire, unless you’re already on @OFire@N or would be protected by @BFoggy-Skin@N. The boar’s pushing charge and wind fox’s recoil don’t have any safety rules, but because recoil is a form of unvoluntary movement, it is at least unaffected by poison. Melee pushing with @BDig@N is restricted by poison when it requires player movement, but unbalancing and piercing effects still happen when pushing a monster against a wall or another monster.
+@MNote:@N crocodile’s dragging and bat’s retreat don’t happen when @Opoisoned@N nor when they would move you onto dangerous visible fire, unless you’re already on @OFire@N or would be protected by @BFoggy-Skin@N. The boar’s pushing charge and wind fox’s recoil don’t have any safety rules, but because recoil is a form of involuntary movement, it is at least unaffected by poison. Melee pushing with @BDig@N is restricted by poison when it requires player movement, but unbalancing and piercing effects still happen when pushing a monster against a wall or another monster.
+
+@YON-HIT EFFECTS@N
+
+Various monsters have attacks that may inflict status effects after a successful hit on the player.
+
+In some cases, the effect is guaranteed on hit, like when a fire llama spits at the player from afar, or when a blinking butterfly makes you blink.
+
+When the description says “may”, it means there is only a chance of inflicting the status on hit. In most cases, the chance scales simply with damage, with higher damage corresponding to higher chances. As a special case, phoenixes’ burning chance is negatively affected by imbalance, too. Also, cat’s dazing effect scales with attack distance instead: lower chance and longer duration at long distances.
 
 @YNOISE@N
 
