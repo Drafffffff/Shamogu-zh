@@ -83,6 +83,9 @@ func (g *Game) monsterDiscord(i ID, ai *Actor) bool {
 	var actors []*Actor
 	for p := range Neighbors(ei.P) {
 		if j, aj := g.ActorAt(p); j >= 0 {
+			if j == PlayerID && ai.Behavior.State == Wandering && g.PlayerIsHidden() {
+				continue
+			}
 			ids = append(ids, j)
 			actors = append(actors, aj)
 		}
