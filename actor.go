@@ -773,19 +773,16 @@ func (g *Game) ResistStatusRoll(i ID, st Status) bool {
 	}
 	switch g.Turn - g.StatusTurn[st] {
 	case 0:
-		switch st {
-		case StatusPoison, StatusDaze, StatusLignification, StatusBerserk, StatusFear:
-			// A high chance to resist re-application of some
-			// statuses if they're already active or just expired
-			// on the same turn.
-			// In particular, this reduces the likeliness of an
-			// annoying immediate re-application of Daze or a
-			// helpful Berserk or Lignification.
-			return g.IntN(3) > 0
-		}
+		// A decent chance to resist re-application of
+		// statuses if they're already active or just expired
+		// on the same turn.
+		// In particular, this reduces the likeliness of an
+		// annoying immediate re-application of Daze or a
+		// helpful Berserk or Lignification.
+		return g.IntN(2) == 0
 	case 1:
 		switch st {
-		case StatusFire, StatusImbalance, StatusDaze:
+		case StatusDaze, StatusFire, StatusImbalance:
 			// A decent chance to resist re-application of some
 			// statuses that can feel annoying if repeated on the
 			// turn following expiration without a pause. In

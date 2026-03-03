@@ -1703,6 +1703,8 @@ In some cases, the effect is guaranteed on hit, like when a fire llama spits at 
 
 When the description says “may”, it means there is only a chance of inflicting the status on hit. In most cases, the chance scales simply with damage, with higher damage corresponding to higher chances. As a special case, phoenixes’ burning chance is reduced by imbalance, too. Also, cat’s dazing effect scales with attack distance instead: lower chance and longer duration at long distances.
 
+The duration of detrimental statuses can be refreshed by further hits, but not that of positive ones like @BBerserk@N or @BLignification@N. Besides, further on-hit applications on the player are possible but only half as likely until after the expiration turn, thanks to the benevolent intervention of your spirit ancestors. That player-specific protection is extended for an extra turn for @ODaze@N, @OFire@N and @OImbalance@N.
+
 @YNOISE@N
 
 Combat and some other actions produce noise, as shown with onomatopoeias in the game logs. Some noises can be heard from a few tiles away only, while others may reach farther, up to two times the view range in the worst case. Possible noises include a gentle “Smash!”, a more serious “ROAR!” or “CRACK!”, a problematic “POP-BOOM!”, or an even more alarming “RING-RING!”. Beware that monsters will investigate the source of those noises.
