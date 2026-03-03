@@ -13,15 +13,22 @@ Reworked and improved content:
   Fire or has Foggy-Skin, following the idea that movement into a dangerous
   cloud is ok as long as it cannot result in immediate damage.  Bat now uses a
   similar safety rule for visible fires.
-* Phoenixes now have only 2 attack but a somewhat higher chance of burning,
-  unless imbalanced. The idea is to make fighting phoenixes in melee a bit less
-  dangerous, in particular with Foggy-Skin or Salamander (see #17), to improve
-  melee/ranged balance among dangerous late monsters.
+* Phoenixes now have only 2 attack but a somewhat higher chance of burning
+  on-hit to compensate for the accuracy loss (for a similar burning chance in
+  the end).  Also, due to their large wings, phoenixes now are particularly
+  vulnerable to imbalance, which results in reduced burning chances beyond the
+  usual reduced attack. The idea is to make fighting phoenixes in melee a bit
+  less dangerous, in particular with Foggy-Skin or Salamander (see #17), to
+  improve melee/ranged balance among dangerous late monsters.
+* Walking trees now ignore the lignification's defense bonus when hitting you,
+  but they still respect the damage cap. The idea is to make walking trees less
+  trivial to handle alone, so that they at least don't feel less dangerous than
+  a rat in such situations, due to missing many times in a row.
 * Shadow now preserves the damage debuff, but makes hunting monsters wander
   again when you hit them (see #17). This way, the ability remains more
   pacific-oriented and helps getting unnoticed through monsters even if they
   already were hunting you.
-* Disorient status now lasts an extra turn.
+* Disorient status now lasts an extra turn, for better Zebra balance.
 * Lion's roar now inflicts 4-5 turns of Fear, instead of 5, with 4 being more
   likely on close targets. This change helps balance hydra+lion and
   frog+lion+owl, as those are somewhat overpowered with respect to other
@@ -46,6 +53,13 @@ Reworked and improved content:
   present comestible imbalance, which is a minor issue in practice, and
   provides a different experience with choice considerations, so it has some
   charm as an occasional challenge.
+* The combat help has a new “ON-HIT EFFECTS” section that explains how statuses
+  inflicted by hits work, including the particularities of the new cat dazing
+  chance and duration scalings, or which statuses may be refreshed or not by
+  further hits. Also, that section documents a new special “protection” by the
+  player spirit ancestors that reduces the likeliness of early status refresh
+  or re-application, in part motivated by making consecutive fire and imbalance
+  dances less likely, so that they remain fun and not repetitive.
 * New help tips about monster examination and rats hunting by smell (see #11).
 
 Improvements in Corrupted Dungeon expansion (see issue #11):
