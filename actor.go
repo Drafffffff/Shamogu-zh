@@ -232,6 +232,7 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, Pushing, "hits may push and @Ounbalance@N foes")
 	desc = traitDesc(desc, t, PushingCharge, "charging pushes and @Ounbalances@N foes")
 	desc = traitDesc(desc, t, BurningHits, "hits may @Oburn@N foes")
+	desc = traitDesc(desc, t, BurningHits|MonsWingFlap, "imbalance vulnerability (decreased burning chance)")
 	desc = traitDesc(desc, t, RunicChicken, "senses and doesn’t trigger runes, cackles loudly on sighting a portal or totem, confusion vulnerability (longer duration)")
 	desc = traitDesc(desc, t, VenomousMelee, "@Ovenomous@N melee attack")
 	desc = traitDesc(desc, t, Gawalt, "wall-jumping movement and attack, weakened attacks, menhir sensing and hiding")
