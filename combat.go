@@ -529,8 +529,8 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 		// Lignification caps attack damage at 1.
 		dmg = min(1, dmg)
 	}
-	if i == PlayerID && ai.DoesAny(Gawalt) && dmg > 1 {
-		// Gawalt monkey reduces damage of non-weak hits.
+	if i == PlayerID && ai.DoesAny(Gawalt) && dmg > 1 && g.IntN(3) > 0 {
+		// Gawalt monkey reduces the chance of strong hits.
 		dmg--
 	}
 	if ai.Has(StatusDig) && (ap == AttackCharge || dmg == 0) || ap == AttackSlap || dmg == 0 && ai.Has(StatusVampirism) {
