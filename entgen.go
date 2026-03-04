@@ -856,6 +856,7 @@ const (
 	MadOctopode
 	NoisyImp
 	RampagingBoar
+	ScaledMegabat
 	TemporalCat
 	ThunderPorcupine
 	TotemWasp
@@ -888,6 +889,7 @@ var MonsData = []monsterInfo{
 	MadOctopode:      {"mad octopode", 'O', 3, 2, 5, PatternCatch | MonsImmunityImbalance | VenomousMelee | MonsCreep | MonsNotable},
 	LashingFrog:      {"lashing frog", 'F', 2, 1, 4, PatternCatch},
 	RampagingBoar:    {"rampaging boar", 'B', 3, 0, 4, PatternRampage | PushingCharge | MonsDig},
+	ScaledMegabat:    {"scaled megabat", 'm', 2, 0, 3, PatternBat | MonsScales | MonsWingFlap},
 	TemporalCat:      {"temporal cat", 'c', 2, 0, 4, PatternSwapDaze | MonsLightFootsteps},
 	ThunderPorcupine: {"thunder porcupine", 'p', 2, 0, 3, DazingSpines | MonsImmunityDaze | MonsLightFootsteps},
 	TotemWasp:        {"totem wasp", 'w', 2, 1, 2, PatternRampage | VenomousMelee | MonsImmunityLignification | MonsWingFlap | MonsNotable},
@@ -904,6 +906,7 @@ var monsEarly = []monsterKind{
 	BerserkingSpider,
 	ConfusingEye,
 	HungryRat,
+	ScaledMegabat,
 	ThunderPorcupine,
 }
 
@@ -1450,11 +1453,13 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 		case 0:
 			p := g.RandomWaypoint()
 			var mk monsterKind
-			switch g.IntN(4) {
+			switch g.IntN(5) {
 			case 0:
 				mk = BerserkingSpider
 			case 1:
 				mk = ConfusingEye
+			case 2:
+				mk = ScaledMegabat
 			default:
 				mk = HungryRat
 			}

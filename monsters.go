@@ -267,7 +267,7 @@ func (g *Game) monsterBumpNext(i ID, ai *Actor) {
 			g.md.RangedAttackAnimation(ai, pl.P, pl.P)
 			g.BumpAttackActor(i, PlayerID, ai, pa, AttackRanged, dist, 0)
 			return
-		case ai.DoesAny(PatternRampage) && ai.CanMove():
+		case ai.DoesAny(PatternRampage|PatternBat) && ai.CanMove():
 			dir := toDir(pl.P.Sub(ei.P))
 			to := pl.P.Sub(dir)
 			if g.BumpMoveActor(i, ai, to) {
