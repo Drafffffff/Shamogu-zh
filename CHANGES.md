@@ -97,6 +97,7 @@ Fixes:
 * Make monsters on a skipped turn (due to out-of-view monster swapping) still
   notice the player when in view during that skipped turn (see #17). Not really
   a bug, but it could (very rarely) feel strange.
+* Fix a bug where disoriented monsters could sometimes move incorrectly.
 
 # v1.4.1 2026-02-10
 
