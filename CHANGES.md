@@ -28,6 +28,13 @@ Reworked and improved content:
   again when you hit them (see #17). This way, the ability remains more
   pacific-oriented and helps getting unnoticed through monsters even if they
   already were hunting you.
+* Gawalt's hit weakening has been made less extreme (see #17). Now it plays
+  similarly as if all monsters had +1 defense, but without impacting accuracy.
+  Previously, it was closer to making all monsters have +2 defense, which was
+  too serious of a drawback in the late game where wall-jumping isn't as strong
+  anymore and some battles become unavoidable. The new formula also preserves a
+  bit better the relative increased resilience of trees with respect to other
+  same high-defense monsters like dragons.
 * Disorient status now lasts an extra turn, for better Zebra balance.
 * Lion's roar now inflicts 4-5 turns of Fear, instead of 5, with 4 being more
   likely on close targets. This change helps balance hydra+lion and
@@ -82,6 +89,9 @@ Fixes:
 * Fix an old regression from v1.2.0 with “pushing gale” in melee sometimes
   producing the wrong log message and doing only 1 damage instead of 2 (see
   issue #11).
+* Make confused wandering monsters ignore a hidden adjacent player. Not really
+  a bug, but was unintuitive enough and problematic with the new make-wander
+  shadowy hits when playing the Bat with the Gawalt.
 * Mention that Disorient only affects hunting monsters, not wandering ones
   (a nuance of little impact, except when combined with gawalt's Shadow).
 * Make monsters on a skipped turn (due to out-of-view monster swapping) still
