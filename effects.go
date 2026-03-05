@@ -12,7 +12,7 @@ const (
 	DurationBerserk                = 8
 	DurationBerserkAfraid          = 4
 	DurationBerserkHit             = 4
-	DurationBerserkStomp           = 5
+	DurationBerserkStomp           = 4
 	DurationBerserkTotem           = 5
 	DurationBerserkTrap            = 5
 	DurationClarity                = 5
