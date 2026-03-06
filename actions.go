@@ -1767,7 +1767,20 @@ func (a ActionHelpMods) Handle(md *model) (gruid.Effect, bool) {
 		}
 		fmt.Fprintf(&sb, "\n\n@Y%s@N\n\n%s", m.String(), m.Desc())
 		if m == ModAdvancedSpirits {
-			sb.WriteString("\n\n@CExtra Info@N\n\nSome advanced secondary spirit traits are a bit tricky to use or understand.\n\nZebra’s “dazzling” trait means that any attack directed at you will be redirected to any monster just on your other side. It hence encourages weird positioning tactics. Also, with Zebra, monsters notice you instantly, without losing a turn, so beware of sudden ranged attacks during exploration.\n\nThe Lion’s roaring happens on first sight, but detecting a monster first beyond view with @BClarity@N will prevent the roaring.\n\nWhen the Elephant is in a dead-end or the Gawalt is on a menhir tile, wandering monsters don’t notice you, but hunting monsters still see you.\n\nThe Chicken not triggering traps is as simple as it sounds, but given how wandering monsters avoid traps, it has subtle stealth implications.")
+			sb.WriteString("\n\n")
+			sb.WriteString(`@CExtra Info@N
+
+Some advanced secondary spirit traits are a bit tricky to use or understand.
+
+The Gawalt’s weakens by 1 damage any hits doing more than 2 base damage and two thirds of the hits doing 2 base damage. Accuracy is preserved.
+
+Zebra’s “dazzling” trait means that any attack directed at you will be redirected to any monster just on your other side. It hence encourages weird positioning tactics. Also, with Zebra, monsters notice you instantly, without losing a turn, so beware of sudden ranged attacks during exploration.
+
+The Lion’s roaring happens on first sight, but detecting a monster first beyond view with @BClarity@N will prevent the roaring. Fear duration is 4-5, with 4 being more likely a short distances, because monsters get over their Fear more quickly when the danger is close.
+
+When the Elephant is in a dead-end or the Gawalt is on a menhir tile, wandering monsters don’t notice you, but hunting monsters still see you.
+
+The Chicken not triggering traps is as simple as it sounds, but given how wandering monsters avoid traps, it has subtle stealth implications.`)
 		}
 	}
 	md.helpTopic(title, sb.String())
