@@ -846,6 +846,7 @@ const (
 	BurningPhoenix
 	ConfusingEye
 	CrazyDruid
+	DraggingAlligator
 	EarthDragon
 	ExplodingNadre
 	FearsomeLich
@@ -871,34 +872,35 @@ const (
 // MonsData provides information about the various kinds of monsters.
 var MonsData = []monsterInfo{
 	// 		  {name, rune, attack, defense, hp, traits}
-	AcidMound:        {"acid mound", 'a', 2, 0, 5, MonsIgnoreDefense | MonsImmunityImbalance | MonsCreep},
-	BarkingHound:     {"barking hound", 'h', 3, 0, 4, MonsBarking | GoodHearing | MonsImmunityFear},
-	BerserkingSpider: {"berserking spider", 's', 2, 1, 3, MonsBerserking | MonsSilent},
-	BlazingGolem:     {"blazing golem", 'G', 2, 3, 4, MonsExplodingDeath | MonsImmunityFire | MonsImmunityPoison | MonsImmunityFear | MonsImmunityConfusion | MonsHeavyFootsteps | MonsNotable},
-	BlinkButterfly:   {"blinking butterfly", 'b', 2, 3, 2, MonsBlink | MonsImmunityImbalance | MonsImmunityLignification | MonsWingFlap},
-	BurningPhoenix:   {"burning phoenix", 'P', 2, 1, 5, PatternRampage | BurningHits | MonsImmunityFire | MonsImmunityLignification | MonsWingFlap | MonsNotable},
-	ConfusingEye:     {"confusing eye", 'e', 2, 0, 2, PatternRanged | MonsConfusion | MonsImmunityConfusion | MonsLightFootsteps},
-	CrazyDruid:       {"crazy druid", 'C', 3, 1, 4, PatternSwap | BurningHits | MonsBerserking | MonsNotable},
-	EarthDragon:      {"earth dragon", 'D', 4, 2, 5, Pushing | MonsDig | MonsImmunityFear | MonsScales | MonsHeavyFootsteps | MonsNotable},
-	ExplodingNadre:   {"exploding nadre", 'n', 2, 3, 1, MonsExplodingDeath | MonsScales},
-	FearsomeLich:     {"fearsome lich", 'L', 2, 2, 5, PatternRanged | MonsFear | MonsIgnoreDefense | MonsImmunityPoison | MonsImmunityConfusion | MonsNotable},
-	FireLlama:        {"fire llama", 'l', 2, 0, 4, PatternRanged | MonsSpitFire},
-	FourHeadedHydra:  {"four-headed hydra", 'H', 2, 0, 6, PatternFourDirsMons | MonsScales | MonsFourHeaded | MonsHeavyFootsteps | MonsNotable},
-	HungryRat:        {"hungry rat", 'r', 2, 0, 3, MonsHungry | MonsLightFootsteps},
-	NoisyImp:         {"noisy imp", 'I', 2, 2, 4, MonsMusic | MonsLightFootsteps | MonsNotable},
-	MadOctopode:      {"mad octopode", 'O', 3, 2, 5, PatternCatch | MonsImmunityImbalance | VenomousMelee | MonsCreep | MonsNotable},
-	LashingFrog:      {"lashing frog", 'F', 2, 1, 4, PatternCatch},
-	RampagingBoar:    {"rampaging boar", 'B', 3, 0, 4, PatternRampage | PushingCharge | MonsDig},
-	SneakyMegabat:    {"sneaky megabat", 'm', 2, 2, 4, PatternBat | GoodHearing | MonsImmunityLignification | MonsWingFlap},
-	TemporalCat:      {"temporal cat", 'c', 2, 0, 4, PatternSwapDaze | MonsLightFootsteps},
-	ThunderPorcupine: {"thunder porcupine", 'p', 2, 0, 3, DazingSpines | MonsImmunityDaze | MonsLightFootsteps},
-	TotemWasp:        {"totem wasp", 'w', 2, 1, 2, PatternRampage | VenomousMelee | MonsImmunityLignification | MonsWingFlap | MonsNotable},
-	UndeadKnight:     {"undead knight", 'K', 3, 3, 4, PatternFourDirsMons | MonsFear | MonsImmunityPoison | MonsImmunityDaze | MonsNotable},
-	VenomousViper:    {"venomous viper", 'v', 2, 1, 4, VenomousMelee | MonsImmunityPoison | MonsScales | MonsCreep},
-	WalkingMushroom:  {"walking mushroom", 'M', 2, 1, 5, MonsSpores | MonsConfusion | MonsImmunityConfusion | MonsImmunityLignification | VulnerabilityFire | MonsNotable},
-	WalkingTree:      {"walking tree", 'T', 2, 2, 5, MonsLignify | MonsImmunityImbalance | MonsImmunityPoison | MonsImmunityLignification | VulnerabilityFire | MonsHeavyFootsteps | MonsNotable},
-	WarpingWraith:    {"warping wraith", 'W', 2, 3, 3, MonsTeleport | MonsImmunityPoison | MonsImmunityLignification | MonsSilent},
-	WindFox:          {"wind fox", 'f', 2, 0, 4, PatternRangedRecoil | MonsLightFootsteps},
+	AcidMound:         {"acid mound", 'a', 2, 0, 5, MonsIgnoreDefense | MonsImmunityImbalance | MonsCreep},
+	BarkingHound:      {"barking hound", 'h', 3, 0, 4, MonsBarking | GoodHearing | MonsImmunityFear},
+	BerserkingSpider:  {"berserking spider", 's', 2, 1, 3, MonsBerserking | MonsSilent},
+	BlazingGolem:      {"blazing golem", 'G', 2, 3, 4, MonsExplodingDeath | MonsImmunityFire | MonsImmunityPoison | MonsImmunityFear | MonsImmunityConfusion | MonsHeavyFootsteps | MonsNotable},
+	BlinkButterfly:    {"blinking butterfly", 'b', 2, 3, 2, MonsBlink | MonsImmunityImbalance | MonsImmunityLignification | MonsWingFlap},
+	BurningPhoenix:    {"burning phoenix", 'P', 2, 1, 5, PatternRampage | BurningHits | MonsImmunityFire | MonsImmunityLignification | MonsWingFlap | MonsNotable},
+	ConfusingEye:      {"confusing eye", 'e', 2, 0, 2, PatternRanged | MonsConfusion | MonsImmunityConfusion | MonsLightFootsteps},
+	CrazyDruid:        {"crazy druid", 'C', 3, 1, 4, PatternSwap | BurningHits | MonsBerserking | MonsNotable},
+	DraggingAlligator: {"dragging alligator", 'A', 3, 1, 4, PatternCrocodile | MonsScales | ResistanceFire | ResistancePoison | ResistanceFear | MonsNotable},
+	EarthDragon:       {"earth dragon", 'D', 4, 2, 5, Pushing | MonsDig | MonsImmunityFear | MonsScales | MonsHeavyFootsteps | MonsNotable},
+	ExplodingNadre:    {"exploding nadre", 'n', 2, 3, 1, MonsExplodingDeath | MonsScales},
+	FearsomeLich:      {"fearsome lich", 'L', 2, 2, 5, PatternRanged | MonsFear | MonsIgnoreDefense | MonsImmunityPoison | MonsImmunityConfusion | MonsNotable},
+	FireLlama:         {"fire llama", 'l', 2, 0, 4, PatternRanged | MonsSpitFire},
+	FourHeadedHydra:   {"four-headed hydra", 'H', 2, 0, 6, PatternFourDirsMons | MonsScales | MonsFourHeaded | MonsHeavyFootsteps | MonsNotable},
+	HungryRat:         {"hungry rat", 'r', 2, 0, 3, MonsHungry | MonsLightFootsteps},
+	NoisyImp:          {"noisy imp", 'I', 2, 2, 4, MonsMusic | MonsLightFootsteps | MonsNotable},
+	MadOctopode:       {"mad octopode", 'O', 3, 2, 5, PatternCatch | MonsImmunityImbalance | VenomousMelee | MonsCreep | MonsNotable},
+	LashingFrog:       {"lashing frog", 'F', 2, 1, 4, PatternCatch},
+	RampagingBoar:     {"rampaging boar", 'B', 3, 0, 4, PatternRampage | PushingCharge | MonsDig},
+	SneakyMegabat:     {"sneaky megabat", 'm', 2, 2, 4, PatternBat | GoodHearing | MonsImmunityLignification | MonsWingFlap},
+	TemporalCat:       {"temporal cat", 'c', 2, 0, 4, PatternSwapDaze | MonsLightFootsteps},
+	ThunderPorcupine:  {"thunder porcupine", 'p', 2, 0, 3, DazingSpines | MonsImmunityDaze | MonsLightFootsteps},
+	TotemWasp:         {"totem wasp", 'w', 2, 1, 2, PatternRampage | VenomousMelee | MonsImmunityLignification | MonsWingFlap | MonsNotable},
+	UndeadKnight:      {"undead knight", 'K', 3, 3, 4, PatternFourDirsMons | MonsFear | MonsImmunityPoison | MonsImmunityDaze | MonsNotable},
+	VenomousViper:     {"venomous viper", 'v', 2, 1, 4, VenomousMelee | MonsImmunityPoison | MonsScales | MonsCreep},
+	WalkingMushroom:   {"walking mushroom", 'M', 2, 1, 5, MonsSpores | MonsConfusion | MonsImmunityConfusion | MonsImmunityLignification | VulnerabilityFire | MonsNotable},
+	WalkingTree:       {"walking tree", 'T', 2, 2, 5, MonsLignify | MonsImmunityImbalance | MonsImmunityPoison | MonsImmunityLignification | VulnerabilityFire | MonsHeavyFootsteps | MonsNotable},
+	WarpingWraith:     {"warping wraith", 'W', 2, 3, 3, MonsTeleport | MonsImmunityPoison | MonsImmunityLignification | MonsSilent},
+	WindFox:           {"wind fox", 'f', 2, 0, 4, PatternRangedRecoil | MonsLightFootsteps},
 }
 
 // monsEarly represents early level monsters.
@@ -1303,8 +1305,12 @@ func (g *Game) genGuardians(nE, nM, nL int) (int, int, int) {
 				g.hideLocation(g.Map.Portal)
 			}
 		}
-		g.genMonsterGuardian(BlazingGolem, p)
-		g.genMonsterGuardian(BlazingGolem, p)
+		mk := BlazingGolem
+		if g.IntN(5) < 2 {
+			mk = DraggingAlligator
+		}
+		g.genMonsterGuardian(mk, p)
+		g.genMonsterGuardian(mk, p)
 	}
 	return max(0, nE), max(0, nM), max(0, nL)
 }
@@ -1461,6 +1467,9 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 	if g.ProcInfo.GuardianPortal1 == g.Map.Level {
 		nM--
 		mk := BlazingGolem
+		if g.IntN(5) < 2 {
+			mk = DraggingAlligator
+		}
 		if g.IntN(5) == 0 {
 			mk = WarpingWraith
 		}
@@ -1538,7 +1547,11 @@ func (g *Game) genOrbAlternateGuardiansAt(p gruid.Point, nE, nM, nL int) (int, i
 		for range 2 {
 			g.genMonsterGuardian(CrazyDruid, p)
 		}
-		g.genMonsterGuardian(BlazingGolem, p)
+		mk := BlazingGolem
+		if g.IntN(5) < 2 {
+			mk = DraggingAlligator
+		}
+		g.genMonsterGuardian(mk, p)
 		nL -= 2
 		nM--
 	case 2:
@@ -1572,7 +1585,11 @@ func (g *Game) genOrbComplementaryGuardiansAt(p gruid.Point, nE, nM, nL int) (in
 	switch g.IntN(4) {
 	case 0:
 		g.genMonsterGuardian(CrazyDruid, p)
-		g.genMonsterGuardian(BlazingGolem, p)
+		if g.IntN(5) > 2 {
+			g.genMonsterGuardian(BlazingGolem, p)
+		} else {
+			g.genMonsterGuardian(DraggingAlligator, p)
+		}
 	case 1:
 		g.genMonsterGuardian(MadOctopode, p)
 	case 2:

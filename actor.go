@@ -222,7 +222,12 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, PatternFourDirsMons, "four-directional attack")
 	desc = traitDesc(desc, t, PatternBat, "sneaky attack pattern")
 	desc = traitDesc(desc, t, PatternCatch, "ranged catching attack that @Ounbalances@N foes")
-	desc = traitDesc(desc, t, PatternCrocodile, "@Ounbalancing@N dragging attack, slow rotation (cannot turn and attack)")
+	if t.Any(Player) {
+		// Player crocodile gets slow rotation, too.
+		desc = traitDesc(desc, t, PatternCrocodile, "@Ounbalancing@N dragging attack, slow rotation (cannot turn and attack)")
+	} else {
+		desc = traitDesc(desc, t, PatternCrocodile, "@Ounbalancing@N dragging attack")
+	}
 	desc = traitDesc(desc, t, PatternRampage, "rampaging charge")
 	desc = traitDesc(desc, t, PatternRanged, "ranged attack")
 	desc = traitDesc(desc, t, PatternRangedRecoil, "ranged attack with recoil")

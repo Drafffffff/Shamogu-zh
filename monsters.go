@@ -254,7 +254,11 @@ func (g *Game) monsterBumpNext(i ID, ai *Actor) {
 	// Extra visibility considerations apply then in various cases.
 	unnoticeable := dist > MaxFOVRange || beh.State != Hunting && g.PlayerIsHidden()
 	if pl.P == to || dist == 1 && !unnoticeable {
-		g.BumpAttackActor(i, PlayerID, ai, pa, AttackPlain, dist, 0)
+		ap := AttackPlain
+		if ai.DoesAny(PatternCrocodile) && dist == 1 {
+			ap = AttackDrag
+		}
+		g.BumpAttackActor(i, PlayerID, ai, pa, ap, dist, 0)
 		return
 	}
 	if g.InFOV(ei.P) && !unnoticeable && g.ActorInRange(ei.P, pl.P) == PlayerID {
