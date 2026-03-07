@@ -17,10 +17,12 @@ type ProcInfo struct {
 	Layouts          []MapLayout      // map layouts
 	Earthquake       int              // level with extra rubble
 	FakePortal       []bool           // levels with fake portal
-	GuardianTotem1   int              // level with early totem guardian
-	GuardianTotem2   int              // level with early totem guardian
-	GuardianPortal1  int              // level with early-mid portal guardian
-	GuardianPortal2  int              // level with mid-late portal guardian
+	GuardianEarly    int              // level with early totem por portal guardians (megabat)
+	GuardianEarly2   int              // level with early totem por portal guardians (megabat)
+	GuardianTotem1   int              // level with early totem guardian (wasps)
+	GuardianTotem2   int              // level with early totem guardian (crazy druid)
+	GuardianPortal1  int              // level with early-mid portal guardian (golems)
+	GuardianPortal2  int              // level with mid-late portal guardian (octopode)
 	WanderingUnique1 int              // level with walking mushroom
 	WanderingUnique2 int              // level with noisy imp
 	MonsEarly        int              // special early level (1-3)
@@ -97,9 +99,9 @@ func (g *Game) flavoursProcGen() {
 	// Levels with special monsters.
 	var (
 		guardianTotem1Level   = 3
-		guardianTotem2Level   = 3
-		guardianPortal2Level  = 6
+		guardianTotem2Level   = 3 + g.IntN(2)
 		guardianPortal1Level  = 4
+		guardianPortal2Level  = 6
 		wanderingUnique1Level = 4
 		wanderingUnique2Level = 4
 	)
@@ -110,16 +112,18 @@ func (g *Game) flavoursProcGen() {
 			guardianTotem1Level = 1
 		}
 		if g.IntN(MapLevels) == 0 {
-			guardianTotem2Level = 1
+			guardianTotem2Level = 1 + g.IntN(2)
 		}
 		if g.IntN(MapLevels) == 0 {
-			guardianPortal1Level = 2
+			guardianPortal1Level = 2 + g.IntN(2)
 		}
 		if g.IntN(MapLevels) == 0 {
 			guardianPortal2Level = 4
 		}
 		if g.IntN(MapLevels) == 0 {
 			wanderingUnique1Level = 2
+		}
+		if g.IntN(MapLevels) == 0 {
 			wanderingUnique2Level = 2
 		}
 	}
@@ -132,10 +136,31 @@ func (g *Game) flavoursProcGen() {
 			}
 		}
 	}
-	gpi.GuardianTotem1 = randTotemLevel(guardianTotem1Level, 4)
-	for gpi.GuardianTotem2 == 0 || gpi.GuardianTotem2 == gpi.GuardianTotem1 {
+	gpi.GuardianEarly = 2
+	if g.IntN(3) == 0 {
+		gpi.GuardianEarly = 3
+	}
+	switch g.IntN(4) {
+	case 0:
+		gpi.GuardianEarly--
+	case 1:
+		gpi.GuardianEarly++
+	}
+	if n := 1 + g.IntN(4); g.IntN(2) == 0 && n != gpi.GuardianEarly {
+		// Sometimes have a second level with a megabat guardian.
+		gpi.GuardianEarly2 = n
+	}
+	gpi.GuardianTotem2 = randTotemLevel(guardianTotem2Level, 4)
+	for gpi.GuardianTotem1 == 0 || gpi.GuardianTotem1 == gpi.GuardianTotem2 {
 		// Wasps do not care about the totem being empty or not.
-		gpi.GuardianTotem2 = guardianTotem2Level + g.IntN(4)
+		gpi.GuardianTotem1 = guardianTotem1Level + g.IntN(4)
+		if gpi.GuardianTotem1 > gpi.GuardianTotem2 && g.IntN(2) == 0 {
+			// Some bias for wasps befor crazy guardian.
+			gpi.GuardianTotem1 = guardianTotem1Level + g.IntN(4)
+		}
+	}
+	if gpi.GuardianTotem2 == gpi.GuardianEarly && gpi.GuardianEarly > 1 {
+		gpi.GuardianEarly--
 	}
 	gpi.GuardianPortal2 = guardianPortal2Level + g.IntN(3)
 	for gpi.GuardianPortal1 == 0 || gpi.GuardianPortal1 == gpi.GuardianPortal2 {

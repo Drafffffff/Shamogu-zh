@@ -243,10 +243,20 @@ func (t Traits) String() string {
 	desc = traitDesc(desc, t, Dazzling, "dazzling (redirect attacks just behind you, easily noticed)")
 	desc = traitDesc(desc, t, DazingSpines, "spines may @Odaze@N attacking foes in melee")
 	switch {
-	case t.All(GoodHearing) && !t.All(BadHearing):
+	case t.Any(GoodHearing) && !t.Any(BadHearing):
 		desc = append(desc, "good hearing")
-	case !t.All(GoodHearing) && t.All(BadHearing):
+	case !t.Any(GoodHearing) && t.Any(BadHearing):
 		desc = append(desc, "bad hearing")
+	}
+	if t.All(GoodHearing | MonsWingFlap) {
+		// Megabat hunts by sound (when out-of-view for noises
+		// originating on the player's tile).
+		//
+		// TODO: this assumes only megabats have both good hearing and
+		// fly (a bit of a convenient hack to avoid needing a new
+		// trait). Relying on the monster kind directly would be
+		// better for such monster-specific traits.
+		desc = append(desc, "hunts by sound")
 	}
 	desc = traitDesc(desc, t, GoodSmell, "smells food from afar")
 	desc = traitDesc(desc, t, TrailingCloud, "movement leaves dust behind")

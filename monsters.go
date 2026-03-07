@@ -160,8 +160,10 @@ func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point, noise bool) 
 		return false
 	}
 	unhidden := !g.PlayerIsHidden()
-	if g.InFOV(ei.P) && at == pp && unhidden {
-		g.Logf("The %s notices you.", ei.Name)
+	if at == pp && (unhidden && g.InFOV(ei.P) || noise && ai.IsMonster(SneakyMegabat)) {
+		if g.InFOV(ei.P) {
+			g.Logf("The %s notices you.", ei.Name)
+		}
 		beh.State = Hunting
 		switch {
 		case ai.DoesAny(MonsBarking):

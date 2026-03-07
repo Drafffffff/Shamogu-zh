@@ -889,7 +889,7 @@ var MonsData = []monsterInfo{
 	MadOctopode:      {"mad octopode", 'O', 3, 2, 5, PatternCatch | MonsImmunityImbalance | VenomousMelee | MonsCreep | MonsNotable},
 	LashingFrog:      {"lashing frog", 'F', 2, 1, 4, PatternCatch},
 	RampagingBoar:    {"rampaging boar", 'B', 3, 0, 4, PatternRampage | PushingCharge | MonsDig},
-	SneakyMegabat:    {"sneaky megabat", 'm', 2, 1, 2, PatternBat | GoodHearing | MonsWingFlap},
+	SneakyMegabat:    {"sneaky megabat", 'm', 2, 2, 4, PatternBat | GoodHearing | MonsImmunityLignification | MonsWingFlap},
 	TemporalCat:      {"temporal cat", 'c', 2, 0, 4, PatternSwapDaze | MonsLightFootsteps},
 	ThunderPorcupine: {"thunder porcupine", 'p', 2, 0, 3, DazingSpines | MonsImmunityDaze | MonsLightFootsteps},
 	TotemWasp:        {"totem wasp", 'w', 2, 1, 2, PatternRampage | VenomousMelee | MonsImmunityLignification | MonsWingFlap | MonsNotable},
@@ -906,7 +906,6 @@ var monsEarly = []monsterKind{
 	BerserkingSpider,
 	ConfusingEye,
 	HungryRat,
-	SneakyMegabat,
 	ThunderPorcupine,
 }
 
@@ -1271,7 +1270,7 @@ func (g *Game) genGuardians(nE, nM, nL int) (int, int, int) {
 	if g.ProcInfo.GuardianPortal2 == g.Map.Level {
 		g.genMonsterGuardian(MadOctopode, g.Map.Portal)
 	}
-	if g.ProcInfo.GuardianTotem1 == g.Map.Level {
+	if g.ProcInfo.GuardianTotem2 == g.Map.Level {
 		g.genMonsterGuardian(CrazyDruid, g.Map.Totem)
 	}
 	if g.ProcInfo.WanderingUnique1 == g.Map.Level {
@@ -1282,10 +1281,15 @@ func (g *Game) genGuardians(nE, nM, nL int) (int, int, int) {
 		nM--
 		g.genMonster(NoisyImp)
 	}
-	if g.ProcInfo.GuardianTotem2 == g.Map.Level {
+	if g.ProcInfo.GuardianTotem1 == g.Map.Level {
 		nE--
 		g.genMonsterGuardian(TotemWasp, g.Map.Totem)
 		g.genMonsterGuardian(TotemWasp, g.Map.Totem)
+	}
+	if g.ProcInfo.GuardianEarly == g.Map.Level || g.ProcInfo.GuardianEarly2 == g.Map.Level {
+		nM--
+		p := g.earlyGuardianPoint()
+		g.genMonsterGuardian(SneakyMegabat, p)
 	}
 	if g.ProcInfo.GuardianPortal1 == g.Map.Level {
 		nM--
@@ -1303,6 +1307,23 @@ func (g *Game) genGuardians(nE, nM, nL int) (int, int, int) {
 		g.genMonsterGuardian(BlazingGolem, p)
 	}
 	return max(0, nE), max(0, nM), max(0, nL)
+}
+
+func (g *Game) earlyGuardianPoint() gruid.Point {
+	if g.IntN(8) == 0 {
+		// Rarely, guard a random vault but hide at least either the
+		// portal or totem.
+		if g.IntN(2) == 0 {
+			g.hideLocation(g.Map.Portal)
+		} else {
+			g.hideLocation(g.Map.Totem)
+		}
+		return g.RandomWaypoint()
+	}
+	if g.IntN(2) == 0 {
+		return g.Map.Totem
+	}
+	return g.Map.Portal
 }
 
 // genGuardiansCorrupted generates any monster guardians and special
@@ -1377,7 +1398,7 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 			}
 		}
 	}
-	if g.ProcInfo.GuardianTotem1 == g.Map.Level {
+	if g.ProcInfo.GuardianTotem2 == g.Map.Level {
 		p := g.corruptedTotemGuardianPoint()
 		if g.IntN(4) > 0 {
 			g.genMonsterGuardian(CrazyDruid, p)
@@ -1410,7 +1431,7 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 			g.genMonsterGuardian(NoisyImp, p)
 		}
 	}
-	if g.ProcInfo.GuardianTotem2 == g.Map.Level {
+	if g.ProcInfo.GuardianTotem1 == g.Map.Level {
 		nE--
 		p := g.corruptedTotemGuardianPoint()
 		if g.IntN(4) > 0 {
@@ -1425,6 +1446,16 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 				g.genMonsterGuardian(nmk, p)
 				nE -= 2
 			}
+		}
+	}
+	if g.ProcInfo.GuardianEarly == g.Map.Level || g.ProcInfo.GuardianEarly2 == g.Map.Level {
+		nM--
+		p := g.earlyGuardianPoint()
+		g.genMonsterGuardian(SneakyMegabat, p)
+		if g.Map.Level >= 3 && g.IntN(3) == 0 {
+			// Rarely, add an imp guardian friend.
+			g.genMonsterGuardian(NoisyImp, p)
+			nE--
 		}
 	}
 	if g.ProcInfo.GuardianPortal1 == g.Map.Level {
