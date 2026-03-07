@@ -148,6 +148,10 @@ func (g *Game) MoveActor(i ID, ai *Actor, to gruid.Point, movk movementKind) boo
 		// Already at destination (usually shouldn't happen).
 		return true
 	}
+	if movk == MovTeleport && i != PlayerID {
+		// Ensure that footsteps don't leak destination after teleport.
+		ei.Noise = false
+	}
 	if movk == MovBump || movk == MovJump {
 		if ai.DoesAny(TrailingCloud) && g.Map.Terrain.At(from) == Floor {
 			g.NormalCloudAt(from, 2)
