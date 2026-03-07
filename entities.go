@@ -194,12 +194,9 @@ func (g *Game) MoveActor(i ID, ai *Actor, to gruid.Point, movk movementKind) boo
 			ai.Behavior.Path = ai.Behavior.Path[1:]
 		}
 	}
-	if i != PlayerID && g.InFOV(ei.P) {
-		g.SenseEntity(i, "see")
-	}
 	switch movk {
 	case MovTeleport:
-		g.md.TeleportAnimation(from, to, i == PlayerID || g.InFOV(to))
+		g.md.TeleportAnimation(i, from, to)
 	case MovBump, MovJump:
 		g.ApplyBumpMoveEffects(i, ai)
 		if paths.DistanceManhattan(from, to) > 1 && (g.InFOV(from) || g.InFOV(to)) {
@@ -209,6 +206,9 @@ func (g *Game) MoveActor(i ID, ai *Actor, to gruid.Point, movk movementKind) boo
 		if from != to {
 			g.md.MoveAnimation(from, to)
 		}
+	}
+	if i != PlayerID {
+		g.SeeEntity(i, ei)
 	}
 	if movk != MovJump {
 		g.TriggerTrap(i, ai)

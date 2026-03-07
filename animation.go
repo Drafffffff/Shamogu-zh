@@ -338,16 +338,23 @@ func (md *model) FloodAnimation(ps []paths.Node, c gruid.Color) {
 	md.anims.Frame(AnimDurVeryShort)
 }
 
-// TeleportAnimation animates an actor teleport between two positions. Should
-// be called while the actor is still at from.
-func (md *model) TeleportAnimation(from, to gruid.Point, showto bool) {
+// TeleportAnimation animates an actor teleport between two positions.
+func (md *model) TeleportAnimation(i ID, from, to gruid.Point) {
 	if DisableAnimations {
+		return
+	}
+	g := md.g
+	if i != PlayerID && !g.InFOV(from) && !g.InFOV(to) {
+		// Neither origin nor destination are visible, so skip
+		// animation.
 		return
 	}
 	md.startAnimSeq()
 	c := md.anims.mgrid.At(from)
-	md.anims.Draw(from, 'Φ', c.Style.Fg)
-	if showto {
+	if i == PlayerID || g.InFOV(from) {
+		md.anims.Draw(from, 'Φ', c.Style.Fg)
+	}
+	if i == PlayerID || g.InFOV(to) {
 		md.anims.Draw(to, 'Φ', c.Style.Fg)
 	}
 	md.anims.Frame(AnimDurMediumLong)

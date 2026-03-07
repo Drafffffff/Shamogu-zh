@@ -76,15 +76,21 @@ func (g *Game) SensePassable(p gruid.Point) {
 // SeeEntities handles knowledge changes about the last known position of
 // map entities that are in the field of view.
 func (g *Game) SeeEntities() {
-	for i, e := range g.NPMapEntities() {
-		if g.InFOV(e.P) {
-			g.SenseEntity(i, "see")
-		} else if g.InFOV(e.KnownP) {
-			e.KnownP = InvalidPos
-		}
+	for i, ei := range g.NPMapEntities() {
+		g.SeeEntity(i, ei)
 	}
 	if g.PlayerActor().Has(StatusClarity) {
 		g.senseMonsters()
+	}
+}
+
+// SeeEntity handles FOV-related knowledge changes about the last known
+// position of the given entity.
+func (g *Game) SeeEntity(i ID, ei *Entity) {
+	if g.InFOV(ei.P) {
+		g.SenseEntity(i, "see")
+	} else if g.InFOV(ei.KnownP) {
+		ei.KnownP = InvalidPos
 	}
 }
 
