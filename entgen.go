@@ -1329,6 +1329,11 @@ func (g *Game) earlyGuardianPoint() gruid.Point {
 	if g.IntN(2) == 0 {
 		return g.Map.Totem
 	}
+	if g.Mod(ModCorruptedDungeon) && g.IntN(3) > 0 {
+		// High chance of guarding any portal.
+		ids := g.AllPortalIDs()
+		return g.Entity(ids[g.IntN(len(ids))]).P
+	}
 	return g.Map.Portal
 }
 
