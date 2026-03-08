@@ -39,7 +39,11 @@ const (
 var CustomKeys bool
 
 // GameConfig contains the current game config.
-var GameConfig Config
+var GameConfig = Config{
+	DarkColors:    true, // default to dark theme
+	Tiles:         true, // default to tiles (when available)
+	VersionNumber: ConfigVersionNumber,
+}
 
 // mode represents the main model mode
 type mode int
@@ -231,6 +235,11 @@ func (md *model) applyKeyConfig() {
 		// For ensuring menu access and esc functionality.
 		md.keysNormal[gruid.KeySpace] = ActionMenu{}
 		md.keysNormal[gruid.KeyEscape] = ActionNone{}
+		// Ensure some new non-configurable actions are set on old
+		// but compatible configs.
+		if _, ok := md.keysNormal["»"]; !ok {
+			md.keysNormal["»"] = ActionWizardNextLevel{}
+		}
 	}
 	if GameConfig.ExamineModeKeys != nil {
 		md.keysTarget = GameConfig.ExamineModeKeys
@@ -241,9 +250,6 @@ func (md *model) applyKeyConfig() {
 
 // InitConfig loads saved config, if any, and initializes GameConfig.
 func InitConfig() error {
-	GameConfig.DarkColors = true // default to dark theme
-	GameConfig.Tiles = true      // default to tiles (when available)
-	GameConfig.Version = Version
 	load, err := LoadConfig()
 	if err != nil {
 		err = fmt.Errorf("error loading config: %v", err)
