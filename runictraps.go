@@ -132,7 +132,7 @@ func (g *Game) TriggerTrap(i ID, ai *Actor) {
 		g.LogfStyled("The %s triggers the %s.", logSpecial, ei.Name, rt.Rune.String())
 		rt.KnownUsed = true
 	case SensingRange(pi, g.PP()) && g.PlayerActor().DoesAny(RunicChicken):
-		g.LogfStyled("The nearby %s was triggered.", logSpecial, ei.Name)
+		g.LogfStyled("The %s triggers.", logSpecial, ei.Name)
 		rt.KnownUsed = true
 	}
 	if i != PlayerID {
