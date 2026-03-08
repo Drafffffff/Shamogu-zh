@@ -108,7 +108,8 @@ func (g *Game) TriggerTrap(i ID, ai *Actor) {
 	if ai.DoesAny(RunicChicken) {
 		return
 	}
-	pi := g.Entity(i).P
+	ei := g.Entity(i)
+	pi := ei.P
 	rt, ok := g.RunicTrapAt(pi)
 	if !ok || rt.Used {
 		return
@@ -121,15 +122,26 @@ func (g *Game) TriggerTrap(i ID, ai *Actor) {
 		// Do not trigger berserk traps while berserk.
 		return
 	}
-	if i == PlayerID {
+	switch {
+	case i == PlayerID:
 		g.LogfStyled("You trigger the %s.", logSpecial, rt.Rune.String())
 		g.StoryLogf("Triggered %s", One(rt.Rune.String()))
 		g.Stats.PlayerTrapTriggers++
-	} else {
-		g.LogfStyled("The %s triggers the %s.", logSpecial, g.Entity(i).Name, rt.Rune.String())
+		rt.KnownUsed = true
+	case g.InFOV(pi):
+		g.LogfStyled("The %s triggers the %s.", logSpecial, ei.Name, rt.Rune.String())
+		rt.KnownUsed = true
+	case SensingRange(pi, g.PP()) && g.PlayerActor().DoesAny(RunicChicken):
+		g.LogfStyled("The nearby %s was triggered.", logSpecial, ei.Name)
+		rt.KnownUsed = true
+	}
+	if i != PlayerID {
 		g.Stats.MonsterTrapTriggers++
 	}
 	g.Stats.MapTriggeredTraps[g.Map.Level-1]++
+	rt.Used = true
+	g.Map.RuneCache.SetU(pi, 0)
+	// Apply runic effect.
 	switch rt.Rune {
 	case RuneBerserk:
 		g.PutStatus1(i, ai, StatusBerserk, DurationBerserkTrap)
@@ -143,11 +155,6 @@ func (g *Game) TriggerTrap(i ID, ai *Actor) {
 	case RuneWarp:
 		g.TeleportActor(i, ai, 1)
 	}
-	rt.Used = true
-	if g.InFOV(pi) {
-		rt.KnownUsed = true
-	}
-	g.Map.RuneCache.SetU(pi, 0)
 }
 
 // RunicTrapAt returns any runic trap at the given position.

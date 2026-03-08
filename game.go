@@ -515,6 +515,12 @@ func (nt NoiseType) Msg() string {
 	}
 }
 
+// SensingRange reports whether p and q are within sensing range from each
+// other (for food, monster, rune sensing).
+func SensingRange(p, q gruid.Point) bool {
+	return paths.DistanceManhattan(p, q) <= 2*MaxFOVRange
+}
+
 // SmellFood performs item sensing of the GoodSmell trait.
 func (g *Game) SmellFood() {
 	pp := g.PP()
@@ -523,7 +529,7 @@ func (g *Game) SmellFood() {
 		if ei.KnownP == ei.P {
 			continue
 		}
-		if paths.DistanceManhattan(ei.P, pp) <= 2*MaxFOVRange {
+		if SensingRange(ei.P, pp) {
 			// NOTE: using path-distance would leak information
 			// about walls (if the player goes through the tedious
 			// task of doing some math).
@@ -543,7 +549,7 @@ func (g *Game) SenseItems(ty itemType) {
 		if it, ok := ei.Role.(Item); !ok || item2type(it) != ty {
 			continue
 		}
-		if paths.DistanceManhattan(ei.P, pp) <= 2*MaxFOVRange {
+		if SensingRange(ei.P, pp) {
 			// NOTE: using path-distance would leak information
 			// about walls (if the player goes through the tedious
 			// task of doing some math).

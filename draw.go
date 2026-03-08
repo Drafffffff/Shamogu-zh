@@ -350,7 +350,7 @@ func (g *Game) drawEntityAt(gd gruid.Grid, e *Entity, p gruid.Point) {
 	c := gd.At(p)
 	c.Rune = e.Rune
 	if !e.IsActor() || g.InFOV(p) ||
-		g.PlayerActor().Has(StatusClarity) && clarityRange(g.PP(), p) || g.Wizard.Mode.Reveal() {
+		g.PlayerActor().Has(StatusClarity) && SensingRange(g.PP(), p) || g.Wizard.Mode.Reveal() {
 		c.Style.Fg = e.Color()
 	} else {
 		c.Style.Fg = ColorForeground
@@ -497,7 +497,7 @@ func (md *model) drawTargInfo() {
 			case g.Wizard.Mode == WizardRevealTerrain:
 				continue
 			case info.sees ||
-				g.PlayerActor().Has(StatusClarity) && clarityRange(g.PP(), e.P) ||
+				g.PlayerActor().Has(StatusClarity) && SensingRange(g.PP(), e.P) ||
 				g.Wizard.Mode == WizardReveal:
 				fmt.Fprintf(&sb, "HP:%s A:%s D:%s",
 					r.fmtHP(),
