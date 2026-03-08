@@ -1510,13 +1510,14 @@ type ActionHelp struct{}
 var helpActions = []Action{
 	ActionHelpDefaultKeys{},
 	ActionHelpCombat{},
+	ActionHelpStealth{},
 	ActionHelpItems{},
-	ActionHelpMods{},
 	ActionHelpStatuses{},
+	ActionHelpMods{},
 	ActionHelpTips{},
 }
 
-var helpKeys = []rune{'?', 'c', 'i', 'm', 's', 't'}
+var helpKeys = []rune{'?', 'c', 's', 'i', 'S', 'm', 't'}
 
 func init() {
 	if len(helpActions) != len(helpKeys) {
@@ -1648,7 +1649,7 @@ func (a ActionHelpCombat) String() string {
 }
 
 func (a ActionHelpCombat) Desc() string {
-	return "Explains how various combat-related features work, including attack patterns and noise."
+	return "Explains how various combat-related features work, including attack patterns and on-hit effects."
 }
 
 func combatHelpText() string {
@@ -1667,7 +1668,7 @@ Special effects like @BBerserk@N or @BDig@N may then increase effective total at
 
 @YCURRENT DIRECTION@N
 
-In the status bar, an arrow shows you the direction of your last movement or attack. That direction is used in various contexts by some effects and abilities, like when eating firebreath pepper, sprinting or jumping.
+In the status bar, an arrow shows you the direction of your last movement or attack. That direction is used in various contexts by some effects and abilities, like when eating firebreath pepper, sprinting or jumping. The current direction is a player-specific feature.
 
 @YATTACK PATTERNS@N
 
@@ -1704,6 +1705,35 @@ In some cases, the effect is guaranteed on hit, like when a fire llama spits at 
 When the description says “may”, it means there is only a chance of inflicting the status on hit. In most cases, the chance scales simply with damage, with higher damage corresponding to higher chances. As a special case, phoenixes’ burning chance is reduced by imbalance, too, due to the difficulty of rebalancing with their large wings. Also, the dazing effect of cat’s space-distorting attacks scales with distance instead: lower chance and longer duration at long distances.
 
 The duration of detrimental statuses can be refreshed by further hits, but not that of positive ones like @BBerserk@N or @BLignification@N. Besides, further on-hit applications on the player are only half as likely until after the expiration turn, thanks to the benevolent intervention of your spirit ancestors. That player-specific protection is extended for an extra turn for @ODaze@N, @OFire@N and @OImbalance@N.
+`)
+}
+
+// ActionHelpStealth opens the log message viewer.
+type ActionHelpStealth struct{}
+
+func (a ActionHelpStealth) Handle(md *model) (gruid.Effect, bool) {
+	md.helpTopic("Stealth (Help)", stealthHelpText())
+	return nil, false
+}
+
+func (a ActionHelpStealth) String() string {
+	return "Stealth"
+}
+
+func (a ActionHelpStealth) Desc() string {
+	return "Explains how various stealth-related features work, including monster mindstate and noise."
+}
+
+func stealthHelpText() string {
+	return strings.TrimSpace(`
+
+In Shamogu, stealth plays an important role. There are two main mechanisms that determine monster behavior changes: presence in the field of view and noise.
+
+@YMONSTER MINDSTATE@N
+
+Monsters can be @Owandering@N, @Oguarding@N or @Rhunting@N. Guarding monsters walk around some vault location, often protecting a totem or portal. Wandering monsters take longer trips, possibly to any place in the map but with some bias toward nearby interesting places. Hunting monsters usually travel to the last location they saw you at; when they lose track of you, they become wandering or guarding again and briefly search around the nearby area before going back to their usual behavior.
+
+When in view, wandering and guarding monsters normally spend a turn noticing the player and switching to hunting behavior. There are some exceptions to this rule. For example, Dazzling Zebra players are instantly noticeable. Also, when hungry rats smell you from afar or sneaky megabats hear you, they immediately start hunting you even if they’re still out of view. Moreover, any monster may perform by chance an ambushing charge from out-of-view, like behind some rubble, attacking and becoming hunting at once.
 
 @YNOISE@N
 
