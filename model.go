@@ -101,7 +101,11 @@ func (md *model) init() gruid.Effect {
 		// Initialize mods before starting the game, because we need
 		// that information during the advanced new game settings.
 		if GameConfig.AdvancedNewGame {
-			g.Mods = slices.Clone(GameConfig.Mods)
+			if len(GameConfig.Mods) == NMods {
+				g.Mods = slices.Clone(GameConfig.Mods)
+			} else {
+				g.Mods = make([]bool, NMods)
+			}
 			md.openSpiritSelectionMenu(modeNewGameAdvanced)
 		} else {
 			g.Mods = make([]bool, NMods)
