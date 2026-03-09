@@ -1,11 +1,56 @@
 # v? ?
 
-Reworked and improved content:
+This release features new and improved content, as well as various fixes.
+
+New content:
 
 * The Orb may now interfere with teleportation about half of the time, driving
   the player away on the last level, making teleport-based strategies less
   reliable as a means of progression toward the Orb, but still useful otherwise
   (see issue #11).
+* New early guardian: **sneaky megabat**. It features a sneaky attack pattern,
+  like Vampiric Bat players. It appears as a totem or portal guardian early on,
+  once or twice per game.
+* New portal guardian: **dragging alligator**. It features a dragging attack
+  pattern, like Spinning Crocodile players. It alternates with blazing golem
+  as a portal guardian, but a bit less frequently. It has higher attack but
+  more modest defenses.
+* New Stealth help topic that explains monster mindstate behavior and how it
+  changes.  The topic also includes the noise explanations that were previously
+  in the Combat topic.
+* The Combat help topic has a new “ON-HIT EFFECTS” section that explains how
+  statuses inflicted by hits work, including the particularities of the new cat
+  dazing chance and duration scalings, or which statuses may be refreshed or
+  not by further hits. Also, that section documents a new special “protection”
+  by the player spirit ancestors that reduces the likeliness of early status
+  refresh or re-application, in part motivated by making consecutive fire and
+  imbalance dances less likely, so that they remain fun and not repetitive.
+* The Tips help topic features extra text about monster examination and rats
+  hunting by smell (see #11).
+
+Improvements in Corrupted Dungeon expansion (see issue #11):
+
+* Improved thematic levels, including a new poison themed level, and various
+  improvements in the lignification one.
+* Adjustments to guardian corruptions. Guardians are less likely to wander than
+  before, but when they do, replacements are more likely and more varied.
+  Rarely, more than one vault can be guarded.
+* The Orb or other special locations may be hidden by foliage or rubble more
+  often than before, in particular when unguarded.
+
+Reworked and improved content:
+
+* Healing Combat challenge mod: ambrosia berries have been restored but heal
+  only for 2 HP. The motivation was to simplify maintenance and compatibility
+  with other mods, like Corrupted Dungeon, that may want to generate ambrosia
+  berries (like in berserk themed levels), but the change also helps preserve
+  original comestible variety and avoid introducing comestible-frequency
+  changes.  Heal-on-kill formula has also been slightly adjusted to make it
+  smoother, while still guaranteeing heal at 3 HP or less.  The mod is no
+  longer considered experimental, because it's very playable despite the still
+  present comestible imbalance, which is a minor issue in practice, and
+  provides a different experience with choice considerations, so it has some
+  charm as an occasional challenge.
 * Remove safety rule for pushing into dangerous clouds (see #16), because it
   wasn't as useful since the Boar pushing changes a few releases ago, and even
   sometimes unwanted. Relatedly, Crocodile's dragging may now move the player
@@ -28,14 +73,18 @@ Reworked and improved content:
   again when you hit them (see #17). This way, the ability remains more
   pacific-oriented and helps getting unnoticed through monsters even if they
   already were hunting you.
-* Gawalt's hit weakening has been made less extreme (see #17). Now it plays
-  similarly as if all monsters had +1 defense, but without impacting accuracy.
-  Previously, it was closer to making all monsters have +2 defense, which was
-  too serious of a drawback in the late game where wall-jumping isn't as strong
-  anymore and some battles become unavoidable. The new formula also preserves a
-  bit better the relative increased resilience of trees with respect to other
-  same high-defense monsters like dragons.
-* Disorient status now lasts an extra turn, for better Zebra balance.
+* Gawalt's hit weakening has been made less extreme (see #17). Now hits that
+  would do 2 damage have only a 2/3 chance of getting weakened. That means that
+  2 attack is enough to sometimes inflict 2 base damage. Hits for higher damage
+  are still always weakened by one, like before. This change makes the impact
+  of 3 attack with respect to 2 attack a bit less important, making defense
+  builds a bit more appealing. The new formula also preserves a bit better the
+  relative increased resilience of trees with respect to other same
+  high-defense monsters like dragons.
+* Zebra's Disorient status now lasts an extra turn, for better balance.
+* Elephant's “stomp” ability now makes you berserk for 4 turns, instead of 5,
+  as the ability was a bit too strong considering its useful extra
+  wall-destroying effects.
 * Lion's roar now inflicts 4-5 turns of Fear, instead of 5, with 4 being more
   likely on close targets. This change helps balance hydra+lion and
   frog+lion+owl, as those are somewhat overpowered with respect to other
@@ -49,35 +98,14 @@ Reworked and improved content:
 * Various inflict-on-hit statuses from monsters on the player now use a
   somewhat biased RNG that makes repeated application just after expiration
   less likely, making consecutive imbalance and fire dances less likely.
-* Healing Combat challenge mod: ambrosia berries have been restored but heal
-  only for 2 HP. The motivation was to simplify maintenance and compatibility
-  with other mods, like Corrupted Dungeon, that may want to generate ambrosia
-  berries (like in berserk themed levels), but the change also helps preserve
-  original comestible variety and avoid introducing comestible-frequency
-  changes.  Heal-on-kill formula has also been slightly adjusted to make it
-  smoother, while still guaranteeing heal at 3 HP or less.  The mod is no
-  longer considered experimental, because it's very playable despite the still
-  present comestible imbalance, which is a minor issue in practice, and
-  provides a different experience with choice considerations, so it has some
-  charm as an occasional challenge.
-* The combat help has a new “ON-HIT EFFECTS” section that explains how statuses
-  inflicted by hits work, including the particularities of the new cat dazing
-  chance and duration scalings, or which statuses may be refreshed or not by
-  further hits. Also, that section documents a new special “protection” by the
-  player spirit ancestors that reduces the likeliness of early status refresh
-  or re-application, in part motivated by making consecutive fire and imbalance
-  dances less likely, so that they remain fun and not repetitive.
-* New help tips about monster examination and rats hunting by smell (see #11).
 
-Improvements in Corrupted Dungeon expansion (see issue #11):
+UI, graphics, QoL:
 
-* Improved thematic levels, including a new poison themed level, and various
-  improvements in the lignification one.
-* Adjustments to guardian corruptions. Guardians are less likely to wander than
-  before, but when they do, replacements are more likely and more varied.
-  Rarely, more than one vault can be guarded.
-* The Orb or other special locations may be hidden by foliage or rubble more
-  often than before, in particular when unguarded.
+* We don't reset configuration anymore for each new release, but only if there
+  were incompatible config changes. In particular, any custom keybindings or
+  options from the previous release should be preserved. Note that saves are
+  still incompatible between releases, so an in-progress run will be lost after
+  updating Shamogu to a new release, and hence needs to be finished before.
 
 Fixes:
 
@@ -98,6 +126,8 @@ Fixes:
   notice the player when in view during that skipped turn (see #17). Not really
   a bug, but it could (very rarely) feel strange.
 * Fix a bug where disoriented monsters could sometimes move incorrectly.
+* Prevent rune trigger message for out-of-view traps (see #17), unless the
+  player has the Runic Chicken and the trap is within sensing range.
 
 # v1.4.1 2026-02-10
 
