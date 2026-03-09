@@ -1498,13 +1498,11 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 		case 0:
 			p := g.RandomWaypoint()
 			var mk monsterKind
-			switch g.IntN(5) {
+			switch g.IntN(4) {
 			case 0:
 				mk = BerserkingSpider
 			case 1:
 				mk = ConfusingEye
-			case 2:
-				mk = SneakyMegabat
 			default:
 				mk = HungryRat
 			}
@@ -1578,10 +1576,20 @@ func (g *Game) genOrbAlternateGuardiansAt(p gruid.Point, nE, nM, nL int) (int, i
 		nL -= 2
 	default:
 		mk := g.randMonsKind(monsMid)
-		for range 4 {
-			g.genMonsterGuardian(mk, p)
+		if g.IntN(1+len(monsMid)) == 0 {
+			// Sneaky megabat nest as rare orb guardians, too.
+			mk = SneakyMegabat
 		}
-		nM -= 4
+		n := 4
+		if mk == ExplodingNadre {
+			// Nadres are frail, so add an extra one to compensate.
+			n++
+			nE++
+		}
+		for range n {
+			g.genMonsterGuardian(mk, p)
+			nM--
+		}
 	}
 	return nE, nM, nL
 }
