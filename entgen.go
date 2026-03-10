@@ -1316,7 +1316,7 @@ func (g *Game) genGuardians(nE, nM, nL int) (int, int, int) {
 }
 
 func (g *Game) earlyGuardianPoint() gruid.Point {
-	if g.IntN(8) == 0 {
+	if g.IntN(6) == 0 {
 		// Rarely, guard a random vault but hide at least either the
 		// portal or totem.
 		if g.IntN(2) == 0 {
