@@ -836,6 +836,16 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 				nt = Floor
 			}
 			st := ts[g.IntN(3)]
+			if st == nt {
+				// Make secondary terrain unlikely of being the
+				// same as primary terrain.
+				st = ts[g.IntN(3)]
+			}
+			if nt == Rubble && g.IntN(2) == 0 {
+				// Floor more likely as secondary terrain for
+				// rubble corruption.
+				st = Floor
+			}
 			switch {
 			case nt == Rubble || g.IntN(4) == 0:
 				// Walls may be destroyed.
@@ -847,7 +857,7 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 						}
 						return mixfn()
 					}
-					if g.IntN(5) == 0 {
+					if g.IntN(4) == 0 {
 						return st
 					}
 					return nt
@@ -858,7 +868,7 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 					if !Passable(t) {
 						return TranslucentWall
 					}
-					if g.IntN(10) == 0 {
+					if g.IntN(6) == 0 {
 						return st
 					}
 					return nt
