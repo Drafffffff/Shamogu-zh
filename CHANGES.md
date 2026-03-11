@@ -106,6 +106,10 @@ UI, graphics, QoL:
   options from the previous release should be preserved. Note that saves are
   still incompatible between releases, so an in-progress run will be lost after
   updating Shamogu to a new release, and hence needs to be finished before.
+* The display of temporary HP bonuses in the form of `HP:base+bonus/max` now
+  takes into account status expiration order in the computation of `base` when
+  both Berserk and Lignification are active at the same time, producing hence a
+  more accurate prediction in such case.
 
 Fixes:
 
