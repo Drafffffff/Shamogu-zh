@@ -880,7 +880,7 @@ var MonsData = []monsterInfo{
 	BurningPhoenix:    {"burning phoenix", 'P', 2, 1, 5, PatternRampage | BurningHits | MonsImmunityFire | MonsImmunityLignification | MonsWingFlap | MonsNotable},
 	ConfusingEye:      {"confusing eye", 'e', 2, 0, 2, PatternRanged | MonsConfusion | MonsImmunityConfusion | MonsLightFootsteps},
 	CrazyDruid:        {"crazy druid", 'C', 3, 1, 4, PatternSwap | BurningHits | MonsBerserking | MonsNotable},
-	DraggingAlligator: {"dragging alligator", 'A', 3, 1, 4, PatternCrocodile | MonsScales | ResistanceFire | ResistancePoison | ResistanceFear | MonsNotable},
+	DraggingAlligator: {"dragging alligator", 'A', 3, 1, 4, PatternCrocodile | MonsScales | ResistanceFire | ResistanceFear | MonsNotable},
 	EarthDragon:       {"earth dragon", 'D', 4, 2, 5, Pushing | MonsDig | MonsImmunityFear | MonsScales | MonsHeavyFootsteps | MonsNotable},
 	ExplodingNadre:    {"exploding nadre", 'n', 2, 3, 1, MonsExplodingDeath | MonsScales},
 	FearsomeLich:      {"fearsome lich", 'L', 2, 2, 5, PatternRanged | MonsFear | MonsIgnoreDefense | MonsImmunityPoison | MonsImmunityConfusion | MonsNotable},
