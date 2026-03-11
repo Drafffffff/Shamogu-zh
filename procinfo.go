@@ -146,7 +146,7 @@ func (g *Game) flavoursProcGen() {
 	case 1:
 		gpi.GuardianEarly++
 	}
-	if n := 1 + g.IntN(4); g.IntN(2) == 0 && n != gpi.GuardianEarly {
+	if n := 1 + g.IntN(4); g.IntN(3) == 0 && n != gpi.GuardianEarly {
 		// Sometimes have a second level with a megabat guardian.
 		gpi.GuardianEarly2 = n
 	}

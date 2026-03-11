@@ -10,7 +10,7 @@ New content:
   (see issue #11).
 * New early guardian: **sneaky megabat**. It features a sneaky attack pattern,
   like Vampiric Bat players. It appears as a totem or portal guardian early on,
-  once or twice per game.
+  once or more rarely twice per game.
 * New portal guardian: **dragging alligator**. It features a dragging attack
   pattern, like Spinning Crocodile players. It alternates with blazing golem
   as a portal guardian, but a bit less frequently. It has higher attack but
