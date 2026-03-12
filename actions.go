@@ -1859,10 +1859,6 @@ On the map, monster color may change depending on active status effects.  By def
 			if !g.Mod(ModAdvancedSpirits) || g.Mod(ModGluttonyRework) {
 				continue
 			}
-		case StatusGardener, StatusShadow, StatusDisorient:
-			if !g.Mod(ModAdvancedSpirits) {
-				continue
-			}
 		}
 		color := statusColor(st, 42)
 		fmt.Fprintf(&sb, "@%c%s@N (@%c%s@N). ", color, st.Name(), color, g.StatusAbbr(pa, st))
