@@ -517,7 +517,7 @@ func (md *model) drawTargInfo() {
 				fmt.Fprintf(&sb, "HP:?/%d A:%d D:%d", r.MaxHP, r.Attack, r.Defense)
 			}
 			sb.WriteByte('\n')
-			fmt.Fprintf(&sb, "@CTraits:@N %s.", r.Traits)
+			fmt.Fprintf(&sb, "@CTraits:@N %s.", TraitDesc(r.Kind, r.Traits))
 		case *Spirit:
 			sb.WriteString("@CTotemic spirit.@N\n" + r.Desc())
 		case *Menhir:

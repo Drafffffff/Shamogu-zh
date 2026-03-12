@@ -32,7 +32,7 @@ func (e *Entity) String() string {
 func (e *Entity) Color() (fg gruid.Color) {
 	switch r := e.Role.(type) {
 	case *Actor:
-		if r.IsPlayer() {
+		if r.Is(Player) {
 			return ColorBlue
 		}
 		fg = ColorOrange
@@ -181,8 +181,8 @@ func (g *Game) MoveActor(i ID, ai *Actor, to gruid.Point, movk movementKind) boo
 		ei.P = to
 		g.Map.ActorCache.SetU(to, i)
 	}
-	switch {
-	case ai.IsPlayer():
+	switch i {
+	case PlayerID:
 		ei.KnownP = ei.P
 		if i, it := g.ItemAt(to); i >= 0 {
 			ei := g.Entity(i)

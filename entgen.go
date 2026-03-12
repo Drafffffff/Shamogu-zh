@@ -13,7 +13,7 @@ func (g *Game) InitPlayer(spe *Entity) {
 	g.Entities[PlayerID] = &Entity{
 		Name: "You",
 		Rune: '@',
-		Role: NewActor(2, 1, 9, Player),
+		Role: NewActor(2, 1, 9, Player, NoTraits),
 	}
 	for i := range FirstMapID {
 		g.Entities[i] = emptySlot()
@@ -143,12 +143,12 @@ var primarySpiritsAdvanced = []spiritInfo{
 		Ability:      [2]Ability{EffectTailSlap{}, EffectTailSlap{}},
 		BonusAttack:  [2]int{1, 1},
 		BonusDefense: [2]int{0, 1},
-		BonusTraits:  [2]Traits{PatternCrocodile, PatternCrocodile}},
+		BonusTraits:  [2]Traits{PatternDragging, PatternDragging}},
 	{
 		Name:        "Vampiric Bat",
 		MaxCharges:  [2]int{1, 2},
 		Ability:     [2]Ability{EffectVampirism{DurationVampirism}, EffectVampirism{DurationVampirism}},
-		BonusTraits: [2]Traits{PatternBat, PatternBat}},
+		BonusTraits: [2]Traits{PatternSneaky, PatternSneaky}},
 }
 
 // secondarySpirits represents the various kinds of secondary spirit totems
@@ -834,11 +834,13 @@ type monsterInfo struct {
 	Traits  Traits // actor's traits
 }
 
-// monsterKind represents the various kinds of monsters.
-type monsterKind int
+// ActorKind represents the various kinds of actors.
+type ActorKind int
 
 const (
-	AcidMound monsterKind = iota
+	Player ActorKind = iota
+
+	AcidMound
 	BarkingHound
 	BerserkingSpider
 	BlazingGolem
@@ -880,7 +882,7 @@ var MonsData = []monsterInfo{
 	BurningPhoenix:    {"burning phoenix", 'P', 2, 1, 5, PatternRampage | BurningHits | MonsImmunityFire | MonsImmunityLignification | MonsWingFlap | MonsNotable},
 	ConfusingEye:      {"confusing eye", 'e', 2, 0, 2, PatternRanged | MonsConfusion | MonsImmunityConfusion | MonsLightFootsteps},
 	CrazyDruid:        {"crazy druid", 'C', 3, 1, 4, PatternSwap | BurningHits | MonsBerserking | MonsNotable},
-	DraggingAlligator: {"dragging alligator", 'A', 3, 1, 4, PatternCrocodile | MonsScales | ResistanceFire | ResistanceFear | MonsNotable},
+	DraggingAlligator: {"dragging alligator", 'A', 3, 1, 4, PatternDragging | MonsScales | ResistanceFire | ResistanceFear | MonsNotable},
 	EarthDragon:       {"earth dragon", 'D', 4, 2, 5, Pushing | MonsDig | MonsImmunityFear | MonsScales | MonsHeavyFootsteps | MonsNotable},
 	ExplodingNadre:    {"exploding nadre", 'n', 2, 3, 1, MonsExplodingDeath | MonsScales},
 	FearsomeLich:      {"fearsome lich", 'L', 2, 2, 5, PatternRanged | MonsFear | MonsIgnoreDefense | MonsImmunityPoison | MonsImmunityConfusion | MonsNotable},
@@ -891,7 +893,7 @@ var MonsData = []monsterInfo{
 	MadOctopode:       {"mad octopode", 'O', 3, 2, 5, PatternCatch | MonsImmunityImbalance | VenomousMelee | MonsCreep | MonsNotable},
 	LashingFrog:       {"lashing frog", 'F', 2, 1, 4, PatternCatch},
 	RampagingBoar:     {"rampaging boar", 'B', 3, 0, 4, PatternRampage | PushingCharge | MonsDig},
-	SneakyMegabat:     {"sneaky megabat", 'm', 2, 2, 4, PatternBat | GoodHearing | MonsImmunityLignification | MonsWingFlap},
+	SneakyMegabat:     {"sneaky megabat", 'm', 2, 2, 4, PatternSneaky | GoodHearing | MonsImmunityLignification | MonsWingFlap},
 	TemporalCat:       {"temporal cat", 'c', 2, 0, 4, PatternSwapDaze | MonsLightFootsteps},
 	ThunderPorcupine:  {"thunder porcupine", 'p', 2, 0, 3, DazingSpines | MonsImmunityDaze | MonsLightFootsteps},
 	TotemWasp:         {"totem wasp", 'w', 2, 1, 2, PatternRampage | VenomousMelee | MonsImmunityLignification | MonsWingFlap | MonsNotable},
@@ -904,7 +906,7 @@ var MonsData = []monsterInfo{
 }
 
 // monsEarly represents early level monsters.
-var monsEarly = []monsterKind{
+var monsEarly = []ActorKind{
 	BerserkingSpider,
 	ConfusingEye,
 	HungryRat,
@@ -913,7 +915,7 @@ var monsEarly = []monsterKind{
 
 // monsMid represents monsters that appear throughout the game (but less often
 // early).
-var monsMid = []monsterKind{
+var monsMid = []ActorKind{
 	AcidMound,
 	BarkingHound,
 	BlinkButterfly,
@@ -928,7 +930,7 @@ var monsMid = []monsterKind{
 
 // monsLate represents dangerous monsters that appear mostly in mid-to-late
 // levels.
-var monsLate = []monsterKind{
+var monsLate = []ActorKind{
 	BurningPhoenix,
 	EarthDragon,
 	FourHeadedHydra,
@@ -1083,12 +1085,12 @@ func (g *Game) genThemedMonsters(mg *MapGen, nE, nM, nL int) {
 	// aren't useful. Some rare annoying monsters are fine.
 	switch mg.theme {
 	case ThemeBerserk:
-		mks := []monsterKind{BerserkingSpider, HungryRat}
+		mks := []ActorKind{BerserkingSpider, HungryRat}
 		for range 1 + nE {
 			g.genMonster(g.randMonsKind(mks))
 		}
 		n := g.IntN(2)
-		mksAnnoying := []monsterKind{CrazyDruid, ExplodingNadre}
+		mksAnnoying := []ActorKind{CrazyDruid, ExplodingNadre}
 		for range 1 + n {
 			// Annoying monsters leading to poison+fire risk.
 			g.genMonster(g.randMonsKind(mksAnnoying))
@@ -1096,7 +1098,7 @@ func (g *Game) genThemedMonsters(mg *MapGen, nE, nM, nL int) {
 		for range 1 + nM - n {
 			g.genMonster(BarkingHound)
 		}
-		mksLate := []monsterKind{UndeadKnight, FearsomeLich}
+		mksLate := []ActorKind{UndeadKnight, FearsomeLich}
 		for range nL {
 			g.genMonster(g.randMonsKind(mksLate))
 		}
@@ -1104,7 +1106,7 @@ func (g *Game) genThemedMonsters(mg *MapGen, nE, nM, nL int) {
 		for range 2 + nE {
 			g.genMonster(ExplodingNadre)
 		}
-		mksAnnoying := []monsterKind{BerserkingSpider, VenomousViper}
+		mksAnnoying := []ActorKind{BerserkingSpider, VenomousViper}
 		g.genMonster(g.randMonsKind(mksAnnoying)) // Annoying poison monster.
 		for range 2 + nM {
 			g.genMonster(FireLlama)
@@ -1143,12 +1145,12 @@ func (g *Game) genThemedMonsters(mg *MapGen, nE, nM, nL int) {
 			nM--
 		}
 		n := 1 + g.IntN(2)
-		mksRanged := []monsterKind{ConfusingEye, WindFox}
+		mksRanged := []ActorKind{ConfusingEye, WindFox}
 		for range n {
 			// Add 1-2 ranged mildly-annoying monsters.
 			g.genMonster(g.randMonsKind(mksRanged))
 		}
-		mks := []monsterKind{RampagingBoar, BlinkButterfly, TemporalCat, LashingFrog, AcidMound, BarkingHound}
+		mks := []ActorKind{RampagingBoar, BlinkButterfly, TemporalCat, LashingFrog, AcidMound, BarkingHound}
 		for range nM + nE - n {
 			// Many mid-monsters whose attack pattern or effect is
 			// neutralized in some way by lignification.
@@ -1159,7 +1161,7 @@ func (g *Game) genThemedMonsters(mg *MapGen, nE, nM, nL int) {
 			// involuntary lignification.
 			g.genMonster(WalkingTree)
 		}
-		mksLate := []monsterKind{FourHeadedHydra, EarthDragon}
+		mksLate := []ActorKind{FourHeadedHydra, EarthDragon}
 		for i := range nL {
 			// Fill with late monsters whose attack pattern is
 			// neutralized by lignification.
@@ -1205,7 +1207,7 @@ func (g *Game) genThemedMonsters(mg *MapGen, nE, nM, nL int) {
 			// Confusion-resistant monster.
 			g.genMonster(ConfusingEye)
 		}
-		mks := []monsterKind{BerserkingSpider, TotemWasp}
+		mks := []ActorKind{BerserkingSpider, TotemWasp}
 		for range 4 + nE - n {
 			// Poisonous early monsters.
 			g.genMonster(g.randMonsKind(mks))
@@ -1259,7 +1261,7 @@ func (g *Game) RandomWaypoint() gruid.Point {
 }
 
 // randMonsKind returns a random monster kind among the given ones.
-func (g *Game) randMonsKind(mks []monsterKind) monsterKind {
+func (g *Game) randMonsKind(mks []ActorKind) ActorKind {
 	return mks[g.IntN(len(mks))]
 }
 
@@ -1497,7 +1499,7 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 		switch g.IntN(2) {
 		case 0:
 			p := g.RandomWaypoint()
-			var mk monsterKind
+			var mk ActorKind
 			switch g.IntN(4) {
 			case 0:
 				mk = BerserkingSpider
@@ -1513,7 +1515,7 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 			nM--
 		default:
 			p := g.RandomWaypoint()
-			var mk monsterKind
+			var mk ActorKind
 			switch g.IntN(3) {
 			case 0:
 				mk = BlinkButterfly
@@ -1729,7 +1731,7 @@ func (g *Game) genMonstersCorrupted(nE, nM, nL int) (int, int, int) {
 	}
 	// Special mid monsters.
 	if g.IntN(rare) == 0 {
-		mks := []monsterKind{WalkingMushroom, BlazingGolem, CrazyDruid, NoisyImp}
+		mks := []ActorKind{WalkingMushroom, BlazingGolem, CrazyDruid, NoisyImp}
 		nMs := min(nM, 1+g.IntN(2), len(mks))
 		monsSpecialMid := g.monsterSelection(mks, len(mks))
 		for _, mk := range monsSpecialMid[:nMs] {
@@ -1743,13 +1745,13 @@ func (g *Game) genMonstersCorrupted(nE, nM, nL int) (int, int, int) {
 		if g.IntN(3) == 0 && g.Map.Level < MapLevels {
 			// Rare chance of special late monsters as totem
 			// guardians.
-			mks := []monsterKind{FearsomeLich, FearsomeLich, MadOctopode}
+			mks := []ActorKind{FearsomeLich, FearsomeLich, MadOctopode}
 			for range nLs {
 				p := g.corruptedTotemGuardianPoint()
 				g.genMonsterGuardian(g.randMonsKind(mks), p)
 			}
 		} else {
-			mks := []monsterKind{UndeadKnight, UndeadKnight, MadOctopode}
+			mks := []ActorKind{UndeadKnight, UndeadKnight, MadOctopode}
 			for range nLs {
 				g.genMonster(g.randMonsKind(mks))
 			}
@@ -1765,7 +1767,7 @@ func (g *Game) genMonstersCorrupted(nE, nM, nL int) (int, int, int) {
 }
 
 // monsterSelection returns a random monster kind subset of size n.
-func (g *Game) monsterSelection(mks []monsterKind, n int) []monsterKind {
+func (g *Game) monsterSelection(mks []ActorKind, n int) []ActorKind {
 	md := slices.Clone(mks)
 	g.rand.Shuffle(len(md), func(i, j int) {
 		md[i], md[j] = md[j], md[i]
@@ -1775,7 +1777,7 @@ func (g *Game) monsterSelection(mks []monsterKind, n int) []monsterKind {
 }
 
 // genMonster spawns a monster of the given kind on a random free floor.
-func (g *Game) genMonster(mk monsterKind) (ID, *Entity) {
+func (g *Game) genMonster(mk ActorKind) (ID, *Entity) {
 	p := g.PP()
 	q := g.randomFreeFloor()
 	// XXX: use walkable-path distance?
@@ -1787,7 +1789,7 @@ func (g *Game) genMonster(mk monsterKind) (ID, *Entity) {
 
 // genMonsterGardian spawns a gardian monster of the given kind around a
 // certain position.
-func (g *Game) genMonsterGuardian(mk monsterKind, at gruid.Point) (ID, *Actor) {
+func (g *Game) genMonsterGuardian(mk ActorKind, at gruid.Point) (ID, *Actor) {
 	p := g.randomFreeNearby(at, 5)
 	id, mons := g.genMonsterAt(mk, p)
 	a := mons.Actor()
@@ -1797,7 +1799,7 @@ func (g *Game) genMonsterGuardian(mk monsterKind, at gruid.Point) (ID, *Actor) {
 
 // genMonsterAt spawns a monster of the given kind on the given position
 // (assumed to be free).
-func (g *Game) genMonsterAt(mk monsterKind, p gruid.Point) (ID, *Entity) {
+func (g *Game) genMonsterAt(mk ActorKind, p gruid.Point) (ID, *Entity) {
 	mons := monster(mk)
 	mons.P = p
 	id := ID(len(g.Entities))
@@ -1807,10 +1809,10 @@ func (g *Game) genMonsterAt(mk monsterKind, p gruid.Point) (ID, *Entity) {
 }
 
 // monster generates a new monster entity using the given data.
-func monster(mk monsterKind) *Entity {
+func monster(mk ActorKind) *Entity {
 	mi := MonsData[mk]
-	a := NewActor(mi.Attack, mi.Defense, mi.HP, mi.Traits)
-	a.Behavior = &Behavior{Kind: mk, Guard: InvalidPos, Target: InvalidPos}
+	a := NewActor(mi.Attack, mi.Defense, mi.HP, mk, mi.Traits)
+	a.Behavior = &Behavior{Guard: InvalidPos, Target: InvalidPos}
 	return &Entity{
 		Name:   mi.Name,
 		Rune:   mi.R,

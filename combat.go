@@ -105,7 +105,7 @@ func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKi
 			break
 		}
 		switch {
-		case ai.DoesAny(PatternCrocodile) && ap != AttackSlap:
+		case ai.DoesAny(PatternDragging) && ap != AttackSlap:
 			g.MakeNoise(ej.P, NoiseChomp)
 		default:
 			g.MakeNoise(ej.P, NoiseCombat)
@@ -374,11 +374,11 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 			ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusImbalance, 1+dmg) && g.InFOV(ei.P) {
 			g.Logf("The confused %s lost balance due to recoil!", ei.Name)
 		}
-	case ai.DoesAny(PatternCrocodile) && ai.CanMove() && !aj.ResistsMove() && ap == AttackDrag && !ai.Has(StatusPoison) && aj.IsAlive():
+	case ai.DoesAny(PatternDragging) && ai.CanMove() && !aj.ResistsMove() && ap == AttackDrag && !ai.Has(StatusPoison) && aj.IsAlive():
 		g.drag(i, j, ai, aj)
-	case ai.DoesAny(PatternBat) && ap == AttackPlain && ai.CanMove() && !ai.Has(StatusPoison):
+	case ai.DoesAny(PatternSneaky) && ap == AttackPlain && ai.CanMove() && !ai.Has(StatusPoison):
 		g.retreat(i, j, ai)
-	case ai.DoesAny(PatternBat) && ap == AttackCharge:
+	case ai.DoesAny(PatternSneaky) && ap == AttackCharge:
 		g.PutStatus(j, aj, StatusConfusion, 2)
 	}
 	// Extra attack effects (shared by both player and monsters).
@@ -418,8 +418,8 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 				g.Logf("The confused %s frightened itself too!", ei.Name)
 			}
 		}
-	case ai.DoesAny(MonsConfusion) && g.IntN(6-dmg) < 2:
-		if g.PutStatus(j, aj, StatusConfusion, DurationConfusionHit) {
+	case ai.DoesAny(MonsConfusion) && g.IntN(6-dmg) < 2 || ai.Is(DraggingAlligator):
+		if !g.ResistStatusRoll(j, StatusConfusion) && g.PutStatus(j, aj, StatusConfusion, DurationConfusionHit) {
 			g.monsConfusionPenalty(i, ai)
 		}
 	case ai.DoesAny(MonsLignify) && g.IntN(6-dmg) < 2:
@@ -451,7 +451,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 		}
 	}
 	if aj.Has(StatusLignification) && !aj.DoesAny(WoodyLegs) &&
-		(afraid && aj.Has(StatusFear) || aj.DoesAny(Elephanty) && ai.IsMonster(HungryRat)) {
+		(afraid && aj.Has(StatusFear) || aj.DoesAny(Elephanty) && ai.Is(HungryRat)) {
 		// When hurt, afraid lignified actors become berserk.
 		g.PutStatus(j, aj, StatusBerserk, DurationBerserkAfraid)
 		if j == PlayerID {
@@ -634,7 +634,7 @@ func (g *Game) monsConfusionPenalty(i ID, ai *Actor) {
 
 // burningRoll reports whether burning should happen.
 func (g *Game) burningRoll(ai *Actor, dmg int) bool {
-	if !ai.IsMonster(BurningPhoenix) {
+	if !ai.Is(BurningPhoenix) {
 		return g.IntN(6-dmg) < 2
 	}
 	if ai.Has(StatusImbalance) {

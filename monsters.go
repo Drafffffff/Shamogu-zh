@@ -160,7 +160,7 @@ func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point, noise bool) 
 		return false
 	}
 	unhidden := !g.PlayerIsHidden()
-	if at == pp && (unhidden && g.InFOV(ei.P) || noise && ai.IsMonster(SneakyMegabat)) {
+	if at == pp && (unhidden && g.InFOV(ei.P) || noise && ai.Is(SneakyMegabat)) {
 		if g.InFOV(ei.P) {
 			g.Logf("The %s notices you.", ei.Name)
 		}
@@ -255,7 +255,7 @@ func (g *Game) monsterBumpNext(i ID, ai *Actor) {
 	unnoticeable := dist > MaxFOVRange || beh.State != Hunting && g.PlayerIsHidden()
 	if pl.P == to || dist == 1 && !unnoticeable {
 		ap := AttackPlain
-		if ai.DoesAny(PatternCrocodile) && dist == 1 {
+		if ai.DoesAny(PatternDragging) && dist == 1 {
 			ap = AttackDrag
 		}
 		g.BumpAttackActor(i, PlayerID, ai, pa, ap, dist, 0)
@@ -273,7 +273,7 @@ func (g *Game) monsterBumpNext(i ID, ai *Actor) {
 			g.md.RangedAttackAnimation(ai, pl.P, pl.P)
 			g.BumpAttackActor(i, PlayerID, ai, pa, AttackRanged, dist, 0)
 			return
-		case ai.DoesAny(PatternRampage|PatternBat) && ai.CanMove():
+		case ai.DoesAny(PatternRampage|PatternSneaky) && ai.CanMove():
 			dir := toDir(pl.P.Sub(ei.P))
 			to := pl.P.Sub(dir)
 			if g.BumpMoveActor(i, ai, to) {

@@ -119,7 +119,7 @@ func (g *Game) SenseEntity(i ID, verb string) {
 			}
 			pa := g.PlayerActor()
 			switch {
-			case pa.DoesAny(Elephanty) && ri.IsMonster(HungryRat):
+			case pa.DoesAny(Elephanty) && ri.Is(HungryRat):
 				g.Logf("You trumpet at the %s", ei.Name)
 				g.MakeNoise(g.PP(), NoiseTrumpet)
 			case pa.DoesAny(ScaryRoar):

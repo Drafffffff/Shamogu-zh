@@ -83,7 +83,7 @@ func (sp *Spirit) Desc() string {
 	fmt.Fprintf(&sb, "@CAbility:@N %s (%d/%d charges). %s",
 		sp.Ability[sp.Level].Name(), sp.Charges, sp.MaxCharges[sp.Level], sp.Ability[sp.Level].Desc())
 	sb.WriteByte('\n')
-	fmt.Fprintf(&sb, "@CTraits:@N %s.", sp.BonusTraits[sp.Level])
+	fmt.Fprintf(&sb, "@CTraits:@N %s.", TraitDesc(Player, sp.BonusTraits[sp.Level]))
 	return sb.String()
 }
 
@@ -116,7 +116,7 @@ func (sp *Spirit) UpgradeDesc() string {
 	fmt.Fprintf(&sb, "@BCharges:@N %+d", sp.MaxCharges[1]-sp.MaxCharges[0])
 	if sp.BonusTraits[1] != sp.BonusTraits[0] {
 		sb.WriteByte('\n')
-		fmt.Fprintf(&sb, "@BNew traits:@N %s.", sp.BonusTraits[1]&^sp.BonusTraits[0])
+		fmt.Fprintf(&sb, "@BNew traits:@N %s.", TraitDesc(Player, sp.BonusTraits[1]&^sp.BonusTraits[0]))
 	}
 	return desc + "\n\n" + sb.String()
 }

@@ -28,7 +28,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 			return g.Sprint(dir)
 		}
 	}
-	if pa.DoesAny(PatternCrocodile) && passto && dir == g.Dir.Mul(-1) {
+	if pa.DoesAny(PatternDragging) && passto && dir == g.Dir.Mul(-1) {
 		// Crocodile needs to spend a turn turning before moving
 		// backwards.
 		g.Dir = dir
@@ -54,7 +54,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 		dist := paths.DistanceManhattan(pl.P, ej.P)
 		if dist == 1 {
 			switch {
-			case pa.DoesAny(PatternCrocodile):
+			case pa.DoesAny(PatternDragging):
 				if dirChange {
 					g.Dir = dir
 					break
@@ -81,7 +81,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 			g.md.RangedAttackAnimation(pa, pl.P, ej.P)
 			g.BumpAttackActor(PlayerID, j, pa, aj, AttackRanged, dist, 0)
 			return true
-		case pa.DoesAny(PatternRampage|PatternBat) && pa.CanMove() && (pa.HP > 1 || !pa.Has(StatusPoison)):
+		case pa.DoesAny(PatternRampage|PatternSneaky) && pa.CanMove() && (pa.HP > 1 || !pa.Has(StatusPoison)):
 			g.Dir = dir
 			to := ej.P.Sub(dir)
 			if !g.BumpMoveActor(PlayerID, pa, to) {
@@ -93,7 +93,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 	}
 	// We're not ranged and next position is not a monster: move.
 	if !pa.CanMove() {
-		if pa.DoesAny(PatternCrocodile) && dirChange && passto {
+		if pa.DoesAny(PatternDragging) && dirChange && passto {
 			g.Dir = dir
 			return true
 		}
@@ -101,7 +101,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 		return false
 	}
 	if pa.HP == 1 && pa.Has(StatusPoison) {
-		if pa.DoesAny(PatternCrocodile) && dirChange && passto {
+		if pa.DoesAny(PatternDragging) && dirChange && passto {
 			g.Dir = dir
 			return true
 		}
@@ -126,7 +126,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 		return true
 	}
 	// Try charge.
-	if pa.DoesAny(PatternCrocodile) && dirChange {
+	if pa.DoesAny(PatternDragging) && dirChange {
 		return true
 	}
 	nto := to.Add(dir)
@@ -145,7 +145,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 // PlayerFears reports whether the players fears the given actor.
 func (g *Game) PlayerFears(j ID, aj *Actor) bool {
 	pa := g.PlayerActor()
-	return pa.Has(StatusFear) || pa.DoesAny(Elephanty) && aj.IsMonster(HungryRat) && !pa.Has(StatusBerserk)
+	return pa.Has(StatusFear) || pa.DoesAny(Elephanty) && aj.Is(HungryRat) && !pa.Has(StatusBerserk)
 }
 
 func (g *Game) logDaze() {
@@ -275,7 +275,7 @@ func (g *Game) ComputePlayerStats() {
 	p.Attack = 2
 	p.Defense = 1
 	p.MaxHP = 9
-	p.Traits = Player
+	p.Traits = NoTraits
 	for _, sp := range g.PlayerSpirits() {
 		p.Attack += sp.BonusAttack[sp.Level]
 		p.Defense += sp.BonusDefense[sp.Level]

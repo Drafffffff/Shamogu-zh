@@ -17,26 +17,23 @@ type Actor struct {
 	FirePos   gruid.Point // position at start of turn while on Fire
 	KnownDead bool        // whether it's a monster known to be dead
 	Statuses  Statuses    // statuses (confused, etc.)
+	Kind      ActorKind   // actor kind (player or some kind of monster)
 	Traits    Traits      // passives traits
 	Behavior  *Behavior   // behavior component (monsters only)
 }
 
 // NewActor returns a new actor with the given combat stats and traits.
-func NewActor(attack, defense, hp int, t Traits) *Actor {
+func NewActor(attack, defense, hp int, ak ActorKind, t Traits) *Actor {
 	a := &Actor{
 		Attack:   attack,
 		Defense:  defense,
 		HP:       hp,
 		MaxHP:    hp,
+		Kind:     ak,
 		Statuses: make(Statuses, NStatuses),
 		Traits:   t,
 	}
 	return a
-}
-
-// IsPlayer reports whether the actor has the Player trait.
-func (a *Actor) IsPlayer() bool {
-	return a.DoesAny(Player)
 }
 
 // DoesAny reports whether the player has all traits in t.
@@ -54,9 +51,9 @@ func (a *Actor) Has(st Status) bool {
 	return a.Statuses.Has(st)
 }
 
-// IsMonster reports whether the actor is a monster of the given kind.
-func (a *Actor) IsMonster(mk monsterKind) bool {
-	return a.Behavior != nil && a.Behavior.Kind == mk
+// Is reports whether the actor is of the given kind.
+func (a *Actor) Is(ak ActorKind) bool {
+	return a.Kind == ak
 }
 
 // CanMove reports whether the actor isn't under any status that prevents
@@ -98,7 +95,7 @@ func (g *Game) AdjustHPWithMin(i ID, ai *Actor, amount int, m int) {
 	}
 	hp, maxHP := ai.HP, ai.GetMaxHP()
 	ai.HP = min(maxHP, max(min(m, hp), hp+amount))
-	if ai.IsPlayer() {
+	if i == PlayerID {
 		if ai.HP > hp {
 			g.Logf("You feel better (+%d HP).", ai.HP-hp)
 		} else if ai.HP < hp {
@@ -131,18 +128,20 @@ func (t Traits) All(of Traits) bool {
 	return t&of == of
 }
 
-// Traits. NOTE: there shouldn't be more than 64 (remaining free: 0).
+// Traits. NOTE: there shouldn't be more than 64 (remaining free: 1).
+// Mostly to be used for player traits and traits that may be shared by more
+// than a single actor kind (but currently various traits are specific to
+// single monsters).
 const (
-	Player Traits = 1 << iota
+	PatternCatch = 1 << iota // unbalancing and catching attack (frog, octopode)
 
-	PatternBat          // sneaky attack pattern (bat)
-	PatternCatch        // unbalancing and catching attack (frog, octopode)
-	PatternCrocodile    // requires extra turn for changing directions (advanced)
+	PatternDragging     // dragging attack pattern (crocodile players, alligator)
 	PatternFourDirs     // four-directional attack in 4 dirs (hydra players)
 	PatternFourDirsMons // four-directional attack (four-headed hydra, undead knight)
 	PatternRampage      // rampaging (boar, phoenix)
 	PatternRanged       // ranged attack (eye, llama, lich)
 	PatternRangedRecoil // ranged attack with recoil (wind fox)
+	PatternSneaky       // sneaky attack pattern (megabat)
 	PatternSwap         // swapping-attack (crazy druid)
 	PatternSwapDaze     // dazing swapping-attack (temporal cat)
 
@@ -216,17 +215,21 @@ const (
 	NoTraits = 0
 )
 
-func (t Traits) String() string {
+// TraitDesc returns a suitable trait description for the given actor kind and
+// extra traits. For monsters, it includes the description of some
+// monster-specific traits.
+func TraitDesc(ak ActorKind, t Traits) string {
 	desc := []string{}
 	desc = traitDesc(desc, t, PatternFourDirs, "four-directional attack with attack bonus per extra foe")
 	desc = traitDesc(desc, t, PatternFourDirsMons, "four-directional attack")
-	desc = traitDesc(desc, t, PatternBat, "sneaky attack pattern")
+	desc = traitDesc(desc, t, PatternSneaky, "sneaky attack pattern")
 	desc = traitDesc(desc, t, PatternCatch, "ranged catching attack that @Ounbalances@N foes")
-	if t.Any(Player) {
+	switch ak {
+	case Player:
 		// Player crocodile gets slow rotation, too.
-		desc = traitDesc(desc, t, PatternCrocodile, "@Ounbalancing@N dragging attack, slow rotation (cannot turn and attack)")
-	} else {
-		desc = traitDesc(desc, t, PatternCrocodile, "@Ounbalancing@N dragging attack")
+		desc = traitDesc(desc, t, PatternDragging, "@Ounbalancing@N dragging attack, slow rotation (cannot turn and attack)")
+	case DraggingAlligator:
+		desc = traitDesc(desc, t, PatternDragging, "@Ounbalancing@N dragging attack, confusing bite")
 	}
 	desc = traitDesc(desc, t, PatternRampage, "rampaging charge")
 	desc = traitDesc(desc, t, PatternRanged, "ranged attack")
@@ -253,14 +256,9 @@ func (t Traits) String() string {
 	case !t.Any(GoodHearing) && t.Any(BadHearing):
 		desc = append(desc, "bad hearing")
 	}
-	if t.All(GoodHearing | MonsWingFlap) {
+	if ak == SneakyMegabat {
 		// Megabat hunts by sound (when out-of-view for noises
 		// originating on the player's tile).
-		//
-		// TODO: this assumes only megabats have both good hearing and
-		// fly (a bit of a convenient hack to avoid needing a new
-		// trait). Relying on the monster kind directly would be
-		// better for such monster-specific traits.
 		desc = append(desc, "hunts by sound")
 	}
 	desc = traitDesc(desc, t, GoodSmell, "smells food from afar")
@@ -834,7 +832,6 @@ type Behavior struct {
 	Path     []gruid.Point // path to destination
 	Guard    gruid.Point   // position to guard (InvalidPos if not)
 	Target   gruid.Point   // Current goal (if not static)
-	Kind     monsterKind   // specific kind of monster
 	State    Mindstate     // Wandering, Hunting, ...
 	SkipTurn bool          // skip turn (like after swapped positions with another monster)
 }
