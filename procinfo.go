@@ -194,12 +194,14 @@ func (g *Game) flavoursProcGen() {
 	// extra unpredictability.
 	switch g.IntN(10) {
 	case 0:
-		gpi.Earthquake = 0
+		gpi.GuardianEarly = 0
 	case 1:
 		gpi.WanderingUnique1 = 0
 	case 2:
 		gpi.WanderingUnique2 = 0
 	case 3:
+		gpi.Earthquake = 0
+	case 4:
 		gpi.TrapLevel = 0
 	}
 }

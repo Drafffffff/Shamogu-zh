@@ -193,13 +193,13 @@ const (
 	MonsSpitFire       // spit fire when ranged (requires PatternRanged)
 	MonsTeleport       // attack may teleport you
 
-	MonsImmunityConfusion     // immune to confusion
-	MonsImmunityDaze          // immune to daze status effect
-	MonsImmunityFear          // immune to fear
-	MonsImmunityFire          // immune to fire
-	MonsImmunityImbalance     // immune to imbalance
-	MonsImmunityLignification // immune to lignification
-	MonsImmunityPoison        // immune to poison
+	ImmunityConfusion     // immune to confusion
+	ImmunityDaze          // immune to daze status effect
+	ImmunityFear          // immune to fear
+	ImmunityFire          // immune to fire
+	ImmunityImbalance     // immune to imbalance
+	ImmunityLignification // immune to lignification
+	ImmunityPoison        // immune to poison
 
 	// NOTE: we don't do descriptions for the traits below (beyond the log
 	// messages about noise), so they could be moved to another struct
@@ -220,27 +220,37 @@ const (
 // monster-specific traits.
 func TraitDesc(ak ActorKind, t Traits) string {
 	desc := []string{}
+
+	// Attack patterns.
 	desc = traitDesc(desc, t, PatternFourDirs, "four-directional attack with attack bonus per extra foe")
 	desc = traitDesc(desc, t, PatternFourDirsMons, "four-directional attack")
-	desc = traitDesc(desc, t, PatternSneaky, "sneaky attack pattern")
 	desc = traitDesc(desc, t, PatternCatch, "ranged catching attack that @Ounbalances@N foes")
-	switch ak {
-	case Player:
-		// Player crocodile gets slow rotation, too.
-		desc = traitDesc(desc, t, PatternDragging, "@Ounbalancing@N dragging attack, slow rotation (cannot turn and attack)")
-	case DraggingAlligator:
-		desc = traitDesc(desc, t, PatternDragging, "@Ounbalancing@N dragging attack, confusing bite")
-	}
+	desc = traitDesc(desc, t, PatternSneaky, "sneaky attack pattern")
+	desc = traitDesc(desc, t, PatternDragging, "@Ounbalancing@N dragging attack")
 	desc = traitDesc(desc, t, PatternRampage, "rampaging charge")
 	desc = traitDesc(desc, t, PatternRanged, "ranged attack")
 	desc = traitDesc(desc, t, PatternRangedRecoil, "ranged attack with recoil")
 	desc = traitDesc(desc, t, PatternSwap, "ranged space-distorting silent attack")
 	desc = traitDesc(desc, t, PatternSwapDaze, "ranged space-distorting silent attack that may @Odaze@N foes")
+	switch ak {
+	case Player:
+		// Player crocodile gets slow rotation, too.
+		if t.Any(PatternSneaky) {
+			desc = append(desc, "confusing charge")
+		}
+		if t.Any(PatternDragging) {
+			desc = append(desc, "slow rotation (cannot turn and attack)")
+		}
+	case DraggingAlligator:
+		desc = append(desc, "confusing bite")
+	case ChaosMegabat:
+		desc = append(desc, "chaos bite (random effect)")
+	}
 
+	// Extra traits.
 	desc = traitDesc(desc, t, Pushing, "hits may push and @Ounbalance@N foes")
 	desc = traitDesc(desc, t, PushingCharge, "charging pushes and @Ounbalances@N foes")
 	desc = traitDesc(desc, t, BurningHits, "hits may @Oburn@N foes")
-	desc = traitDesc(desc, t, BurningHits|MonsWingFlap, "imbalance vulnerability (decreased burning chance)")
 	desc = traitDesc(desc, t, RunicChicken, "senses and doesn’t trigger runes, cackles loudly on sighting a portal or totem, confusion vulnerability (longer duration)")
 	desc = traitDesc(desc, t, VenomousMelee, "@Ovenomous@N melee attack")
 	desc = traitDesc(desc, t, Gawalt, "wall-jumping movement and attack, weakened hits, menhir sensing and hiding")
@@ -250,30 +260,25 @@ func TraitDesc(ak ActorKind, t Traits) string {
 	desc = traitDesc(desc, t, NocturnalFlying, "nocturnal (reduced view range), flies over foliage")
 	desc = traitDesc(desc, t, Dazzling, "dazzling (redirect attacks just behind you, easily noticed)")
 	desc = traitDesc(desc, t, DazingSpines, "spines may @Odaze@N attacking foes in melee")
+	desc = traitDesc(desc, t, GoodSmell, "smells food from afar")
+	desc = traitDesc(desc, t, TrailingCloud, "movement leaves dust behind")
+	desc = traitDesc(desc, t, WoodyLegs, "woody legs (can move while lignified)")
 	switch {
 	case t.Any(GoodHearing) && !t.Any(BadHearing):
 		desc = append(desc, "good hearing")
 	case !t.Any(GoodHearing) && t.Any(BadHearing):
 		desc = append(desc, "bad hearing")
 	}
-	if ak == SneakyMegabat {
+
+	// Extra monster-specific traits.
+	switch ak {
+	case ChaosMegabat:
 		// Megabat hunts by sound (when out-of-view for noises
 		// originating on the player's tile).
 		desc = append(desc, "hunts by sound")
+	case BurningPhoenix:
+		desc = append(desc, "imbalance vulnerability (decreased burning chance)")
 	}
-	desc = traitDesc(desc, t, GoodSmell, "smells food from afar")
-	desc = traitDesc(desc, t, TrailingCloud, "movement leaves dust behind")
-	desc = traitDesc(desc, t, WoodyLegs, "woody legs (can move while lignified)")
-
-	desc = traitDesc(desc, t, VulnerabilityFire, "@OFire@N vulnerability (longer duration)")
-
-	desc = traitDesc(desc, t, ResistanceConfusion, "@OConfusion@N resistance (half duration)")
-	desc = traitDesc(desc, t, ResistanceDaze, "@ODaze@N resistance (can invoke spirits while dazed)")
-	desc = traitDesc(desc, t, ResistanceFear, "@OFear@N resistance (half duration)")
-	desc = traitDesc(desc, t, ResistanceFire, "@OFire@N resistance (delayed burning)")
-	desc = traitDesc(desc, t, ResistanceImbalance, "@OImbalance@N resistance (half duration)")
-	desc = traitDesc(desc, t, ResistancePoison, "@OPoison@N resistance (half duration)")
-
 	desc = traitDesc(desc, t, MonsBarking, "barks on sight and @Ofrightens@N you")
 	desc = traitDesc(desc, t, MonsBerserking, "hits may @Bberserk@N you briefly")
 	desc = traitDesc(desc, t, MonsBlink, "hits makes you blink")
@@ -290,13 +295,21 @@ func TraitDesc(ak ActorKind, t Traits) string {
 	desc = traitDesc(desc, t, MonsSpitFire, "spites @Ofire@N from afar")
 	desc = traitDesc(desc, t, MonsSpores, "releases @Blignifying@N spores on sight")
 
-	desc = traitDesc(desc, t, MonsImmunityConfusion, "immune to @OConfusion@N")
-	desc = traitDesc(desc, t, MonsImmunityDaze, "@ODaze@N immunity")
-	desc = traitDesc(desc, t, MonsImmunityFear, "@OFear@N immunity")
-	desc = traitDesc(desc, t, MonsImmunityFire, "@OFire@N immunity")
-	desc = traitDesc(desc, t, MonsImmunityImbalance, "@OImbalance@N immunity")
-	desc = traitDesc(desc, t, MonsImmunityLignification, "@BLignification@N immunity")
-	desc = traitDesc(desc, t, MonsImmunityPoison, "@OPoison@N immunity")
+	// Vulnerabilities, Resistances, Immunities.
+	desc = traitDesc(desc, t, VulnerabilityFire, "@OFire@N vulnerability (longer duration)")
+	desc = traitDesc(desc, t, ResistanceConfusion, "@OConfusion@N resistance (half duration)")
+	desc = traitDesc(desc, t, ResistanceDaze, "@ODaze@N resistance (can invoke spirits while dazed)")
+	desc = traitDesc(desc, t, ResistanceFear, "@OFear@N resistance (half duration)")
+	desc = traitDesc(desc, t, ResistanceFire, "@OFire@N resistance (delayed burning)")
+	desc = traitDesc(desc, t, ResistanceImbalance, "@OImbalance@N resistance (half duration)")
+	desc = traitDesc(desc, t, ResistancePoison, "@OPoison@N resistance (half duration)")
+	desc = traitDesc(desc, t, ImmunityConfusion, "immune to @OConfusion@N")
+	desc = traitDesc(desc, t, ImmunityDaze, "@ODaze@N immunity")
+	desc = traitDesc(desc, t, ImmunityFear, "@OFear@N immunity")
+	desc = traitDesc(desc, t, ImmunityFire, "@OFire@N immunity")
+	desc = traitDesc(desc, t, ImmunityImbalance, "@OImbalance@N immunity")
+	desc = traitDesc(desc, t, ImmunityLignification, "@BLignification@N immunity")
+	desc = traitDesc(desc, t, ImmunityPoison, "@OPoison@N immunity")
 
 	return strings.Join(desc, ", ")
 }
@@ -557,7 +570,7 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 			return false
 		}
 	case StatusFire:
-		if ai.Has(StatusFoggySkin) || ai.DoesAny(MonsImmunityFire) {
+		if ai.Has(StatusFoggySkin) || ai.DoesAny(ImmunityFire) {
 			return false
 		}
 		if ai.DoesAny(VulnerabilityFire) {
@@ -574,7 +587,7 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 			return false
 		}
 	case StatusFear:
-		if ai.Has(StatusBerserk) || ai.DoesAny(MonsImmunityFear) {
+		if ai.Has(StatusBerserk) || ai.DoesAny(ImmunityFear) {
 			return false
 		}
 		if ai.DoesAny(ResistanceFear) {
@@ -584,14 +597,14 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 			turns *= 2
 		}
 	case StatusDaze:
-		if ai.Has(StatusClarity) || ai.DoesAny(MonsImmunityDaze) {
+		if ai.Has(StatusClarity) || ai.DoesAny(ImmunityDaze) {
 			return false
 		}
 		if ai.Has(StatusConfusion) {
 			turns *= 2
 		}
 	case StatusConfusion:
-		if ai.Has(StatusClarity) || ai.DoesAny(MonsImmunityConfusion) {
+		if ai.Has(StatusClarity) || ai.DoesAny(ImmunityConfusion) {
 			return false
 		}
 		if ai.DoesAny(RunicChicken) {
@@ -601,7 +614,7 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 			turns = (turns + 1) / 2
 		}
 	case StatusImbalance:
-		if ai.Has(StatusLignification) || ai.DoesAny(MonsImmunityImbalance) {
+		if ai.Has(StatusLignification) || ai.DoesAny(ImmunityImbalance) {
 			return false
 		}
 		if ai.DoesAny(ResistanceImbalance) {
@@ -611,11 +624,11 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 			turns *= 2
 		}
 	case StatusLignification:
-		if ai.DoesAny(MonsImmunityLignification) || active || ai.Has(StatusFoggySkin) {
+		if ai.DoesAny(ImmunityLignification) || active || ai.Has(StatusFoggySkin) {
 			return false
 		}
 	case StatusPoison:
-		if ai.Has(StatusLignification) || ai.DoesAny(MonsImmunityPoison) {
+		if ai.Has(StatusLignification) || ai.DoesAny(ImmunityPoison) {
 			return false
 		}
 		if ai.DoesAny(ResistancePoison) {

@@ -1692,7 +1692,7 @@ In Shamogu, both the player and the monsters may use one of several attack patte
 
 @CDragging@N attacks are melee attacks that drag foes backwards, unbalancing them. They’re performed by Spinning Crocodile players.
 
-@CSneak@N attacks are a two-phased attack pattern. When ranged, it works as a confusing rampaging attack. In melee, a plain attack is followed by quick 2-tile retreat. Sneak attacks are performed by sneaky megabats and Vampiric Bat players.
+@CSneak@N attacks are a two-phased attack pattern. When ranged, it works as a rampaging attack. In melee, a plain attack is followed by quick 2-tile retreat. Sneak attacks are performed by sneaky megabats and Vampiric Bat players.
 
 @MNote:@N crocodile’s dragging and bat’s retreat don’t happen when @Opoisoned@N nor when they would move you onto dangerous visible fire, unless you’re already on @OFire@N or would be protected by @BFoggy-Skin@N. The boar’s pushing charge and wind fox’s recoil don’t have any safety rules, but because recoil is a form of involuntary movement, it is at least unaffected by poison. Melee pushing with @BDig@N is restricted by poison when it requires player movement, but unbalancing and piercing effects still happen when pushing a monster against a wall or another monster.
 

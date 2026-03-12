@@ -846,6 +846,7 @@ const (
 	BlazingGolem
 	BlinkButterfly
 	BurningPhoenix
+	ChaosMegabat
 	ConfusingEye
 	CrazyDruid
 	DraggingAlligator
@@ -859,7 +860,6 @@ const (
 	MadOctopode
 	NoisyImp
 	RampagingBoar
-	SneakyMegabat
 	TemporalCat
 	ThunderPorcupine
 	TotemWasp
@@ -874,34 +874,34 @@ const (
 // MonsData provides information about the various kinds of monsters.
 var MonsData = []monsterInfo{
 	// 		  {name, rune, attack, defense, hp, traits}
-	AcidMound:         {"acid mound", 'a', 2, 0, 5, MonsIgnoreDefense | MonsImmunityImbalance | MonsCreep},
-	BarkingHound:      {"barking hound", 'h', 3, 0, 4, MonsBarking | GoodHearing | MonsImmunityFear},
+	AcidMound:         {"acid mound", 'a', 2, 0, 5, MonsIgnoreDefense | ImmunityImbalance | MonsCreep},
+	BarkingHound:      {"barking hound", 'h', 3, 0, 4, MonsBarking | GoodHearing | ImmunityFear},
 	BerserkingSpider:  {"berserking spider", 's', 2, 1, 3, MonsBerserking | MonsSilent},
-	BlazingGolem:      {"blazing golem", 'G', 2, 3, 4, MonsExplodingDeath | MonsImmunityFire | MonsImmunityPoison | MonsImmunityFear | MonsImmunityConfusion | MonsHeavyFootsteps | MonsNotable},
-	BlinkButterfly:    {"blinking butterfly", 'b', 2, 3, 2, MonsBlink | MonsImmunityImbalance | MonsImmunityLignification | MonsWingFlap},
-	BurningPhoenix:    {"burning phoenix", 'P', 2, 1, 5, PatternRampage | BurningHits | MonsImmunityFire | MonsImmunityLignification | MonsWingFlap | MonsNotable},
-	ConfusingEye:      {"confusing eye", 'e', 2, 0, 2, PatternRanged | MonsConfusion | MonsImmunityConfusion | MonsLightFootsteps},
+	BlazingGolem:      {"blazing golem", 'G', 2, 3, 4, MonsExplodingDeath | ImmunityFire | ImmunityPoison | ImmunityFear | ImmunityConfusion | MonsHeavyFootsteps | MonsNotable},
+	BlinkButterfly:    {"blinking butterfly", 'b', 2, 3, 2, MonsBlink | ImmunityImbalance | ImmunityLignification | MonsWingFlap},
+	BurningPhoenix:    {"burning phoenix", 'P', 2, 1, 5, PatternRampage | BurningHits | ImmunityFire | ImmunityLignification | MonsWingFlap | MonsNotable},
+	ChaosMegabat:      {"chaos megabat", 'm', 2, 2, 4, PatternSneaky | GoodHearing | ImmunityLignification | MonsWingFlap},
+	ConfusingEye:      {"confusing eye", 'e', 2, 0, 2, PatternRanged | MonsConfusion | ImmunityConfusion | MonsLightFootsteps},
 	CrazyDruid:        {"crazy druid", 'C', 3, 1, 4, PatternSwap | BurningHits | MonsBerserking | MonsNotable},
 	DraggingAlligator: {"dragging alligator", 'A', 3, 1, 4, PatternDragging | MonsScales | ResistanceFire | ResistanceFear | MonsNotable},
-	EarthDragon:       {"earth dragon", 'D', 4, 2, 5, Pushing | MonsDig | MonsImmunityFear | MonsScales | MonsHeavyFootsteps | MonsNotable},
+	EarthDragon:       {"earth dragon", 'D', 4, 2, 5, Pushing | MonsDig | ImmunityFear | MonsScales | MonsHeavyFootsteps | MonsNotable},
 	ExplodingNadre:    {"exploding nadre", 'n', 2, 3, 1, MonsExplodingDeath | MonsScales},
-	FearsomeLich:      {"fearsome lich", 'L', 2, 2, 5, PatternRanged | MonsFear | MonsIgnoreDefense | MonsImmunityPoison | MonsImmunityConfusion | MonsNotable},
+	FearsomeLich:      {"fearsome lich", 'L', 2, 2, 5, PatternRanged | MonsFear | MonsIgnoreDefense | ImmunityPoison | ImmunityConfusion | MonsNotable},
 	FireLlama:         {"fire llama", 'l', 2, 0, 4, PatternRanged | MonsSpitFire},
 	FourHeadedHydra:   {"four-headed hydra", 'H', 2, 0, 6, PatternFourDirsMons | MonsScales | MonsFourHeaded | MonsHeavyFootsteps | MonsNotable},
 	HungryRat:         {"hungry rat", 'r', 2, 0, 3, MonsHungry | MonsLightFootsteps},
 	NoisyImp:          {"noisy imp", 'I', 2, 2, 4, MonsMusic | MonsLightFootsteps | MonsNotable},
-	MadOctopode:       {"mad octopode", 'O', 3, 2, 5, PatternCatch | MonsImmunityImbalance | VenomousMelee | MonsCreep | MonsNotable},
+	MadOctopode:       {"mad octopode", 'O', 3, 2, 5, PatternCatch | ImmunityImbalance | VenomousMelee | MonsCreep | MonsNotable},
 	LashingFrog:       {"lashing frog", 'F', 2, 1, 4, PatternCatch},
 	RampagingBoar:     {"rampaging boar", 'B', 3, 0, 4, PatternRampage | PushingCharge | MonsDig},
-	SneakyMegabat:     {"sneaky megabat", 'm', 2, 2, 4, PatternSneaky | GoodHearing | MonsImmunityLignification | MonsWingFlap},
 	TemporalCat:       {"temporal cat", 'c', 2, 0, 4, PatternSwapDaze | MonsLightFootsteps},
-	ThunderPorcupine:  {"thunder porcupine", 'p', 2, 0, 3, DazingSpines | MonsImmunityDaze | MonsLightFootsteps},
-	TotemWasp:         {"totem wasp", 'w', 2, 1, 2, PatternRampage | VenomousMelee | MonsImmunityLignification | MonsWingFlap | MonsNotable},
-	UndeadKnight:      {"undead knight", 'K', 3, 3, 4, PatternFourDirsMons | MonsFear | MonsImmunityPoison | MonsImmunityDaze | MonsNotable},
-	VenomousViper:     {"venomous viper", 'v', 2, 1, 4, VenomousMelee | MonsImmunityPoison | MonsScales | MonsCreep},
-	WalkingMushroom:   {"walking mushroom", 'M', 2, 1, 5, MonsSpores | MonsConfusion | MonsImmunityConfusion | MonsImmunityLignification | VulnerabilityFire | MonsNotable},
-	WalkingTree:       {"walking tree", 'T', 2, 2, 5, MonsLignify | MonsImmunityImbalance | MonsImmunityPoison | MonsImmunityLignification | VulnerabilityFire | MonsHeavyFootsteps | MonsNotable},
-	WarpingWraith:     {"warping wraith", 'W', 2, 3, 3, MonsTeleport | MonsImmunityPoison | MonsImmunityLignification | MonsSilent},
+	ThunderPorcupine:  {"thunder porcupine", 'p', 2, 0, 3, DazingSpines | ImmunityDaze | MonsLightFootsteps},
+	TotemWasp:         {"totem wasp", 'w', 2, 1, 2, PatternRampage | VenomousMelee | ImmunityLignification | MonsWingFlap | MonsNotable},
+	UndeadKnight:      {"undead knight", 'K', 3, 3, 4, PatternFourDirsMons | MonsFear | ImmunityPoison | ImmunityDaze | MonsNotable},
+	VenomousViper:     {"venomous viper", 'v', 2, 1, 4, VenomousMelee | ImmunityPoison | MonsScales | MonsCreep},
+	WalkingMushroom:   {"walking mushroom", 'M', 2, 1, 5, MonsSpores | MonsConfusion | ImmunityConfusion | ImmunityLignification | VulnerabilityFire | MonsNotable},
+	WalkingTree:       {"walking tree", 'T', 2, 2, 5, MonsLignify | ImmunityImbalance | ImmunityPoison | ImmunityLignification | VulnerabilityFire | MonsHeavyFootsteps | MonsNotable},
+	WarpingWraith:     {"warping wraith", 'W', 2, 3, 3, MonsTeleport | ImmunityPoison | ImmunityLignification | MonsSilent},
 	WindFox:           {"wind fox", 'f', 2, 0, 4, PatternRangedRecoil | MonsLightFootsteps},
 }
 
@@ -1293,7 +1293,7 @@ func (g *Game) genGuardians(nE, nM, nL int) (int, int, int) {
 	if g.ProcInfo.GuardianEarly == g.Map.Level {
 		nM--
 		p := g.earlyGuardianPoint()
-		g.genMonsterGuardian(SneakyMegabat, p)
+		g.genMonsterGuardian(ChaosMegabat, p)
 	}
 	if g.ProcInfo.GuardianPortal1 == g.Map.Level {
 		nM--
@@ -1464,7 +1464,7 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 	if g.ProcInfo.GuardianEarly == g.Map.Level {
 		nM--
 		p := g.earlyGuardianPoint()
-		g.genMonsterGuardian(SneakyMegabat, p)
+		g.genMonsterGuardian(ChaosMegabat, p)
 		if g.Map.Level >= 3 && g.IntN(3) == 0 {
 			// Rarely, add an imp guardian friend.
 			g.genMonsterGuardian(NoisyImp, p)
@@ -1580,7 +1580,7 @@ func (g *Game) genOrbAlternateGuardiansAt(p gruid.Point, nE, nM, nL int) (int, i
 		mk := g.randMonsKind(monsMid)
 		if g.IntN(1+len(monsMid)) == 0 {
 			// Sneaky megabat nest as rare orb guardians, too.
-			mk = SneakyMegabat
+			mk = ChaosMegabat
 		}
 		n := 4
 		if mk == ExplodingNadre {

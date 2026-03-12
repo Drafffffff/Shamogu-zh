@@ -730,7 +730,7 @@ func (eff EffectLignify) Apply(g *Game) bool {
 		if !g.InFOV(ei.P) {
 			continue
 		}
-		if ai.DoesAny(MonsImmunityLignification) || ai.Has(StatusLignification) {
+		if ai.DoesAny(ImmunityLignification) || ai.Has(StatusLignification) {
 			// Double-check before so that the "Growing roots"
 			// message appears first and only if the status will
 			// apply.

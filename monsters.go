@@ -160,7 +160,7 @@ func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point, noise bool) 
 		return false
 	}
 	unhidden := !g.PlayerIsHidden()
-	if at == pp && (unhidden && g.InFOV(ei.P) || noise && ai.Is(SneakyMegabat)) {
+	if at == pp && (unhidden && g.InFOV(ei.P) || noise && ai.Is(ChaosMegabat)) {
 		if g.InFOV(ei.P) {
 			g.Logf("The %s notices you.", ei.Name)
 		}
@@ -192,7 +192,7 @@ func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point, noise bool) 
 // wandering monsters.
 func (g *Game) PlayerIsHidden() bool {
 	pl, pa := g.Player()
-	return pa.DoesAny(Gawalt) && (pa.Has(StatusShadow) || g.menhirAt(pl.P)) ||
+	return pa.Has(StatusShadow) || pa.DoesAny(Gawalt) && g.menhirAt(pl.P) ||
 		pa.DoesAny(Elephanty) && g.Map.AdjacentNonPassableCount(pl.P) >= 3
 }
 
