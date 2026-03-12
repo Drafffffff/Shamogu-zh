@@ -425,13 +425,13 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 	case ai.Is(DraggingAlligator):
 		_ = !g.ResistStatusRoll(j, StatusConfusion) && g.PutStatus(j, aj, StatusConfusion, 2)
 	case ai.Is(ChaosMegabat) && g.IntN(6-dmg) < 2:
-		g.inflictChaos(j, aj)
+		g.inflictChaos(j, aj, g.PutStatus)
 		if ai.Has(StatusConfusion) {
 			if g.InFOV(ei.P) {
 				g.LogfStyled("The confused %s bites itself too!", logHurtMons, ei.Name)
 			}
 			g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
-			g.inflictChaos(i, ai)
+			g.inflictChaos(i, ai, g.PutStatus1)
 		}
 	case ai.Is(WalkingTree) && g.IntN(6-dmg) < 2:
 		if !g.ResistStatusRoll(j, StatusLignification) && g.PutStatus(j, aj, StatusLignification, DurationLignificationHit) {
@@ -977,7 +977,7 @@ func (g *Game) dazzlingRedirect(i ID) (ID, *Actor) {
 // inflictChaos implements the chaos megabat bite effects.
 // Effects are designed to be survivable enough and showcase interesting
 // interactions.
-func (g *Game) inflictChaos(i ID, ai *Actor) {
+func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) bool) {
 	if ai.IsDead() {
 		return
 	}
@@ -987,64 +987,64 @@ func (g *Game) inflictChaos(i ID, ai *Actor) {
 	}
 	switch g.IntN(n) {
 	case 0:
-		if !g.PutStatus(i, ai, StatusLignification, DurationLignificationHit) {
+		if !f(i, ai, StatusLignification, DurationLignificationHit) {
 			break
 		}
 		switch g.IntN(6) {
 		case 0, 1:
 			// Sometimes, give Lignification+Fear.
-			g.PutStatus(i, ai, StatusFear, DurationFearUndead)
+			f(i, ai, StatusFear, DurationFearUndead)
 		case 2:
 			// Rarely, Lignification+Fire.
-			g.PutStatus(i, ai, StatusFire, DurationFire)
+			f(i, ai, StatusFire, DurationFire)
 		case 3:
-			g.PutStatus(i, ai, StatusDaze, DurationDazeSpines)
+			f(i, ai, StatusDaze, DurationDazeSpines)
 		}
 	case 1:
-		if g.PutStatus(i, ai, StatusImbalance, 4) {
-			g.PutStatus(i, ai, StatusConfusion, 4)
+		if f(i, ai, StatusImbalance, 4) {
+			f(i, ai, StatusConfusion, 4)
 		}
 	case 2:
-		if !g.PutStatus(i, ai, StatusBerserk, DurationBerserkHit) {
+		if !f(i, ai, StatusBerserk, DurationBerserkHit) {
 			break
 		}
 		switch g.IntN(5) {
 		case 0, 1:
-			g.PutStatus(i, ai, StatusPoison, DurationPoisonBite)
+			f(i, ai, StatusPoison, DurationPoisonBite)
 		case 2:
-			g.PutStatus(i, ai, StatusDaze, DurationDazeSpines)
+			f(i, ai, StatusDaze, DurationDazeSpines)
 		}
 	default:
 		// Player-specific rare effects.
 		switch g.IntN(6) {
 		case 0:
 			d := (1 + DurationClarity) / 2
-			if g.PutStatus(i, ai, StatusClarity, d) && g.IntN(2) == 0 {
-				g.PutStatus(i, ai, StatusFear, d)
+			if f(i, ai, StatusClarity, d) && g.IntN(2) == 0 {
+				f(i, ai, StatusFear, d)
 			}
 		case 1:
 			d := (1 + DurationFoggySkin) / 2
-			if g.PutStatus(i, ai, StatusFoggySkin, d) && g.IntN(2) == 0 {
-				g.PutStatus(i, ai, StatusConfusion, d)
+			if f(i, ai, StatusFoggySkin, d) && g.IntN(2) == 0 {
+				f(i, ai, StatusConfusion, d)
 			}
 		case 2:
 			d := (1 + DurationTimeStop) / 2
-			if g.PutStatus(i, ai, StatusTimeStop, d) && g.IntN(2) == 0 {
-				g.PutStatus(i, ai, StatusImbalance, d)
+			if f(i, ai, StatusTimeStop, d) && g.IntN(2) == 0 {
+				f(i, ai, StatusImbalance, d)
 			}
 		case 3:
 			d := (1 + DurationShadow) / 2
-			if g.PutStatus(i, ai, StatusShadow, d) && g.IntN(2) == 0 {
-				g.PutStatus(i, ai, StatusImbalance, d)
+			if f(i, ai, StatusShadow, d) && g.IntN(2) == 0 {
+				f(i, ai, StatusImbalance, d)
 			}
 		case 4:
 			d := (1 + DurationDisorient) / 2
-			if g.PutStatus(i, ai, StatusDisorient, d) && g.IntN(2) == 0 {
-				g.PutStatus(i, ai, StatusFear, d)
+			if f(i, ai, StatusDisorient, d) && g.IntN(2) == 0 {
+				f(i, ai, StatusFear, d)
 			}
 		case 5:
-			if g.PutStatus(i, ai, StatusVampirism, DurationVampirism) && g.IntN(2) == 0 {
-				g.PutStatus(i, ai, StatusConfusion, DurationConfusionHit)
+			if f(i, ai, StatusVampirism, DurationVampirism) && g.IntN(2) == 0 {
+				f(i, ai, StatusConfusion, DurationConfusionHit)
 			}
 		}
 	}
