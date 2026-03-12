@@ -1288,7 +1288,7 @@ func (g *Game) genGuardians(nE, nM, nL int) (int, int, int) {
 		g.genMonsterGuardian(TotemWasp, g.Map.Totem)
 		g.genMonsterGuardian(TotemWasp, g.Map.Totem)
 	}
-	if g.ProcInfo.GuardianEarly == g.Map.Level || g.ProcInfo.GuardianEarly2 == g.Map.Level {
+	if g.ProcInfo.GuardianEarly == g.Map.Level {
 		nM--
 		p := g.earlyGuardianPoint()
 		g.genMonsterGuardian(SneakyMegabat, p)
@@ -1459,7 +1459,7 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 			}
 		}
 	}
-	if g.ProcInfo.GuardianEarly == g.Map.Level || g.ProcInfo.GuardianEarly2 == g.Map.Level {
+	if g.ProcInfo.GuardianEarly == g.Map.Level {
 		nM--
 		p := g.earlyGuardianPoint()
 		g.genMonsterGuardian(SneakyMegabat, p)

@@ -18,7 +18,6 @@ type ProcInfo struct {
 	Earthquake       int              // level with extra rubble
 	FakePortal       []bool           // levels with fake portal
 	GuardianEarly    int              // level with early totem por portal guardians (megabat)
-	GuardianEarly2   int              // level with early totem por portal guardians (megabat)
 	GuardianTotem1   int              // level with early totem guardian (wasps)
 	GuardianTotem2   int              // level with early totem guardian (crazy druid)
 	GuardianPortal1  int              // level with early-mid portal guardian (golems)
@@ -145,10 +144,6 @@ func (g *Game) flavoursProcGen() {
 		gpi.GuardianEarly--
 	case 1:
 		gpi.GuardianEarly++
-	}
-	if n := 1 + g.IntN(4); g.IntN(3) == 0 && n != gpi.GuardianEarly {
-		// Sometimes have a second level with a megabat guardian.
-		gpi.GuardianEarly2 = n
 	}
 	gpi.GuardianTotem2 = randTotemLevel(guardianTotem2Level, 4)
 	for gpi.GuardianTotem1 == 0 || gpi.GuardianTotem1 == gpi.GuardianTotem2 {
