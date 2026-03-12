@@ -115,7 +115,7 @@ func (g *Game) TriggerTrap(i ID, ai *Actor) {
 		return
 	}
 	switch {
-	case rt.Rune == RuneLignification && (ai.Has(StatusLignification) || ai.DoesAny(MonsLignify)):
+	case rt.Rune == RuneLignification && (ai.Has(StatusLignification) || ai.Is(WalkingTree)):
 		// Do not trigger lignification traps while lignified.
 		return
 	case rt.Rune == RuneBerserk && ai.Has(StatusBerserk):

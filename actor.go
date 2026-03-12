@@ -66,7 +66,7 @@ func (a *Actor) CanMove() bool {
 // includes lignified actors that can still move due to woodylegs as well as
 // walking trees.
 func (a *Actor) ResistsMove() bool {
-	return a.Has(StatusLignification) || a.DoesAny(MonsLignify)
+	return a.Has(StatusLignification) || a.Is(WalkingTree)
 }
 
 // IsAlive reports whether the actor is still alive.
@@ -128,7 +128,8 @@ func (t Traits) All(of Traits) bool {
 	return t&of == of
 }
 
-// Traits. NOTE: there shouldn't be more than 64 (remaining free: 1).
+// Extra Traits. NOTE: there shouldn't be more than 64 (remaining free: 12).
+//
 // Mostly to be used for player traits and traits that may be shared by more
 // than a single actor kind (but currently various traits are specific to
 // single monsters).
@@ -136,29 +137,27 @@ const (
 	PatternCatch = 1 << iota // unbalancing and catching attack (frog, octopode)
 
 	PatternDragging     // dragging attack pattern (crocodile players, alligator)
-	PatternFourDirs     // four-directional attack in 4 dirs (hydra players)
-	PatternFourDirsMons // four-directional attack (four-headed hydra, undead knight)
+	PatternFourDirs     // four-directional attack in 4 dirs (hydra, undead knight)
 	PatternRampage      // rampaging (boar, phoenix)
 	PatternRanged       // ranged attack (eye, llama, lich)
 	PatternRangedRecoil // ranged attack with recoil (wind fox)
-	PatternSneaky       // sneaky attack pattern (megabat)
+	PatternSneaky       // sneaky attack pattern (vampiric bat, chaos megabat)
 	PatternSwap         // swapping-attack (crazy druid)
 	PatternSwapDaze     // dazing swapping-attack (temporal cat)
 
 	BadHearing      // worse hearing of noise (footsteps)
 	BurningHits     // hits may burn
-	Dazzling        // zebra's camouflage
 	DazingSpines    // body covered in dazing spines (porcupine)
+	Dazzling        // zebra's camouflage
+	Elephanty       // rat phobia, difficult rotation when facing a wall, immune to berserk after-effects
 	Gawalt          // wall-jumping, weakened hits, menhir sensing and hiding
 	Gluttony        // gluttony status after eating
 	GoodHearing     // better hearing of noise (footsteps)
 	GoodSmell       // smell food from a distance
 	NocturnalFlying // flying a bit above the ground like an owl
-	Pushing         // unbalancing pushing (earth-dragon)
 	PushingCharge   // unbalancing pushing when charging (boar)
-	ScaryRoar       // intimidating roar on first sight
-	Elephanty       // rat phobia, difficult rotation when facing a wall, immune to berserk after-effects
 	RunicChicken    // doesn't trigger traps, cackles loudly on sighting a portal or totem
+	ScaryRoar       // intimidating roar on first sight
 	TrailingCloud   // leave dust behind after moving (on floor tiles)
 	VenomousMelee   // (non-ranged) attacks may poison foes
 	WoodyLegs       // can move while lignified
@@ -172,27 +171,6 @@ const (
 	ResistanceImbalance // halves duration of imbalance status
 	ResistancePoison    // halves duration of poison status
 
-	// Monster-only traits, often similar to player's spirit passive or
-	// active abilities but not exactly the same and with different
-	// activation conditions.
-
-	MonsBarking        // bark with a fear inducing chance on noticing the player
-	MonsBerserking     // berserking spiders may make you berserk
-	MonsBlink          // attack makes you blink
-	MonsConfusion      // confusing attack (like floating eyes)
-	MonsDig            // dig walls when hunting
-	MonsExplodingDeath // explode on death
-	MonsFear           // attack may frighten
-	MonsFourHeaded     // perform 4 attacks per attack
-	MonsHungry         // hunts you by smell, becomes berserk if you eat in view
-	MonsIgnoreDefense  // attack ignores defense
-	MonsLignify        // attack may lignify you (also makes unmovable by force)
-	MonsSpores         // lignifying spores
-	MonsMusic          // makes music for you (noisy imp)
-	MonsScales         // scales provide extra protection from ranged attacks
-	MonsSpitFire       // spit fire when ranged (requires PatternRanged)
-	MonsTeleport       // attack may teleport you
-
 	ImmunityConfusion     // immune to confusion
 	ImmunityDaze          // immune to daze status effect
 	ImmunityFear          // immune to fear
@@ -201,16 +179,27 @@ const (
 	ImmunityLignification // immune to lignification
 	ImmunityPoison        // immune to poison
 
+	// Monster-only traits shared by various monsters.
+
+	MonsBerserking     // hits may make you berserk (spiders, crazy druid)
+	MonsConfusion      // confusing attack (floating eyes, walking mushroom)
+	MonsDig            // dig walls when hunting (boars, dragons)
+	MonsExplodingDeath // explode on death (nadres, golems)
+	MonsFear           // attack may frighten (lich, knight)
+	MonsIgnoreDefense  // attack ignores defense (acid mound, lich)
+	MonsScales         // scales provide extra protection from ranged attacks (viper, hydra, nadre, dragon, alligator)
+
 	// NOTE: we don't do descriptions for the traits below (beyond the log
 	// messages about noise), so they could be moved to another struct
-	// field to make place for more traits.
+	// field to make place for more traits if we ever need it.
 
 	MonsCreep          // creep noise (instead of footsteps)
 	MonsHeavyFootsteps // heavy footsteps
 	MonsLightFootsteps // light footsteps
-	MonsSilent         // silent movement
+	MonsSilent         // silent movement (spiders, wraith)
 	MonsWingFlap       // wing flapping noise (instead of footsteps)
-	MonsNotable        // dangerous monster (mention in timeline)
+
+	MonsNotable // notable monster (mention in timeline)
 
 	NoTraits = 0
 )
@@ -222,24 +211,25 @@ func TraitDesc(ak ActorKind, t Traits) string {
 	desc := []string{}
 
 	// Attack patterns.
-	desc = traitDesc(desc, t, PatternFourDirs, "four-directional attack with attack bonus per extra foe")
-	desc = traitDesc(desc, t, PatternFourDirsMons, "four-directional attack")
 	desc = traitDesc(desc, t, PatternCatch, "ranged catching attack that @Ounbalances@N foes")
-	desc = traitDesc(desc, t, PatternSneaky, "sneaky attack pattern")
 	desc = traitDesc(desc, t, PatternDragging, "@Ounbalancing@N dragging attack")
+	desc = traitDesc(desc, t, PatternFourDirs, "four-directional attack")
 	desc = traitDesc(desc, t, PatternRampage, "rampaging charge")
 	desc = traitDesc(desc, t, PatternRanged, "ranged attack")
 	desc = traitDesc(desc, t, PatternRangedRecoil, "ranged attack with recoil")
+	desc = traitDesc(desc, t, PatternSneaky, "sneaky attack pattern")
 	desc = traitDesc(desc, t, PatternSwap, "ranged space-distorting silent attack")
 	desc = traitDesc(desc, t, PatternSwapDaze, "ranged space-distorting silent attack that may @Odaze@N foes")
 	switch ak {
 	case Player:
 		// Player crocodile gets slow rotation, too.
-		if t.Any(PatternSneaky) {
-			desc = append(desc, "confusing charge")
-		}
-		if t.Any(PatternDragging) {
+		switch {
+		case t.Any(PatternDragging):
 			desc = append(desc, "slow rotation (cannot turn and attack)")
+		case t.Any(PatternFourDirs):
+			desc = append(desc, "attack bonus per extra foe")
+		case t.Any(PatternSneaky):
+			desc = append(desc, "confusing charge")
 		}
 	case DraggingAlligator:
 		desc = append(desc, "confusing bite")
@@ -248,20 +238,19 @@ func TraitDesc(ak ActorKind, t Traits) string {
 	}
 
 	// Extra traits.
-	desc = traitDesc(desc, t, Pushing, "hits may push and @Ounbalance@N foes")
-	desc = traitDesc(desc, t, PushingCharge, "charging pushes and @Ounbalances@N foes")
 	desc = traitDesc(desc, t, BurningHits, "hits may @Oburn@N foes")
-	desc = traitDesc(desc, t, RunicChicken, "senses and doesn’t trigger runes, cackles loudly on sighting a portal or totem, confusion vulnerability (longer duration)")
-	desc = traitDesc(desc, t, VenomousMelee, "@Ovenomous@N melee attack")
+	desc = traitDesc(desc, t, DazingSpines, "spines may @Odaze@N attacking foes in melee")
+	desc = traitDesc(desc, t, Dazzling, "dazzling (redirect attacks just behind you, easily noticed)")
+	desc = traitDesc(desc, t, Elephanty, "rat phobia, difficult rotation when facing a wall, unnoticed in dead-ends, immune to berserk after-effects")
 	desc = traitDesc(desc, t, Gawalt, "wall-jumping movement and attack, weakened hits, menhir sensing and hiding")
 	desc = traitDesc(desc, t, Gluttony, "gluttony (needs to eat in pairs)")
-	desc = traitDesc(desc, t, ScaryRoar, "scary roar on first sight")
-	desc = traitDesc(desc, t, Elephanty, "rat phobia, difficult rotation when facing a wall, unnoticed in dead-ends, immune to berserk after-effects")
-	desc = traitDesc(desc, t, NocturnalFlying, "nocturnal (reduced view range), flies over foliage")
-	desc = traitDesc(desc, t, Dazzling, "dazzling (redirect attacks just behind you, easily noticed)")
-	desc = traitDesc(desc, t, DazingSpines, "spines may @Odaze@N attacking foes in melee")
 	desc = traitDesc(desc, t, GoodSmell, "smells food from afar")
+	desc = traitDesc(desc, t, NocturnalFlying, "nocturnal (reduced view range), flies over foliage")
+	desc = traitDesc(desc, t, PushingCharge, "charging pushes and @Ounbalances@N foes")
+	desc = traitDesc(desc, t, RunicChicken, "senses and doesn’t trigger runes, cackles loudly on sighting a portal or totem, confusion vulnerability (longer duration)")
+	desc = traitDesc(desc, t, ScaryRoar, "scary roar on first sight")
 	desc = traitDesc(desc, t, TrailingCloud, "movement leaves dust behind")
+	desc = traitDesc(desc, t, VenomousMelee, "@Ovenomous@N melee attack")
 	desc = traitDesc(desc, t, WoodyLegs, "woody legs (can move while lignified)")
 	switch {
 	case t.Any(GoodHearing) && !t.Any(BadHearing):
@@ -272,28 +261,40 @@ func TraitDesc(ak ActorKind, t Traits) string {
 
 	// Extra monster-specific traits.
 	switch ak {
+	case BarkingHound:
+		desc = append(desc, "barks on sight and @Ofrightens@N you")
+	case BlinkButterfly:
+		desc = append(desc, "hits makes you blink")
+	case BurningPhoenix:
+		desc = append(desc, "imbalance vulnerability (decreased burning chance)")
 	case ChaosMegabat:
 		// Megabat hunts by sound (when out-of-view for noises
 		// originating on the player's tile).
 		desc = append(desc, "hunts by sound")
-	case BurningPhoenix:
-		desc = append(desc, "imbalance vulnerability (decreased burning chance)")
+	case EarthDragon:
+		desc = append(desc, "hits may push and @Ounbalance@N foes")
+	case FireLlama:
+		desc = append(desc, "spites @Ofire@N from afar")
+	case FourHeadedHydra:
+		desc = append(desc, "attacks with all four heads")
+	case HungryRat:
+		desc = append(desc, "hunts you by smell, becomes berserk if you eat in view")
+	case NoisyImp:
+		desc = append(desc, "plays guitar for you, avoids fights")
+	case WalkingMushroom:
+		desc = append(desc, "releases @Blignifying@N spores on sight")
+	case WalkingTree:
+		desc = append(desc, "hits may @Blignify@N you, hits ignore lignification’s defense bonus, woody legs, permanently lignified")
+	case WarpingWraith:
+		desc = append(desc, "hits teleport you away")
 	}
-	desc = traitDesc(desc, t, MonsBarking, "barks on sight and @Ofrightens@N you")
 	desc = traitDesc(desc, t, MonsBerserking, "hits may @Bberserk@N you briefly")
-	desc = traitDesc(desc, t, MonsBlink, "hits makes you blink")
 	desc = traitDesc(desc, t, MonsConfusion, "hits may @Oconfuse@N you")
 	desc = traitDesc(desc, t, MonsDig, "digs walls when hunting")
 	desc = traitDesc(desc, t, MonsExplodingDeath, "explodes on death")
 	desc = traitDesc(desc, t, MonsFear, "hits may @Ofrighten@N you")
-	desc = traitDesc(desc, t, MonsFourHeaded, "attacks with all four heads")
-	desc = traitDesc(desc, t, MonsHungry, "hunts you by smell, becomes berserk if you eat in view")
 	desc = traitDesc(desc, t, MonsIgnoreDefense, "attack ignores defense")
-	desc = traitDesc(desc, t, MonsLignify, "hits may @Blignify@N you, hits ignore lignification’s defense bonus, woody legs, permanently lignified")
-	desc = traitDesc(desc, t, MonsMusic, "plays guitar for you, avoids fights")
 	desc = traitDesc(desc, t, MonsScales, "scales (+1 Defense against ranged attacks)")
-	desc = traitDesc(desc, t, MonsSpitFire, "spites @Ofire@N from afar")
-	desc = traitDesc(desc, t, MonsSpores, "releases @Blignifying@N spores on sight")
 
 	// Vulnerabilities, Resistances, Immunities.
 	desc = traitDesc(desc, t, VulnerabilityFire, "@OFire@N vulnerability (longer duration)")
@@ -1015,7 +1016,7 @@ func (g *Game) handleCornered(i ID, ai *Actor) {
 	case ai.Has(StatusClarity):
 		// Players under clarity cannot become Berserk.
 		return
-	case ai.Has(StatusFear) || ai.DoesAny(MonsMusic) && !ai.Has(StatusBerserk):
+	case ai.Has(StatusFear) || ai.Is(NoisyImp) && !ai.Has(StatusBerserk):
 		// Actor is afraid or is playing music while not berserk: it
 		// may become berserk if cornered.
 	case i == PlayerID && ai.DoesAny(Elephanty):

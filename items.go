@@ -196,7 +196,7 @@ func (c *Comestible) Use(g *Game, i ID) bool {
 	g.Stats.MapEatenComestibles[g.Map.Level-1]++
 	g.handleGluttonyOnEating()
 	for i, ai := range g.Monsters() {
-		if ai.DoesAny(MonsHungry) && g.InFOV(g.Entity(i).P) {
+		if ai.Is(HungryRat) && g.InFOV(g.Entity(i).P) {
 			g.PutStatus(i, ai, StatusBerserk, DurationBerserk)
 			// Make monster hunt in case it was still wandering
 			// (with no extra log message).

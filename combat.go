@@ -360,9 +360,9 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 	afraid := aj.Has(StatusFear)
 	// Extra effects by attack pattern.
 	switch {
-	case ai.DoesAny(Pushing|PushingCharge) && !aj.ResistsMove() && !redirected:
+	case (ai.DoesAny(PushingCharge) || ai.Is(EarthDragon)) && !aj.ResistsMove() && !redirected:
 		if ai.Has(StatusDig) || ai.DoesAny(PushingCharge) && ap == AttackCharge && dist > 2 ||
-			ai.DoesAny(Pushing) && !g.ResistStatusRoll(j, StatusImbalance) && g.IntN(5-dmg) < 2 {
+			ai.Is(EarthDragon) && !g.ResistStatusRoll(j, StatusImbalance) && g.IntN(5-dmg) < 2 {
 			g.push(i, j, ai, aj, ap, dist, bonus)
 		}
 	case ai.DoesAny(PatternSwap|PatternSwapDaze) && ap != AttackCharge && !ai.Has(StatusLignification) && !aj.ResistsMove():
@@ -403,7 +403,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 	}
 	// Monster-specific extra attack effects (at most one per monster).
 	switch {
-	case ai.DoesAll(MonsSpitFire) && ap == AttackRanged:
+	case ai.Is(FireLlama) && ap == AttackRanged:
 		if g.PutStatus(j, aj, StatusFire, DurationFire) {
 			if p := ej.P; g.Map.Burnable(p) {
 				g.FireCloudAt(p)
@@ -433,7 +433,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 			g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
 			g.inflictChaos(i, ai)
 		}
-	case ai.DoesAny(MonsLignify) && g.IntN(6-dmg) < 2:
+	case ai.Is(WalkingTree) && g.IntN(6-dmg) < 2:
 		if !g.ResistStatusRoll(j, StatusLignification) && g.PutStatus(j, aj, StatusLignification, DurationLignificationHit) {
 			g.monsConfusionPenalty(i, ai)
 		}
@@ -441,9 +441,9 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 		if !g.ResistStatusRoll(j, StatusBerserk) && g.PutStatus(j, aj, StatusBerserk, DurationBerserkHit) {
 			g.monsConfusionPenalty(i, ai)
 		}
-	case ai.DoesAny(MonsBlink) && aj.IsAlive():
+	case ai.Is(BlinkButterfly) && aj.IsAlive():
 		g.blinkOther(i, j, ai, aj)
-	case ai.DoesAny(MonsTeleport) && aj.IsAlive() && !aj.ResistsMove():
+	case ai.Is(WarpingWraith) && aj.IsAlive() && !aj.ResistsMove():
 		if j == PlayerID {
 			g.Logf("The %s teleports you away!", ei.Name)
 		} else {
@@ -521,14 +521,14 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 	if ap == AttackRanged && aj.DoesAny(MonsScales) {
 		defense++
 	}
-	if ai.DoesAny(MonsLignify) && aj.Has(StatusLignification) {
+	if ai.Is(WalkingTree) && aj.Has(StatusLignification) {
 		defense -= LignificationDefenseBonus
 	}
 	if ai.DoesAny(MonsIgnoreDefense) {
 		defense = 0
 	}
 	n := 1 // default number of attacks
-	if ai.Has(StatusFocus) || ai.DoesAny(MonsFourHeaded) {
+	if ai.Has(StatusFocus) || ai.Is(FourHeadedHydra) {
 		n += 3 // extra attacks for each extra head
 	}
 	var dmg int
@@ -536,7 +536,7 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 		// Damage per attack.
 		dmg += g.computeDamage(attack, defense)
 	}
-	if aj.Has(StatusLignification) || aj.DoesAny(MonsLignify) {
+	if aj.Has(StatusLignification) || aj.Is(WalkingTree) {
 		// Lignification caps attack damage at 1.
 		dmg = min(1, dmg)
 	}
@@ -599,7 +599,7 @@ func (g *Game) AttackDamage(i, j ID, ai, aj *Actor, ap AttackKind, bonus int) in
 	}
 	dmg = g.InflictDamageGeneric(i, j, ai, aj, dmg, ap) // dmg actually remains the same
 	if i == PlayerID && aj.Behavior != nil {
-		if ai.Has(StatusShadow) && !aj.DoesAny(MonsHungry) && aj.Behavior.State == Hunting {
+		if ai.Has(StatusShadow) && !aj.Is(HungryRat) && aj.Behavior.State == Hunting {
 			// Shadowy attacks make hunting monsters lose track of
 			// you and wander again to a nearby location.
 			aj.Behavior.State = Wandering

@@ -234,7 +234,7 @@ func (md *model) RangedAttackAnimation(a *Actor, from, to gruid.Point) {
 	}
 	fg := ColorForeground
 	switch {
-	case a.DoesAny(MonsSpitFire):
+	case a.Is(FireLlama):
 		fg = ColorOrange
 	case a.DoesAny(MonsFear):
 		fg = ColorMagenta

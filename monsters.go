@@ -39,7 +39,7 @@ func (g *Game) HandleMonsterTurn(i ID, ai *Actor) {
 	if beh.Target == ei.P || beh.Target == InvalidPos {
 		// The monster's target has either been reached or is invalid:
 		// we spend a turn chosing a new target.
-		if ai.DoesAny(MonsHungry) && g.HungryHunt(ei.P) || g.Marked() && beh.Guard == InvalidPos {
+		if ai.Is(HungryRat) && g.HungryHunt(ei.P) || g.Marked() && beh.Guard == InvalidPos {
 			beh.Target = pl.P
 			beh.State = Hunting
 			return
@@ -118,7 +118,7 @@ func (g *Game) monsterBumpDisoriented(i ID, ai *Actor) bool {
 	to := ei.P.Add(g.Dir.Mul(-1)) // redirection target due to disorientation
 	if to == pl.P || paths.DistanceManhattan(pl.P, to) < paths.DistanceManhattan(pl.P, ei.P) &&
 		g.ActorInRange(ei.P, pl.P) == PlayerID {
-		if ai.Has(StatusFear) || (ai.DoesAny(MonsMusic) && !ai.Has(StatusBerserk)) {
+		if ai.Has(StatusFear) || (ai.Is(NoisyImp) && !ai.Has(StatusBerserk)) {
 			// The disoriented and afraid monster loses a turn when
 			// it wants to go toward the player.
 			return true
@@ -166,7 +166,7 @@ func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point, noise bool) 
 		}
 		beh.State = Hunting
 		switch {
-		case ai.DoesAny(MonsBarking):
+		case ai.Is(BarkingHound):
 			g.Logf("The %s barks.", ei.Name)
 			g.md.BarkAnimation(ei.P)
 			g.MakeNoise(ei.P, NoiseBark)
@@ -175,7 +175,7 @@ func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point, noise bool) 
 				g.LogfStyled("The confused %s bit its tongue while barking!", logHurtMons, g.Entity(i).Name)
 				g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
 			}
-		case ai.DoesAny(MonsSpores):
+		case ai.Is(WalkingMushroom):
 			pa := g.PlayerActor()
 			if !pa.Has(StatusLignification) {
 				g.releaseSpores(i)
@@ -299,7 +299,7 @@ func (g *Game) monsterBumpNext(i ID, ai *Actor) {
 			// hidden player.
 			return
 		}
-		if ai.DoesAny(PatternFourDirsMons) {
+		if ai.DoesAny(PatternFourDirs) {
 			g.FourDirectionalAttack(i, ai, AttackCharge, 2)
 		} else if j, aj := g.ActorAt(nto); j == PlayerID {
 			g.BumpAttackActor(i, j, ai, aj, AttackCharge, 2, 0)
@@ -329,14 +329,14 @@ func (g *Game) monsterBumpNext(i ID, ai *Actor) {
 // a straight direction from the player, they'll flee randomly in a direction
 // that avoids them (if any is free). Reports whether turn is finished.
 func (g *Game) monsterFlee(i ID, ai *Actor) bool {
-	if !ai.Has(StatusFear) && (!ai.DoesAny(MonsMusic) || ai.Has(StatusBerserk)) {
+	if !ai.Has(StatusFear) && (!ai.Is(NoisyImp) || ai.Has(StatusBerserk)) {
 		return false
 	}
 	ei, pl := g.Entity(i), g.PlayerEntity()
 	if !g.InFOV(ei.P) {
 		return false
 	}
-	if ai.DoesAny(MonsMusic) && g.IntN(3) > 0 {
+	if ai.Is(NoisyImp) && g.IntN(3) > 0 {
 		g.MakeNoise(ei.P, NoiseMusic)
 	}
 	if g.ActorInRange(ei.P, pl.P) != PlayerID {
