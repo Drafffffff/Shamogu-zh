@@ -340,7 +340,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 		// if the player is shadowed.
 		ai.Behavior.State = Hunting
 		if aj.DoesAny(Dazzling) && (ap == AttackCharge || ap == AttackPlain ||
-			ap == AttackRanged && !ai.DoesAny(PatternCatch)) {
+			ap == AttackDrag || ap == AttackRanged && !ai.DoesAny(PatternCatch)) {
 			if k, ak := g.dazzlingRedirect(i); k >= 0 {
 				j, aj = k, ak
 				redirected = true
