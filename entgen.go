@@ -1328,8 +1328,18 @@ func (g *Game) earlyGuardianPoint() gruid.Point {
 		}
 		return g.RandomWaypoint()
 	}
-	if g.IntN(2) == 0 {
-		return g.Map.Totem
+	if g.IntN(2) == 0 && (g.Map.Level > 1 || g.IntN(5) == 0) {
+		// Guard the totem about half of the time, except on level 1 or
+		// when totem is already guarded (much lower chance in those
+		// cases).
+		switch g.ProcInfo.GuardianEarly {
+		case g.ProcInfo.GuardianTotem1, g.ProcInfo.GuardianTotem2:
+			if g.IntN(4) == 0 {
+				return g.Map.Totem
+			}
+		default:
+			return g.Map.Totem
+		}
 	}
 	if g.Mod(ModCorruptedDungeon) && g.IntN(3) > 0 {
 		// High chance of guarding any portal.

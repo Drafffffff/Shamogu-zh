@@ -135,15 +135,17 @@ func (g *Game) flavoursProcGen() {
 			}
 		}
 	}
-	gpi.GuardianEarly = 2
-	if g.IntN(3) == 0 {
+	gpi.GuardianEarly = 2 // 30-35% chance
+	switch n := g.IntN(10); {
+	case n < 3:
+		// 30% chance of being in level 3.
 		gpi.GuardianEarly = 3
-	}
-	switch g.IntN(4) {
-	case 0:
-		gpi.GuardianEarly--
-	case 1:
-		gpi.GuardianEarly++
+	case (n == 4 || g.Mod(ModCorruptedDungeon) && n == 5) && g.IntN(2) == 0:
+		// Low 5% or 10% chance of being in level 1.
+		gpi.GuardianEarly = 1
+	case n >= 7:
+		// 30% chance of no chaos megabat.
+		gpi.GuardianEarly = 0
 	}
 	gpi.GuardianTotem2 = randTotemLevel(guardianTotem2Level, 4)
 	for gpi.GuardianTotem1 == 0 || gpi.GuardianTotem1 == gpi.GuardianTotem2 {
@@ -158,7 +160,7 @@ func (g *Game) flavoursProcGen() {
 		gpi.GuardianEarly--
 	}
 	gpi.GuardianPortal2 = guardianPortal2Level + g.IntN(3)
-	for gpi.GuardianPortal1 == 0 || gpi.GuardianPortal1 == gpi.GuardianPortal2 {
+	for gpi.GuardianPortal1 == 0 || gpi.GuardianPortal1 == gpi.GuardianPortal2 || gpi.GuardianPortal1 == gpi.GuardianEarly {
 		gpi.GuardianPortal1 = guardianPortal1Level + g.IntN(4)
 	}
 	gpi.WanderingUnique1 = wanderingUnique1Level + g.IntN(6)
@@ -193,8 +195,6 @@ func (g *Game) flavoursProcGen() {
 	// Disable very occasionally some events/flavours, for some
 	// extra unpredictability.
 	switch g.IntN(10) {
-	case 0:
-		gpi.GuardianEarly = 0
 	case 1:
 		gpi.WanderingUnique1 = 0
 	case 2:
