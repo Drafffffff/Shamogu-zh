@@ -987,7 +987,7 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 	}
 	switch g.IntN(n) {
 	case 0:
-		if !f(i, ai, StatusLignification, DurationLignificationHit) {
+		if g.ResistStatusRoll(i, StatusLignification) || !f(i, ai, StatusLignification, DurationLignificationHit) {
 			break
 		}
 		switch g.IntN(6) {
@@ -1001,14 +1001,24 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 			f(i, ai, StatusDaze, DurationDazeSpines)
 		}
 	case 1:
-		if f(i, ai, StatusImbalance, 3) {
+		if !g.ResistStatusRoll(i, StatusImbalance) && f(i, ai, StatusImbalance, 3) {
 			f(i, ai, StatusConfusion, 3)
 		}
 	case 2:
-		if !f(i, ai, StatusBerserk, DurationBerserkHit) {
+		n := 5
+		d := DurationBerserkHit
+		if i != PlayerID {
+			// Reduce berserk time for confusion-reflected berserk,
+			// as that's a bit too dangerous (though possibly fun
+			// occasionally). Also increase chances of negative
+			// effects.
+			d /= 2
+			n = 4
+		}
+		if g.ResistStatusRoll(i, StatusBerserk) || !f(i, ai, StatusBerserk, DurationBerserkHit) {
 			break
 		}
-		switch g.IntN(5) {
+		switch g.IntN(n) {
 		case 0, 1:
 			f(i, ai, StatusPoison, DurationPoisonBite)
 		case 2:
