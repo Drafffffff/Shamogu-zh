@@ -11,8 +11,9 @@ New content:
 * New early guardian: **chaos megabat**. It features a sneaky attack pattern,
   like Vampiric Bat players, but also a chaos bite that inflicts random
   effects (often good ones, sometimes bad ones). It appears as a totem or
-  portal guardian early on on most runs. Relatively harmless for a guardian,
-  but somewhat durable, unpredictable and difficult to avoid.
+  portal guardian early on on most runs, usually around levels 2-3. Not strong
+  by itself for a guardian, but somewhat durable, unpredictable and difficult
+  to avoid.
 * New portal guardian: **dragging alligator**. It features a dragging attack
   pattern, like Spinning Crocodile players, as well as a confusing bite, easily
   leading to the Confusion+Imbalance “drunken fight” defensive effect. It
