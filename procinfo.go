@@ -135,7 +135,7 @@ func (g *Game) flavoursProcGen() {
 			}
 		}
 	}
-	gpi.GuardianEarly = 2 // 30-40% chance
+	gpi.GuardianEarly = 2 // 40-50% chance
 	switch n := g.IntN(10); {
 	case n < 3:
 		// 30% chance of being in level 3.
@@ -144,8 +144,8 @@ func (g *Game) flavoursProcGen() {
 		// Low 10% chance of being in level 1 when corrupted dungeon is
 		// enabled.
 		gpi.GuardianEarly = 1
-	case n >= 7:
-		// 30% chance of no chaos megabat.
+	case n >= 8:
+		// 20% chance of no chaos megabat.
 		gpi.GuardianEarly = 0
 	}
 	gpi.GuardianTotem2 = randTotemLevel(guardianTotem2Level, 4)
