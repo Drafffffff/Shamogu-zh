@@ -1001,8 +1001,8 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 			f(i, ai, StatusDaze, DurationDazeSpines)
 		}
 	case 1:
-		if f(i, ai, StatusImbalance, 4) {
-			f(i, ai, StatusConfusion, 4)
+		if f(i, ai, StatusImbalance, 3) {
+			f(i, ai, StatusConfusion, 3)
 		}
 	case 2:
 		if !f(i, ai, StatusBerserk, DurationBerserkHit) {
