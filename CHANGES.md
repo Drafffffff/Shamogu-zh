@@ -114,6 +114,14 @@ UI, graphics, QoL:
   takes into account status expiration order in the computation of `base` when
   both Berserk and Lignification are active at the same time, producing hence a
   more accurate prediction in such case.
+* Display `[Warning]` or `[Confirm]` in status bar for critical mode asking for
+  SPACE/ESC and confirmation mode asking for y/N, respectively. Also, clicking
+  on log message lines or status bar with the mouse will act as ESC and N in
+  such cases, for users that want to fully play with mouse (right click already
+  did the same but might've been less obvious). The confirmation case still
+  cannot be done with the mouse, but it's not required for anything in normal
+  play, and quitting a game without saving can be done quickly enough by
+  playing badly and dying.
 
 Fixes:
 

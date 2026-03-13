@@ -131,7 +131,8 @@ func (md *model) more(msg gruid.Msg) bool {
 			return true
 		}
 	case gruid.MsgMouse:
-		if msg.Action == gruid.MouseSecondary {
+		if msg.Action == gruid.MouseSecondary ||
+			msg.Action == gruid.MouseMain && (msg.P.Y < 2 || msg.P.Y == UIHeight-1) {
 			return true
 		}
 	}
@@ -155,7 +156,8 @@ func (md *model) updateConfirmation(msg gruid.Msg) confirm {
 		}
 		return confirmFalse
 	case gruid.MsgMouse:
-		if msg.Action == gruid.MouseSecondary {
+		if msg.Action == gruid.MouseSecondary ||
+			msg.Action == gruid.MouseMain && (msg.P.Y < 2 || msg.P.Y == UIHeight-1) {
 			return confirmFalse
 		}
 	}

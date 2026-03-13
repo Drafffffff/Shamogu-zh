@@ -127,7 +127,16 @@ func (md *model) updateStatus() {
 				Text:     stt.WithText("≡ ").WithStyle(gruid.Style{Attrs: AttrInMap}),
 				Disabled: true})
 		}
-		if md.targ.kb {
+		switch {
+		case md.mode == modeCritical:
+			entries = append(entries, ui.MenuEntry{
+				Text:     stt.WithText("@O[Warning]@N "),
+				Disabled: true})
+		case md.mode == modeQuitConfirmation || md.mode == modeWizardConfirmation:
+			entries = append(entries, ui.MenuEntry{
+				Text:     stt.WithText("@C[Confirm]@N "),
+				Disabled: true})
+		case md.targ.kb:
 			entries = append(entries, ui.MenuEntry{
 				Text:     stt.WithText("@C[Examine]@N "),
 				Disabled: true})
