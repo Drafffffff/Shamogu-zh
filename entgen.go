@@ -1743,6 +1743,14 @@ func (g *Game) genMonstersCorrupted(nE, nM, nL int) (int, int, int) {
 	// Special mid monsters.
 	if g.IntN(rare) == 0 {
 		mks := []ActorKind{WalkingMushroom, BlazingGolem, CrazyDruid, NoisyImp}
+		if g.IntN(3) == 0 {
+			// Sometimes replace the wandering golem by an alligator.
+			mks[1] = DraggingAlligator
+		}
+		if g.IntN(3) == 0 {
+			// Sometimes replace the crazy druid by a bat.
+			mks[2] = ChaosMegabat
+		}
 		nMs := min(nM, 1+g.IntN(2), len(mks))
 		monsSpecialMid := g.monsterSelection(mks, len(mks))
 		for _, mk := range monsSpecialMid[:nMs] {
