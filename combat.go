@@ -993,12 +993,18 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 		switch g.IntN(6) {
 		case 0, 1:
 			// Sometimes, give Lignification+Fear.
-			f(i, ai, StatusFear, DurationFearUndead)
+			if !g.ResistStatusRoll(i, StatusFear) {
+				f(i, ai, StatusFear, DurationFearUndead)
+			}
 		case 2:
 			// Rarely, Lignification+Fire.
-			f(i, ai, StatusFire, DurationFire)
+			if !g.ResistStatusRoll(i, StatusFire) {
+				f(i, ai, StatusFire, DurationFire)
+			}
 		case 3:
-			f(i, ai, StatusDaze, DurationDazeSpines)
+			if !g.ResistStatusRoll(i, StatusDaze) {
+				f(i, ai, StatusDaze, DurationDazeSpines)
+			}
 		}
 	case 1:
 		if !g.ResistStatusRoll(i, StatusImbalance) && f(i, ai, StatusImbalance, 3) {
@@ -1020,40 +1026,50 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 		}
 		switch g.IntN(n) {
 		case 0, 1:
-			f(i, ai, StatusPoison, DurationPoisonBite)
+			if !g.ResistStatusRoll(i, StatusPoison) {
+				f(i, ai, StatusPoison, DurationPoisonBite)
+			}
 		case 2:
-			f(i, ai, StatusDaze, DurationDazeSpines)
+			if !g.ResistStatusRoll(i, StatusDaze) {
+				f(i, ai, StatusDaze, DurationDazeSpines)
+			}
 		}
 	default:
 		// Player-specific rare effects.
 		switch g.IntN(6) {
 		case 0:
 			d := (1 + DurationClarity) / 2
-			if f(i, ai, StatusClarity, d) && g.IntN(2) == 0 {
+			if f(i, ai, StatusClarity, d) &&
+				g.IntN(2) == 0 && !g.ResistStatusRoll(i, StatusFear) {
 				f(i, ai, StatusFear, d)
 			}
 		case 1:
 			d := (1 + DurationFoggySkin) / 2
-			if f(i, ai, StatusFoggySkin, d) && g.IntN(2) == 0 {
+			if f(i, ai, StatusFoggySkin, d) &&
+				g.IntN(2) == 0 && !g.ResistStatusRoll(i, StatusConfusion) {
 				f(i, ai, StatusConfusion, d)
 			}
 		case 2:
 			d := (1 + DurationTimeStop) / 2
-			if f(i, ai, StatusTimeStop, d) && g.IntN(2) == 0 {
+			if f(i, ai, StatusTimeStop, d) &&
+				g.IntN(2) == 0 && !g.ResistStatusRoll(i, StatusImbalance) {
 				f(i, ai, StatusImbalance, d)
 			}
 		case 3:
 			d := (1 + DurationShadow) / 2
-			if f(i, ai, StatusShadow, d) && g.IntN(2) == 0 {
+			if f(i, ai, StatusShadow, d) &&
+				g.IntN(2) == 0 && !g.ResistStatusRoll(i, StatusImbalance) {
 				f(i, ai, StatusImbalance, d)
 			}
 		case 4:
 			d := (1 + DurationDisorient) / 2
-			if f(i, ai, StatusDisorient, d) && g.IntN(2) == 0 {
+			if f(i, ai, StatusDisorient, d) &&
+				g.IntN(2) == 0 && !g.ResistStatusRoll(i, StatusFear) {
 				f(i, ai, StatusFear, d)
 			}
 		case 5:
-			if f(i, ai, StatusVampirism, DurationVampirism) && g.IntN(2) == 0 {
+			if f(i, ai, StatusVampirism, DurationVampirism) &&
+				g.IntN(2) == 0 && !g.ResistStatusRoll(i, StatusConfusion) {
 				f(i, ai, StatusConfusion, DurationConfusionHit)
 			}
 		}
