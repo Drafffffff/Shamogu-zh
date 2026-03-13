@@ -1292,6 +1292,7 @@ func (g *Game) genGuardians(nE, nM, nL int) (int, int, int) {
 	}
 	if g.ProcInfo.GuardianEarly == g.Map.Level {
 		nM--
+		nE++
 		p := g.earlyGuardianPoint()
 		g.genMonsterGuardian(ChaosMegabat, p)
 	}
