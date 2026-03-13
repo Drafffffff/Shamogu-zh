@@ -135,13 +135,14 @@ func (g *Game) flavoursProcGen() {
 			}
 		}
 	}
-	gpi.GuardianEarly = 2 // 30-35% chance
+	gpi.GuardianEarly = 2 // 30-40% chance
 	switch n := g.IntN(10); {
 	case n < 3:
 		// 30% chance of being in level 3.
 		gpi.GuardianEarly = 3
-	case (n == 4 || g.Mod(ModCorruptedDungeon) && n == 5) && g.IntN(2) == 0:
-		// Low 5% or 10% chance of being in level 1.
+	case g.Mod(ModCorruptedDungeon) && n == 3:
+		// Low 10% chance of being in level 1 when corrupted dungeon is
+		// enabled.
 		gpi.GuardianEarly = 1
 	case n >= 7:
 		// 30% chance of no chaos megabat.
