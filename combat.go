@@ -445,18 +445,10 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 		if !g.ResistStatusRoll(j, StatusBerserk) && g.PutStatus(j, aj, StatusBerserk, DurationBerserkHit) {
 			g.monsConfusionPenalty(i, ai)
 		}
-	case (ai.Is(BlinkButterfly) || ai.Is(ChaosMegabat) && g.IntN(16) == 0) && aj.IsAlive():
+	case ai.Is(BlinkButterfly) || ai.Is(ChaosMegabat) && g.IntN(16) == 0:
 		g.blinkOther(i, j, ai, aj)
-	case (ai.Is(WarpingWraith) || ai.Is(ChaosMegabat) && g.IntN(32) == 0) && aj.IsAlive() && !aj.ResistsMove():
-		if j == PlayerID {
-			g.Logf("The %s teleports you away!", ei.Name)
-		} else {
-			g.Logf("The confused %s teleports the %s away!", ei.Name, ej.Name)
-		}
-		g.TeleportActor(j, aj, 0)
-		if ai.Has(StatusConfusion) && ai.IsAlive() {
-			g.TeleportActor(i, ai, 1)
-		}
+	case ai.Is(WarpingWraith) || ai.Is(ChaosMegabat) && g.IntN(32) == 0:
+		g.teleportOther(i, j, ai, aj)
 	}
 	// Extra defense effects.
 	switch {
@@ -919,25 +911,27 @@ func (g *Game) digAt(at gruid.Point) bool {
 	return true
 }
 
-// blinkOther implements the blinking bump effect.
+// blinkOther implements the butterfly's blinking hit effect.
 func (g *Game) blinkOther(i, j ID, ai, aj *Actor) {
 	if aj.IsDead() || aj.ResistsMove() {
 		return
 	}
 	ej := g.Entity(j)
-	if to, ok := g.BlinkPos(ej.P); ok {
-		g.MoveActor(j, aj, to, MovTeleport)
-		ei := g.Entity(i)
-		if j == PlayerID {
-			g.Logf("The %s’s attack made you blink away.", ei.Name)
-			g.StoryLogf("Blinked away by %s", ei.Name)
-		}
-		if ai.Has(StatusConfusion) && !ai.ResistsMove() {
-			if to, ok := g.BlinkPos(ei.P); ok {
-				g.MoveActor(i, ai, to, MovTeleport)
-				g.LogfStyled("The confused %s hurt and blinked itself too!", logHurtMons, ei.Name)
-				g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
-			}
+	to, ok := g.BlinkPos(ej.P)
+	if !ok {
+		return
+	}
+	g.MoveActor(j, aj, to, MovTeleport)
+	ei := g.Entity(i)
+	if j == PlayerID {
+		g.Logf("The %s’s attack made you blink away.", ei.Name)
+		g.StoryLogf("Blinked away by %s", ei.Name)
+	}
+	if ai.Has(StatusConfusion) && !ai.ResistsMove() {
+		if to, ok := g.BlinkPos(ei.P); ok {
+			g.MoveActor(i, ai, to, MovTeleport)
+			g.LogfStyled("The confused %s hurt and blinked itself too!", logHurtMons, ei.Name)
+			g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
 		}
 	}
 }
@@ -967,6 +961,24 @@ func (g *Game) BlinkPos(from gruid.Point) (gruid.Point, bool) {
 		return InvalidPos, false
 	}
 	return ps[g.IntN(len(ps))], true
+}
+
+// teleportOther implements wraith's teleporting hit effect.
+func (g *Game) teleportOther(i, j ID, ai, aj *Actor) {
+	if aj.IsDead() || aj.ResistsMove() {
+		return
+	}
+	ei := g.Entity(i)
+	if j == PlayerID {
+		g.Logf("The %s teleports you away!", ei.Name)
+	} else {
+		ej := g.Entity(j)
+		g.Logf("The confused %s teleports the %s away!", ei.Name, ej.Name)
+	}
+	g.TeleportActor(j, aj, 0)
+	if ai.Has(StatusConfusion) && ai.IsAlive() {
+		g.TeleportActor(i, ai, 1)
+	}
 }
 
 // dazzlingRedirect may return a new target for the given monster, suitable for
