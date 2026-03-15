@@ -445,9 +445,9 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 		if !g.ResistStatusRoll(j, StatusBerserk) && g.PutStatus(j, aj, StatusBerserk, DurationBerserkHit) {
 			g.monsConfusionPenalty(i, ai)
 		}
-	case ai.Is(BlinkButterfly) && aj.IsAlive():
+	case (ai.Is(BlinkButterfly) || ai.Is(ChaosMegabat) && g.IntN(16) == 0) && aj.IsAlive():
 		g.blinkOther(i, j, ai, aj)
-	case ai.Is(WarpingWraith) && aj.IsAlive() && !aj.ResistsMove():
+	case (ai.Is(WarpingWraith) || ai.Is(ChaosMegabat) && g.IntN(32) == 0) && aj.IsAlive() && !aj.ResistsMove():
 		if j == PlayerID {
 			g.Logf("The %s teleports you away!", ei.Name)
 		} else {
