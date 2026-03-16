@@ -110,7 +110,7 @@ func (g *Game) generateMap(ml MapLayout) (*MapGen, bool) {
 	}
 
 	mg.genFoliage()
-	// Vault placement.
+	// Vault placement (6-8 vaults per map).
 	bigCenter := g.IntN(2) == 0
 	if bigCenter {
 		mg.genVaults(BigVaultTemplates, 1, PlacementCenter)
@@ -119,8 +119,19 @@ func (g *Game) generateMap(ml MapLayout) (*MapGen, bool) {
 		mg.genVaults(BigVaultTemplates, 1, PlacementEdge)
 		mg.genVaults(SmallVaultTemplates, 1, PlacementCenter)
 	}
+	nsv := 4 // number of small vaults
+	switch {
+	case g.Map.Level < 3:
+		// In the very early game, we generate one less small vault,
+		// because they are much more likely to be empty.
+		nsv--
+	case g.IntN(2+g.Map.Level/3) > 1:
+		// In the late game, make it more likely to generate an extra
+		// small vault, as there are more items and menhirs.
+		nsv++
+	}
 	mg.genVaults(BigVaultTemplates, 1, PlacementRandom)
-	mg.genVaults(SmallVaultTemplates, 4+mg.rand.IntN(2), PlacementRandom)
+	mg.genVaults(SmallVaultTemplates, nsv, PlacementRandom)
 	mg.connectAllVaults()
 	g.computeWaypoints(mg)
 	// Terrain effects: may introduce new unreachable passable terrain, but
