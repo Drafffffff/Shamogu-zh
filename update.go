@@ -177,8 +177,15 @@ func (md *model) updateNormal(msg gruid.Msg) {
 
 func (md *model) updateKeyDown(msg gruid.MsgKeyDown) {
 	md.status.focus = false
-	if !md.targ.kb && inMap(md.targ.p) && msg.Key != gruid.KeyPageDown && msg.Key != gruid.KeyPageUp {
-		md.targ.CancelExamine()
+	if !md.targ.kb {
+		if inMap(md.targ.p) {
+			if msg.Key != gruid.KeyPageDown && msg.Key != gruid.KeyPageUp {
+				md.targ.CancelExamine()
+			}
+		} else if msg.Key == gruid.KeyPageDown || msg.Key == gruid.KeyPageUp {
+			md.status.menu.Update(msg)
+			return
+		}
 	}
 	a := md.keysNormal[msg.Key]
 	if md.targ.kb {
