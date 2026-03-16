@@ -1733,7 +1733,7 @@ func (g *Game) hideFrom(lt *lighter, from, dir gruid.Point) {
 func (g *Game) genMonstersCorrupted(nE, nM, nL int) (int, int, int) {
 	const rare = 18
 	// Special early monsters.
-	if g.IntN(rare) == 0 {
+	if g.IntN(rare) == 0 && nE >= 0 {
 		nEs := min(nE, 1+g.IntN(3))
 		for range nEs {
 			g.genMonster(TotemWasp)
@@ -1741,7 +1741,7 @@ func (g *Game) genMonstersCorrupted(nE, nM, nL int) (int, int, int) {
 		nE -= nEs
 	}
 	// Special mid monsters.
-	if g.IntN(rare) == 0 {
+	if g.IntN(rare) == 0 && nM >= 0 {
 		mks := []ActorKind{WalkingMushroom, BlazingGolem, CrazyDruid, NoisyImp}
 		if g.IntN(3) == 0 {
 			// Sometimes replace the wandering golem by an alligator.
@@ -1759,7 +1759,7 @@ func (g *Game) genMonstersCorrupted(nE, nM, nL int) (int, int, int) {
 		nM -= nMs
 	}
 	// Special late monsters.
-	if g.IntN(rare) == 0 {
+	if g.IntN(rare) == 0 && nL >= 0 {
 		nLs := min(nL, 1+g.IntN(2))
 		if g.IntN(3) == 0 && g.Map.Level < MapLevels {
 			// Rare chance of special late monsters as totem
