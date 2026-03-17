@@ -102,7 +102,7 @@ func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKi
 			ohp := ai.HP
 			g.AdjustHP(i, ai, dmg)
 			if i == PlayerID && ai.HP > ohp {
-				g.StoryLogf("You drained life force from %s (HP: %d/%d)", One(ej.Name), ai.HP, ai.GetMaxHP())
+				g.StoryLogf("You drained vitality from %s (HP: %d/%d)", One(ej.Name), ai.HP, ai.GetMaxHP())
 			}
 		}
 		if ai.DoesAny(PatternSwap|PatternSwapDaze) || ai.Has(StatusShadow) || aj.Has(StatusShadow) || g.IntN(dmg) == 0 {
