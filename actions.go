@@ -1847,7 +1847,7 @@ func statusesHelpText(g *Game) string {
 
 In the status bar and descriptions, positive status effects are shown as @BBlue@N and negative ones are @OOrange@N. They last for a certain number of turns, shown between parens. Statuses end at the end of your turn, before monsters act, so you have to sometimes be careful before expiration. On the last turn, good statuses show as @CCyan@N if they are normally relevant during your turn and the monsters’, @VViolet@N if they have an effect on your turn only, and @SGrey@N if they don’t have an effect during your turn.
 
-On the map, monster color may change depending on active status effects.  By default, status-free wandering monsters are @OOrange@N and hunting monsters are @ORed@N. @MMagenta@N indicates a positive status. @YYellow@N indicates both positive and negative statuses. @GGreen@N indicates a negative status. @CCyan@N indicates two or more negative statuses.`)
+On the map, monster color may change depending on active status effects.  By default, status-free wandering monsters are @OOrange@N and hunting monsters are @RRed@N. @MMagenta@N indicates a positive status. @YYellow@N indicates both positive and negative statuses. @GGreen@N indicates a negative status. @CCyan@N indicates two or more negative statuses.`)
 	sb.WriteString("\n\n")
 	sb.WriteString(`@YSTATUSES@N`)
 	sb.WriteString("\n\n")
