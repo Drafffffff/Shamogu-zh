@@ -1923,7 +1923,7 @@ Watch out for @Mfootstep noise@N: while going through dense foliage, it can be v
 
 @YCONFIGURATION TIPS@N
 
-If you often get surprised by @OFire@N or @OPoison@N and get hurt by mistake, you may want to enable extra warnings in configuration options. Those warnings also stop you when @BBerserk@N or @BLignification@N is about to expire.
+If you often get surprised by @OFire@N or @OPoison@N and get hurt by mistake, you may want to enable extra warnings in the configuration options. Those warnings also stop you when @BBerserk@N or @BLignification@N is about to expire.
 
 @YWIZARD MODE@N
 
