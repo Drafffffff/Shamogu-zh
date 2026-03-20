@@ -937,10 +937,6 @@ func (eff EffectSnack) Desc() string {
 	return desc + " It doesn’t trigger @BGluttony@N."
 }
 
-func (g *Game) menhirMsg(name string) {
-	g.Logf("You activate the %s.", name)
-}
-
 type EffectGarden struct{}
 
 func (eff EffectGarden) Apply(g *Game) bool {
@@ -1100,6 +1096,10 @@ func (eff EffectDisorient) Name() string {
 
 func (eff EffectDisorient) Desc() string {
 	return fmt.Sprintf("@BDisorient@N for %d turns. %s @GInstant@N.", DurationDisorient, statusDesc[StatusDisorient])
+}
+
+func (g *Game) menhirMsg(name string) {
+	g.Logf("You activate the %s.", name)
 }
 
 type EffectEarthMenhir struct{}

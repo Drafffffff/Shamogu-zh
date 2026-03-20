@@ -1765,7 +1765,7 @@ func itemHelpText() string {
 	return strings.TrimSpace(`
 @CComestibles@N are found in every level. When the player is over them, pressing the @MInteract Key@N(e) allows to pick them. When your inventory is full, you’ll have to select a comestible to leave on the ground. Opening the @MInventory@N(i) allows to eat an equipped comestible or any comestible on the ground.
 
-@CTotems@N are found once per level. By pressing the @MInteract Key@N(e), their spirit may either be chosen as a new secondary spirit or used to upgrade one of your existing spirits. Opening the @MInventory@N(i) allows then to use your chosen spirits. Beware that monsters that see you chosing a spirit will go berserk!
+@CTotems@N are found once per level. By pressing the @MInteract Key@N(e), their spirit may either be chosen as a new secondary spirit or used to upgrade one of your existing spirits. Opening the @MInventory@N(i) allows then to use your chosen spirits. Beware that monsters that see you choosing a spirit will go berserk!
 
 @CMenhirs@N are found in every level. Pressing the @MInteract Key@N(e) will activate them.
 
