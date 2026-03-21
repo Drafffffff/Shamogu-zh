@@ -1854,11 +1854,8 @@ On the map, monster color may change depending on active status effects.  By def
 	pa := g.PlayerActor()
 	for i, desc := range statusDesc {
 		st := Status(i)
-		switch st {
-		case StatusGluttony:
-			if !g.Mod(ModAdvancedSpirits) || g.Mod(ModGluttonyRework) {
-				continue
-			}
+		if st == StatusGluttony && g.Mod(ModGluttonyRework) {
+			continue
 		}
 		color := statusColor(st, 42)
 		fmt.Fprintf(&sb, "@%c%s@N (@%c%s@N). ", color, st.Name(), color, g.StatusAbbr(pa, st))
