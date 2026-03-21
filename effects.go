@@ -683,7 +683,7 @@ func (eff EffectBark) Name() string {
 }
 
 func (eff EffectBark) Desc() string {
-	return fmt.Sprintf("Frighten all monsters in a %d-radius distance for %d turns.",
+	return fmt.Sprintf("Frighten all monsters within %d tiles of distance for %d turns.",
 		MaxFOVRange, DurationFearBark)
 }
 
@@ -717,7 +717,7 @@ func (eff EffectNoxiousSmell) Name() string {
 }
 
 func (eff EffectNoxiousSmell) Desc() string {
-	return fmt.Sprintf("Confuse monsters in a %d-radius distance for %d turns.",
+	return fmt.Sprintf("Confuse monsters within %d tiles of distance for %d turns.",
 		MaxFOVRange, DurationConfusionSkunk)
 }
 
@@ -1237,7 +1237,7 @@ func (eff EffectWarpingMenhir) Apply(g *Game) bool {
 }
 
 func (eff EffectWarpingMenhir) Desc() string {
-	return fmt.Sprintf("Teleports away monsters in a %d-radius distance. Reveals location of any portals. The dungeon might sense you and send a wraith to investigate: the deeper you are, the more likely.", MaxFOVRange)
+	return fmt.Sprintf("Teleports away monsters within %d tiles of distance. Reveals location of any portals. The dungeon might sense you and send a wraith to investigate: the deeper you are, the more likely.", MaxFOVRange)
 }
 
 type EffectPoisonMenhir struct{}
@@ -1269,7 +1269,7 @@ func (eff EffectPoisonMenhir) Apply(g *Game) bool {
 }
 
 func (eff EffectPoisonMenhir) Desc() string {
-	return fmt.Sprintf("Makes many poisonous clouds appear in a %d-radius distance. Reveals translucent walls.", MaxFOVRange)
+	return fmt.Sprintf("Makes many poisonous clouds appear within %d tiles of distance. Reveals translucent walls.", MaxFOVRange)
 }
 
 type EffectFireMenhir struct{}
@@ -1320,5 +1320,5 @@ func (g *Game) revealFoliage() {
 }
 
 func (eff EffectFireMenhir) Desc() string {
-	return fmt.Sprintf("Makes many fire clouds appear in a %d-radius distance, each one lasting 6-12 turns. Reveals foliage partially.", MaxFOVRange)
+	return fmt.Sprintf("Makes many fire clouds appear within %d tiles of distance, each one lasting 6-12 turns. Reveals foliage partially.", MaxFOVRange)
 }
