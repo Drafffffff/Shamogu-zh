@@ -1690,7 +1690,7 @@ In Shamogu, both the player and the monsters may use one of several attack patte
 
 @CSpace-distorting@N attacks are ranged attacks that @Mswap positions@N on successful hits, but result in normal movement on misses. Any foes adjacent to the landing hit position are blinked away. Note that such attacks reverse your current direction. They also swap any clouds, but not the terrain.
 
-@CDragging@N attacks are melee attacks that drag foes backwards, unbalancing them. They’re performed by Spinning Crocodile players.
+@CDragging@N attacks are melee attacks that drag foes backwards, unbalancing them. They’re performed by dragging alligators and Spinning Crocodile players.
 
 @CSneak@N attacks are a two-phased attack pattern. When ranged, it works as a rampaging attack. In melee, a plain attack is followed by quick 2-tile retreat. Sneak attacks are performed by sneaky megabats and Vampiric Bat players.
 
