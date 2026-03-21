@@ -102,6 +102,11 @@ Reworked and improved content:
 * Various inflict-on-hit statuses from monsters on the player now use a
   somewhat biased RNG that makes repeated application just after expiration
   less likely, making consecutive imbalance and fire dances less likely.
+* Slightly tweaked number of vaults in maps: there should now be one less vault
+  in the very early game, as vaults tend to be empty quite often, due to less
+  menhirs and comestibles.  Same base number of vaults in mid and late game,
+  but slightly higher chance of extra vault in late game with respect to mid
+  game (chances for extra vault were the same for both before).
 
 UI, graphics, QoL:
 
@@ -122,6 +127,10 @@ UI, graphics, QoL:
   cannot be done with the mouse, but it's not required for anything in normal
   play, and quitting a game without saving can be done quickly enough by
   playing badly and dying.
+* On the project's website: new game manual in html form that includes bonus
+  sections with lists of comestibles, menhirs, runes, spirits and monsters.
+  Most other content is simply from the in-game help, but replicated there for
+  convenience.
 
 Fixes:
 
