@@ -1688,7 +1688,7 @@ In Shamogu, both the player and the monsters may use one of several attack patte
 
 @CRecoil@N is an extra attack effect for wind fox monsters, as well as Wind Fox spirit players. After an attack from within a 4-tile range, they may move backwards one tile when ranged, or two cells with extra wind noise when in melee.
 
-@CSpace-Distorting@N attacks are ranged attacks that @Mswap positions@N on successful hits, but result in normal movement on misses. Any foes adjacent to the landing hit position are blinked away. Note that such attacks reverse your current direction. They also swap any clouds, but not the terrain.
+@CSpace-distorting@N attacks are ranged attacks that @Mswap positions@N on successful hits, but result in normal movement on misses. Any foes adjacent to the landing hit position are blinked away. Note that such attacks reverse your current direction. They also swap any clouds, but not the terrain.
 
 @CDragging@N attacks are melee attacks that drag foes backwards, unbalancing them. They’re performed by Spinning Crocodile players.
 
