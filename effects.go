@@ -1009,7 +1009,7 @@ func (eff EffectStomp) Name() string {
 }
 
 func (eff EffectStomp) Desc() string {
-	return fmt.Sprintf("Destroys walls in a 2-tile radius. Makes you @BBerserk@N for %d turns.",
+	return fmt.Sprintf("Destroy walls in a 2-tile radius. Makes you @BBerserk@N for %d turns.",
 		DurationBerserkStomp)
 }
 
@@ -1049,7 +1049,7 @@ func (eff EffectDeathStare) Name() string {
 }
 
 func (eff EffectDeathStare) Desc() string {
-	return fmt.Sprintf("Kills first visible foe in front. Gives you @OFear@N for %d turns as backlash.",
+	return fmt.Sprintf("Kill first visible foe in front. Gives you @OFear@N for %d turns as backlash.",
 		DurationFearDeathStare)
 }
 
