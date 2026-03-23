@@ -31,6 +31,10 @@ New content:
   imbalance dances less likely, so that they remain fun and not repetitive.
 * The Tips help topic features extra text about monster examination and rats
   hunting by smell (see #11).
+* On the project's website: new game manual in html form that includes bonus
+  sections with lists of comestibles, menhirs, runes, spirits and monsters.
+  Most other content is simply from the in-game help, but replicated there for
+  convenience.
 
 Improvements in Corrupted Dungeon expansion (see issue #11):
 
@@ -127,10 +131,9 @@ UI, graphics, QoL:
   cannot be done with the mouse, but it's not required for anything in normal
   play, and quitting a game without saving can be done quickly enough by
   playing badly and dying.
-* On the project's website: new game manual in html form that includes bonus
-  sections with lists of comestibles, menhirs, runes, spirits and monsters.
-  Most other content is simply from the in-game help, but replicated there for
-  convenience.
+* In the (unlikely) case that status effects don't fit in the status bar, now
+  an arrow shows up at the end of the line, suggesting that scrolling is
+  possible (either with the mouse or using page up/down).
 
 Fixes:
 
