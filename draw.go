@@ -625,6 +625,9 @@ func drawGamePicture(gd gruid.Grid) {
 func (md *model) drawInventory() {
 	menugd := md.menu.main.Draw()
 	md.gd.Copy(menugd)
+	if md.desc.Content.Text() == "" {
+		return
+	}
 	descgd := md.desc.Draw(md.gd.Slice(md.gd.Range().Columns(UIWidth/2, UIWidth)))
 	if md.menu.mode != modeEquip || !md.drawGroundDesc {
 		return
