@@ -125,7 +125,18 @@ func (md *model) Draw() gruid.Grid {
 	}
 	// We draw the status line last: it should always be visible and no
 	// other widgets should ever need that space.
-	md.gd.Slice(md.gd.Range().Line(UIHeight - 1)).Copy(md.status.menu.Draw())
+	md.gd.Slice(md.gd.Range().Line(UIHeight-1).Shift(1, 0, 0, 0)).Copy(md.status.menu.Draw())
+	if pages := md.status.menu.Pages(); pages.X > 0 {
+		// When the status bar cannot hold all the content, draw arrows
+		// at the start and/or end of the line.
+		page := md.status.menu.Page()
+		if page.X < pages.X {
+			md.gd.Set(gruid.Point{UIWidth - 1, UIHeight - 1}, gruid.Cell{Rune: '>'})
+		}
+		if page.X > 0 {
+			md.gd.Set(gruid.Point{0, UIHeight - 1}, gruid.Cell{Rune: '<'})
+		}
+	}
 	return md.gd
 }
 
