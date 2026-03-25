@@ -111,6 +111,11 @@ Reworked and improved content:
   menhirs and comestibles.  Same base number of vaults in mid and late game,
   but slightly higher chance of extra vault in late game with respect to mid
   game (chances for extra vault were the same for both before).
+* When Owl is not flying (gardening or lignified), fuzzy visibility has been
+  improved (still affected by nocturnal range, but when close you can see
+  behind foliage now, like without the Owl, as it was a bit unintuitive that
+  nocturnality would make foliage the same as rubble, even though not absurd
+  either).
 
 UI, graphics, QoL:
 
