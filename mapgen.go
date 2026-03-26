@@ -665,7 +665,7 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 
 	// getTerrain returns a random rectangular portion of the map.
 	getTerrain := func() rl.Grid {
-		switch g.IntN(6) {
+		switch g.IntN(5) {
 		case 0, 1:
 			left := mg.terrain.Slice(mg.terrain.Range().Columns(0, 3+MapWidth/2))
 			right := mg.terrain.Slice(mg.terrain.Range().Columns(-3+MapWidth/2, MapWidth))
@@ -673,10 +673,10 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 				return right
 			}
 			return left
-		case 2, 3:
+		case 2:
 			center := mg.terrain.Slice(mg.terrain.Range().Columns(25, 55))
 			return center
-		case 4:
+		case 3:
 			top := mg.terrain.Slice(mg.terrain.Range().Lines(0, 1+MapHeight/2))
 			bottom := mg.terrain.Slice(mg.terrain.Range().Lines(-1+MapHeight/2, MapHeight))
 			if mg.rand.IntN(2) == 0 {
