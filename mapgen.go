@@ -830,7 +830,8 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 			passable = func(p gruid.Point) bool { return true }
 		}
 		mp := &MappingPath{passable: passable}
-		maxRange := 2*MaxFOVRange + g.IntN(MaxFOVRange)
+		mr := MaxFOVRange + MaxFOVRange/2
+		maxRange := mr + g.IntN(mr)
 		nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{p}, maxRange)
 		// Natural mix of rubble/foliage/floor in proportions 1/2-3/3-4.
 		mixfn := mix(1, 2+g.IntN(2), 3+g.IntN(2))
