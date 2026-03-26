@@ -665,18 +665,18 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 
 	// getTerrain returns a random rectangular portion of the map.
 	getTerrain := func() rl.Grid {
-		switch g.IntN(4) {
-		case 0:
+		switch g.IntN(6) {
+		case 0, 1:
 			left := mg.terrain.Slice(mg.terrain.Range().Columns(0, 3+MapWidth/2))
 			right := mg.terrain.Slice(mg.terrain.Range().Columns(-3+MapWidth/2, MapWidth))
 			if mg.rand.IntN(2) == 0 {
 				return right
 			}
 			return left
-		case 1:
+		case 2, 3:
 			center := mg.terrain.Slice(mg.terrain.Range().Columns(25, 55))
 			return center
-		case 2:
+		case 4:
 			top := mg.terrain.Slice(mg.terrain.Range().Lines(0, 1+MapHeight/2))
 			bottom := mg.terrain.Slice(mg.terrain.Range().Lines(-1+MapHeight/2, MapHeight))
 			if mg.rand.IntN(2) == 0 {
@@ -789,7 +789,7 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 		}
 	}
 
-	if g.IntN(sometimes) == 0 {
+	if g.IntN(occasionally) == 0 {
 		terrain := getTerrain()
 		// Replace most non-vault walls by foliage/floor/rubble.
 		var f func() rl.Cell

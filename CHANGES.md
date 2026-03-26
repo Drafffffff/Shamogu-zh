@@ -45,6 +45,9 @@ Improvements in Corrupted Dungeon expansion (see issue #11):
   Rarely, more than one vault can be guarded.
 * The Orb or other special locations may be hidden by foliage or rubble more
   often than before, in particular when unguarded.
+* Adjusted map corruption chances a bit. In particular, extreme wall
+  corruptions that result in maps that are too open happen a bit less often
+  now.
 
 Reworked and improved content:
 
