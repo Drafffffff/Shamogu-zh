@@ -59,7 +59,7 @@ func (m Mod) Desc() string {
 	case ModAdvancedSpirits:
 		return "Enable extra advanced secondary spirits: Dazzling Zebra, Gardening Lion, Gawalt Monkey, Gluttonous Bear, Runic Chicken, Staring Owl, Stomping Elephant.\n\nAdvanced secondaries always have strong points but also serious and quirky drawbacks.\n\nBeware that regular spirits are rarer early on than advanced ones!"
 	case ModGluttonyRework:
-		return "Makes the Gluttonous Bear eat in pairs through a choice-of-two menu, without relying on a Gluttony status.\n\nThe Advanced Spirits mod should be enabled too for this mod to take effect."
+		return "Makes the Gluttonous Bear eat in pairs through a choice-of-two menu, without relying on a Gluttony status.\n\nThe Advanced Spirits mod should be enabled too for this mod to take effect.\n\nRecommended for players that don’t like the default Bear with a Gluttony status."
 	case ModSmallInventory:
 		return "Inventory can only hold 3 comestibles. Choose them with care!"
 	case ModNoRecharges:
