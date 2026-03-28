@@ -20,8 +20,8 @@ New content:
   as more rarely various effects that would usually be impossible, like
   Gardening or Time Stop. While relatively harmless for a guardian in practice,
   the chaos megabat is difficult to avoid and quite evasive.
-* New portal guardian: **dragging alligator**.  Alligators sometimes appear as
-  a pair of mid game portal guardians in place of the blazing golems. They may
+* New portal guardian: **dragging alligator**.  Alligators often appear as a
+  pair of mid game portal guardians in place of the blazing golems. They may
   occasionally guard a random vault, too. Alligators make up for lower defense
   than golems with their dragging attack pattern and higher attack. Their
   scales still protect them somewhat from ranged attacks, and while they don’t
