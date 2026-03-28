@@ -23,9 +23,11 @@ New content:
 * New portal guardian: **dragging alligator**.  Alligators often appear as a
   pair of mid game portal guardians in place of the blazing golems. They may
   occasionally guard a random vault, too. Alligators make up for lower defense
-  than golems with their dragging attack pattern and higher attack. Their
-  scales still protect them somewhat from ranged attacks, and while they don’t
-  have any immunities, they’re special in being partially resistant to Fire and
+  than golems with their dragging attack pattern, a confusing bite and higher
+  attack. On the plus side, those can easily lead to the Imbalance+Confusion
+  “drunken fight” defensive effect for the player. However, the scales still
+  protect alligators somewhat from ranged attacks, and while they don’t have
+  any immunities, they’re special in being partially resistant to Fire and
   Fear, like upgraded Salamander and Hound players. Unlike golems, alligators
   feature normal footsteps and are hence not as easy to notice from far away.
 * New Stealth help topic that explains monster mindstate behavior and how it
