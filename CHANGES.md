@@ -8,17 +8,26 @@ New content:
   the player away on the last level, making teleport-based strategies less
   reliable as a means of progression toward the Orb, but still useful otherwise
   (see issue #11).
-* New early guardian: **chaos megabat**. It features a sneaky attack pattern,
-  like Vampiric Bat players, but also a chaos bite that inflicts random
-  effects (often good ones, sometimes bad ones). It appears as a totem or
-  portal guardian early on on most runs, usually around levels 2-3. Not strong
-  by itself for a lone guardian, but somewhat durable, unpredictable and
-  difficult to avoid.
-* New portal guardian: **dragging alligator**. It features a dragging attack
-  pattern, like Spinning Crocodile players, as well as a confusing bite, easily
-  leading to the Confusion+Imbalance “drunken fight” defensive effect. It
-  alternates with blazing golem as a portal guardian, but a bit less
-  frequently. It has higher attack but more modest defenses.
+* New early guardian: **chaos megabat**. The chaos megabat appears in most
+  games as an early totem or portal guardian.  It has good hearing, like
+  hounds, and is immune to Lignification, like other flying monsters. Also,
+  when hearing noise at the player’s position, it starts hunting immediately
+  even when out-of-view. The megabat features a sneaky attack pattern, like
+  Vampiric Bat players. However, instead of a vampiric bite, it has a chaos
+  bite, which inflicts random effects. Those effects are not completely random
+  and tend to be fun but survivable and often helpful instead of harmful.  You
+  can for example get Lignification, Berserk, or Confusion+Imbalance, as well
+  as more rarely various effects that would usually be impossible, like
+  Gardening or Time Stop. While relatively harmless for a guardian in practice,
+  the chaos megabat is difficult to avoid and quite evasive.
+* New portal guardian: **dragging alligator**.  Alligators sometimes appear as
+  a pair of mid game portal guardians in place of the blazing golems. They may
+  occasionally guard a random vault, too. Alligators make up for lower defense
+  than golems with their dragging attack pattern and higher attack. Their
+  scales still protect them somewhat from ranged attacks, and while they don’t
+  have any immunities, they’re special in being partially resistant to Fire and
+  Fear, like upgraded Salamander and Hound players. Unlike golems, alligators
+  feature normal footsteps and are hence not as easy to notice from far away.
 * New Stealth help topic that explains monster mindstate behavior and how it
   changes.  The topic also includes the noise explanations that were previously
   in the Combat topic.
@@ -92,18 +101,21 @@ Reworked and improved content:
   builds a bit more appealing. The new formula also preserves a bit better the
   relative increased resilience of trees with respect to other same
   high-defense monsters like dragons.
-* Zebra's Disorient status now lasts an extra turn, for better balance.
+* Zebra's Disorient status now lasts an extra turn, for better balance (see
+  #17).
 * Elephant's “stomp” ability now makes you berserk for 4 turns, instead of 5,
   as the ability was a bit too strong considering its useful extra
-  wall-destroying effects.
+  wall-destroying effects (see #17).
 * Lion's roar now inflicts 4-5 turns of Fear, instead of 5, with 4 being more
-  likely on close targets. This change helps balance hydra+lion and
+  likely on close targets (see #17). This change helps balance hydra+lion and
   frog+lion+owl, as those are somewhat overpowered with respect to other
   combinations. Thematically, we can think of it as monsters often getting over
   their fear earlier when danger is close.
-* Cat's dazing effect on swapping happens now less often than before; it's also
-  somewhat less likely but longer on average at long distances to make distant
-  swapping by monster cats more unlikely to be undone just afterwards.
+* Cat's dazing effect on swapping happens now less often than before and
+  chances don't scale with damage anymore; instead, it's somewhat less likely
+  but with longer duration on average at long distances to make distant
+  swapping by monster cats more unlikely to be undone just afterwards (see
+  #17).
 * Dazing chance and duration after falling when doing various jumps while
   imbalanced have been adjusted so that they are more significant (see #17).
 * Various inflict-on-hit statuses from monsters on the player now use a
