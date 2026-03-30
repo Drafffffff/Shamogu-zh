@@ -1,4 +1,4 @@
-# v? ?
+# v1.5.0 2026-03-30
 
 This release features new and improved content, as well as various fixes.
 
@@ -42,10 +42,10 @@ New content:
   imbalance dances less likely, so that they remain fun and not repetitive.
 * The Tips help topic features extra text about monster examination and rats
   hunting by smell (see #11).
-* On the project's website: new game manual in html form that includes bonus
-  sections with lists of comestibles, menhirs, runes, spirits and monsters.
-  Most other content is simply from the in-game help, but replicated there for
-  convenience.
+* On the project's website: new **game manual** in html form that includes
+  bonus sections with lists of comestibles, menhirs, runes, spirits and
+  monsters.  Most other content is simply from the in-game help, but replicated
+  there for convenience.
 
 Improvements in Corrupted Dungeon expansion (see issue #11):
 
@@ -58,7 +58,8 @@ Improvements in Corrupted Dungeon expansion (see issue #11):
   often than before, in particular when unguarded.
 * Adjusted map corruption chances a bit. In particular, extreme wall
   corruptions that result in maps that are too open happen a bit less often
-  now.
+  now. And the radius of centered map corruptions can be a bit lower than
+  before.
 
 Reworked and improved content:
 
@@ -178,6 +179,8 @@ Fixes:
 * Fix a bug where disoriented monsters could sometimes move incorrectly.
 * Prevent rune trigger message for out-of-view traps (see #17), unless the
   player has the Runic Chicken and the trap is within sensing range.
+* Fix animation issue with teleport that could sometimes briefly leak
+  out-of-view information during animations on that turn (see #17).
 
 # v1.4.1 2026-02-10
 
