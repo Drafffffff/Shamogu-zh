@@ -1666,6 +1666,8 @@ Players under the @BFocus@N status effect and four-headed hydras perform four da
 
 Special effects like @BBerserk@N or @BDig@N may then increase effective total attack damage by one, bypassing defense and any maximum damage caps.
 
+Combat damage is applied to an actor’s HP. Zero HP means death. There is no passive HP regeneration, so monsters never recover lost HP. The player can recover HP by eating some comestibles or by going through a portal.
+
 @YCURRENT DIRECTION@N
 
 In the status bar, an arrow shows you the direction of your last movement or attack. That direction is used in various contexts by some effects and abilities, like when eating firebreath pepper, sprinting or jumping. The current direction is a player-specific feature.
@@ -1742,6 +1744,10 @@ Combat and some other actions produce noise, as shown with onomatopoeias in the 
 Shamogu also shows visually the sound made by monsters out of view: @Rfootsteps@N, @Olight footsteps@N, @Gcreep noise@N, @Cflapping of wings@N, and @Mheavy footsteps@N. Note that monsters cannot hear your footsteps or, at the very least, they don’t care about such small noises!
 
 Players and monsters with the “good hearing” trait may hear sounds farther than usual. Players with “bad hearing” cannot hear @Gcreep noises@N nor @Cflapping of wings@N well, but they hear others sounds normally.
+
+@YCLOCK@N
+
+When you spend more than a thousand turns on a given map, the dungeon core will detect your location and will make monsters hunt you on their next trip. A new pair of hunting blazing golems will be sent, too. Beware of playing too slowly!
 `)
 }
 
