@@ -1249,15 +1249,31 @@ func (g *Game) genThemedMonsters(mg *MapGen, nE, nM, nL int) {
 // position if there is no such place. It doesn't reserve the place for
 // exclusive use.
 func (g *Game) RandomWaypoint() gruid.Point {
-	// TODO: try to avoid returning a point that's too close to the player.
 	if len(g.Map.Waypoints) > 0 {
+		pp := g.PP()
 		p := g.Map.Waypoints[g.IntN(len(g.Map.Waypoints))]
-		if p == g.PP() {
-			return g.RandomPassableWithoutTrap()
+		if paths.DistanceManhattan(pp, p) <= MaxFOVRange {
+			// Try again once if we got to close to the player.
+			p = g.Map.Waypoints[g.IntN(len(g.Map.Waypoints))]
+			if p == pp {
+				// Non-vault waypoint if we got the player's
+				// waypoint.
+				return g.randomNonVaultWaypoint()
+			}
 		}
 		return g.RandomPassableWithin(p, 5)
 	}
-	return g.RandomPassableWithoutTrap()
+	return g.randomNonVaultWaypoint()
+}
+
+func (g *Game) randomNonVaultWaypoint() gruid.Point {
+	pp := g.PP()
+	p := g.RandomPassableWithoutTrap()
+	if paths.DistanceManhattan(pp, p) <= MaxFOVRange {
+		// Try again once if we got too close to the player.
+		p = g.RandomPassableWithoutTrap()
+	}
+	return p
 }
 
 // randMonsKind returns a random monster kind among the given ones.
@@ -1506,7 +1522,7 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 			}
 		}
 	}
-	if (g.IntN(5) == 0 || g.IntN(g.Map.Level) > 0) && g.IntN(3*MapLevels) == 0 && nE >= 2 && nM >= 2 {
+	if g.IntN(3*MapLevels) == 0 && nE >= 2 && nM >= 2 {
 		switch g.IntN(2) {
 		case 0:
 			p := g.RandomWaypoint()
@@ -1520,6 +1536,9 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 				mk = HungryRat
 			}
 			n := 5 + g.IntN(g.Map.Level/2)
+			if g.Map.Level == 1 {
+				n -= g.IntN(2) + g.IntN(2)
+			}
 			for range n {
 				g.genMonsterGuardian(mk, p)
 			}
@@ -1537,6 +1556,9 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 				mk = g.randMonsKind(monsMid)
 			}
 			n := 3 + g.IntN(1+g.Map.Level/4)
+			if g.Map.Level == 1 {
+				n -= g.IntN(2)
+			}
 			for range n {
 				g.genMonsterGuardian(mk, p)
 			}
