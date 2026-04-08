@@ -1249,10 +1249,10 @@ func (g *Game) genThemedMonsters(mg *MapGen, nE, nM, nL int) {
 // position if there is no such place. It doesn't reserve the place for
 // exclusive use.
 func (g *Game) RandomWaypoint() gruid.Point {
+	// TODO: try to avoid returning a point that's too close to the player.
 	if len(g.Map.Waypoints) > 0 {
 		p := g.Map.Waypoints[g.IntN(len(g.Map.Waypoints))]
 		if p == g.PP() {
-			//
 			return g.RandomPassableWithoutTrap()
 		}
 		return g.RandomPassableWithin(p, 5)
@@ -1808,7 +1808,7 @@ func (g *Game) genMonster(mk ActorKind) (ID, *Entity) {
 	return g.genMonsterAt(mk, q)
 }
 
-// genMonsterGardian spawns a gardian monster of the given kind around a
+// genMonsterGuardian spawns a guardian monster of the given kind around a
 // certain position.
 func (g *Game) genMonsterGuardian(mk ActorKind, at gruid.Point) (ID, *Actor) {
 	p := g.randomFreeNearby(at, 5)
