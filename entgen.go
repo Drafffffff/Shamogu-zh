@@ -1506,7 +1506,7 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 			}
 		}
 	}
-	if g.IntN(2*MapLevels) == 0 && nE >= 2 && nM >= 2 {
+	if (g.IntN(5) == 0 || g.IntN(g.Map.Level) > 0) && g.IntN(3*MapLevels) == 0 && nE >= 2 && nM >= 2 {
 		switch g.IntN(2) {
 		case 0:
 			p := g.RandomWaypoint()
@@ -1519,27 +1519,29 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 			default:
 				mk = HungryRat
 			}
-			for range 5 + g.IntN(4) {
+			n := 5 + g.IntN(g.Map.Level/2)
+			for range n {
 				g.genMonsterGuardian(mk, p)
 			}
-			nE -= 2
+			nE -= 1 + n/5
 			nM--
 		default:
 			p := g.RandomWaypoint()
 			var mk ActorKind
-			switch g.IntN(3) {
+			switch g.IntN(4) {
 			case 0:
 				mk = BlinkButterfly
-			case 1:
+			case 1, 2:
 				mk = ExplodingNadre
 			default:
 				mk = g.randMonsKind(monsMid)
 			}
-			for range 4 + g.IntN(2) {
+			n := 3 + g.IntN(1+g.Map.Level/4)
+			for range n {
 				g.genMonsterGuardian(mk, p)
 			}
 			nE--
-			nM -= 2
+			nM -= 1 + n/4
 		}
 	}
 	return max(0, nE), max(0, nM), max(0, nL)

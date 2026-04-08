@@ -1,3 +1,9 @@
+# v? ?
+
+* Corrupted dungeon: monster nests now scale with map level and happen less
+  often early on, to make (very) rare cases that could feel a bit too unfair
+  even rarer.
+
 # v1.5.0 2026-03-30
 
 This release features new and improved content, as well as various fixes.
