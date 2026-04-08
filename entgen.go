@@ -1253,7 +1253,7 @@ func (g *Game) RandomWaypoint() gruid.Point {
 		pp := g.PP()
 		p := g.Map.Waypoints[g.IntN(len(g.Map.Waypoints))]
 		if paths.DistanceManhattan(pp, p) <= MaxFOVRange {
-			// Try again once if we got to close to the player.
+			// Try again once if we got too close to the player.
 			p = g.Map.Waypoints[g.IntN(len(g.Map.Waypoints))]
 			if p == pp {
 				// Non-vault waypoint if we got the player's
