@@ -126,6 +126,7 @@ func (g *Game) TriggerTrap(i ID, ai *Actor) {
 	case i == PlayerID:
 		g.LogfStyled("You trigger the %s.", logSpecial, rt.Rune.String())
 		g.StoryLogf("Triggered %s", One(rt.Rune.String()))
+		TotemEvents(g, &EventHappened{EvType: EventPlayRune})
 		g.Stats.PlayerTriggers++
 		rt.KnownUsed = true
 	case g.InFOV(pi):
@@ -136,6 +137,7 @@ func (g *Game) TriggerTrap(i ID, ai *Actor) {
 		rt.KnownUsed = true
 	}
 	if i != PlayerID {
+		TotemEvents(g, &EventHappened{EvType: EventMonsRune})
 		g.Stats.MonsterTriggers++
 	}
 	g.Stats.MapTriggeredTraps[g.Map.Level-1]++

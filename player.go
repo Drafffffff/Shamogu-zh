@@ -283,4 +283,5 @@ func (g *Game) ComputePlayerStats() {
 		p.Traits |= sp.BonusTraits[sp.Level]
 	}
 	p.HP = min(p.HP, p.GetMaxHP())
+	g.UpdateEventFilter()
 }

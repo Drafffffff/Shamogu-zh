@@ -407,7 +407,7 @@ func (md *model) modSelectionMenu() {
 				Text:     ui.Text("Expansions").WithStyle(hstyle),
 				Disabled: true,
 			})
-		case 2:
+		case 3:
 			entries = append(entries, ui.MenuEntry{
 				Text:     ui.Text("Small Mods").WithStyle(hstyle),
 				Disabled: true,

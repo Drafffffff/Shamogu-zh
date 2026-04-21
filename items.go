@@ -53,6 +53,7 @@ type Spirit struct {
 	BonusHP      [2]int     // bonus hp per level (may be zero)
 	Uses         int        // number of times it was used (for statistics)
 	Advanced     bool       // advanced secondary spirit
+	Condition    *SpiritCond
 }
 
 func (sp *Spirit) Desc() string {
@@ -84,6 +85,11 @@ func (sp *Spirit) Desc() string {
 		sp.Ability[sp.Level].Name(), sp.Charges, sp.MaxCharges[sp.Level], sp.Ability[sp.Level].Desc())
 	sb.WriteByte('\n')
 	fmt.Fprintf(&sb, "@CTraits:@N %s.", TraitDesc(Player, sp.BonusTraits[sp.Level]))
+	if cond := sp.Condition; cond != nil {
+		sb.WriteByte('\n')
+		sb.WriteByte('\n')
+		sb.WriteString(cond.Desc())
+	}
 	return sb.String()
 }
 
@@ -122,6 +128,10 @@ func (sp *Spirit) UpgradeDesc() string {
 }
 
 func (sp *Spirit) Use(g *Game, i ID) bool {
+	if sp.Condition != nil && !sp.Condition.CanInvoke() {
+		g.Log("This spirit cannot yet be invoked!")
+		return false
+	}
 	if sp.Charges == 0 {
 		g.Log("No charges remaining.")
 		return false
@@ -143,6 +153,7 @@ func (sp *Spirit) Use(g *Game, i ID) bool {
 	}
 	sp.Charges--
 	sp.Uses++
+	TotemEvents(g, &EventHappened{EvType: EventInvoke})
 	g.Stats.SpiritUses++
 	g.Stats.MapSpiritUses[g.Map.Level-1]++
 	name := sp.Ability[sp.Level].Name()
@@ -192,6 +203,7 @@ func (c *Comestible) Use(g *Game, i ID) bool {
 	}
 	g.Stats.Comestibles[g.Entity(i).Name]++
 	g.Entities[i] = emptySlot()
+	TotemEvents(g, &EventHappened{EvType: EventComestible})
 	g.Stats.EatenComestibles++
 	g.Stats.MapEatenComestibles[g.Map.Level-1]++
 	g.handleGluttonyOnEating()
@@ -256,6 +268,7 @@ func (g *Game) EquipItemAt(i ID) bool {
 		ej.P = InvalidPos
 		et := g.Entity(g.genEmptyTotemAt(g.PP()))
 		et.Seen = true
+		TotemEvents(g, &EventHappened{EvType: EventTotem})
 		g.totemPickupBerserk()
 		return true
 	case *Comestible:
@@ -269,6 +282,7 @@ func (g *Game) EquipItemAt(i ID) bool {
 		}
 		ej.P = InvalidPos
 		g.Entities[i], g.Entities[j] = g.Entities[j], g.Entities[i]
+		TotemEvents(g, &EventHappened{EvType: EventPickup})
 		return true
 	default:
 		panic("unexpected item type")
@@ -317,6 +331,7 @@ func (m *Menhir) Use(g *Game, i ID) bool {
 	}
 	g.StoryLogf("Activated %s", One(g.Entity(i).Name))
 	m.Used = true
+	TotemEvents(g, &EventHappened{EvType: EventMenhir})
 	g.Stats.ActivatedMenhirs++
 	g.Stats.MapActivatedMenhirs[g.Map.Level-1]++
 	return true
@@ -351,6 +366,7 @@ func (p *Portal) Use(g *Game, i ID) bool {
 	g.StoryLog("Entered a magical portal!")
 	g.LogStyled("You enter the portal.", logSpecial)
 	g.NextLevel()
+	TotemEvents(g, &EventHappened{EvType: EventNewLevel})
 	return false
 }
 
@@ -362,6 +378,7 @@ func (g *Game) useFakePortal() {
 	g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, maxdist)
 	g.MakeNoise(g.PP(), NoiseFakePortal)
 	g.LogStyled("An eerie sound came out, but nothing happened!", logSpecial)
+	TotemEvents(g, &EventHappened{EvType: EventFakePortal})
 	for i, ai := range g.Monsters() {
 		ei := g.Entity(i)
 		if g.PR.BreadthFirstMapAt(ei.P) <= maxdist {

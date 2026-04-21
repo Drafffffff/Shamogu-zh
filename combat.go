@@ -230,6 +230,7 @@ func (g *Game) logBumpDamage(i, j ID, _, aj *Actor, dmg int, ap AttackKind) {
 func (g *Game) monsterDeath(i, j ID, aj *Actor) {
 	ej := g.Entity(j)
 	g.Stats.Death(ej.Name)
+	TotemEvents(g, &EventHappened{EvType: EventMonsDeath})
 	g.md.DeathAnimation(ej.P)
 	if g.InFOV(ej.P) {
 		// Mark as known dead here, because due to clouds the player
@@ -899,8 +900,7 @@ func (g *Game) digAt(at gruid.Point) bool {
 	if Passable(t) {
 		return false
 	}
-	g.Stats.Digs++
-	g.Map.Terrain.Set(at, Rubble)
+	g.BreakWall(at)
 	if t == TranslucentWall {
 		g.PoisonCloudAt(at)
 	}

@@ -51,6 +51,11 @@ func init() {
 	gob.Register(EffectPoisonMenhir{})
 	gob.Register(EffectFireMenhir{})
 
+	// Spirit Conditions.
+	gob.Register(EffectCantInvoke{})
+	gob.Register(EffectPunish{})
+	gob.Register(WatchEvent{})
+
 	// Actions in key-config.
 	gob.Register(ActionAutoExplore{})
 	gob.Register(ActionBump{})

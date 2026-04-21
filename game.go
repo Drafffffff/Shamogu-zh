@@ -45,6 +45,7 @@ type Game struct {
 	Turn           int            // current game's turn
 	StatusTurn     [NStatuses]int // last turn with specific status
 	CorruptionTurn int            // next corruption event (corrupted dungeon mod)
+	EventFilter    EventType      // events spirits are watching (condition mod)
 
 	Logs     *Logs     // game log
 	Mods     []bool    // active game mods

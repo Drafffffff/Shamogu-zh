@@ -996,8 +996,7 @@ func (g *Game) stompDigAt(at gruid.Point) {
 	if Passable(t) {
 		return
 	}
-	g.Stats.Digs++
-	g.Map.Terrain.Set(at, Rubble)
+	g.BreakWall(at)
 	if t == TranslucentWall {
 		g.PoisonCloudAt(at)
 	}
@@ -1176,11 +1175,16 @@ func (m *Map) interiorWallAt(p gruid.Point) bool {
 	return true
 }
 
+func (g *Game) BreakWall(at gruid.Point) {
+	g.Stats.Digs++
+	TotemEvents(g, &EventHappened{EvType: EventWallBreak})
+	g.Map.Terrain.Set(at, Rubble)
+}
+
 // earthMenhirDig is similar to dig but without the noise and extra behaviors
 // (because we want a single noise source at the "earthquake" centre).
 func (g *Game) earthMenhirDig(at gruid.Point) {
-	g.Stats.Digs++
-	g.Map.Terrain.Set(at, Rubble)
+	g.BreakWall(at)
 	for q := range Neighbors(at) {
 		switch g.Map.Terrain.At(q) {
 		case Floor, Foliage:

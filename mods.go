@@ -9,6 +9,7 @@ type Mod int
 const (
 	ModCorruptedDungeon Mod = iota // mod with lots of unusual and random stuff going on
 	ModAdvancedSpirits             // dedicated slot for challenge secondary spirits
+	ModTotemConditions             // totems come with Curse/Until conditions
 	ModGluttonyRework              // mod with choice-of-two gluttony rework
 
 	ModSmallInventory // mod limiting inventory to 3 comestible slots
@@ -23,7 +24,7 @@ const NMods = int(modCount)
 
 var gameMods = []Mod{
 	// expansion mods
-	ModCorruptedDungeon, ModAdvancedSpirits,
+	ModCorruptedDungeon, ModAdvancedSpirits, ModTotemConditions,
 	ModGluttonyRework,
 	// challenge mods
 	ModSmallInventory,
@@ -31,7 +32,7 @@ var gameMods = []Mod{
 }
 
 // Number of expansion mods (for header positioning purposes in menu).
-const NExpansions = 3
+const NExpansions = 4
 
 func (m Mod) String() string {
 	switch m {
@@ -39,6 +40,8 @@ func (m Mod) String() string {
 		return "Corrupted Dungeon"
 	case ModAdvancedSpirits:
 		return "Advanced Spirits"
+	case ModTotemConditions:
+		return "Totem Conditions"
 	case ModGluttonyRework:
 		return "Gluttony Rework"
 	case ModSmallInventory:
@@ -58,6 +61,8 @@ func (m Mod) Desc() string {
 		return "The orb’s influence has scattered twisted surprises through the dungeon. Some might even be good!\n\nRecommended for experienced players that want more unpredictability and variability."
 	case ModAdvancedSpirits:
 		return "Enable extra advanced secondary spirits: Dazzling Zebra, Gardening Lion, Gawalt Monkey, Gluttonous Bear, Runic Chicken, Staring Owl, Stomping Elephant.\n\nAdvanced secondaries always have strong points but also serious and quirky drawbacks.\n\nBeware that regular spirits are rarer early on than advanced ones!"
+	case ModTotemConditions:
+		return "Read the fine print: each spirit will curse you to play by its rules or lose its benefits."
 	case ModGluttonyRework:
 		return "Makes the Gluttonous Bear eat in pairs through a choice-of-two menu, without relying on a Gluttony status.\n\nThe Advanced Spirits mod should be enabled too for this mod to take effect.\n\nRecommended for players that don’t like the default Bear with a Gluttony status."
 	case ModSmallInventory:

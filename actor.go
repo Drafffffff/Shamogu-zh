@@ -98,6 +98,7 @@ func (g *Game) AdjustHPWithMin(i ID, ai *Actor, amount int, m int) {
 	if i == PlayerID {
 		if ai.HP > hp {
 			g.Logf("You feel better (+%d HP).", ai.HP-hp)
+			TotemEvents(g, &EventHappened{EvType: EventHPGain})
 		} else if ai.HP < hp {
 			g.Logf("You feel weaker (-%d HP).", hp-ai.HP)
 		} else if amount >= 0 {
@@ -1115,6 +1116,9 @@ func (g *Game) TeleportActor(i ID, ai *Actor, n int) bool {
 	}
 	g.MoveActor(i, ai, to, MovTeleport)
 	g.teleportStatuses(i, ai, n)
+	if i == PlayerID {
+		TotemEvents(g, &EventHappened{EvType: EventTeleport})
+	}
 	return true
 }
 
