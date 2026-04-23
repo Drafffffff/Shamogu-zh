@@ -55,6 +55,8 @@ func init() {
 	gob.Register(EffectCantInvoke{})
 	gob.Register(EffectPunish{})
 	gob.Register(WatchEvent{})
+	gob.Register(WatchDeath{})
+	gob.Register(WatchPlayerStatus{})
 
 	// Actions in key-config.
 	gob.Register(ActionAutoExplore{})

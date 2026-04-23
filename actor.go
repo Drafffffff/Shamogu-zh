@@ -675,6 +675,7 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 		}
 		g.LogfStyled("You’re %s (%s).", style, st, fmtTurns(turns, n))
 		g.md.StopAuto()
+		TotemEvents(g, &EventWithStatus{EvType: EventBeginStatus, EvEntity: g.Entity(i), EvStatus: st})
 	} else if ei := g.Entity(i); g.InFOV(ei.P) {
 		g.Logf("The %s is %s (%s).", ei.Name, st, fmtTurns(turns, n))
 	}

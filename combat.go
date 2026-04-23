@@ -230,7 +230,7 @@ func (g *Game) logBumpDamage(i, j ID, _, aj *Actor, dmg int, ap AttackKind) {
 func (g *Game) monsterDeath(i, j ID, aj *Actor) {
 	ej := g.Entity(j)
 	g.Stats.Death(ej.Name)
-	TotemEvents(g, &EventHappened{EvType: EventMonsDeath})
+	TotemEvents(g, &EventWithEntity{EvType: EventMonsDeath, EvEntity: ej})
 	g.md.DeathAnimation(ej.P)
 	if g.InFOV(ej.P) {
 		// Mark as known dead here, because due to clouds the player

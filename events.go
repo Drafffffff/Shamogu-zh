@@ -44,6 +44,7 @@ const (
 	EventInvoke                       // invoked a spirit
 	EventHPGain                       // player gained HP
 	EventTeleport                     // player teleported
+	EventBeginStatus                  // player status started
 
 	EventMonsDeath                    // monster died
 
@@ -81,6 +82,61 @@ func (w *WatchEvent) EventTypes() EventType {
 
 func (w *WatchEvent) CheckEvent(e Event) bool {
 	return e.Type().Any(w.Type)
+}
+
+// EventWithEntity carries the entity relevant to the event
+type EventWithEntity struct {
+	EvType   EventType
+	EvEntity *Entity
+}
+
+func (ev *EventWithEntity) Type() EventType {
+	return ev.EvType
+}
+
+type WatchDeath struct {
+	MonsName string
+}
+
+func (w *WatchDeath) Desc() string {
+	return fmt.Sprintf("A %s dies", w.MonsName)
+}
+
+func (w *WatchDeath) EventTypes() EventType {
+	return EventMonsDeath
+}
+
+func (w *WatchDeath) CheckEvent(e Event) bool {
+	d, ok := e.(*EventWithEntity)
+	return ok && d.EvType == EventMonsDeath && d.EvEntity.Name == w.MonsName
+}
+
+// EventWithStatus marks status changes with the entity and status
+type EventWithStatus struct {
+	EvType   EventType
+	EvEntity *Entity
+	EvStatus Status
+}
+
+func (ev *EventWithStatus) Type() EventType {
+	return ev.EvType
+}
+
+type WatchPlayerStatus struct {
+	EvStatus Status
+}
+
+func (w *WatchPlayerStatus) Desc() string {
+	return fmt.Sprintf("you become %s", w.EvStatus)
+}
+
+func (w *WatchPlayerStatus) EventTypes() EventType {
+	return EventBeginStatus
+}
+
+func (w *WatchPlayerStatus) CheckEvent(e Event) bool {
+	d, ok := e.(*EventWithStatus)
+	return ok && d.EvType == EventBeginStatus && d.EvStatus == w.EvStatus
 }
 
 var eventWatchers = []WatchEvent{
@@ -234,21 +290,45 @@ func (c *EffectPunish) ApplyEvent(sp *Spirit, e Event) Consequence {
 	return CqNone
 }
 
+// OnStatus consequence when the player gets a particular status
+func OnStatus(cq Consequence, st Status) CondEffect {
+	w := &WatchPlayerStatus{EvStatus: st}
+	return &EffectPunish{When: w, Do: cq}
+}
+
+// UntilDeath condition that ends when a particular monster type dies
+func UntilDeath(mons string, ef CondEffect) *SpiritCond {
+	u := &WatchDeath{MonsName: mons}
+	return &SpiritCond{Effect: ef, Until: u}
+}
+
 // GenCondition generates a random condition to attach to a spirit
 func (g *Game) GenCondition() *SpiritCond {
 	var e CondEffect
 	nu := len(untilEvents)
 	u := g.rand.IntN(nu)
-	switch g.IntN(3) {
+	switch g.IntN(8) {
 	case 0:
 		e = &EffectCantInvoke{}
-	default:
+	case 1, 2:
 		nc := nCq - int(CqLeave)
 		c := g.rand.IntN(nc)
 		w := c + u + g.rand.IntN(len(eventWatchers) - nu - nc)
 		e = &EffectPunish {
 			When: &eventWatchers[w],
 			Do:   CqLeave+Consequence(c),
+		}
+	default:
+		switch g.IntN(9) {
+		case 0: return UntilDeath("walking tree",    OnStatus(CqLeave, StatusLignification))
+		case 1: return UntilDeath("barking hound",   OnStatus(CqLeave, StatusBerserk))
+		case 2: return UntilDeath("fire llama",      OnStatus(CqLeave, StatusFoggySkin))
+		case 3: return UntilDeath("burning phoenix", OnStatus(CqDischarge, StatusFire)) // or on HP loss from burning?
+		case 4: return UntilDeath("temporal cat",    OnStatus(CqDischargeAll, StatusDaze))
+		case 5: return UntilDeath("lashing frog",    OnStatus(CqDischargeAll, StatusImbalance))
+		case 6: return UntilDeath("barking hound",   OnStatus(CqDischargeAll, StatusFear))
+		case 7: return UntilDeath("mad octopode",    OnStatus(CqDischargeAll, StatusPoison)) // totem wasp?
+		case 8: return UntilDeath("warping wraith", &EffectPunish{When: &WatchEvent{Type: EventTeleport, EvDesc:"you teleport"}, Do: CqLeave})
 		}
 	}
 	return &SpiritCond{ Effect: e, Until: &untilEvents[u] }
