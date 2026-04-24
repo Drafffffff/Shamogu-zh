@@ -45,6 +45,7 @@ const (
 	EventHPGain                       // player gained HP
 	EventTeleport                     // player teleported
 	EventBeginStatus                  // player status started
+	EventDamage                       // player takes staus-based damage
 
 	EventMonsDeath                    // monster died
 
@@ -94,12 +95,41 @@ func (ev *EventWithEntity) Type() EventType {
 	return ev.EvType
 }
 
-type WatchDeath struct {
+// EntityMatcher filters entities
+type EntityMatcher interface {
+	Match(*Entity) bool
+	Desc() string
+}
+
+type MatchEither struct {
+	A EntityMatcher
+	B EntityMatcher
+}
+
+func (m *MatchEither) Desc() string {
+	return fmt.Sprintf("%s or %s", m.A.Desc(), m.B.Desc())
+}
+
+func (m *MatchEither) Match(e *Entity) bool {
+	return m.A.Match(e) || m.B.Match(e)
+}
+
+type MonsterByName struct {
 	MonsName string
 }
 
+func (m *MonsterByName) Desc() string { return m.MonsName }
+
+func (m *MonsterByName) Match(e *Entity) bool {
+	return e.Name == m.MonsName
+}
+
+type WatchDeath struct {
+	Mons EntityMatcher
+}
+
 func (w *WatchDeath) Desc() string {
-	return fmt.Sprintf("A %s dies", w.MonsName)
+	return fmt.Sprintf("A %s dies", w.Mons.Desc())
 }
 
 func (w *WatchDeath) EventTypes() EventType {
@@ -108,7 +138,7 @@ func (w *WatchDeath) EventTypes() EventType {
 
 func (w *WatchDeath) CheckEvent(e Event) bool {
 	d, ok := e.(*EventWithEntity)
-	return ok && d.EvType == EventMonsDeath && d.EvEntity.Name == w.MonsName
+	return ok && d.EvType == EventMonsDeath && w.Mons.Match(d.EvEntity)
 }
 
 // EventWithStatus marks status changes with the entity and status
@@ -137,6 +167,23 @@ func (w *WatchPlayerStatus) EventTypes() EventType {
 func (w *WatchPlayerStatus) CheckEvent(e Event) bool {
 	d, ok := e.(*EventWithStatus)
 	return ok && d.EvType == EventBeginStatus && d.EvStatus == w.EvStatus
+}
+
+type WatchPlayerDamage struct {
+	EvStatus Status
+}
+
+func (w *WatchPlayerDamage) Desc() string {
+	return fmt.Sprintf("you are hurt by %s", w.EvStatus.Name())
+}
+
+func (w *WatchPlayerDamage) EventTypes() EventType {
+	return EventDamage
+}
+
+func (w *WatchPlayerDamage) CheckEvent(e Event) bool {
+	d, ok := e.(*EventWithStatus)
+	return ok && d.EvType == EventDamage && d.EvStatus == w.EvStatus
 }
 
 var eventWatchers = []WatchEvent{
@@ -296,9 +343,15 @@ func OnStatus(cq Consequence, st Status) CondEffect {
 	return &EffectPunish{When: w, Do: cq}
 }
 
+// OnDamage consequence when the player takes damage from a status
+func OnDamage(cq Consequence, st Status) CondEffect {
+	w := &WatchPlayerDamage{EvStatus: st}
+	return &EffectPunish{When: w, Do: cq}
+}
+
 // UntilDeath condition that ends when a particular monster type dies
 func UntilDeath(mons string, ef CondEffect) *SpiritCond {
-	u := &WatchDeath{MonsName: mons}
+	u := &WatchDeath{Mons: &MonsterByName{MonsName: mons}}
 	return &SpiritCond{Effect: ef, Until: u}
 }
 
@@ -323,11 +376,15 @@ func (g *Game) GenCondition() *SpiritCond {
 		case 0: return UntilDeath("walking tree",    OnStatus(CqLeave, StatusLignification))
 		case 1: return UntilDeath("barking hound",   OnStatus(CqLeave, StatusBerserk))
 		case 2: return UntilDeath("fire llama",      OnStatus(CqLeave, StatusFoggySkin))
-		case 3: return UntilDeath("burning phoenix", OnStatus(CqDischarge, StatusFire)) // or on HP loss from burning?
-		case 4: return UntilDeath("temporal cat",    OnStatus(CqDischargeAll, StatusDaze))
-		case 5: return UntilDeath("lashing frog",    OnStatus(CqDischargeAll, StatusImbalance))
-		case 6: return UntilDeath("barking hound",   OnStatus(CqDischargeAll, StatusFear))
-		case 7: return UntilDeath("mad octopode",    OnStatus(CqDischargeAll, StatusPoison)) // totem wasp?
+		case 3: return UntilDeath("temporal cat",    OnStatus(CqDischargeAll, StatusDaze))
+		case 4: return UntilDeath("lashing frog",    OnStatus(CqDischargeAll, StatusImbalance))
+		case 5: return UntilDeath("barking hound",   OnStatus(CqDischargeAll, StatusFear))
+		case 6: return UntilDeath("burning phoenix", OnDamage(CqDischarge, StatusFire))
+		case 7: c := OnDamage(CqDischarge, StatusPoison)
+			o := &MonsterByName{MonsName: "mad octopode"}
+			w := &MonsterByName{MonsName: "totem wasp"}
+			u := &WatchDeath{Mons: &MatchEither{A: o, B: w}}
+			return &SpiritCond{Effect: c, Until: u}
 		case 8: return UntilDeath("warping wraith", &EffectPunish{When: &WatchEvent{Type: EventTeleport, EvDesc:"you teleport"}, Do: CqLeave})
 		}
 	}

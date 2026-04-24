@@ -132,6 +132,7 @@ func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKi
 		if j == PlayerID {
 			g.LogfStyled("The fire burns you (%d dmg).", logHurtPlayer, FireDamage)
 			g.StoryLogf("Burnt by fire (HP: %d/%d)", aj.HP, aj.GetMaxHP())
+			TotemEvents(g, &EventWithStatus{EvType: EventDamage, EvStatus: StatusFire, EvEntity: ej})
 			break
 		}
 		if aj.IsDead() {
@@ -141,6 +142,7 @@ func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKi
 		if j == PlayerID {
 			g.LogfStyled("Catching fire burns you (%d dmg).", logHurtPlayer, FireDamage)
 			g.StoryLogf("Caught fire (HP: %d/%d)", aj.HP, aj.GetMaxHP())
+			TotemEvents(g, &EventWithStatus{EvType: EventDamage, EvStatus: StatusFire, EvEntity: ej})
 			break
 		}
 		if aj.IsDead() {
@@ -150,6 +152,7 @@ func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKi
 		if j == PlayerID {
 			g.LogfStyled("Moving while poisoned hurts you (%d dmg).", logHurtPlayer, dmg)
 			g.StoryLogf("Moved while poisoned (HP: %d/%d)", aj.HP, aj.GetMaxHP())
+			TotemEvents(g, &EventWithStatus{EvType: EventDamage, EvStatus: StatusPoison, EvEntity: ej})
 			break
 		}
 		if aj.IsDead() {

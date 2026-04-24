@@ -54,9 +54,12 @@ func init() {
 	// Spirit Conditions.
 	gob.Register(EffectCantInvoke{})
 	gob.Register(EffectPunish{})
+	gob.Register(MatchEither{})
+	gob.Register(MonsterByName{})
 	gob.Register(WatchEvent{})
 	gob.Register(WatchDeath{})
 	gob.Register(WatchPlayerStatus{})
+	gob.Register(WatchPlayerDamage{})
 
 	// Actions in key-config.
 	gob.Register(ActionAutoExplore{})
