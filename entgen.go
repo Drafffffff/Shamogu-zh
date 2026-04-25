@@ -524,7 +524,7 @@ func (g *Game) genItems(mg *MapGen) {
 		n := 0
 		comestibleIdx = func() comestibleKind {
 			n++
-			if n <= 1 {
+			if n <= 1 && g.IntN(4) > 0 {
 				// A single ambrosia berries on berserk levels,
 				// for recovering health when at 1 HP.
 				return AmbrosiaBerries
@@ -537,7 +537,7 @@ func (g *Game) genItems(mg *MapGen) {
 		n := 0
 		comestibleIdx = func() comestibleKind {
 			n++
-			if n <= 1 {
+			if n <= 1 && g.IntN(4) > 0 {
 				// A single foggy-skin onion on lignification
 				// levels to recover movement early.
 				return FoggySkinOnion
@@ -548,7 +548,7 @@ func (g *Game) genItems(mg *MapGen) {
 		n := 0
 		comestibleIdx = func() comestibleKind {
 			n++
-			if n <= 1 {
+			if n <= 1 && g.IntN(4) > 0 {
 				// A single clarity leaves on warp levels to
 				// cure daze once after teleport.
 				return ClarityLeaves
