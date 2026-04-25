@@ -25,7 +25,7 @@ func (g *Game) CheckEvent(ev EventType) bool {
 func (g *Game) UpdateEventFilter() {
 	g.EventFilter = 0
 	for _, e := range g.Entities[:NSpirits] {
-		if sp, ok := e.Role.(*Spirit); ok && sp.Condition != nil {
+		if sp, ok := e.Role.(*Spirit); ok {
 			g.EventFilter |= sp.Condition.EventTypes()
 		}
 	}
@@ -259,13 +259,16 @@ type SpiritCond struct {
 	Until   EventWatcher
 }
 type CondEffect interface {
-	EventTypes()  EventType
-	ApplyEvent(*Spirit, Event) Consequence
-	CanInvoke()   bool
-	Desc()  string
+	EventTypes()                EventType
+	ApplyEvent(*Spirit, Event)  Consequence
+	Enabled()                   SpiritPart
+	Desc()                      string
 }
 
 func (c *SpiritCond) EventTypes() EventType {
+	if c == nil {
+		return EventType(0)
+	}
 	return c.Effect.EventTypes() | c.Until.EventTypes()
 }
 func (c *SpiritCond) Desc() string {
@@ -275,16 +278,41 @@ func (c *SpiritCond) Desc() string {
 	fmt.Fprintf(&sb, "@YUntil:@N %s.", c.Until.Desc())
 	return sb.String()
 }
+func (c *SpiritCond) Enabled() SpiritPart {
+	if c == nil {
+		return HasAll
+	}
+	return c.Effect.Enabled()
+}
 func (c *SpiritCond) CanInvoke() bool {
-	return c.Effect.CanInvoke()
+	return c.Enabled().Any(HasInvoke)
 }
 func (c *SpiritCond) ApplyEvent(sp *Spirit, e Event) Consequence {
+	if c == nil {
+		return CqNone
+	}
 	if c.Until.CheckEvent(e) {
 		return CqEndCondition
 	}
 	return c.Effect.ApplyEvent(sp, e)
 }
 
+// SpiritPart allows independently disabling part of a spirit
+type SpiritPart int
+
+func (t SpiritPart) Any(of SpiritPart) bool {
+	return t&of != 0
+}
+
+const (
+	HasInvoke SpiritPart = 1 << iota
+	HasStats
+	HasTraits
+	HasPassives = HasStats | HasTraits
+	HasAll = HasInvoke | HasPassives
+)
+
+// Consequence represents a result of a condition being met
 type Consequence int
 
 const (
@@ -316,12 +344,12 @@ func TotemEvents(g *Game, ev Event) {
 		return
 	}
 	for i, e := range g.Entities[:NSpirits] {
-		if sp, ok := e.Role.(*Spirit); ok && sp.Condition != nil {
+		if sp, ok := e.Role.(*Spirit); ok {
 			switch sp.Condition.ApplyEvent(sp, ev) {
 			case CqEndCondition:
 				g.Logf("Your %s spirit has been fulfilled!", e.Name)
 				sp.Condition = nil
-				g.UpdateEventFilter()
+				g.ComputePlayerStats()
 			case CqLeave:
 				g.Logf("The %s spirit has left you!", e.Name)
 				g.StoryLogf("Lost the %s spirit", e.Name)
@@ -339,44 +367,59 @@ func TotemEvents(g *Game, ev Event) {
 	}
 }
 
-// EffectCantInvoke prevents invoking the spirit while the condition is active
-type EffectCantInvoke struct {}
+// CondDisabled prevents invoking the spirit while the condition is active
+type CondDisabled struct {
+	Part SpiritPart
+}
 
-func (cond *EffectCantInvoke) EventTypes() EventType {
+func (cond *CondDisabled) EventTypes() EventType {
 	return EventType(0)
 }
 
-func (cond *EffectCantInvoke) Desc() string {
-	return "This spirit cannot be invoked"
+func (cond *CondDisabled) Desc() string {
+	switch cond.Part {
+	case HasInvoke:
+		return "This spirit cannot be invoked"
+	case HasStats:
+		return "This spirit doesn't affect your Attack, Defense, or max HP"
+	case HasTraits:
+		return "This spirit's special traits don't apply"
+	case HasAll:
+		return "This spirit has no effect"
+	case HasPassives:
+		return "This spirit can be invoked but has no other effects"
+	default:
+		panic("unexpected disabled spirit part combination")
+	}
 }
 
-func (cond *EffectCantInvoke) CanInvoke() bool {
-	return false
+func (cond *CondDisabled) Enabled() SpiritPart {
+	return HasAll & ^cond.Part
 }
 
-func (cond *EffectCantInvoke) ApplyEvent(sp *Spirit, e Event) Consequence {
+func (cond *CondDisabled) ApplyEvent(sp *Spirit, e Event) Consequence {
 	return CqNone
 }
 
-// EffectPunish applies a consequence whenever an event triggers
-type EffectPunish struct {
+// CondPunish applies a consequence whenever an event triggers
+type CondPunish struct {
 	When EventWatcher
 	Do   Consequence
 }
 
-func (c *EffectPunish) EventTypes() EventType {
+func (c *CondPunish) EventTypes() EventType {
 	return c.When.EventTypes()
 }
 
-func (c *EffectPunish) Desc() string {
+func (c *CondPunish) Desc() string {
 	return fmt.Sprintf("This spirit %s if %s", descCq(c.Do), c.When.Desc())
 }
 
-func (c *EffectPunish) CanInvoke() bool {
-	return true
+func (c *CondPunish) Enabled() SpiritPart {
+	return HasAll
 }
 
-func (c *EffectPunish) ApplyEvent(sp *Spirit, e Event) Consequence {
+func (c *CondPunish) ApplyEvent(sp *Spirit, e Event) Consequence {
 	if c.When.CheckEvent(e) {
 		return c.Do
 	}
@@ -386,27 +429,27 @@ func (c *EffectPunish) ApplyEvent(sp *Spirit, e Event) Consequence {
 // OnEvent consequence based on event type
 func OnEvent(cq Consequence, ty EventType) CondEffect {
 	w := &WatchEvent{Type: ty}
-	return &EffectPunish{When: w, Do: cq}
+	return &CondPunish{When: w, Do: cq}
 }
 
 // OnStatus consequence when the player gets a particular status
 func OnStatus(cq Consequence, st Status) CondEffect {
 	w := &WatchPlayerStatus{EvStatus: st}
-	return &EffectPunish{When: w, Do: cq}
+	return &CondPunish{When: w, Do: cq}
 }
 
 // OnDamage consequence when the player takes damage from a status
 func OnDamage(cq Consequence, st Status) CondEffect {
 	w := &WatchPlayerDamage{EvStatus: st}
-	return &EffectPunish{When: w, Do: cq}
+	return &CondPunish{When: w, Do: cq}
 }
 
 func Cond(ef CondEffect, u EventWatcher) *SpiritCond {
 	return &SpiritCond{Effect: ef, Until: u}
 }
 
-func NoInv(u EventWatcher) *SpiritCond {
-	return Cond(&EffectCantInvoke{}, u)
+func Dis(p SpiritPart, u EventWatcher) *SpiritCond {
+	return Cond(&CondDisabled{Part: p}, u)
 }
 
 func Dies(mons ...string) EventWatcher {
@@ -434,18 +477,18 @@ func (g *Game) GenCondition() *SpiritCond {
 	case 11: return Cond(OnDamage(CqDischarge, StatusPoison),       Dies("mad octopode", "totem wasp"))
 	case 12: return Cond(OnDamage(CqDischarge, StatusPoison),       Gets(StatusLignification, "venomous viper"))
 	case 13: return Cond(OnStatus(CqDischarge, StatusConfusion),    Gets(StatusFear, "confusing eye"))
-	case 14: return NoInv(Gets(StatusLignification, "thunder porcupine"))
-	case 15: return NoInv(Gets(StatusImbalance, "lashing frog", "rampaging boar"))
-	case 16: return NoInv(Gets(StatusFire,    "fire llama", "exploding nadre"))
-	case 17: return NoInv(Gets(StatusBerserk, "berserking spider", "blinking butterfly"))
-	case 18: return NoInv(Gets(StatusBerserk, "noisy imp", "crazy druid", "walking mushroom"))
+	case 14: return Dis(HasInvoke,   Gets(StatusLignification, "thunder porcupine", "berserking spider"))
+	case 15: return Dis(HasStats,    Gets(StatusImbalance, "lashing frog", "rampaging boar"))
+	case 16: return Dis(HasInvoke,   Gets(StatusFire,    "fire llama", "exploding nadre"))
+	case 17: return Dis(HasPassives, Gets(StatusBerserk, "berserking spider", "blinking butterfly"))
+	case 18: return Dis(HasInvoke,   Gets(StatusBerserk, "noisy imp", "crazy druid", "walking mushroom"))
 	default:
 		nu := len(untilTypes)
 		u := g.rand.IntN(nu)
 		nc := nCq - int(CqLeave)
 		c := g.rand.IntN(nc)
 		w := c + u + g.rand.IntN(len(watchTypes) - nu - nc)
-		e := &EffectPunish {
+		e := &CondPunish {
 			When: &WatchEvent{Type: watchTypes[w]},
 			Do:   CqLeave+Consequence(c),
 		}

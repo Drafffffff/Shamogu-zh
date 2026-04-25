@@ -52,8 +52,8 @@ func init() {
 	gob.Register(EffectFireMenhir{})
 
 	// Spirit Conditions.
-	gob.Register(EffectCantInvoke{})
-	gob.Register(EffectPunish{})
+	gob.Register(CondDisabled{})
+	gob.Register(CondPunish{})
 	gob.Register(MatchEither{})
 	gob.Register(MonsterByName{})
 	gob.Register(WatchEvent{})

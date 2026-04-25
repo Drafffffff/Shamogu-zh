@@ -128,7 +128,7 @@ func (sp *Spirit) UpgradeDesc() string {
 }
 
 func (sp *Spirit) Use(g *Game, i ID) bool {
-	if sp.Condition != nil && !sp.Condition.CanInvoke() {
+	if !sp.Condition.CanInvoke() {
 		g.Log("This spirit cannot yet be invoked!")
 		return false
 	}
