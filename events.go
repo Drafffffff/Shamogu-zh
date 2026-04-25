@@ -44,9 +44,9 @@ const (
 	EventInvoke                       // invoked a spirit
 	EventHPGain                       // player gained HP
 	EventTeleport                     // player teleported
-	EventBeginStatus                  // player status started
 	EventDamage                       // player takes staus-based damage
 
+	EventBeginStatus                  // actor status started
 	EventMonsDeath                    // monster died
 
 	EventWallBreak                    // wall broken
@@ -70,11 +70,26 @@ func (ev *EventHappened) Type() EventType {
 
 type WatchEvent struct {
 	Type  EventType
-	EvDesc  string
 }
 
 func (w *WatchEvent) Desc() string {
-	return w.EvDesc
+	switch w.Type {
+	case EventMenhir:      return "you activate a Menhir"
+	case EventTotem:       return "you use a totem"
+	case EventFakePortal:  return "a portal you use malfunctions"
+	case EventNewLevel:    return "you reach the next level"
+	case EventPlayRune:    return "you trigger a rune"
+	case EventMonsRune:    return "a monster triggers a rune"
+	case EventPickup:      return "you pick up a comestible"
+	case EventComestible:  return "you eat a comestible"
+	case EventInvoke:      return "you invoke a spirit"
+	case EventHPGain:      return "you gain HP"
+	case EventTeleport:    return "you teleport"
+	case EventDamage:      return "you are hurt by fire or poison"
+	case EventMonsDeath:   return "a monster dies"
+	case EventWallBreak:   return "a wall breaks"
+	default: return "(unknown)" // includes some generic events that shouldn't be used
+	}
 }
 
 func (w *WatchEvent) EventTypes() EventType {
@@ -124,6 +139,16 @@ func (m *MonsterByName) Match(e *Entity) bool {
 	return e.Name == m.MonsName
 }
 
+// AnyMonster makes a matcher for any of the given names
+func AnyMonster(mons ...string) EntityMatcher {
+	var ms EntityMatcher = &MonsterByName{MonsName: mons[0]}
+	for _, m := range mons[1:] {
+		ms = &MatchEither{A: ms, B: &MonsterByName{MonsName: m}}
+	}
+	return ms
+}
+
+// WatchDeath triggers when a matched monster dies
 type WatchDeath struct {
 	Mons EntityMatcher
 }
@@ -141,6 +166,25 @@ func (w *WatchDeath) CheckEvent(e Event) bool {
 	return ok && d.EvType == EventMonsDeath && w.Mons.Match(d.EvEntity)
 }
 
+// WatchMonsStatus triggers when a monster begins a specific status
+type WatchMonsStatus struct {
+	EvStatus Status
+	Mons     EntityMatcher
+}
+
+func (w *WatchMonsStatus) Desc() string {
+	return fmt.Sprintf("A %s becomes %s", w.Mons.Desc(), w.EvStatus)
+}
+
+func (w *WatchMonsStatus) EventTypes() EventType {
+	return EventBeginStatus
+}
+
+func (w *WatchMonsStatus) CheckEvent(e Event) bool {
+	d, ok := e.(*EventWithStatus)
+	return ok && d.EvType == EventBeginStatus && d.EvStatus == w.EvStatus && w.Mons.Match(d.EvEntity)
+}
+
 // EventWithStatus marks status changes with the entity and status
 type EventWithStatus struct {
 	EvType   EventType
@@ -152,6 +196,7 @@ func (ev *EventWithStatus) Type() EventType {
 	return ev.EvType
 }
 
+// WatchPlayerStatus triggers when the player begins a specific status
 type WatchPlayerStatus struct {
 	EvStatus Status
 }
@@ -166,9 +211,10 @@ func (w *WatchPlayerStatus) EventTypes() EventType {
 
 func (w *WatchPlayerStatus) CheckEvent(e Event) bool {
 	d, ok := e.(*EventWithStatus)
-	return ok && d.EvType == EventBeginStatus && d.EvStatus == w.EvStatus
+	return ok && d.EvType == EventBeginStatus && d.EvStatus == w.EvStatus && d.EvEntity.IsActor() && d.EvEntity.Actor().Is(Player)
 }
 
+// WatchPlayerDamage triggers when fire or poison hurts the player
 type WatchPlayerDamage struct {
 	EvStatus Status
 }
@@ -186,25 +232,25 @@ func (w *WatchPlayerDamage) CheckEvent(e Event) bool {
 	return ok && d.EvType == EventDamage && d.EvStatus == w.EvStatus
 }
 
-var eventWatchers = []WatchEvent{
-	{Type: EventMonsDeath,   EvDesc:"a monster dies"},
-	{Type: EventPickup,      EvDesc:"you pick up a comestible"},
-	{Type: EventInvoke,      EvDesc:"you invoke a spirit"},
-	{Type: EventMonsRune,    EvDesc:"a monster triggers a rune"},
-	{Type: EventTeleport,    EvDesc:"you teleport"},
-	{Type: EventComestible,  EvDesc:"you eat a comestible"},
-	{Type: EventWallBreak,   EvDesc:"a wall breaks"},
-	{Type: EventHPGain,      EvDesc:"you gain HP"},
-	{Type: EventMenhir,      EvDesc:"you activate a Menhir"},
-	{Type: EventTotem,       EvDesc:"you use a totem"},
-	{Type: EventNewLevel,    EvDesc:"you reach the next level"},
-	{Type: EventPlayRune,    EvDesc:"you trigger a rune"},
+var watchTypes = []EventType{
+	EventMonsDeath,
+	EventPickup,
+	EventInvoke,
+	EventMonsRune,
+	EventTeleport,
+	EventComestible,
+	EventWallBreak,
+	EventHPGain,
+	EventMenhir,
+	EventTotem,
+	EventNewLevel,
+	EventPlayRune,
 }
-var untilEvents = []WatchEvent{
-	{Type: EventWallBreak,   EvDesc:"a wall breaks"},
-	{Type: EventHPGain,      EvDesc:"you gain HP"},
-	{Type: EventTeleport,    EvDesc:"you teleport"},
-	{Type: EventFakePortal,  EvDesc:"a portal you use malfunctions"},
+var untilTypes = []EventType{
+	EventWallBreak,
+	EventHPGain,
+	EventTeleport,
+	EventFakePortal,
 }
 
 // SpiritCond represents a condition imposed by a spirit
@@ -337,6 +383,12 @@ func (c *EffectPunish) ApplyEvent(sp *Spirit, e Event) Consequence {
 	return CqNone
 }
 
+// OnEvent consequence based on event type
+func OnEvent(cq Consequence, ty EventType) CondEffect {
+	w := &WatchEvent{Type: ty}
+	return &EffectPunish{When: w, Do: cq}
+}
+
 // OnStatus consequence when the player gets a particular status
 func OnStatus(cq Consequence, st Status) CondEffect {
 	w := &WatchPlayerStatus{EvStatus: st}
@@ -349,44 +401,54 @@ func OnDamage(cq Consequence, st Status) CondEffect {
 	return &EffectPunish{When: w, Do: cq}
 }
 
-// UntilDeath condition that ends when a particular monster type dies
-func UntilDeath(mons string, ef CondEffect) *SpiritCond {
-	u := &WatchDeath{Mons: &MonsterByName{MonsName: mons}}
+func Cond(ef CondEffect, u EventWatcher) *SpiritCond {
 	return &SpiritCond{Effect: ef, Until: u}
+}
+
+func NoInv(u EventWatcher) *SpiritCond {
+	return Cond(&EffectCantInvoke{}, u)
+}
+
+func Dies(mons ...string) EventWatcher {
+	return &WatchDeath{Mons: AnyMonster(mons...)}
+}
+
+func Gets(st Status, mons ...string) EventWatcher {
+	return &WatchMonsStatus{EvStatus: st, Mons: AnyMonster(mons...)}
 }
 
 // GenCondition generates a random condition to attach to a spirit
 func (g *Game) GenCondition() *SpiritCond {
-	var e CondEffect
-	nu := len(untilEvents)
-	u := g.rand.IntN(nu)
-	switch g.IntN(8) {
-	case 0:
-		e = &EffectCantInvoke{}
-	case 1, 2:
+	switch g.IntN(25) {
+	case  0: return Cond(OnStatus(CqLeave, StatusLignification),    Gets(StatusFire, "walking tree"))
+	case  1: return Cond(OnStatus(CqLeave, StatusBerserk),          Dies("barking hound"))
+	case  2: return Cond(OnStatus(CqLeave, StatusFoggySkin),        Dies("fire llama"))
+	case  3: return Cond(OnEvent (CqLeave, EventTeleport),          Dies("warping wraith"))
+	case  4: return Cond(OnStatus(CqDischargeAll, StatusDaze),      Gets(StatusDaze, "temporal cat"))
+	case  5: return Cond(OnStatus(CqDischargeAll, StatusImbalance), Dies("lashing frog"))
+	case  6: return Cond(OnStatus(CqDischargeAll, StatusFear),      Gets(StatusConfusion, "barking hound"))
+	case  7: return Cond(OnEvent (CqDischargeAll, EventHPGain),     Gets(StatusBerserk, "four-headed hydra"))
+	case  8: return Cond(OnEvent (CqDischargeAll, EventWallBreak),  Gets(StatusPoison, "rampaging boar", "earth dragon"))
+	case  9: return Cond(OnEvent (CqDischarge, EventPickup),        Gets(StatusPoison, "hungry rat"))
+	case 10: return Cond(OnDamage(CqDischarge, StatusFire),         Gets(StatusImbalance, "burning phoenix"))
+	case 11: return Cond(OnDamage(CqDischarge, StatusPoison),       Dies("mad octopode", "totem wasp"))
+	case 12: return Cond(OnDamage(CqDischarge, StatusPoison),       Gets(StatusLignification, "venomous viper"))
+	case 13: return Cond(OnStatus(CqDischarge, StatusConfusion),    Gets(StatusFear, "confusing eye"))
+	case 14: return NoInv(Gets(StatusLignification, "thunder porcupine"))
+	case 15: return NoInv(Gets(StatusImbalance, "lashing frog", "rampaging boar"))
+	case 16: return NoInv(Gets(StatusFire,    "fire llama", "exploding nadre"))
+	case 17: return NoInv(Gets(StatusBerserk, "berserking spider", "blinking butterfly"))
+	case 18: return NoInv(Gets(StatusBerserk, "noisy imp", "crazy druid", "walking mushroom"))
+	default:
+		nu := len(untilTypes)
+		u := g.rand.IntN(nu)
 		nc := nCq - int(CqLeave)
 		c := g.rand.IntN(nc)
-		w := c + u + g.rand.IntN(len(eventWatchers) - nu - nc)
-		e = &EffectPunish {
-			When: &eventWatchers[w],
+		w := c + u + g.rand.IntN(len(watchTypes) - nu - nc)
+		e := &EffectPunish {
+			When: &WatchEvent{Type: watchTypes[w]},
 			Do:   CqLeave+Consequence(c),
 		}
-	default:
-		switch g.IntN(9) {
-		case 0: return UntilDeath("walking tree",    OnStatus(CqLeave, StatusLignification))
-		case 1: return UntilDeath("barking hound",   OnStatus(CqLeave, StatusBerserk))
-		case 2: return UntilDeath("fire llama",      OnStatus(CqLeave, StatusFoggySkin))
-		case 3: return UntilDeath("temporal cat",    OnStatus(CqDischargeAll, StatusDaze))
-		case 4: return UntilDeath("lashing frog",    OnStatus(CqDischargeAll, StatusImbalance))
-		case 5: return UntilDeath("barking hound",   OnStatus(CqDischargeAll, StatusFear))
-		case 6: return UntilDeath("burning phoenix", OnDamage(CqDischarge, StatusFire))
-		case 7: c := OnDamage(CqDischarge, StatusPoison)
-			o := &MonsterByName{MonsName: "mad octopode"}
-			w := &MonsterByName{MonsName: "totem wasp"}
-			u := &WatchDeath{Mons: &MatchEither{A: o, B: w}}
-			return &SpiritCond{Effect: c, Until: u}
-		case 8: return UntilDeath("warping wraith", &EffectPunish{When: &WatchEvent{Type: EventTeleport, EvDesc:"you teleport"}, Do: CqLeave})
-		}
+		return &SpiritCond{ Effect: e, Until: &WatchEvent{Type: untilTypes[u]} }
 	}
-	return &SpiritCond{ Effect: e, Until: &untilEvents[u] }
 }
