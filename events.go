@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"strings"
+
+	"codeberg.org/anaseto/gruid"
 )
 
 // Event represents an occurrence that might trigger a spirit condition
@@ -348,11 +350,14 @@ func TotemEvents(g *Game, ev Event) {
 			switch sp.Condition.ApplyEvent(sp, ev) {
 			case CqEndCondition:
 				g.Logf("Your %s spirit has been fulfilled!", e.Name)
+				g.StoryLogf("Fulfilled the %s spirit", e.Name)
+				g.curseLiftedFog()
 				sp.Condition = nil
 				g.ComputePlayerStats()
 			case CqLeave:
 				g.Logf("The %s spirit has left you!", e.Name)
 				g.StoryLogf("Lost the %s spirit", e.Name)
+				g.spiritLeftDaze()
 				g.Entities[i] = emptySlot()
 				g.ComputePlayerStats()
 			case CqDischargeAll:
@@ -365,6 +370,34 @@ func TotemEvents(g *Game, ev Event) {
 			}
 		}
 	}
+}
+
+// curseLiftedFog creates fog in an X shape when a condition is fulfilled
+func (g *Game) curseLiftedFog() {
+	pp := g.PP()
+	for i := -1; i <= 1; i += 2 {
+		for j := -1; j <= 1; j += 2 {
+			q := pp.Shift(i, j)
+			if g.Map.Passable(q) {
+				g.NormalCloudAt(q, 3)
+			}
+		}
+	}
+}
+
+// spiritLeftDaze dazes player and monsters in view when a spirit leaves
+func (g *Game) spiritLeftDaze() {
+	g.PutStatus(PlayerID, g.PlayerActor(), StatusDaze, 2)
+	for i, ai := range g.Monsters() {
+		ei := g.Entity(i)
+		if !g.InFOV(ei.P) {
+			continue
+		}
+		g.PutStatus(i, ai, StatusDaze, 6)
+	}
+	mp := &MapPath{passable: inMap}
+	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, MaxFOVRange)
+	g.md.FloodAnimation(nodes, ColorViolet)
 }
 
 // CondDisabled prevents invoking the spirit while the condition is active
