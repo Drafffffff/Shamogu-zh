@@ -58,9 +58,10 @@ func init() {
 	gob.Register(MonsterByName{})
 	gob.Register(WatchEvent{})
 	gob.Register(WatchDeath{})
-	gob.Register(WatchPlayerStatus{})
 	gob.Register(WatchMonsStatus{})
+	gob.Register(WatchPlayerStatus{})
 	gob.Register(WatchPlayerDamage{})
+	gob.Register(WatchCompleteLevel{})
 
 	// Actions in key-config.
 	gob.Register(ActionAutoExplore{})

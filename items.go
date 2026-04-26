@@ -365,6 +365,7 @@ func (p *Portal) Use(g *Game, i ID) bool {
 	}
 	g.StoryLog("Entered a magical portal!")
 	g.LogStyled("You enter the portal.", logSpecial)
+	TotemEvents(g, &EventHappened{EvType: EventPortal})
 	g.NextLevel()
 	TotemEvents(g, &EventHappened{EvType: EventNewLevel})
 	return false
