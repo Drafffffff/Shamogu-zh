@@ -827,7 +827,7 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 		g.rand.Shuffle(len(freep), func(i, j int) { freep[i], freep[j] = freep[j], freep[i] })
 		// kw, kt := 0, 0
 		for _, p := range freep {
-			n, _ := g.neighborInfo(p)
+			n := g.passabilityToggles(p)
 			if n != 2 {
 				// Adding a wall without changing topology
 				// happens only when there's exactly one
@@ -975,4 +975,20 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 			return t
 		})
 	}
+}
+
+// passabilityToggles returns the number of passability toggles
+// (non-passable/passable alternations) when cycling around neighbors.
+func (g *Game) passabilityToggles(p gruid.Point) int {
+	dirs := [9]gruid.Point{{1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}}
+	n, pass := 0, g.Map.Passable(p.Add(gruid.Point{1, -1}))
+	for _, dir := range dirs {
+		q := p.Add(dir)
+		qpass := g.Map.Passable(q)
+		if pass != qpass {
+			n++
+		}
+		pass = qpass
+	}
+	return n
 }
