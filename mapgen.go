@@ -820,7 +820,7 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 		freep := []gruid.Point{} // free points adjacent to a wall
 		for p, t := range mg.terrain.All() {
 			if !mg.vault.At(p) && p.In(terrain.Bounds()) && (t == Floor || t == Foliage) &&
-				g.Map.AdjacentNonPassableCount(p) == 1 {
+				g.Map.AdjacentNonPassableCount(p) >= 1 {
 				freep = append(freep, p)
 			}
 		}
