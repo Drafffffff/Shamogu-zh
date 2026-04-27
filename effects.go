@@ -102,6 +102,15 @@ func (g *Game) eatMsg(name string, hpstr string) {
 	}
 }
 
+// healPlayer restores HP and emits a healing event for spirit conditions
+func (g *Game) healPlayer(ai *Actor, amount int) {
+	hp := ai.HP
+	g.AdjustHP(PlayerID, ai, amount)
+	if ai.HP > hp {
+		TotemEvents(g, &EventHappened{EvType: EventHeal})
+	}
+}
+
 type EffectAmbrosiaBerries struct{ HealingCombat bool }
 
 func (eff EffectAmbrosiaBerries) Apply(g *Game) bool {
@@ -111,7 +120,7 @@ func (eff EffectAmbrosiaBerries) Apply(g *Game) bool {
 		heal = HealAmbrosiaHC
 	}
 	g.eatMsg("ambrosia berries", newHPMsg(pa, heal))
-	g.AdjustHP(PlayerID, pa, heal)
+	g.healPlayer(pa, heal)
 	if g.IntN(2) == 0 {
 		g.PutStatus1(PlayerID, pa, StatusConfusion, DurationConfusionAmbrosia)
 	} else {
@@ -203,7 +212,7 @@ func (eff EffectClarityLeaves) Apply(g *Game) bool {
 	g.eatMsg("clarity leaves", hpstr)
 	g.PutStatus1(PlayerID, pa, StatusClarity, DurationClarity+extraTurns)
 	if !eff.HealingCombat {
-		g.AdjustHP(PlayerID, pa, HealClarityLeaves)
+		g.healPlayer(pa, HealClarityLeaves)
 	}
 	return true
 }
@@ -240,7 +249,7 @@ func (eff EffectFoggySkinOnion) Apply(g *Game) bool {
 	g.eatMsg("foggy-skin onion", hpstr)
 	g.PutStatus1(PlayerID, pa, StatusFoggySkin, DurationFoggySkin+extraTurns)
 	if !eff.HealingCombat {
-		g.AdjustHP(PlayerID, pa, HealFoggySkinOnion)
+		g.healPlayer(pa, HealFoggySkinOnion)
 	}
 	return true
 }
@@ -258,7 +267,7 @@ func (eff EffectFirebreathPepper) Apply(g *Game) bool {
 	g.eatMsg("firebreath pepper", newHPMsgNH(pa, HealFirebreathPepper, eff.HealingCombat))
 	g.MakeNoise(pp, NoiseRoar)
 	if !eff.HealingCombat {
-		g.AdjustHP(PlayerID, pa, HealFirebreathPepper)
+		g.healPlayer(pa, HealFirebreathPepper)
 	}
 	g.md.FirebreathAnimation(pp.Add(g.Dir), g.Dir)
 	p := pp
@@ -298,7 +307,7 @@ func (eff EffectTeleportMushroom) Apply(g *Game) bool {
 	if !g.TeleportActor(PlayerID, pa, 1) {
 		g.Log("You resist teleport while lignified.")
 		if !eff.HealingCombat {
-			g.AdjustHP(PlayerID, pa, HealTeleportLignified)
+			g.healPlayer(pa, HealTeleportLignified)
 		}
 	}
 	if j >= 0 {

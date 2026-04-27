@@ -45,7 +45,8 @@ const (
 	EventPickup                       // picked up a comestible
 	EventComestible                   // ate a comestible
 	EventInvoke                       // invoked a spirit
-	EventHPGain                       // player gained HP
+	EventHeal                         // player gained permanent HP
+	EventHPGain                       // player gained any HP
 	EventTeleport                     // player teleported
 	EventDamage                       // player takes staus-based damage
 
@@ -86,6 +87,7 @@ func (w *WatchEvent) Desc() string {
 	case EventPickup:      return "you pick up a comestible"
 	case EventComestible:  return "you eat a comestible"
 	case EventInvoke:      return "you invoke a spirit"
+	case EventHeal:        return "a comestible heals your HP"
 	case EventHPGain:      return "you gain HP"
 	case EventTeleport:    return "you teleport"
 	case EventBeginStatus: return "you get any status"
@@ -304,7 +306,7 @@ var watchTypes = []EventType{
 }
 var untilTypes = []EventType{
 	EventWallBreak,
-	EventHPGain,
+	EventHeal,
 	EventTeleport,
 	EventFakePortal,
 }
@@ -565,7 +567,7 @@ func (g *Game) GenCondition() *SpiritCond {
 	case  6: return Cond(OnStatus(CqDischargeAll, StatusDaze),      Gets(StatusDaze, "temporal cat"))
 	case  7: return Cond(OnStatus(CqDischargeAll, StatusImbalance), Dies("lashing frog"))
 	case  8: return Cond(OnStatus(CqDischargeAll, StatusFear),      Gets(StatusConfusion, "barking hound"))
-	case  9: return Cond(OnEvent (CqDischargeAll, EventHPGain),     Gets(StatusBerserk, "four-headed hydra"))
+	case  9: return Cond(OnEvent (CqDischargeAll, EventHeal),       Gets(StatusBerserk, "four-headed hydra"))
 	case 10: return Cond(OnEvent (CqDischargeAll, EventWallBreak),  Gets(StatusPoison, "rampaging boar", "earth dragon"))
 	case 11: return Cond(OnEvent (CqDischargeAll, EventMonsDeath),  &WatchCompleteLevel{Test: Charges})
 	case 12: return Cond(OnAnyStatus(CqDischarge),                  &WatchCompleteLevel{Test: Charges})
