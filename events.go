@@ -58,7 +58,7 @@ const (
 // EventWatcher
 type EventWatcher interface {
 	EventTypes()  EventType
-	CheckEvent(*Spirit, Event) bool
+	CheckEvent(*Game, *Spirit, Event) bool
 	Desc()  string
 }
 
@@ -100,7 +100,7 @@ func (w *WatchEvent) EventTypes() EventType {
 	return w.Type
 }
 
-func (w *WatchEvent) CheckEvent(sp *Spirit, e Event) bool {
+func (w *WatchEvent) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	return e.Type().Any(w.Type)
 }
 
@@ -165,7 +165,7 @@ func (w *WatchDeath) EventTypes() EventType {
 	return EventMonsDeath
 }
 
-func (w *WatchDeath) CheckEvent(sp *Spirit, e Event) bool {
+func (w *WatchDeath) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	d, ok := e.(*EventWithEntity)
 	return ok && d.EvType == EventMonsDeath && w.Mons.Match(d.EvEntity)
 }
@@ -184,7 +184,7 @@ func (w *WatchMonsStatus) EventTypes() EventType {
 	return EventBeginStatus
 }
 
-func (w *WatchMonsStatus) CheckEvent(sp *Spirit, e Event) bool {
+func (w *WatchMonsStatus) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	d, ok := e.(*EventWithStatus)
 	return ok && d.EvType == EventBeginStatus && d.EvStatus == w.EvStatus && w.Mons.Match(d.EvEntity)
 }
@@ -217,7 +217,7 @@ func (w *WatchPlayerStatus) EventTypes() EventType {
 	return EventBeginStatus
 }
 
-func (w *WatchPlayerStatus) CheckEvent(sp *Spirit, e Event) bool {
+func (w *WatchPlayerStatus) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	d, ok := e.(*EventWithStatus)
 	return ok && d.EvType == EventBeginStatus && (w.MatchAny || d.EvStatus == w.EvStatus) && d.EvEntity.IsActor() && d.EvEntity.Actor().Is(Player)
 }
@@ -235,30 +235,51 @@ func (w *WatchPlayerDamage) EventTypes() EventType {
 	return EventDamage
 }
 
-func (w *WatchPlayerDamage) CheckEvent(sp *Spirit, e Event) bool {
+func (w *WatchPlayerDamage) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	d, ok := e.(*EventWithStatus)
 	return ok && d.EvType == EventDamage && d.EvStatus == w.EvStatus
 }
 
 // WatchCompleteLevel triggers when a matched monster dies
 type WatchCompleteLevel struct {
+	Test        CompleteType
 	CanComplete bool
 }
 
+type CompleteType int
+
+const (
+	Charges CompleteType = iota // still have ability charges
+	EmptyInventory              // no comestibles left
+)
+
 func (w *WatchCompleteLevel) Desc() string {
-	return "You complete a full level with some charges remaining"
+	switch w.Test {
+	case Charges:
+		return "You complete a full level with some charges remaining"
+	case EmptyInventory:
+		return "You enter a portal with no comestibles in your inventory"
+	default:
+		panic("unexpected complete-level condition")
+	}
 }
 
 func (w *WatchCompleteLevel) EventTypes() EventType {
 	return EventPortal | EventNewLevel
 }
 
-func (w *WatchCompleteLevel) CheckEvent(sp *Spirit, e Event) bool {
-	t := e.Type()
-	if t == EventPortal && w.CanComplete {
-		w.CanComplete = sp.Charges > 0
-	}
-	if t == EventNewLevel {
+func (w *WatchCompleteLevel) CheckEvent(g *Game, sp *Spirit, e Event) bool {
+	switch e.Type() {
+	case EventPortal:
+		switch w.Test {
+		case Charges:
+			if w.CanComplete {
+				w.CanComplete = sp.Charges > 0
+			}
+		case EmptyInventory:
+			w.CanComplete = len(g.ComestibleIDs()) == 0
+		}
+	case EventNewLevel:
 		if w.CanComplete {
 			return true
 		}
@@ -294,10 +315,10 @@ type SpiritCond struct {
 	Until   EventWatcher
 }
 type CondEffect interface {
-	EventTypes()                EventType
-	ApplyEvent(*Spirit, Event)  Consequence
-	Enabled()                   SpiritPart
-	Desc()                      string
+	EventTypes()                       EventType
+	ApplyEvent(*Game, *Spirit, Event)  Consequence
+	Enabled()                          SpiritPart
+	Desc()                             string
 }
 
 func (c *SpiritCond) EventTypes() EventType {
@@ -322,14 +343,14 @@ func (c *SpiritCond) Enabled() SpiritPart {
 func (c *SpiritCond) CanInvoke() bool {
 	return c.Enabled().Any(HasInvoke)
 }
-func (c *SpiritCond) ApplyEvent(sp *Spirit, e Event) Consequence {
+func (c *SpiritCond) ApplyEvent(g *Game, sp *Spirit, e Event) Consequence {
 	if c == nil {
 		return CqNone
 	}
-	if c.Until.CheckEvent(sp, e) {
+	if c.Until.CheckEvent(g, sp, e) {
 		return CqEndCondition
 	}
-	return c.Effect.ApplyEvent(sp, e)
+	return c.Effect.ApplyEvent(g, sp, e)
 }
 
 // SpiritPart allows independently disabling part of a spirit
@@ -380,7 +401,7 @@ func TotemEvents(g *Game, ev Event) {
 	}
 	for i, e := range g.Entities[:NSpirits] {
 		if sp, ok := e.Role.(*Spirit); ok {
-			switch sp.Condition.ApplyEvent(sp, ev) {
+			switch sp.Condition.ApplyEvent(g, sp, ev) {
 			case CqEndCondition:
 				g.Logf("Your %s spirit has been fulfilled!", e.Name)
 				g.StoryLogf("Fulfilled the %s spirit", e.Name)
@@ -463,7 +484,7 @@ func (cond *CondDisabled) Enabled() SpiritPart {
 	return HasAll & ^cond.Part
 }
 
-func (cond *CondDisabled) ApplyEvent(sp *Spirit, e Event) Consequence {
+func (cond *CondDisabled) ApplyEvent(g *Game, sp *Spirit, e Event) Consequence {
 	return CqNone
 }
 
@@ -485,8 +506,8 @@ func (c *CondPunish) Enabled() SpiritPart {
 	return HasAll
 }
 
-func (c *CondPunish) ApplyEvent(sp *Spirit, e Event) Consequence {
-	if c.When.CheckEvent(sp, e) {
+func (c *CondPunish) ApplyEvent(g *Game, sp *Spirit, e Event) Consequence {
+	if c.When.CheckEvent(g, sp, e) {
 		return c.Do
 	}
 	return CqNone
@@ -540,24 +561,25 @@ func (g *Game) GenCondition() *SpiritCond {
 	case  2: return Cond(OnStatus(CqLeave, StatusFoggySkin),        Dies("fire llama"))
 	case  3: return Cond(OnStatus(CqLeave, StatusClarity),          Gets(StatusConfusion, "blinking butterfly"))
 	case  4: return Cond(OnEvent (CqLeave, EventTeleport),          Dies("warping wraith"))
-	case  5: return Cond(OnStatus(CqDischargeAll, StatusDaze),      Gets(StatusDaze, "temporal cat"))
-	case  6: return Cond(OnStatus(CqDischargeAll, StatusImbalance), Dies("lashing frog"))
-	case  7: return Cond(OnStatus(CqDischargeAll, StatusFear),      Gets(StatusConfusion, "barking hound"))
-	case  8: return Cond(OnEvent (CqDischargeAll, EventHPGain),     Gets(StatusBerserk, "four-headed hydra"))
-	case  9: return Cond(OnEvent (CqDischargeAll, EventWallBreak),  Gets(StatusPoison, "rampaging boar", "earth dragon"))
-	case 10: return Cond(OnEvent (CqDischargeAll, EventMonsDeath),  &WatchCompleteLevel{})
-	case 11: return Cond(OnAnyStatus(CqDischarge),                  &WatchCompleteLevel{})
-	case 12: return Cond(OnEvent (CqDischargeAll, EventMenhir),     &WatchCompleteLevel{})
-	case 13: return Cond(OnEvent (CqDischarge, EventPickup),        Gets(StatusPoison, "hungry rat"))
-	case 14: return Cond(OnDamage(CqDischarge, StatusFire),         Gets(StatusImbalance, "burning phoenix"))
-	case 15: return Cond(OnDamage(CqDischarge, StatusPoison),       Dies("mad octopode", "totem wasp"))
-	case 16: return Cond(OnDamage(CqDischarge, StatusPoison),       Gets(StatusLignification, "venomous viper"))
-	case 17: return Cond(OnStatus(CqDischarge, StatusConfusion),    Gets(StatusFear, "confusing eye"))
-	case 18: return Dis(HasInvoke,   Gets(StatusLignification, "thunder porcupine", "berserking spider"))
-	case 19: return Dis(HasStats,    Gets(StatusImbalance, "lashing frog", "rampaging boar"))
-	case 20: return Dis(HasInvoke,   Gets(StatusFire,    "fire llama", "exploding nadre"))
-	case 21: return Dis(HasPassives, Gets(StatusBerserk, "berserking spider", "blinking butterfly"))
-	case 22: return Dis(HasInvoke,   Gets(StatusBerserk, "noisy imp", "crazy druid", "walking mushroom"))
+	case  5: return Cond(OnEvent (CqLeave, EventPickup),            &WatchCompleteLevel{Test: EmptyInventory})
+	case  6: return Cond(OnStatus(CqDischargeAll, StatusDaze),      Gets(StatusDaze, "temporal cat"))
+	case  7: return Cond(OnStatus(CqDischargeAll, StatusImbalance), Dies("lashing frog"))
+	case  8: return Cond(OnStatus(CqDischargeAll, StatusFear),      Gets(StatusConfusion, "barking hound"))
+	case  9: return Cond(OnEvent (CqDischargeAll, EventHPGain),     Gets(StatusBerserk, "four-headed hydra"))
+	case 10: return Cond(OnEvent (CqDischargeAll, EventWallBreak),  Gets(StatusPoison, "rampaging boar", "earth dragon"))
+	case 11: return Cond(OnEvent (CqDischargeAll, EventMonsDeath),  &WatchCompleteLevel{Test: Charges})
+	case 12: return Cond(OnAnyStatus(CqDischarge),                  &WatchCompleteLevel{Test: Charges})
+	case 13: return Cond(OnEvent (CqDischargeAll, EventMenhir),     &WatchCompleteLevel{Test: Charges})
+	case 14: return Cond(OnEvent (CqDischarge, EventPickup),        Gets(StatusPoison, "hungry rat"))
+	case 15: return Cond(OnDamage(CqDischarge, StatusFire),         Gets(StatusImbalance, "burning phoenix"))
+	case 16: return Cond(OnDamage(CqDischarge, StatusPoison),       Dies("mad octopode", "totem wasp"))
+	case 17: return Cond(OnDamage(CqDischarge, StatusPoison),       Gets(StatusLignification, "venomous viper"))
+	case 18: return Cond(OnStatus(CqDischarge, StatusConfusion),    Gets(StatusFear, "confusing eye"))
+	case 19: return Dis(HasInvoke,   Gets(StatusLignification, "thunder porcupine", "berserking spider"))
+	case 20: return Dis(HasStats,    Gets(StatusImbalance, "lashing frog", "rampaging boar"))
+	case 21: return Dis(HasInvoke,   Gets(StatusFire,    "fire llama", "exploding nadre"))
+	case 22: return Dis(HasPassives, Gets(StatusBerserk, "berserking spider", "blinking butterfly"))
+	case 23: return Dis(HasInvoke,   Gets(StatusBerserk, "noisy imp", "crazy druid", "walking mushroom"))
 	default:
 		nu := len(untilTypes)
 		u := g.rand.IntN(nu)
