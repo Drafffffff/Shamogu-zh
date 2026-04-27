@@ -813,6 +813,46 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 		})
 	}
 
+	if g.IntN(occasionally) == 0 {
+		terrain := getTerrain()
+		// Wall 1-layer thickening within terrain section of the map
+		// (outside of vaults).
+		freep := []gruid.Point{} // free points adjacent to a wall
+		for p, t := range mg.terrain.All() {
+			if !mg.vault.At(p) && p.In(terrain.Bounds()) && (t == Floor || t == Foliage) &&
+				g.Map.AdjacentNonPassableCount(p) == 1 {
+				freep = append(freep, p)
+			}
+		}
+		g.rand.Shuffle(len(freep), func(i, j int) { freep[i], freep[j] = freep[j], freep[i] })
+		kw, kt := 0, 0
+		for _, p := range freep {
+			n, _ := g.neighborInfo(p)
+			if n != 2 {
+				// Adding a wall without changing topology
+				// happens only when there's exactly one
+				// wall-passable-wall or passable-wall-passable
+				// change (n == 2).
+				continue
+			}
+			// Replace by wall or translucent wall based on the
+			// nature of the non-passable adjacent tile.
+		nbloop:
+			for q := range Neighbors(p) {
+				switch mg.terrain.At(q) {
+				case Wall:
+					mg.terrain.Set(p, Wall)
+					kw++
+					break nbloop
+				case TranslucentWall:
+					mg.terrain.Set(p, TranslucentWall)
+					kt++
+					break nbloop
+				}
+			}
+		}
+	}
+
 	if g.IntN(often) == 0 || mg.theme != ThemeNone && g.IntN(2) == 0 {
 		// Corrupt terrain around some random point biased toward
 		// center.
