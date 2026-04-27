@@ -829,13 +829,13 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 		for _, p := range freep {
 			n := g.passabilityToggles(p)
 			if n != 2 {
-				// Adding a wall without changing topology
-				// happens only when there's exactly one
-				// wall-passable-wall or passable-wall-passable
-				// change (n == 2).
 				continue
 			}
-			// Replace by wall or translucent wall based on the
+			// There are two passability toggles (one from passable
+			// to wall, then one to passable again), so we can put
+			// a wall without changing topology.
+			//
+			// We replace by wall or translucent wall based on the
 			// nature of the non-passable adjacent tile.
 		nbloop:
 			for q := range Neighbors(p) {
