@@ -813,7 +813,7 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 		})
 	}
 
-	if g.IntN(occasionally) == 0 {
+	if g.IntN(sometimes) == 0 {
 		terrain := getTerrain()
 		// Wall 1-layer thickening within terrain section of the map
 		// (outside of vaults).
@@ -838,7 +838,7 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 			// We replace by wall or translucent wall based on the
 			// nature of the non-passable adjacent tile.
 		nbloop:
-			for q := range Neighbors(p) {
+			for q := range NeighborsFunc(p, func(q gruid.Point) bool { return !g.Map.Passable(q) }) {
 				switch mg.terrain.At(q) {
 				case Wall:
 					mg.terrain.Set(p, Wall)
