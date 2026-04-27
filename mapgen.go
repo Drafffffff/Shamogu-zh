@@ -980,7 +980,7 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 // passabilityToggles returns the number of passability toggles
 // (non-passable/passable alternations) when cycling around neighbors.
 func (g *Game) passabilityToggles(p gruid.Point) int {
-	dirs := [9]gruid.Point{{1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}}
+	dirs := [8]gruid.Point{{1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}}
 	n, pass := 0, g.Map.Passable(p.Add(gruid.Point{1, -1}))
 	for _, dir := range dirs {
 		q := p.Add(dir)
