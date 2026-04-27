@@ -825,7 +825,7 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 			}
 		}
 		g.rand.Shuffle(len(freep), func(i, j int) { freep[i], freep[j] = freep[j], freep[i] })
-		kw, kt := 0, 0
+		// kw, kt := 0, 0
 		for _, p := range freep {
 			n, _ := g.neighborInfo(p)
 			if n != 2 {
@@ -842,15 +842,16 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 				switch mg.terrain.At(q) {
 				case Wall:
 					mg.terrain.Set(p, Wall)
-					kw++
+					// kw++
 					break nbloop
 				case TranslucentWall:
 					mg.terrain.Set(p, TranslucentWall)
-					kt++
+					// kt++
 					break nbloop
 				}
 			}
 		}
+		// log.Printf("extra walls: %d %d", kw, kt)
 	}
 
 	if g.IntN(often) == 0 || mg.theme != ThemeNone && g.IntN(2) == 0 {
