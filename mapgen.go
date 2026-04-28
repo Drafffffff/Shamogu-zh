@@ -152,7 +152,12 @@ func (g *Game) generateMap(ml MapLayout) (*MapGen, bool) {
 	mgen := rl.MapGen{Rand: mg.rand, Grid: mg.terrain}
 	ntiles := mgen.KeepCC(mg.PR, freep, Wall)
 	// Report whether the generated map has enough passable terrain.
-	const minCaveSize = 1000
+	minCaveSize := 1000
+	if g.Mod(ModCorruptedDungeon) {
+		// Allow smaller caves with Corrupted Dungeon (wall-thickening
+		// terrain corruptions may want to go below the default limit).
+		minCaveSize -= 100
+	}
 	return mg, ntiles > minCaveSize
 }
 
@@ -819,13 +824,12 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 		// (outside of vaults).
 		freep := []gruid.Point{} // free points adjacent to a wall
 		for p, t := range mg.terrain.All() {
-			if !mg.vault.At(p) && p.In(terrain.Bounds()) && (t == Floor || t == Foliage) &&
+			if !mg.vault.At(p) && !mg.tunnel.At(p) && p.In(terrain.Bounds()) && (t == Floor || t == Foliage) &&
 				g.Map.AdjacentNonPassableCount(p) >= 1 {
 				freep = append(freep, p)
 			}
 		}
 		g.rand.Shuffle(len(freep), func(i, j int) { freep[i], freep[j] = freep[j], freep[i] })
-		// kw, kt := 0, 0
 		for _, p := range freep {
 			n := g.passabilityToggles(p)
 			if n != 2 {
@@ -842,16 +846,13 @@ func (g *Game) genCorruptedTerrain(mg *MapGen) {
 				switch mg.terrain.At(q) {
 				case Wall:
 					mg.terrain.Set(p, Wall)
-					// kw++
 					break nbloop
 				case TranslucentWall:
 					mg.terrain.Set(p, TranslucentWall)
-					// kt++
 					break nbloop
 				}
 			}
 		}
-		// log.Printf("extra walls: %d %d", kw, kt)
 	}
 
 	if g.IntN(often) == 0 || mg.theme != ThemeNone && g.IntN(2) == 0 {
