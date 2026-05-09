@@ -864,7 +864,7 @@ func (md *model) updateEquipItemDesc(ei, ej *Entity) {
 	switch rj := ej.Role.(type) {
 	case *Spirit:
 		l.Box.Title = ui.Textf("%s (upgrade)", ej.Name)
-		l.Content = stt.WithText(rj.UpgradeDesc()).Format(UIWidth/2 - 1 - 2)
+		l.Content = stt.WithText(rj.UpgradeDesc(ei)).Format(UIWidth/2 - 1 - 2)
 	case *Comestible:
 		l.Box.Title = ui.Textf("%s (replace)", ej.Name)
 		l.Content = stt.WithText(rj.Desc()).Format(UIWidth/2 - 1 - 2)

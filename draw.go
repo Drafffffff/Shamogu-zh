@@ -542,7 +542,7 @@ func (md *model) drawTargInfo() {
 			sb.WriteByte('\n')
 			fmt.Fprintf(&sb, "@CTraits:@N %s.", TraitDesc(r.Kind, r.Traits))
 		case *Spirit:
-			sb.WriteString("@CTotemic spirit.@N\n" + r.Desc())
+			sb.WriteString("@CTotemic spirit.@N\n" + r.FullDesc())
 		case *Menhir:
 			sb.WriteString(r.Desc())
 			if r.Used {
