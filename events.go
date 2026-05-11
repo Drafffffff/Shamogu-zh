@@ -202,6 +202,11 @@ func (ev *EventWithStatus) Type() EventType {
 	return ev.EvType
 }
 
+func (ev *EventWithStatus) onPlayer() bool {
+	e := ev.EvEntity
+	return e.IsActor() && e.Actor().Is(Player)
+}
+
 // WatchPlayerStatus triggers when the player begins a specific status
 type WatchPlayerStatus struct {
 	MatchAny bool    // ignore EvStatus; allow any
@@ -221,7 +226,30 @@ func (w *WatchPlayerStatus) EventTypes() EventType {
 
 func (w *WatchPlayerStatus) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	d, ok := e.(*EventWithStatus)
-	return ok && d.EvType == EventBeginStatus && (w.MatchAny || d.EvStatus == w.EvStatus) && d.EvEntity.IsActor() && d.EvEntity.Actor().Is(Player)
+	return ok && d.EvType == EventBeginStatus && (w.MatchAny || d.EvStatus == w.EvStatus) && d.onPlayer()
+}
+
+// WatchTwoStatus triggers when the player gets a combination of statuses
+type WatchTwoStatus struct {
+	A Status
+	B Status
+}
+
+func (w *WatchTwoStatus) Desc() string {
+	return fmt.Sprintf("You become %s and %s", w.A, w.B)
+}
+
+func (w *WatchTwoStatus) EventTypes() EventType {
+	return EventBeginStatus
+}
+
+func (w *WatchTwoStatus) CheckEvent(g *Game, sp *Spirit, e Event) bool {
+	d, ok := e.(*EventWithStatus)
+	if !(ok && d.EvType == EventBeginStatus && d.onPlayer()) {
+		return false
+	}
+	s := g.PlayerActor().Statuses
+	return (d.EvStatus == w.A && s.Has(w.B)) || (d.EvStatus == w.B && s.Has(w.A))
 }
 
 // WatchPlayerDamage triggers when fire or poison hurts the player
@@ -558,7 +586,7 @@ func (g *Game) GenCondition() *SpiritCond {
 		case 2: return Cond(OnAnyStatus(CqDischarge),                &WatchCompleteLevel{Test: Charges})
 		}
 	}
-	switch g.IntN(11) {
+	switch g.IntN(13) {
 	case  0: return Cond(OnStatus(CqLeave, StatusLignification),    Gets(StatusFire, "walking tree"))
 	case  1: return Cond(OnStatus(CqLeave, StatusFoggySkin),        Gets(StatusFire, "fire llama", "exploding nadre"))
 	case  2: return Cond(OnStatus(CqLeave, StatusClarity),          Gets(StatusConfusion, "blinking butterfly"))
@@ -569,6 +597,8 @@ func (g *Game) GenCondition() *SpiritCond {
 	case  7: return Cond(OnDamage(CqDischargeAll, StatusPoison),    Dies("mad octopode", "totem wasp"))
 	case  8: return Dis(HasInvoke,   Gets(StatusFire,      "fire llama", "exploding nadre"))
 	case  9: return Dis(HasStats,    Gets(StatusImbalance, "lashing frog", "rampaging boar"))
-	default: return Dis(HasPassives, Gets(StatusBerserk,   "noisy imp", "crazy druid", "walking mushroom"))
+	case 10: return Dis(HasPassives, Gets(StatusBerserk,   "noisy imp", "crazy druid", "walking mushroom"))
+	case 11: return Dis(HasAll, &WatchTwoStatus{A:StatusConfusion, B:StatusImbalance})
+	default: return Dis(HasAll, &WatchTwoStatus{A:StatusLignification, B:StatusFear})
 	}
 }
