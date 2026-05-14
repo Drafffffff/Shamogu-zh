@@ -1476,7 +1476,11 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 		p := g.corruptedTotemGuardianPoint()
 		if g.IntN(4) > 0 {
 			g.genMonsterGuardian(TotemWasp, p)
-			g.genMonsterGuardian(TotemWasp, p)
+			if g.IntN(10) > 0 {
+				g.genMonsterGuardian(TotemWasp, p)
+			} else {
+				nE++
+			}
 		} else {
 			g.genMonster(TotemWasp)
 			g.genMonster(TotemWasp)
@@ -1510,7 +1514,11 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 		p := g.corruptedPortalGuardianPoint()
 		if g.IntN(4) > 0 {
 			g.genMonsterGuardian(mk, p)
-			g.genMonsterGuardian(mk, p)
+			if g.IntN(10) > 0 {
+				g.genMonsterGuardian(mk, p)
+			} else {
+				nM++
+			}
 		} else {
 			g.genMonster(mk)
 			g.genMonster(mk)
