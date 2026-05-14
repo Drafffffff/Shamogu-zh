@@ -52,6 +52,7 @@ const (
 
 	EventBeginStatus                  // actor status started
 	EventMonsDeath                    // monster died
+	EventMonsSeen                     // you see a monster
 
 	EventWallBreak                    // wall broken
 )
@@ -154,22 +155,30 @@ func AnyMonster(mons ...string) EntityMatcher {
 	return ms
 }
 
-// WatchDeath triggers when a matched monster dies
-type WatchDeath struct {
-	Mons EntityMatcher
+// WatchMonsEvent triggers based on a specified event and monster type
+type WatchMonsEvent struct {
+	Mons   EntityMatcher
+	EvType EventType
 }
 
-func (w *WatchDeath) Desc() string {
-	return fmt.Sprintf("A %s dies", w.Mons.Desc())
+func (w *WatchMonsEvent) Desc() string {
+	switch w.EvType {
+	case EventMonsDeath:
+		return fmt.Sprintf("A %s dies", w.Mons.Desc())
+	case EventMonsSeen:
+		return fmt.Sprintf("You see a %s", w.Mons.Desc())
+	default:
+		panic("unexpected complete-level condition")
+	}
 }
 
-func (w *WatchDeath) EventTypes() EventType {
-	return EventMonsDeath
+func (w *WatchMonsEvent) EventTypes() EventType {
+	return w.EvType
 }
 
-func (w *WatchDeath) CheckEvent(g *Game, sp *Spirit, e Event) bool {
+func (w *WatchMonsEvent) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	d, ok := e.(*EventWithEntity)
-	return ok && d.EvType == EventMonsDeath && w.Mons.Match(d.EvEntity)
+	return ok && w.EvType == d.EvType && w.Mons.Match(d.EvEntity)
 }
 
 // WatchMonsStatus triggers when a monster begins a specific status
@@ -560,7 +569,11 @@ func Dis(p SpiritPart, u EventWatcher) *SpiritCond {
 }
 
 func Dies(mons ...string) EventWatcher {
-	return &WatchDeath{Mons: AnyMonster(mons...)}
+	return &WatchMonsEvent{EvType: EventMonsDeath, Mons: AnyMonster(mons...)}
+}
+
+func Seen(mons ...string) EventWatcher {
+	return &WatchMonsEvent{EvType: EventMonsSeen, Mons: AnyMonster(mons...)}
 }
 
 func Gets(st Status, mons ...string) EventWatcher {
@@ -586,12 +599,15 @@ func (g *Game) GenCondition() *SpiritCond {
 		case 2: return Cond(OnAnyStatus(CqDischarge),                &WatchCompleteLevel{Test: Charges})
 		}
 	}
+	if l == 8 && g.IntN(8) == 0 {
+		return Dis(HasInvoke, Seen("fearsome lich", "undead knight"))
+	}
 	switch g.IntN(13) {
 	case  0: return Cond(OnStatus(CqLeave, StatusLignification),    Gets(StatusFire, "walking tree"))
 	case  1: return Cond(OnStatus(CqLeave, StatusFoggySkin),        Gets(StatusFire, "fire llama", "exploding nadre"))
 	case  2: return Cond(OnStatus(CqLeave, StatusClarity),          Gets(StatusConfusion, "blinking butterfly"))
 	case  3: return Cond(OnStatus(CqLeave, StatusBerserk),          Dies("barking hound"))
-	case  4: return Cond(OnEvent (CqLeave, EventTeleport),          Dies("warping wraith"))
+	case  4: return Cond(OnEvent (CqLeave, EventTeleport),          Seen("warping wraith"))
 	case  5: return Cond(OnEvent (CqDischargeAll, EventHeal),       Gets(StatusBerserk, "four-headed hydra"))
 	case  6: return Cond(OnDamage(CqDischarge,    StatusFire),      Gets(StatusImbalance, "burning phoenix"))
 	case  7: return Cond(OnDamage(CqDischargeAll, StatusPoison),    Dies("mad octopode", "totem wasp"))

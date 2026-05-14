@@ -233,13 +233,13 @@ func (g *Game) logBumpDamage(i, j ID, _, aj *Actor, dmg int, ap AttackKind) {
 func (g *Game) monsterDeath(i, j ID, aj *Actor) {
 	ej := g.Entity(j)
 	g.Stats.Death(ej.Name)
-	TotemEvents(g, &EventWithEntity{EvType: EventMonsDeath, EvEntity: ej})
 	g.md.DeathAnimation(ej.P)
 	if g.InFOV(ej.P) {
 		// Mark as known dead here, because due to clouds the player
 		// might not see it later otherwise.
 		aj.KnownDead = true
 	}
+	TotemEvents(g, &EventWithEntity{EvType: EventMonsDeath, EvEntity: ej})
 	if g.Mod(ModHealingCombat) && !g.HasVampirism() {
 		// When Healing Combat is enabled and the player is not a bat,
 		// we have a chance of healing when killing monsters.

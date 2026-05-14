@@ -57,7 +57,7 @@ func init() {
 	gob.Register(MatchEither{})
 	gob.Register(MonsterByName{})
 	gob.Register(WatchEvent{})
-	gob.Register(WatchDeath{})
+	gob.Register(WatchMonsEvent{})
 	gob.Register(WatchMonsStatus{})
 	gob.Register(WatchPlayerStatus{})
 	gob.Register(WatchTwoStatus{})
