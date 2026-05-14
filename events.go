@@ -136,21 +136,21 @@ func (m MatchEither) Match(e *Entity) bool {
 	return m.A.Match(e) || m.B.Match(e)
 }
 
-type MonsterByName struct {
-	MonsName string
+type MonsterByKind struct {
+	Kind ActorKind
 }
 
-func (m MonsterByName) Desc() string { return m.MonsName }
+func (m MonsterByKind) Desc() string { return MonsData[m.Kind].Name }
 
-func (m MonsterByName) Match(e *Entity) bool {
-	return e.Name == m.MonsName
+func (m MonsterByKind) Match(e *Entity) bool {
+	return e.IsActor() && e.Actor().Is(m.Kind)
 }
 
 // AnyMonster makes a matcher for any of the given names
-func AnyMonster(mons ...string) EntityMatcher {
-	var ms EntityMatcher = MonsterByName{MonsName: mons[0]}
+func AnyMonster(mons ...ActorKind) EntityMatcher {
+	var ms EntityMatcher = MonsterByKind{Kind: mons[0]}
 	for _, m := range mons[1:] {
-		ms = MatchEither{A: ms, B: MonsterByName{MonsName: m}}
+		ms = MatchEither{A: ms, B: MonsterByKind{Kind: m}}
 	}
 	return ms
 }
@@ -568,15 +568,15 @@ func Dis(p SpiritPart, u EventWatcher) *SpiritCond {
 	return Cond(CondDisabled{Part: p}, u)
 }
 
-func Dies(mons ...string) EventWatcher {
+func Dies(mons ...ActorKind) EventWatcher {
 	return WatchMonsEvent{EvType: EventMonsDeath, Mons: AnyMonster(mons...)}
 }
 
-func Seen(mons ...string) EventWatcher {
+func Seen(mons ...ActorKind) EventWatcher {
 	return WatchMonsEvent{EvType: EventMonsSeen, Mons: AnyMonster(mons...)}
 }
 
-func Gets(st Status, mons ...string) EventWatcher {
+func Gets(st Status, mons ...ActorKind) EventWatcher {
 	return WatchMonsStatus{EvStatus: st, Mons: AnyMonster(mons...)}
 }
 
@@ -585,11 +585,11 @@ func (g *Game) GenCondition() *SpiritCond {
 	l := g.Map.Level
 	if l >= 5 {
 		switch g.IntN(12) {
-		case 0: return CondU(OnEvent (CqDischarge, EventPickup),        Gets(StatusPoison, "hungry rat"))
-		case 1: return CondU(OnEvent (CqDischargeAll, EventWallBreak),  Gets(StatusPoison, "rampaging boar", "earth dragon"))
-		case 2: return CondU(OnStatus(CqDischargeAll, StatusDaze),      Gets(StatusDaze, "temporal cat"))
-		case 3: return CondU(OnStatus(CqDischargeAll, StatusFear),      Gets(StatusConfusion, "barking hound"))
-		case 4: return CondU(OnStatus(CqDischargeAll, StatusConfusion), Gets(StatusFear, "confusing eye"))
+		case 0: return CondU(OnEvent (CqDischarge, EventPickup),        Gets(StatusPoison, HungryRat))
+		case 1: return CondU(OnEvent (CqDischargeAll, EventWallBreak),  Gets(StatusPoison, RampagingBoar, EarthDragon))
+		case 2: return CondU(OnStatus(CqDischargeAll, StatusDaze),      Gets(StatusDaze, TemporalCat))
+		case 3: return CondU(OnStatus(CqDischargeAll, StatusFear),      Gets(StatusConfusion, BarkingHound))
+		case 4: return CondU(OnStatus(CqDischargeAll, StatusConfusion), Gets(StatusFear, ConfusingEye))
 		}
 	}
 	if l >= 3 {
@@ -600,20 +600,20 @@ func (g *Game) GenCondition() *SpiritCond {
 		}
 	}
 	if l == 8 && g.IntN(8) == 0 {
-		return Dis(HasInvoke, Seen("fearsome lich", "undead knight"))
+		return Dis(HasInvoke, Seen(FearsomeLich, UndeadKnight))
 	}
 	switch g.IntN(13) {
-	case  0: return Cond(OnStatus(CqLeave, StatusLignification),    Gets(StatusFire, "walking tree"))
-	case  1: return Cond(OnStatus(CqLeave, StatusFoggySkin),        Gets(StatusFire, "fire llama", "exploding nadre"))
-	case  2: return Cond(OnStatus(CqLeave, StatusClarity),          Gets(StatusConfusion, "blinking butterfly"))
-	case  3: return Cond(OnStatus(CqLeave, StatusBerserk),          Dies("barking hound"))
-	case  4: return Cond(OnEvent (CqLeave, EventTeleport),          Seen("warping wraith"))
-	case  5: return Cond(OnEvent (CqDischargeAll, EventHeal),       Gets(StatusBerserk, "four-headed hydra"))
-	case  6: return Cond(OnDamage(CqDischarge,    StatusFire),      Gets(StatusImbalance, "burning phoenix"))
-	case  7: return Cond(OnDamage(CqDischargeAll, StatusPoison),    Dies("mad octopode", "totem wasp"))
-	case  8: return Dis(HasInvoke,   Gets(StatusFire,      "fire llama", "exploding nadre"))
-	case  9: return Dis(HasStats,    Gets(StatusImbalance, "lashing frog", "rampaging boar"))
-	case 10: return Dis(HasPassives, Gets(StatusBerserk,   "noisy imp", "crazy druid", "walking mushroom"))
+	case  0: return Cond(OnStatus(CqLeave, StatusLignification),    Gets(StatusFire, WalkingTree))
+	case  1: return Cond(OnStatus(CqLeave, StatusFoggySkin),        Gets(StatusFire, FireLlama, ExplodingNadre))
+	case  2: return Cond(OnStatus(CqLeave, StatusClarity),          Gets(StatusConfusion, BlinkButterfly))
+	case  3: return Cond(OnStatus(CqLeave, StatusBerserk),          Dies(BarkingHound))
+	case  4: return Cond(OnEvent (CqLeave, EventTeleport),          Seen(WarpingWraith))
+	case  5: return Cond(OnEvent (CqDischargeAll, EventHeal),       Gets(StatusBerserk, FourHeadedHydra))
+	case  6: return Cond(OnDamage(CqDischarge,    StatusFire),      Gets(StatusImbalance, BurningPhoenix))
+	case  7: return Cond(OnDamage(CqDischargeAll, StatusPoison),    Dies(MadOctopode, TotemWasp))
+	case  8: return Dis(HasInvoke,   Gets(StatusFire,      FireLlama, ExplodingNadre))
+	case  9: return Dis(HasStats,    Gets(StatusImbalance, LashingFrog, RampagingBoar))
+	case 10: return Dis(HasPassives, Gets(StatusBerserk,   NoisyImp, CrazyDruid, WalkingMushroom))
 	case 11: return Dis(HasAll, WatchTwoStatus{A:StatusConfusion, B:StatusImbalance})
 	default: return Dis(HasAll, WatchTwoStatus{A:StatusLignification, B:StatusFear})
 	}

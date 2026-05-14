@@ -55,7 +55,7 @@ func init() {
 	gob.Register(CondDisabled{})
 	gob.Register(CondPunish{})
 	gob.Register(MatchEither{})
-	gob.Register(MonsterByName{})
+	gob.Register(MonsterByKind{})
 	gob.Register(WatchEvent{})
 	gob.Register(WatchMonsEvent{})
 	gob.Register(WatchMonsStatus{})
