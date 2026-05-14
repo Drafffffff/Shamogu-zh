@@ -77,7 +77,7 @@ type WatchEvent struct {
 	Type  EventType
 }
 
-func (w *WatchEvent) Desc() string {
+func (w WatchEvent) Desc() string {
 	switch w.Type {
 	case EventMenhir:      return "you activate a Menhir"
 	case EventTotem:       return "you use a totem"
@@ -99,11 +99,11 @@ func (w *WatchEvent) Desc() string {
 	}
 }
 
-func (w *WatchEvent) EventTypes() EventType {
+func (w WatchEvent) EventTypes() EventType {
 	return w.Type
 }
 
-func (w *WatchEvent) CheckEvent(g *Game, sp *Spirit, e Event) bool {
+func (w WatchEvent) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	return e.Type().Any(w.Type)
 }
 
@@ -128,11 +128,11 @@ type MatchEither struct {
 	B EntityMatcher
 }
 
-func (m *MatchEither) Desc() string {
+func (m MatchEither) Desc() string {
 	return fmt.Sprintf("%s or %s", m.A.Desc(), m.B.Desc())
 }
 
-func (m *MatchEither) Match(e *Entity) bool {
+func (m MatchEither) Match(e *Entity) bool {
 	return m.A.Match(e) || m.B.Match(e)
 }
 
@@ -140,17 +140,17 @@ type MonsterByName struct {
 	MonsName string
 }
 
-func (m *MonsterByName) Desc() string { return m.MonsName }
+func (m MonsterByName) Desc() string { return m.MonsName }
 
-func (m *MonsterByName) Match(e *Entity) bool {
+func (m MonsterByName) Match(e *Entity) bool {
 	return e.Name == m.MonsName
 }
 
 // AnyMonster makes a matcher for any of the given names
 func AnyMonster(mons ...string) EntityMatcher {
-	var ms EntityMatcher = &MonsterByName{MonsName: mons[0]}
+	var ms EntityMatcher = MonsterByName{MonsName: mons[0]}
 	for _, m := range mons[1:] {
-		ms = &MatchEither{A: ms, B: &MonsterByName{MonsName: m}}
+		ms = MatchEither{A: ms, B: MonsterByName{MonsName: m}}
 	}
 	return ms
 }
@@ -161,7 +161,7 @@ type WatchMonsEvent struct {
 	EvType EventType
 }
 
-func (w *WatchMonsEvent) Desc() string {
+func (w WatchMonsEvent) Desc() string {
 	switch w.EvType {
 	case EventMonsDeath:
 		return fmt.Sprintf("A %s dies", w.Mons.Desc())
@@ -172,11 +172,11 @@ func (w *WatchMonsEvent) Desc() string {
 	}
 }
 
-func (w *WatchMonsEvent) EventTypes() EventType {
+func (w WatchMonsEvent) EventTypes() EventType {
 	return w.EvType
 }
 
-func (w *WatchMonsEvent) CheckEvent(g *Game, sp *Spirit, e Event) bool {
+func (w WatchMonsEvent) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	d, ok := e.(*EventWithEntity)
 	return ok && w.EvType == d.EvType && w.Mons.Match(d.EvEntity)
 }
@@ -187,15 +187,15 @@ type WatchMonsStatus struct {
 	Mons     EntityMatcher
 }
 
-func (w *WatchMonsStatus) Desc() string {
+func (w WatchMonsStatus) Desc() string {
 	return fmt.Sprintf("A %s becomes %s", w.Mons.Desc(), w.EvStatus)
 }
 
-func (w *WatchMonsStatus) EventTypes() EventType {
+func (w WatchMonsStatus) EventTypes() EventType {
 	return EventBeginStatus
 }
 
-func (w *WatchMonsStatus) CheckEvent(g *Game, sp *Spirit, e Event) bool {
+func (w WatchMonsStatus) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	d, ok := e.(*EventWithStatus)
 	return ok && d.EvType == EventBeginStatus && d.EvStatus == w.EvStatus && w.Mons.Match(d.EvEntity)
 }
@@ -222,18 +222,18 @@ type WatchPlayerStatus struct {
 	EvStatus Status
 }
 
-func (w *WatchPlayerStatus) Desc() string {
+func (w WatchPlayerStatus) Desc() string {
 	if w.MatchAny {
 		return "you get any status"
 	}
 	return fmt.Sprintf("you become %s", w.EvStatus)
 }
 
-func (w *WatchPlayerStatus) EventTypes() EventType {
+func (w WatchPlayerStatus) EventTypes() EventType {
 	return EventBeginStatus
 }
 
-func (w *WatchPlayerStatus) CheckEvent(g *Game, sp *Spirit, e Event) bool {
+func (w WatchPlayerStatus) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	d, ok := e.(*EventWithStatus)
 	return ok && d.EvType == EventBeginStatus && (w.MatchAny || d.EvStatus == w.EvStatus) && d.onPlayer()
 }
@@ -244,15 +244,15 @@ type WatchTwoStatus struct {
 	B Status
 }
 
-func (w *WatchTwoStatus) Desc() string {
+func (w WatchTwoStatus) Desc() string {
 	return fmt.Sprintf("You become %s and %s", w.A, w.B)
 }
 
-func (w *WatchTwoStatus) EventTypes() EventType {
+func (w WatchTwoStatus) EventTypes() EventType {
 	return EventBeginStatus
 }
 
-func (w *WatchTwoStatus) CheckEvent(g *Game, sp *Spirit, e Event) bool {
+func (w WatchTwoStatus) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	d, ok := e.(*EventWithStatus)
 	if !(ok && d.EvType == EventBeginStatus && d.onPlayer()) {
 		return false
@@ -266,15 +266,15 @@ type WatchPlayerDamage struct {
 	EvStatus Status
 }
 
-func (w *WatchPlayerDamage) Desc() string {
+func (w WatchPlayerDamage) Desc() string {
 	return fmt.Sprintf("you are hurt by %s", w.EvStatus.Name())
 }
 
-func (w *WatchPlayerDamage) EventTypes() EventType {
+func (w WatchPlayerDamage) EventTypes() EventType {
 	return EventDamage
 }
 
-func (w *WatchPlayerDamage) CheckEvent(g *Game, sp *Spirit, e Event) bool {
+func (w WatchPlayerDamage) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	d, ok := e.(*EventWithStatus)
 	return ok && d.EvType == EventDamage && d.EvStatus == w.EvStatus
 }
@@ -478,11 +478,11 @@ type CondDisabled struct {
 	Part SpiritPart
 }
 
-func (cond *CondDisabled) EventTypes() EventType {
+func (cond CondDisabled) EventTypes() EventType {
 	return EventType(0)
 }
 
-func (cond *CondDisabled) Desc() string {
+func (cond CondDisabled) Desc() string {
 	switch cond.Part {
 	case HasInvoke:
 		return "This spirit cannot be invoked"
@@ -499,11 +499,11 @@ func (cond *CondDisabled) Desc() string {
 	}
 }
 
-func (cond *CondDisabled) Enabled() SpiritPart {
+func (cond CondDisabled) Enabled() SpiritPart {
 	return HasAll & ^cond.Part
 }
 
-func (cond *CondDisabled) ApplyEvent(g *Game, sp *Spirit, e Event) Consequence {
+func (cond CondDisabled) ApplyEvent(g *Game, sp *Spirit, e Event) Consequence {
 	return CqNone
 }
 
@@ -513,19 +513,19 @@ type CondPunish struct {
 	Do   Consequence
 }
 
-func (c *CondPunish) EventTypes() EventType {
+func (c CondPunish) EventTypes() EventType {
 	return c.When.EventTypes()
 }
 
-func (c *CondPunish) Desc() string {
+func (c CondPunish) Desc() string {
 	return fmt.Sprintf("This spirit %s if %s", descCq(c.Do), c.When.Desc())
 }
 
-func (c *CondPunish) Enabled() SpiritPart {
+func (c CondPunish) Enabled() SpiritPart {
 	return HasAll
 }
 
-func (c *CondPunish) ApplyEvent(g *Game, sp *Spirit, e Event) Consequence {
+func (c CondPunish) ApplyEvent(g *Game, sp *Spirit, e Event) Consequence {
 	if c.When.CheckEvent(g, sp, e) {
 		return c.Do
 	}
@@ -534,26 +534,26 @@ func (c *CondPunish) ApplyEvent(g *Game, sp *Spirit, e Event) Consequence {
 
 // OnEvent consequence based on event type
 func OnEvent(cq Consequence, ty EventType) CondEffect {
-	w := &WatchEvent{Type: ty}
-	return &CondPunish{When: w, Do: cq}
+	w := WatchEvent{Type: ty}
+	return CondPunish{When: w, Do: cq}
 }
 
 // OnStatus consequence when the player gets a particular status
 func OnStatus(cq Consequence, st Status) CondEffect {
-	w := &WatchPlayerStatus{EvStatus: st}
-	return &CondPunish{When: w, Do: cq}
+	w := WatchPlayerStatus{EvStatus: st}
+	return CondPunish{When: w, Do: cq}
 }
 
 // OnDamage consequence when the player takes damage from a status
 func OnDamage(cq Consequence, st Status) CondEffect {
-	w := &WatchPlayerDamage{EvStatus: st}
-	return &CondPunish{When: w, Do: cq}
+	w := WatchPlayerDamage{EvStatus: st}
+	return CondPunish{When: w, Do: cq}
 }
 
 // OnAnyStatus consequence when the player gets any status
 func OnAnyStatus(cq Consequence) CondEffect {
-	w := &WatchPlayerStatus{MatchAny: true}
-	return &CondPunish{When: w, Do: cq}
+	w := WatchPlayerStatus{MatchAny: true}
+	return CondPunish{When: w, Do: cq}
 }
 
 func Cond(ef CondEffect, u EventWatcher) *SpiritCond {
@@ -565,19 +565,19 @@ func CondU(ef CondEffect, u EventWatcher) *SpiritCond {
 }
 
 func Dis(p SpiritPart, u EventWatcher) *SpiritCond {
-	return Cond(&CondDisabled{Part: p}, u)
+	return Cond(CondDisabled{Part: p}, u)
 }
 
 func Dies(mons ...string) EventWatcher {
-	return &WatchMonsEvent{EvType: EventMonsDeath, Mons: AnyMonster(mons...)}
+	return WatchMonsEvent{EvType: EventMonsDeath, Mons: AnyMonster(mons...)}
 }
 
 func Seen(mons ...string) EventWatcher {
-	return &WatchMonsEvent{EvType: EventMonsSeen, Mons: AnyMonster(mons...)}
+	return WatchMonsEvent{EvType: EventMonsSeen, Mons: AnyMonster(mons...)}
 }
 
 func Gets(st Status, mons ...string) EventWatcher {
-	return &WatchMonsStatus{EvStatus: st, Mons: AnyMonster(mons...)}
+	return WatchMonsStatus{EvStatus: st, Mons: AnyMonster(mons...)}
 }
 
 // GenCondition generates a random condition to attach to a spirit
@@ -614,7 +614,7 @@ func (g *Game) GenCondition() *SpiritCond {
 	case  8: return Dis(HasInvoke,   Gets(StatusFire,      "fire llama", "exploding nadre"))
 	case  9: return Dis(HasStats,    Gets(StatusImbalance, "lashing frog", "rampaging boar"))
 	case 10: return Dis(HasPassives, Gets(StatusBerserk,   "noisy imp", "crazy druid", "walking mushroom"))
-	case 11: return Dis(HasAll, &WatchTwoStatus{A:StatusConfusion, B:StatusImbalance})
-	default: return Dis(HasAll, &WatchTwoStatus{A:StatusLignification, B:StatusFear})
+	case 11: return Dis(HasAll, WatchTwoStatus{A:StatusConfusion, B:StatusImbalance})
+	default: return Dis(HasAll, WatchTwoStatus{A:StatusLignification, B:StatusFear})
 	}
 }

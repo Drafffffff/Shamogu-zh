@@ -62,7 +62,7 @@ func init() {
 	gob.Register(WatchPlayerStatus{})
 	gob.Register(WatchTwoStatus{})
 	gob.Register(WatchPlayerDamage{})
-	gob.Register(WatchCompleteLevel{})
+	gob.Register(&WatchCompleteLevel{})
 
 	// Actions in key-config.
 	gob.Register(ActionAutoExplore{})
