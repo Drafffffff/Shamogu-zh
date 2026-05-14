@@ -1,8 +1,17 @@
 # v? ?
 
+Reworked and improved content:
+
 * Corrupted dungeon: monster nests now scale with map level and happen less
   often early on, to make (very) rare cases that could feel a bit too unfair
-  even rarer.
+  even rarer (see #18).
+* Corrupted dungeon: only 3/4 chance of relief comestible in warp, berserk and
+  lignification thematic levels (see #11).
+* Corrupted dungeon: new kind of map corruption that performs wall-thickening
+  (see #11).
+
+UI, graphics, QoL:
+
 * Make Runic Chicken players not avoid traps in auto-explore and travel.
 
 # v1.5.0 2026-03-30
