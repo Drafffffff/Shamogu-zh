@@ -8,6 +8,8 @@ Reworked and improved content:
 * Corrupted dungeon: only 3/4 chance of relief comestible in warp, berserk and
   lignification thematic levels (see #11).
 * Corrupted dungeon: rarely spawn lone golem or wasp guardian (see #11).
+* Corrupted dungeon: new rare spooky level with empty totem, runes and menhirs
+  (see #11).
 * Corrupted dungeon: new kind of map corruption that performs wall-thickening
   (see #11).
 

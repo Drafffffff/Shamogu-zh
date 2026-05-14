@@ -429,6 +429,7 @@ func (g *Game) genItems(mg *MapGen) {
 		_, p := g.RandomVaultsPlace(mg, npvaults, PlaceItem)
 		return p
 	}
+	var usedLevel bool // spooky corrupted level with used runes/menhirs
 	if spi := g.ProcInfo.Spirits[g.Map.Level-1]; spi.Idx >= 0 {
 		var sp *Entity
 		if spi.Advanced {
@@ -443,6 +444,12 @@ func (g *Game) genItems(mg *MapGen) {
 		g.Map.Totem = sp.P
 		g.AddEntity(sp)
 	} else if g.Map.Level < MapLevels {
+		if g.Mod(ModCorruptedDungeon) {
+			// In Corrupted Dungeon games with an empty totem,
+			// empty all runes and menhirs 1/15 times on average
+			// per game (2 empty totem levels).
+			usedLevel = g.IntN(30) == 0
+		}
 		addEmptyTotem := func() {
 			p := totemPoint()
 			g.Map.Totem = p
@@ -632,6 +639,24 @@ func (g *Game) genItems(mg *MapGen) {
 	}
 	for range rtt {
 		g.genRunicTrapInTunnel(mg, trapRune())
+	}
+	if usedLevel {
+		// Rare spooky level with only used runes and menhirs.
+		for _, e := range g.NPMapEntities() {
+			switch it := e.Role.(type) {
+			case *RunicTrap:
+				it.Used = true
+			case *Menhir:
+				it.Used = true
+			case *Portal:
+				if it.Fake {
+					// Mark even fake portals as already
+					// used if they ever happen on such a
+					// spooky level.
+					it.Used = true
+				}
+			}
+		}
 	}
 }
 
