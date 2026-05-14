@@ -3,6 +3,7 @@
 * Corrupted dungeon: monster nests now scale with map level and happen less
   often early on, to make (very) rare cases that could feel a bit too unfair
   even rarer.
+* Make Runic Chicken players not avoid traps in auto-explore and travel.
 
 # v1.5.0 2026-03-30
 
