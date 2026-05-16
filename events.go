@@ -35,22 +35,16 @@ func (g *Game) UpdateEventFilter() {
 
 const (
 	EventMenhir EventType = 1 << iota // menhir activated
-	EventTotem                        // totem used
-	EventFakePortal                   // portal malfunctioned
 	EventPortal                       // portal worked (used to record end-of-level properties)
 	EventNewLevel                     // new level starts (when condition actually triggers)
-	EventPlayRune                     // player triggered a rune
-	EventMonsRune                     // monster triggered a rune
+	EventFakePortal                   // portal malfunctioned
 
 	EventPickup                       // picked up a comestible
-	EventComestible                   // ate a comestible
-	EventInvoke                       // invoked a spirit
 	EventHeal                         // player gained permanent HP
-	EventHPGain                       // player gained any HP
 	EventTeleport                     // player teleported
-	EventDamage                       // player takes staus-based damage
+	EventDamage                       // player takes status-based damage
 
-	EventBeginStatus                  // actor status started
+	EventStatus                       // actor status started
 	EventMonsDeath                    // monster died
 	EventMonsSeen                     // you see a monster
 
@@ -80,18 +74,11 @@ type WatchEvent struct {
 func (w WatchEvent) Desc() string {
 	switch w.Type {
 	case EventMenhir:      return "you activate a Menhir"
-	case EventTotem:       return "you use a totem"
-	case EventFakePortal:  return "a portal you use malfunctions"
 	case EventNewLevel:    return "you reach the next level"
-	case EventPlayRune:    return "you trigger a rune"
-	case EventMonsRune:    return "a monster triggers a rune"
 	case EventPickup:      return "you pick up a comestible"
-	case EventComestible:  return "you eat a comestible"
-	case EventInvoke:      return "you invoke a spirit"
+	case EventFakePortal:  return "a portal you use malfunctions"
 	case EventHeal:        return "a comestible heals your HP"
-	case EventHPGain:      return "you gain HP"
 	case EventTeleport:    return "you teleport"
-	case EventBeginStatus: return "you get any status"
 	case EventDamage:      return "you are hurt by fire or poison"
 	case EventMonsDeath:   return "a monster dies"
 	case EventWallBreak:   return "a wall breaks"
@@ -192,12 +179,12 @@ func (w WatchMonsStatus) Desc() string {
 }
 
 func (w WatchMonsStatus) EventTypes() EventType {
-	return EventBeginStatus
+	return EventStatus
 }
 
 func (w WatchMonsStatus) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	d, ok := e.(*EventWithStatus)
-	return ok && d.EvType == EventBeginStatus && d.EvStatus == w.EvStatus && w.Mons.Match(d.EvEntity)
+	return ok && d.EvType == EventStatus && d.EvStatus == w.EvStatus && w.Mons.Match(d.EvEntity)
 }
 
 // EventWithStatus marks status changes with the entity and status
@@ -230,12 +217,12 @@ func (w WatchPlayerStatus) Desc() string {
 }
 
 func (w WatchPlayerStatus) EventTypes() EventType {
-	return EventBeginStatus
+	return EventStatus
 }
 
 func (w WatchPlayerStatus) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	d, ok := e.(*EventWithStatus)
-	return ok && d.EvType == EventBeginStatus && (w.MatchAny || d.EvStatus == w.EvStatus) && d.onPlayer()
+	return ok && d.EvType == EventStatus && (w.MatchAny || d.EvStatus == w.EvStatus) && d.onPlayer()
 }
 
 // WatchEither triggers when either component does
@@ -268,12 +255,12 @@ func (w WatchTwoStatus) Desc() string {
 }
 
 func (w WatchTwoStatus) EventTypes() EventType {
-	return EventBeginStatus
+	return EventStatus
 }
 
 func (w WatchTwoStatus) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	d, ok := e.(*EventWithStatus)
-	if !(ok && d.EvType == EventBeginStatus && d.onPlayer()) {
+	if !(ok && d.EvType == EventStatus && d.onPlayer()) {
 		return false
 	}
 	s := g.PlayerActor().Statuses

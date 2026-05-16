@@ -98,7 +98,6 @@ func (g *Game) AdjustHPWithMin(i ID, ai *Actor, amount int, m int) {
 	if i == PlayerID {
 		if ai.HP > hp {
 			g.Logf("You feel better (+%d HP).", ai.HP-hp)
-			TotemEvents(g, &EventHappened{EvType: EventHPGain})
 		} else if ai.HP < hp {
 			g.Logf("You feel weaker (-%d HP).", hp-ai.HP)
 		} else if amount >= 0 {
@@ -585,7 +584,7 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 		}
 		g.InflictDamage(i, ai, FireDamage, AttackFireCatch)
 		if ai.IsDead() {
-			TotemEvents(g, &EventWithStatus{EvType: EventBeginStatus, EvEntity: g.Entity(i), EvStatus: st})
+			TotemEvents(g, &EventWithStatus{EvType: EventStatus, EvEntity: g.Entity(i), EvStatus: st})
 			return false
 		}
 	case StatusFear:
@@ -679,7 +678,7 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 	} else if ei := g.Entity(i); g.InFOV(ei.P) {
 		g.Logf("The %s is %s (%s).", ei.Name, st, fmtTurns(turns, n))
 	}
-	TotemEvents(g, &EventWithStatus{EvType: EventBeginStatus, EvEntity: g.Entity(i), EvStatus: st})
+	TotemEvents(g, &EventWithStatus{EvType: EventStatus, EvEntity: g.Entity(i), EvStatus: st})
 	switch st {
 	case StatusBerserk:
 		g.AdjustHP(i, ai, ai.HPBonus())

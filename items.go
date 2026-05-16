@@ -172,7 +172,6 @@ func (sp *Spirit) Use(g *Game, i ID) bool {
 	}
 	sp.Charges--
 	sp.Uses++
-	TotemEvents(g, &EventHappened{EvType: EventInvoke})
 	g.Stats.SpiritUses++
 	g.Stats.MapSpiritUses[g.Map.Level-1]++
 	name := sp.Ability[sp.Level].Name()
@@ -222,7 +221,6 @@ func (c *Comestible) Use(g *Game, i ID) bool {
 	}
 	g.Stats.Comestibles[g.Entity(i).Name]++
 	g.Entities[i] = emptySlot()
-	TotemEvents(g, &EventHappened{EvType: EventComestible})
 	g.Stats.EatenComestibles++
 	g.Stats.MapEatenComestibles[g.Map.Level-1]++
 	g.handleGluttonyOnEating()
@@ -290,7 +288,6 @@ func (g *Game) EquipItemAt(i ID) bool {
 		ej.P = InvalidPos
 		et := g.Entity(g.genEmptyTotemAt(g.PP()))
 		et.Seen = true
-		TotemEvents(g, &EventHappened{EvType: EventTotem})
 		g.totemPickupBerserk()
 		return true
 	case *Comestible:
