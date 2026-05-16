@@ -238,6 +238,25 @@ func (w WatchPlayerStatus) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	return ok && d.EvType == EventBeginStatus && (w.MatchAny || d.EvStatus == w.EvStatus) && d.onPlayer()
 }
 
+// WatchEither triggers when either component does
+type WatchEither struct {
+	A EventWatcher
+	B EventWatcher
+}
+
+func (w WatchEither) Desc() string {
+	return fmt.Sprintf("%s or %s", w.A.Desc(), w.B.Desc())
+}
+
+func (w WatchEither) EventTypes() EventType {
+	return w.A.EventTypes() | w.B.EventTypes()
+}
+
+func (w WatchEither) CheckEvent(g *Game, sp *Spirit, e Event) bool {
+	return w.A.CheckEvent(g, sp, e) || w.B.CheckEvent(g, sp, e)
+}
+
+
 // WatchTwoStatus triggers when the player gets a combination of statuses
 type WatchTwoStatus struct {
 	A Status
@@ -583,13 +602,16 @@ func Gets(st Status, mons ...ActorKind) EventWatcher {
 // GenCondition generates a random condition to attach to a spirit
 func (g *Game) GenCondition() *SpiritCond {
 	l := g.Map.Level
+	if l == 8 && g.IntN(8) == 0 {
+		return Dis(HasInvoke, Seen(FearsomeLich, UndeadKnight))
+	}
 	if l >= 5 {
 		switch g.IntN(12) {
-		case 0: return CondU(OnEvent (CqDischarge, EventPickup),        Gets(StatusPoison, HungryRat))
-		case 1: return CondU(OnEvent (CqDischargeAll, EventWallBreak),  Gets(StatusPoison, RampagingBoar, EarthDragon))
-		case 2: return CondU(OnStatus(CqDischargeAll, StatusDaze),      Gets(StatusDaze, TemporalCat))
+		case 0: return CondU(OnEvent (CqDischarge,    EventPickup),     Gets(StatusPoison, HungryRat))
+		case 1: return CondU(OnEvent (CqDischarge,    EventWallBreak),  Gets(StatusPoison, RampagingBoar, EarthDragon))
+		case 2: return CondU(OnStatus(CqDischargeAll, StatusDaze),      Dies(TemporalCat))
 		case 3: return CondU(OnStatus(CqDischargeAll, StatusFear),      Gets(StatusConfusion, BarkingHound))
-		case 4: return CondU(OnStatus(CqDischargeAll, StatusConfusion), Gets(StatusFear, ConfusingEye))
+		case 4: return CondU(OnStatus(CqDischargeAll, StatusImbalance), Gets(StatusImbalance, LashingFrog, RampagingBoar))
 		}
 	}
 	if l >= 3 {
@@ -599,22 +621,18 @@ func (g *Game) GenCondition() *SpiritCond {
 		case 2: return Cond(OnAnyStatus(CqDischarge),                &WatchCompleteLevel{Test: Charges})
 		}
 	}
-	if l == 8 && g.IntN(8) == 0 {
-		return Dis(HasInvoke, Seen(FearsomeLich, UndeadKnight))
-	}
-	switch g.IntN(13) {
-	case  0: return Cond(OnStatus(CqLeave, StatusLignification),    Gets(StatusFire, WalkingTree))
-	case  1: return Cond(OnStatus(CqLeave, StatusFoggySkin),        Gets(StatusFire, FireLlama, ExplodingNadre))
-	case  2: return Cond(OnStatus(CqLeave, StatusClarity),          Gets(StatusConfusion, BlinkButterfly))
-	case  3: return Cond(OnStatus(CqLeave, StatusBerserk),          Dies(BarkingHound))
-	case  4: return Cond(OnEvent (CqLeave, EventTeleport),          Seen(WarpingWraith))
-	case  5: return Cond(OnEvent (CqDischargeAll, EventHeal),       Gets(StatusBerserk, FourHeadedHydra))
-	case  6: return Cond(OnDamage(CqDischarge,    StatusFire),      Gets(StatusImbalance, BurningPhoenix))
-	case  7: return Cond(OnDamage(CqDischargeAll, StatusPoison),    Dies(MadOctopode, TotemWasp))
+	switch g.IntN(12) {
+	case  0: return Cond(OnStatus(CqLeave, StatusLignification), WatchEither{A: Gets(StatusFire, WalkingTree), B: Seen(WalkingMushroom)})
+	case  1: return Cond(OnStatus(CqLeave, StatusFoggySkin),     Gets(StatusFire, FireLlama, ExplodingNadre))
+	case  2: return Cond(OnStatus(CqLeave, StatusClarity),       Gets(StatusConfusion, BlinkButterfly))
+	case  3: return Cond(OnEvent (CqLeave, EventTeleport),       Seen(WarpingWraith))
+	case  4: return Cond(OnDamage(CqLeave, StatusPoison),        Dies(MadOctopode, TotemWasp))
+	case  5: return Cond(OnDamage(CqDischarge,    StatusFire),   Gets(StatusImbalance, BurningPhoenix))
+	case  6: return Cond(OnEvent (CqDischargeAll, EventHeal),    Gets(StatusBerserk, FourHeadedHydra))
+	case  7: return Dis(HasStats,    Seen(TotemWasp, BlazingGolem, DraggingAlligator))
 	case  8: return Dis(HasInvoke,   Gets(StatusFire,      FireLlama, ExplodingNadre))
-	case  9: return Dis(HasStats,    Gets(StatusImbalance, LashingFrog, RampagingBoar))
-	case 10: return Dis(HasPassives, Gets(StatusBerserk,   NoisyImp, CrazyDruid, WalkingMushroom))
-	case 11: return Dis(HasAll, WatchTwoStatus{A:StatusConfusion, B:StatusImbalance})
+	case  9: return Dis(HasPassives, Gets(StatusBerserk,   NoisyImp, CrazyDruid, WalkingMushroom))
+	case 10: return Dis(HasAll, WatchTwoStatus{A:StatusConfusion, B:StatusImbalance})
 	default: return Dis(HasAll, WatchTwoStatus{A:StatusLignification, B:StatusFear})
 	}
 }

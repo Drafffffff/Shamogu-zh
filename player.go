@@ -288,5 +288,7 @@ func (g *Game) ComputePlayerStats() {
 		}
 	}
 	p.HP = min(p.HP, p.GetMaxHP())
-	g.UpdateEventFilter()
+	if g.Mod(ModTotemConditions) {
+		g.UpdateEventFilter()
+	}
 }
