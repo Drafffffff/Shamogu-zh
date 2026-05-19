@@ -443,7 +443,7 @@ func (g *Game) genItems(mg *MapGen) {
 		spr := sp.Role.(*Spirit)
 		spr.Charges = spr.MaxCharges[spr.Level]
 		if g.Mod(ModTotemConditions) {
-			spr.Condition = g.GenCondition()
+			spr.Condition = g.ProcInfo.Conditions[g.Map.Level-1]
 		}
 		sp.Rune = '!'
 		sp.P = totemPoint()

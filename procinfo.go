@@ -33,6 +33,7 @@ type ProcInfo struct {
 	ThemedLevel      int              // special theme for rare late corrupted level (4-8)
 	TrapLevel        int              // special level with lots of traps (5-9)
 	Spirits          []spiritProcInfo // spirit index for each dungeon level (-1 if no spirit)
+	Conditions       []*SpiritCond    // spirit condition for each dungeon level
 	Menhirs          []int            // menhir-generation data
 	MenhirIdx        int              // current index in Menhirs
 	Comestibles      []int            // comestible-generation data
@@ -307,6 +308,10 @@ func (g *Game) spiritProcGen() {
 	// generated).
 	ts = append(ts, spiritProcInfo{Idx: -1})
 	g.ProcInfo.Spirits = ts
+	// Generate spirit conditions
+	if g.Mod(ModTotemConditions) {
+		g.ProcInfo.Conditions = g.GenConditions()
+	}
 }
 
 // PrintGeneratedTotems prints the given totem procgen info for debug purposes.

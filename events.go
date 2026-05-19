@@ -586,40 +586,48 @@ func Gets(st Status, mons ...ActorKind) EventWatcher {
 	return WatchMonsStatus{EvStatus: st, Mons: AnyMonster(mons...)}
 }
 
-// GenCondition generates a random condition to attach to a spirit
-func (g *Game) GenCondition() *SpiritCond {
-	l := g.Map.Level
-	if l == 8 && g.IntN(8) == 0 {
-		return Dis(HasInvoke, Seen(FearsomeLich, UndeadKnight))
-	}
-	if l >= 5 {
-		switch g.IntN(12) {
-		case 0: return CondU(OnEvent (CqDischarge,    EventPickup),     Gets(StatusPoison, HungryRat))
-		case 1: return CondU(OnEvent (CqDischarge,    EventWallBreak),  Gets(StatusPoison, RampagingBoar, EarthDragon))
-		case 2: return CondU(OnStatus(CqDischargeAll, StatusDaze),      Dies(TemporalCat))
-		case 3: return CondU(OnStatus(CqDischargeAll, StatusFear),      Gets(StatusConfusion, BarkingHound))
-		case 4: return CondU(OnStatus(CqDischargeAll, StatusImbalance), Gets(StatusImbalance, LashingFrog, RampagingBoar))
+// GenCondition randomly generates the sequence of conditions for a run
+// 8 are generated but the ones corresponding to empty totems will be ignored
+func (g *Game) GenConditions() []*SpiritCond {
+	cs := make([]*SpiritCond, 8)
+	for i, j := range g.rand.Perm(12)[0:8] {
+		switch j {
+		case  0: cs[i] = Cond(OnStatus(CqLeave, StatusLignification), WatchEither{A: Gets(StatusFire, WalkingTree), B: Seen(WalkingMushroom)})
+		case  1: cs[i] = Cond(OnStatus(CqLeave, StatusFoggySkin),     Gets(StatusFire, FireLlama, ExplodingNadre))
+		case  2: cs[i] = Cond(OnStatus(CqLeave, StatusClarity),       Gets(StatusConfusion, BlinkButterfly))
+		case  3: cs[i] = Cond(OnEvent (CqLeave, EventTeleport),       Seen(WarpingWraith))
+		case  4: cs[i] = Cond(OnDamage(CqLeave, StatusPoison),        Dies(MadOctopode, TotemWasp))
+		case  5: cs[i] = Cond(OnDamage(CqDischarge,    StatusFire),   Gets(StatusImbalance, BurningPhoenix))
+		case  6: cs[i] = Cond(OnEvent (CqDischargeAll, EventHeal),    Gets(StatusBerserk, FourHeadedHydra))
+		case  7: cs[i] = Dis(HasStats,    Seen(TotemWasp, BlazingGolem, DraggingAlligator))
+		case  8: cs[i] = Dis(HasInvoke,   Gets(StatusFire,      FireLlama, ExplodingNadre))
+		case  9: cs[i] = Dis(HasPassives, Gets(StatusBerserk,   NoisyImp, CrazyDruid, WalkingMushroom))
+		case 10: cs[i] = Dis(HasAll, WatchTwoStatus{A:StatusConfusion, B:StatusImbalance})
+		default: cs[i] = Dis(HasAll, WatchTwoStatus{A:StatusLignification, B:StatusFear})
 		}
 	}
-	if l >= 3 {
-		switch g.IntN(10) {
-		case 0: return Cond(OnEvent(CqLeave, EventPickup),           &WatchCompleteLevel{Test: EmptyInventory})
-		case 1: return Cond(OnEvent(CqDischargeAll, EventMonsDeath), &WatchCompleteLevel{Test: Charges})
-		case 2: return Cond(OnAnyStatus(CqDischarge),                &WatchCompleteLevel{Test: Charges})
+	for _, j := range g.rand.Perm(3)[0:2] {
+		i := 2 + g.IntN(4) // levels 3 to 6
+		switch j {
+		case 0: cs[i] = Cond(OnEvent(CqLeave, EventPickup),           &WatchCompleteLevel{Test: EmptyInventory})
+		case 1: cs[i] = Cond(OnEvent(CqDischargeAll, EventMonsDeath), &WatchCompleteLevel{Test: Charges})
+		case 2: cs[i] = Cond(OnAnyStatus(CqDischarge),                &WatchCompleteLevel{Test: Charges})
 		}
 	}
-	switch g.IntN(12) {
-	case  0: return Cond(OnStatus(CqLeave, StatusLignification), WatchEither{A: Gets(StatusFire, WalkingTree), B: Seen(WalkingMushroom)})
-	case  1: return Cond(OnStatus(CqLeave, StatusFoggySkin),     Gets(StatusFire, FireLlama, ExplodingNadre))
-	case  2: return Cond(OnStatus(CqLeave, StatusClarity),       Gets(StatusConfusion, BlinkButterfly))
-	case  3: return Cond(OnEvent (CqLeave, EventTeleport),       Seen(WarpingWraith))
-	case  4: return Cond(OnDamage(CqLeave, StatusPoison),        Dies(MadOctopode, TotemWasp))
-	case  5: return Cond(OnDamage(CqDischarge,    StatusFire),   Gets(StatusImbalance, BurningPhoenix))
-	case  6: return Cond(OnEvent (CqDischargeAll, EventHeal),    Gets(StatusBerserk, FourHeadedHydra))
-	case  7: return Dis(HasStats,    Seen(TotemWasp, BlazingGolem, DraggingAlligator))
-	case  8: return Dis(HasInvoke,   Gets(StatusFire,      FireLlama, ExplodingNadre))
-	case  9: return Dis(HasPassives, Gets(StatusBerserk,   NoisyImp, CrazyDruid, WalkingMushroom))
-	case 10: return Dis(HasAll, WatchTwoStatus{A:StatusConfusion, B:StatusImbalance})
-	default: return Dis(HasAll, WatchTwoStatus{A:StatusLignification, B:StatusFear})
+	nu := 1 + g.IntN(2)
+	for _, j := range g.rand.Perm(5)[0:nu] {
+		i := 4 + g.IntN(4) // levels 5 to 8
+		switch j {
+		case 0: cs[i] = CondU(OnEvent (CqDischarge,    EventPickup),     Gets(StatusPoison, HungryRat))
+		case 1: cs[i] = CondU(OnEvent (CqDischarge,    EventWallBreak),  Gets(StatusPoison, RampagingBoar, EarthDragon))
+		case 2: cs[i] = CondU(OnStatus(CqDischargeAll, StatusDaze),      Dies(TemporalCat))
+		case 3: cs[i] = CondU(OnStatus(CqDischargeAll, StatusFear),      Gets(StatusConfusion, BarkingHound))
+		case 4: cs[i] = CondU(OnStatus(CqDischargeAll, StatusImbalance), Gets(StatusImbalance, LashingFrog, RampagingBoar))
+		}
 	}
+	if g.IntN(6) == 0 {
+		cs[7] = Dis(HasInvoke, Seen(FearsomeLich, UndeadKnight))
+		cs[7].Upgrade = true
+	}
+	return cs
 }
