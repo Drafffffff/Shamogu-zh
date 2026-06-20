@@ -220,32 +220,43 @@ func (g *Game) flavoursProcGen() {
 }
 
 func (g *Game) spiritProcGen() {
+	// Simpler case: only one empty slot and no special handling
+	// for advanced totems
+	if g.Mod(ModTotemConditions) {
+		ts := make([]spiritProcInfo, 7)
+		n := len(secondarySpirits)
+		if !g.Mod(ModAdvancedSpirits) {
+			for i, j := range g.rand.Perm(n) {
+				ts[i].Idx = j
+			}
+		} else {
+			p := g.rand.Perm(n + len(challengeSpirits))
+			for i, j := range p[0:n] {
+				if j < n {
+					ts[i].Idx = j
+				} else {
+					ts[i].Idx = j - n
+					ts[i].Advanced = true
+				}
+			}
+		}
+		// Empty totem on a random level, and the last one
+		ts = slices.Insert(ts, 1 + g.IntN(len(ts)), spiritProcInfo{Idx: -1})
+		ts = append(ts, spiritProcInfo{Idx: -1})
+		g.ProcInfo.Spirits = ts
+		// Generate totem conditions
+		g.ProcInfo.Conditions = g.GenConditions()
+		return
+	}
 	// spirits represents a permutation of indices corresponding to
 	// secondary spirits.
-	spirits := make([]int, len(secondarySpirits))
-	for i := range spirits {
-		spirits[i] = i
-	}
-	g.rand.Shuffle(len(spirits), func(i, j int) {
-		spirits[i], spirits[j] = spirits[j], spirits[i]
-	})
-	// extras represents a permutation of indices corresponding to
-	// extra spirits.
-	var extras []int
-	if g.Mod(ModAdvancedSpirits) {
-		extras = make([]int, len(challengeSpirits))
-		for i := range extras {
-			extras[i] = i
-		}
-		g.rand.Shuffle(len(extras), func(i, j int) {
-			extras[i], extras[j] = extras[j], extras[i]
-		})
-	}
+	spirits := g.rand.Perm(len(secondarySpirits))
 	// ts contains information about generated totemic spirits.
 	// There are 6 generated non-empty totems per game.
 	ts := make([]spiritProcInfo, 6)
-	if len(extras) > 0 {
+	if g.Mod(ModAdvancedSpirits) {
 		// Extra totems: generate 3 of each kind.
+		extras := g.rand.Perm(len(challengeSpirits))
 		for i := range 3 {
 			ts[i].Idx = extras[i]
 			ts[i].Advanced = true
@@ -308,10 +319,6 @@ func (g *Game) spiritProcGen() {
 	// generated).
 	ts = append(ts, spiritProcInfo{Idx: -1})
 	g.ProcInfo.Spirits = ts
-	// Generate spirit conditions
-	if g.Mod(ModTotemConditions) {
-		g.ProcInfo.Conditions = g.GenConditions()
-	}
 }
 
 // PrintGeneratedTotems prints the given totem procgen info for debug purposes.
