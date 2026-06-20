@@ -285,6 +285,23 @@ func (w WatchPlayerDamage) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	return ok && d.EvType == EventDamage && d.EvStatus == w.EvStatus
 }
 
+// WatchReachLevel triggers when you reach a numbered level
+type WatchReachLevel struct {
+	Level int
+}
+
+func (w WatchReachLevel) Desc() string {
+	return fmt.Sprintf("You reach level %d", w.Level)
+}
+
+func (w WatchReachLevel) EventTypes() EventType {
+	return EventNewLevel
+}
+
+func (w WatchReachLevel) CheckEvent(g *Game, sp *Spirit, e Event) bool {
+	return g.Map.Level == w.Level
+}
+
 // WatchCompleteLevel triggers when a matched monster dies
 type WatchCompleteLevel struct {
 	Test        CompleteType
@@ -605,6 +622,19 @@ func (g *Game) GenConditions() []*SpiritCond {
 		case 10: cs[i] = Dis(HasAll, WatchTwoStatus{A:StatusConfusion, B:StatusImbalance})
 		default: cs[i] = Dis(HasAll, WatchTwoStatus{A:StatusLignification, B:StatusFear})
 		}
+	}
+	if g.rand.IntN(4) != 0 {
+		var w EventWatcher
+		switch g.rand.IntN(6) {
+		case  0: w = WatchEither{A: WatchPlayerStatus{EvStatus: StatusDaze},      B: WatchPlayerStatus{EvStatus: StatusImbalance}}
+		case  1: w = WatchEither{A: WatchPlayerStatus{EvStatus: StatusConfusion}, B: WatchPlayerStatus{EvStatus: StatusBerserk}}
+		case  2: w = WatchEither{A: WatchPlayerStatus{EvStatus: StatusFire},      B: WatchPlayerStatus{EvStatus: StatusPoison}}
+		case  3: w = WatchEither{A: WatchEvent{Type: EventMenhir}, B: WatchEvent{Type: EventHeal}}
+		case  4: w = WatchEvent{Type: EventPickup}
+		default: w = Dies(ThunderPorcupine)
+		}
+		c := CondPunish{When: w, Do: CqLeave}
+		cs[g.rand.IntN(5) / 3] = Cond(c, WatchReachLevel{Level: 4})
 	}
 	for _, j := range g.rand.Perm(3)[0:2] {
 		i := 2 + g.IntN(4) // levels 3 to 6

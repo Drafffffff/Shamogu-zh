@@ -63,6 +63,7 @@ func init() {
 	gob.Register(WatchEither{})
 	gob.Register(WatchTwoStatus{})
 	gob.Register(WatchPlayerDamage{})
+	gob.Register(WatchReachLevel{})
 	gob.Register(&WatchCompleteLevel{})
 
 	// Actions in key-config.
