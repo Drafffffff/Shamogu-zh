@@ -88,8 +88,8 @@ func (sp *Spirit) EitherDesc(descUpgrade bool) string {
 	if cond := sp.Condition; cond != nil {
 		sb.WriteByte('\n')
 		sb.WriteByte('\n')
-		if descUpgrade && cond.Upgrade {
-			sb.WriteString("(Including on upgrade:)\n")
+		if descUpgrade {
+			sb.WriteString(cond.Upgrade.Desc())
 		}
 		sb.WriteString(cond.Desc())
 	}
@@ -135,10 +135,11 @@ func (sp *Spirit) UpgradeDesc(enew *Entity) string {
 		sb.WriteByte('\n')
 		fmt.Fprintf(&sb, "@BNew traits:@N %s.", TraitDesc(Player, sp.BonusTraits[1]&^sp.BonusTraits[0]))
 	}
-	if cond := enew.Role.(*Spirit).Condition; cond != nil && cond.Upgrade {
+	hasCond := sp.Condition != nil
+	if cond := enew.Role.(*Spirit).Condition; cond != nil && cond.Upgrade.Applies(hasCond) {
 		sb.WriteByte('\n')
 		sb.WriteByte('\n')
-		if sp.Condition != nil {
+		if hasCond {
 			sb.WriteString("Replacing existing curse:\n")
 		}
 		sb.WriteString(cond.Desc())
@@ -271,7 +272,7 @@ func (g *Game) EquipItemAt(i ID) bool {
 			}
 			ev.Level++
 			ev.Charges += ev.MaxCharges[1] - ev.MaxCharges[0]
-			if c := it.(*Spirit).Condition; c.Upgrade {
+			if c := it.(*Spirit).Condition; c.Upgrade.Applies(ev.Condition != nil) {
 				ev.Condition = c
 			}
 			g.Logf("You upgrade your %s spirit.", ei.Name)

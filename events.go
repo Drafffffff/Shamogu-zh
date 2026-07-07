@@ -350,11 +350,35 @@ func (w *WatchCompleteLevel) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	return false
 }
 
+// UpgradePolicy describes how the condition applies when used as an upgrade
+type UpgradePolicy int
+
+const (
+	UpgradeIgnores UpgradePolicy = iota // never used on upgrade
+	UpgradeContinues                    // replaces an unfulfilled condition
+	UpgradeReplaces                     // replaces any condition
+)
+
+func (p UpgradePolicy) Applies(existing bool) bool {
+	return p >= UpgradeContinues && (existing || p >= UpgradeReplaces)
+}
+
+func (p UpgradePolicy) Desc() string {
+	switch p {
+	case UpgradeContinues:
+		return "(Including when upgrading an unfulfilled spirit:)\n"
+	case UpgradeReplaces:
+		return "(Including on any upgrade:)\n"
+	default:
+		return ""
+	}
+}
+
 // SpiritCond represents a condition imposed by a spirit
 type SpiritCond struct {
 	Effect  CondEffect
 	Until   EventWatcher
-	Upgrade bool
+	Upgrade UpgradePolicy
 }
 type CondEffect interface {
 	EventTypes()                       EventType
@@ -584,7 +608,11 @@ func Cond(ef CondEffect, u EventWatcher) *SpiritCond {
 }
 
 func CondU(ef CondEffect, u EventWatcher) *SpiritCond {
-	return &SpiritCond{Effect: ef, Until: u, Upgrade: true}
+	return &SpiritCond{Effect: ef, Until: u, Upgrade: UpgradeReplaces}
+}
+
+func CondC(ef CondEffect, u EventWatcher) *SpiritCond {
+	return &SpiritCond{Effect: ef, Until: u, Upgrade: UpgradeContinues}
 }
 
 func Dis(p SpiritPart, u EventWatcher) *SpiritCond {
@@ -639,9 +667,9 @@ func (g *Game) GenConditions() []*SpiritCond {
 	for _, j := range g.rand.Perm(3)[0:2] {
 		i := 2 + g.IntN(4) // levels 3 to 6
 		switch j {
-		case 0: cs[i] = Cond(OnEvent(CqLeave, EventPickup),           &WatchCompleteLevel{Test: EmptyInventory})
-		case 1: cs[i] = Cond(OnEvent(CqDischargeAll, EventMonsDeath), &WatchCompleteLevel{Test: Charges})
-		case 2: cs[i] = Cond(OnAnyStatus(CqDischarge),                &WatchCompleteLevel{Test: Charges})
+		case 0: cs[i] = CondC(OnEvent(CqLeave, EventPickup),           &WatchCompleteLevel{Test: EmptyInventory})
+		case 1: cs[i] = CondC(OnEvent(CqDischargeAll, EventMonsDeath), &WatchCompleteLevel{Test: Charges})
+		case 2: cs[i] = CondC(OnAnyStatus(CqDischarge),                &WatchCompleteLevel{Test: Charges})
 		}
 	}
 	nu := 1 + g.IntN(2)
@@ -657,7 +685,7 @@ func (g *Game) GenConditions() []*SpiritCond {
 	}
 	if g.IntN(6) == 0 {
 		cs[7] = Dis(HasInvoke, Seen(FearsomeLich, UndeadKnight))
-		cs[7].Upgrade = true
+		cs[7].Upgrade = UpgradeReplaces
 	}
 	return cs
 }
