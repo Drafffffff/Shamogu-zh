@@ -619,6 +619,10 @@ func Dis(p SpiritPart, u EventWatcher) *SpiritCond {
 	return Cond(CondDisabled{Part: p}, u)
 }
 
+func DisU(p SpiritPart, u EventWatcher) *SpiritCond {
+	return CondU(CondDisabled{Part: p}, u)
+}
+
 func Dies(mons ...ActorKind) EventWatcher {
 	return WatchMonsEvent{EvType: EventMonsDeath, Mons: AnyMonster(mons...)}
 }
@@ -635,7 +639,7 @@ func Gets(st Status, mons ...ActorKind) EventWatcher {
 // 8 are generated but the ones corresponding to empty totems will be ignored
 func (g *Game) GenConditions() []*SpiritCond {
 	cs := make([]*SpiritCond, 8)
-	for i, j := range g.rand.Perm(12)[0:8] {
+	for i, j := range g.rand.Perm(10)[0:8] {
 		switch j {
 		case  0: cs[i] = Cond(OnStatus(CqLeave, StatusLignification), WatchEither{A: Gets(StatusFire, WalkingTree), B: Seen(WalkingMushroom)})
 		case  1: cs[i] = Cond(OnStatus(CqLeave, StatusFoggySkin),     Gets(StatusFire, FireLlama, ExplodingNadre))
@@ -645,10 +649,8 @@ func (g *Game) GenConditions() []*SpiritCond {
 		case  5: cs[i] = Cond(OnDamage(CqDischarge,    StatusFire),   Gets(StatusImbalance, BurningPhoenix))
 		case  6: cs[i] = Cond(OnEvent (CqDischargeAll, EventHeal),    Gets(StatusBerserk, FourHeadedHydra))
 		case  7: cs[i] = Dis(HasStats,    Seen(TotemWasp, BlazingGolem, DraggingAlligator))
-		case  8: cs[i] = Dis(HasInvoke,   Gets(StatusFire,      FireLlama, ExplodingNadre))
-		case  9: cs[i] = Dis(HasPassives, Gets(StatusBerserk,   NoisyImp, CrazyDruid, WalkingMushroom))
-		case 10: cs[i] = Dis(HasAll, WatchTwoStatus{A:StatusConfusion, B:StatusImbalance})
-		default: cs[i] = Dis(HasAll, WatchTwoStatus{A:StatusLignification, B:StatusFear})
+		case  8: cs[i] = Dis(HasInvoke,   Gets(StatusImbalance, FourHeadedHydra))
+		default: cs[i] = Dis(HasPassives, Gets(StatusBerserk,   NoisyImp, CrazyDruid, WalkingMushroom))
 		}
 	}
 	if g.rand.IntN(4) != 0 {
@@ -673,19 +675,20 @@ func (g *Game) GenConditions() []*SpiritCond {
 		}
 	}
 	nu := 1 + g.IntN(2)
-	for _, j := range g.rand.Perm(5)[0:nu] {
-		i := 4 + g.IntN(4) // levels 5 to 8
+	for _, j := range g.rand.Perm(7)[0:nu] {
+		i := 3 + g.IntN(5) // levels 4 to 8
 		switch j {
 		case 0: cs[i] = CondU(OnEvent (CqDischarge,    EventPickup),     Gets(StatusPoison, HungryRat))
 		case 1: cs[i] = CondU(OnEvent (CqDischarge,    EventWallBreak),  Gets(StatusPoison, RampagingBoar, EarthDragon))
 		case 2: cs[i] = CondU(OnStatus(CqDischargeAll, StatusDaze),      Dies(TemporalCat))
 		case 3: cs[i] = CondU(OnStatus(CqDischargeAll, StatusFear),      Gets(StatusConfusion, BarkingHound))
 		case 4: cs[i] = CondU(OnStatus(CqDischargeAll, StatusImbalance), Gets(StatusImbalance, LashingFrog, RampagingBoar))
+		case 5: cs[i] = DisU(HasAll, WatchTwoStatus{A:StatusConfusion, B:StatusImbalance})
+		case 6: cs[i] = DisU(HasAll, WatchTwoStatus{A:StatusLignification, B:StatusFear})
 		}
 	}
-	if g.IntN(6) == 0 {
-		cs[7] = Dis(HasInvoke, Seen(FearsomeLich, UndeadKnight))
-		cs[7].Upgrade = UpgradeReplaces
+	if g.IntN(3) == 0 {
+		cs[7] = DisU(HasInvoke, Seen(FearsomeLich, UndeadKnight))
 	}
 	return cs
 }
