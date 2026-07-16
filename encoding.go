@@ -60,9 +60,11 @@ func init() {
 	gob.Register(WatchMonsEvent{})
 	gob.Register(WatchMonsStatus{})
 	gob.Register(WatchPlayerStatus{})
+	gob.Register(WatchHits{})
 	gob.Register(WatchEither{})
 	gob.Register(WatchTwoStatus{})
 	gob.Register(WatchPlayerDamage{})
+	gob.Register(&WatchMoveFar{})
 	gob.Register(WatchReachLevel{})
 	gob.Register(&WatchCompleteLevel{})
 

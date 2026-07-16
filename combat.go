@@ -370,6 +370,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 		}
 		return
 	}
+	TotemEvents(g, &EventAffects{EvType: EventHits, EvActor: ai, EvTarget: aj})
 	afraid := aj.Has(StatusFear)
 	// Extra effects by attack pattern.
 	switch {

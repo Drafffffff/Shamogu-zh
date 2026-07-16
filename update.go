@@ -114,6 +114,7 @@ func (md *model) update(msg gruid.Msg) gruid.Effect {
 		}
 	}
 	md.g.UpdateFirePos(PlayerID, md.g.PlayerActor())
+	TotemEvents(md.g, &EventHappened{EvType: EventPlayerTurn})
 	eff, done := md.action.Handle(md)
 	if done {
 		md.endTurn()

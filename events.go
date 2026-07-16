@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"codeberg.org/anaseto/gruid"
+	"codeberg.org/anaseto/gruid/paths"
 )
 
 // Event represents an occurrence that might trigger a spirit condition
@@ -43,10 +44,12 @@ const (
 	EventHeal                         // player gained permanent HP
 	EventTeleport                     // player teleported
 	EventDamage                       // player takes status-based damage
+	EventPlayerTurn                   // player's turn starts
 
 	EventStatus                       // actor status started
 	EventMonsDeath                    // monster died
 	EventMonsSeen                     // you see a monster
+	EventHits                         // actor hits another
 
 	EventWallBreak                    // wall broken
 )
@@ -225,6 +228,38 @@ func (w WatchPlayerStatus) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	return ok && d.EvType == EventStatus && (w.MatchAny || d.EvStatus == w.EvStatus) && d.onPlayer()
 }
 
+// WatchHits triggers when some actor hits a monster
+type WatchHits struct {
+	PlayerActs bool // triggers on the player, versus a monster
+}
+
+func (w WatchHits) Desc() string {
+	if w.PlayerActs {
+		return "you hit a monster"
+	}
+	return "a monster hits another"
+}
+
+func (w WatchHits) EventTypes() EventType {
+	return EventHits
+}
+
+func (w WatchHits) CheckEvent(g *Game, sp *Spirit, e Event) bool {
+	d, ok := e.(*EventAffects)
+	return ok && !d.EvTarget.Is(Player) && w.PlayerActs == d.EvActor.Is(Player)
+}
+
+// EventAffects indicates one actor doing something to another
+type EventAffects struct {
+	EvType   EventType
+	EvActor  *Actor
+	EvTarget *Actor
+}
+
+func (ev *EventAffects) Type() EventType {
+	return ev.EvType
+}
+
 // WatchEither triggers when either component does
 type WatchEither struct {
 	A EventWatcher
@@ -283,6 +318,30 @@ func (w WatchPlayerDamage) EventTypes() EventType {
 func (w WatchPlayerDamage) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	d, ok := e.(*EventWithStatus)
 	return ok && d.EvType == EventDamage && d.EvStatus == w.EvStatus
+}
+
+// WatchMoveFar triggers when the player moves more than 1 tile between turn starts
+type WatchMoveFar struct {
+	PrevPos gruid.Point
+}
+
+func (w *WatchMoveFar) Desc() string {
+	return "you move by more than one tile in a turn"
+}
+
+func (w *WatchMoveFar) EventTypes() EventType {
+	return EventPlayerTurn | EventNewLevel
+}
+
+func (w *WatchMoveFar) CheckEvent(g *Game, sp *Spirit, e Event) bool {
+	if (e.Type() == EventNewLevel) {
+		w.PrevPos = InvalidPos
+		return false
+	}
+	p := w.PrevPos
+	n := g.Entity(PlayerID).P
+	w.PrevPos = n
+	return p != InvalidPos && paths.DistanceManhattan(p, n) > 1
 }
 
 // WatchReachLevel triggers when you reach a numbered level
@@ -666,12 +725,14 @@ func (g *Game) GenConditions() []*SpiritCond {
 		c := CondPunish{When: w, Do: CqLeave}
 		cs[g.rand.IntN(5) / 3] = Cond(c, WatchReachLevel{Level: 4})
 	}
-	for _, j := range g.rand.Perm(3)[0:2] {
+	for _, j := range g.rand.Perm(5)[0:2] {
 		i := 2 + g.IntN(4) // levels 3 to 6
 		switch j {
 		case 0: cs[i] = CondC(OnEvent(CqLeave, EventPickup),           &WatchCompleteLevel{Test: EmptyInventory})
 		case 1: cs[i] = CondC(OnEvent(CqDischargeAll, EventMonsDeath), &WatchCompleteLevel{Test: Charges})
 		case 2: cs[i] = CondC(OnAnyStatus(CqDischarge),                &WatchCompleteLevel{Test: Charges})
+		case 3: cs[i] = CondC(CondPunish{When: &WatchHits{PlayerActs: true},       Do: CqDischarge},    &WatchCompleteLevel{Test: Charges})
+		case 4: cs[i] = CondC(CondPunish{When: &WatchMoveFar{PrevPos: InvalidPos}, Do: CqDischargeAll}, &WatchCompleteLevel{Test: Charges})
 		}
 	}
 	nu := 1 + g.IntN(2)
