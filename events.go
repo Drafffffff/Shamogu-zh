@@ -154,9 +154,9 @@ type WatchMonsEvent struct {
 func (w WatchMonsEvent) Desc() string {
 	switch w.EvType {
 	case EventMonsDeath:
-		return fmt.Sprintf("A %s dies", w.Mons.Desc())
+		return fmt.Sprintf("a %s dies", w.Mons.Desc())
 	case EventMonsSeen:
-		return fmt.Sprintf("You see a %s", w.Mons.Desc())
+		return fmt.Sprintf("you see a %s", w.Mons.Desc())
 	default:
 		panic("unexpected complete-level condition")
 	}
@@ -178,7 +178,7 @@ type WatchMonsStatus struct {
 }
 
 func (w WatchMonsStatus) Desc() string {
-	return fmt.Sprintf("A %s becomes %s", w.Mons.Desc(), w.EvStatus)
+	return fmt.Sprintf("a %s becomes %s", w.Mons.Desc(), w.EvStatus)
 }
 
 func (w WatchMonsStatus) EventTypes() EventType {
@@ -286,7 +286,7 @@ type WatchTwoStatus struct {
 }
 
 func (w WatchTwoStatus) Desc() string {
-	return fmt.Sprintf("You become %s and %s", w.A, w.B)
+	return fmt.Sprintf("you become %s and %s", w.A, w.B)
 }
 
 func (w WatchTwoStatus) EventTypes() EventType {
@@ -350,7 +350,7 @@ type WatchReachLevel struct {
 }
 
 func (w WatchReachLevel) Desc() string {
-	return fmt.Sprintf("You reach level %d", w.Level)
+	return fmt.Sprintf("you reach level %d", w.Level)
 }
 
 func (w WatchReachLevel) EventTypes() EventType {
@@ -377,9 +377,9 @@ const (
 func (w *WatchCompleteLevel) Desc() string {
 	switch w.Test {
 	case Charges:
-		return "You complete a full level with some charges remaining"
+		return "you complete a full level with some charges remaining"
 	case EmptyInventory:
-		return "You enter a portal with no comestibles in your inventory"
+		return "you enter a portal with no comestibles in your inventory"
 	default:
 		panic("unexpected complete-level condition")
 	}
@@ -454,9 +454,9 @@ func (c *SpiritCond) EventTypes() EventType {
 }
 func (c *SpiritCond) Desc() string {
 	var sb strings.Builder
-	fmt.Fprintf(&sb, "@RCurse:@N %s.", c.Effect.Desc())
+	fmt.Fprintf(&sb, "@RCurse:@N %s.", UpperFirst(c.Effect.Desc()))
 	sb.WriteByte('\n')
-	fmt.Fprintf(&sb, "@YUntil:@N %s.", c.Until.Desc())
+	fmt.Fprintf(&sb, "@YUntil:@N %s.", UpperFirst(c.Until.Desc()))
 	return sb.String()
 }
 func (c *SpiritCond) Enabled() SpiritPart {
