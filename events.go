@@ -178,7 +178,11 @@ type WatchMonsStatus struct {
 }
 
 func (w WatchMonsStatus) Desc() string {
-	return fmt.Sprintf("a %s becomes %s", w.Mons.Desc(), w.EvStatus)
+	d := w.Mons.Desc()
+	if w.EvStatus == StatusFire {
+		return fmt.Sprintf("a %s catches fire", d)
+	}
+	return fmt.Sprintf("a %s becomes %s", d, w.EvStatus)
 }
 
 func (w WatchMonsStatus) EventTypes() EventType {
@@ -215,6 +219,9 @@ type WatchPlayerStatus struct {
 func (w WatchPlayerStatus) Desc() string {
 	if w.MatchAny {
 		return "you get any status"
+	}
+	if w.EvStatus == StatusFire {
+		return "you catch fire"
 	}
 	return fmt.Sprintf("you become %s", w.EvStatus)
 }
