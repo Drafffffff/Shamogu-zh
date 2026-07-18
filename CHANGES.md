@@ -17,6 +17,10 @@ UI, graphics, QoL:
 
 * Make Runic Chicken players not avoid traps in auto-explore and travel.
 
+Fixes:
+
+* Fix wrong out-of-view rune-trigger log message with chicken (see #19).
+
 # v1.5.0 2026-03-30
 
 This release features new and improved content, as well as various fixes.
