@@ -274,6 +274,11 @@ type WatchEither struct {
 }
 
 func (w WatchEither) Desc() string {
+	if aw, ok := w.A.(WatchPlayerStatus); ok && aw.EvStatus != StatusFire {
+		if bw, ok := w.B.(WatchPlayerStatus); ok {
+			return fmt.Sprintf("you become %s or %s", aw.EvStatus, bw.EvStatus)
+		}
+	}
 	return fmt.Sprintf("%s or %s", w.A.Desc(), w.B.Desc())
 }
 
@@ -662,12 +667,6 @@ func OnDamage(cq Consequence, st Status) CondEffect {
 	return CondPunish{When: w, Do: cq}
 }
 
-// OnAnyStatus consequence when the player gets any status
-func OnAnyStatus(cq Consequence) CondEffect {
-	w := WatchPlayerStatus{MatchAny: true}
-	return CondPunish{When: w, Do: cq}
-}
-
 func Cond(ef CondEffect, u EventWatcher) *SpiritCond {
 	return &SpiritCond{Effect: ef, Until: u}
 }
@@ -678,6 +677,10 @@ func CondU(ef CondEffect, u EventWatcher) *SpiritCond {
 
 func CondC(ef CondEffect, u EventWatcher) *SpiritCond {
 	return &SpiritCond{Effect: ef, Until: u, Upgrade: UpgradeContinues}
+}
+
+func Compl(t CompleteType, c Consequence, w EventWatcher) *SpiritCond {
+	return CondC(CondPunish{When: w, Do: c}, &WatchCompleteLevel{Test: t})
 }
 
 func Dis(p SpiritPart, u EventWatcher) *SpiritCond {
@@ -734,11 +737,11 @@ func (g *Game) GenConditions() []*SpiritCond {
 	for _, j := range g.rand.Perm(5)[0:2] {
 		i := 2 + g.IntN(4) // levels 3 to 6
 		switch j {
-		case 0: cs[i] = CondC(OnEvent(CqLeave, EventPickup),           &WatchCompleteLevel{Test: EmptyInventory})
-		case 1: cs[i] = CondC(OnEvent(CqDischargeAll, EventMonsDeath), &WatchCompleteLevel{Test: Charges})
-		case 2: cs[i] = CondC(OnAnyStatus(CqDischarge),                &WatchCompleteLevel{Test: Charges})
-		case 3: cs[i] = CondC(CondPunish{When: &WatchHits{PlayerActs: true},       Do: CqDischarge},    &WatchCompleteLevel{Test: Charges})
-		case 4: cs[i] = CondC(CondPunish{When: &WatchMoveFar{PrevPos: InvalidPos}, Do: CqDischargeAll}, &WatchCompleteLevel{Test: Charges})
+		case 0: cs[i] = Compl(EmptyInventory, CqLeave, WatchEvent{Type: EventPickup})
+		case 1: cs[i] = Compl(Charges, CqDischargeAll, WatchEvent{Type: EventMonsDeath})
+		case 2: cs[i] = Compl(Charges, CqDischarge,    WatchPlayerStatus{MatchAny: true})
+		case 3: cs[i] = Compl(Charges, CqDischarge,    WatchHits{PlayerActs: true})
+		case 4: cs[i] = Compl(Charges, CqDischargeAll, &WatchMoveFar{PrevPos: InvalidPos})
 		}
 	}
 	nu := 1 + g.IntN(2)
