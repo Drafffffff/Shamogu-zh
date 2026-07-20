@@ -40,6 +40,9 @@ func emptySlot() *Entity {
 
 // GenEntities generates the entities for a new level, placing them on the map.
 func (g *Game) GenEntities(mg *MapGen) {
+	g.Map.Orb = InvalidPos
+	g.Map.Portal = InvalidPos
+	g.Map.Totem = InvalidPos
 	// Reset non-player actors.
 	clear(g.Entities[FirstMapID+1:])
 	g.Entities = g.Entities[:FirstMapID+1]

@@ -18,6 +18,7 @@ UI, graphics, QoL:
 Fixes:
 
 * Fix wrong out-of-view rune-trigger log message with chicken (see #19).
+* Fix rare case of wrong guardian placement on level 9 with corrupted dungeon.
 
 # v1.5.0 2026-03-30
 

@@ -115,6 +115,9 @@ func testGame(t *testing.T) {
 			if b[p] {
 				t.Errorf("Two actors in same place: %v", p)
 			}
+			if !g.Map.Passable(p) {
+				t.Errorf("Placed %s at non-passable tile: %v (level %d)", g.Entity(i).Name, p, g.Map.Level)
+			}
 			b[p] = true
 		}
 	}
