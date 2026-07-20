@@ -461,9 +461,8 @@ func (c *SpiritCond) EventTypes() EventType {
 }
 func (c *SpiritCond) Desc() string {
 	var sb strings.Builder
-	fmt.Fprintf(&sb, "@RCurse:@N %s.", UpperFirst(c.Effect.Desc()))
-	sb.WriteByte('\n')
-	fmt.Fprintf(&sb, "@YUntil:@N %s.", UpperFirst(c.Until.Desc()))
+	fmt.Fprintf(&sb, "@RCurse:@N %s.\n", UpperFirst(c.Effect.Desc()))
+	fmt.Fprintf(&sb, "@YUntil:@N %s.\n", UpperFirst(c.Until.Desc()))
 	return sb.String()
 }
 func (c *SpiritCond) Enabled() SpiritPart {

@@ -58,6 +58,16 @@ type Spirit struct {
 
 func (sp *Spirit) EitherDesc(descUpgrade bool) string {
 	var sb strings.Builder
+	if cond := sp.Condition; cond != nil {
+		if descUpgrade {
+			sb.WriteString(cond.Upgrade.Desc())
+		}
+		sb.WriteString(cond.Desc())
+		sb.WriteByte('\n')
+	}
+	if descUpgrade {
+		sb.WriteString("@CTotemic spirit.@N\n")
+	}
 	bonuses := []string{}
 	if attack := sp.BonusAttack[sp.Level]; attack > 0 {
 		bonuses = append(bonuses, fmt.Sprintf("%+d Attack", attack))
@@ -85,14 +95,6 @@ func (sp *Spirit) EitherDesc(descUpgrade bool) string {
 		sp.Ability[sp.Level].Name(), sp.Charges, sp.MaxCharges[sp.Level], sp.Ability[sp.Level].Desc())
 	sb.WriteByte('\n')
 	fmt.Fprintf(&sb, "@CTraits:@N %s.", TraitDesc(Player, sp.BonusTraits[sp.Level]))
-	if cond := sp.Condition; cond != nil {
-		sb.WriteByte('\n')
-		sb.WriteByte('\n')
-		if descUpgrade {
-			sb.WriteString(cond.Upgrade.Desc())
-		}
-		sb.WriteString(cond.Desc())
-	}
 	return sb.String()
 }
 
@@ -107,6 +109,15 @@ func (sp *Spirit) Desc() string {
 func (sp *Spirit) UpgradeDesc(enew *Entity) string {
 	desc := sp.Desc()
 	var sb strings.Builder
+	sb.WriteString("@MThe spirit essence can be used to upgrade this spirit.@N\n")
+	hasCond := sp.Condition != nil
+	if cond := enew.Role.(*Spirit).Condition; cond != nil && cond.Upgrade.Applies(hasCond) {
+		if hasCond {
+			sb.WriteString("Replacing existing curse:\n")
+		}
+		sb.WriteString(cond.Desc())
+		sb.WriteByte('\n')
+	}
 	bonuses := []string{}
 	if attack := sp.BonusAttack[1] - sp.BonusAttack[0]; attack > 0 {
 		bonuses = append(bonuses, fmt.Sprintf("%+d Attack", attack))
@@ -117,7 +128,6 @@ func (sp *Spirit) UpgradeDesc(enew *Entity) string {
 	if hp := sp.BonusHP[1] - sp.BonusHP[0]; hp > 0 {
 		bonuses = append(bonuses, fmt.Sprintf("%+d HP", hp))
 	}
-	sb.WriteString("@MThe spirit essence can be used to upgrade this spirit.@N\n")
 	if len(bonuses) > 0 {
 		sb.WriteString("Gives ")
 		for i, bonus := range bonuses {
@@ -134,15 +144,6 @@ func (sp *Spirit) UpgradeDesc(enew *Entity) string {
 	if sp.BonusTraits[1] != sp.BonusTraits[0] {
 		sb.WriteByte('\n')
 		fmt.Fprintf(&sb, "@BNew traits:@N %s.", TraitDesc(Player, sp.BonusTraits[1]&^sp.BonusTraits[0]))
-	}
-	hasCond := sp.Condition != nil
-	if cond := enew.Role.(*Spirit).Condition; cond != nil && cond.Upgrade.Applies(hasCond) {
-		sb.WriteByte('\n')
-		sb.WriteByte('\n')
-		if hasCond {
-			sb.WriteString("Replacing existing curse:\n")
-		}
-		sb.WriteString(cond.Desc())
 	}
 	return desc + "\n\n" + sb.String()
 }
