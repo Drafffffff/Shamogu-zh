@@ -1,17 +1,15 @@
 # v? ?
 
-Reworked and improved content:
+Corrupted dungeon improvements:
 
-* Corrupted dungeon: monster nests now scale with map level and happen less
+* Monster nests now scale with map level and happen less
   often early on, to make (very) rare cases that could feel a bit too unfair
   even rarer (see #18).
-* Corrupted dungeon: only 3/4 chance of relief comestible in warp, berserk and
-  lignification thematic levels (see #11).
-* Corrupted dungeon: rarely spawn lone golem or wasp guardian (see #11).
-* Corrupted dungeon: new rare spooky level with empty totem, runes and menhirs
-  (see #11).
-* Corrupted dungeon: new kind of map corruption that performs wall-thickening
-  (see #11).
+* Only 3/4 chance of relief comestible in warp, berserk and lignification thematic levels (see #11).
+* Rarely spawn lone golem or wasp guardian (see #11).
+* New rare spooky level with empty totem, runes and menhirs (see #11).
+* New kind of map corruption that performs wall-thickening (see #11).
+* New rare variations of alternative guardians (see #11).
 
 UI, graphics, QoL:
 

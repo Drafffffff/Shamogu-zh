@@ -22,6 +22,7 @@ type ProcInfo struct {
 	GuardianTotem2   int              // level with early totem guardian (crazy druid)
 	GuardianPortal1  int              // level with early-mid portal guardian (golems)
 	GuardianPortal2  int              // level with mid-late portal guardian (octopode)
+	SingleGuardKind  ActorKind        // replace (most) guards by the same kind (disabled if Player)
 	WanderingUnique1 int              // level with walking mushroom
 	WanderingUnique2 int              // level with noisy imp
 	MonsEarly        int              // special early level (1-3)
@@ -124,6 +125,10 @@ func (g *Game) flavoursProcGen() {
 		}
 		if g.IntN(MapLevels) == 0 {
 			wanderingUnique2Level = 2
+		}
+		if g.IntN(12) == 0 {
+			gpi.SingleGuardKind = g.randMonsKind([]ActorKind{
+				CrazyDruid, DraggingAlligator, BlazingGolem, ChaosMegabat, WalkingMushroom, WarpingWraith})
 		}
 	}
 	randTotemLevel := func(n, m int) int {

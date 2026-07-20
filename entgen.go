@@ -1411,15 +1411,27 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 				g.genMonster(UndeadKnight)
 			}
 		default:
-			g.genMonsterGuardian(FearsomeLich, p)
-			g.genMonsterGuardian(UndeadKnight, p)
+			if g.ProcInfo.SingleGuardKind == Player {
+				g.genMonsterGuardian(FearsomeLich, p)
+				g.genMonsterGuardian(UndeadKnight, p)
+				break
+			}
+			for range 3 {
+				g.genMonsterGuardian(g.ProcInfo.SingleGuardKind, p)
+			}
 		}
 		if q := g.Map.Orb; p != q && g.IntN(2) == 0 {
 			switch g.IntN(9) {
 			case 0, 1:
-				g.genMonsterGuardian(FearsomeLich, q)
-				g.genMonsterGuardian(UndeadKnight, q)
 				nL -= 2
+				if g.ProcInfo.SingleGuardKind == Player {
+					g.genMonsterGuardian(FearsomeLich, q)
+					g.genMonsterGuardian(UndeadKnight, q)
+					break
+				}
+				for range 3 {
+					g.genMonsterGuardian(g.ProcInfo.SingleGuardKind, p)
+				}
 			case 2, 3, 4:
 				nE, nM, nL = g.genOrbComplementaryGuardiansAt(q, nE, nM, nL)
 				if g.IntN(4) == 0 {
@@ -1442,10 +1454,20 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 	}
 	if g.ProcInfo.GuardianPortal2 == g.Map.Level {
 		p := g.corruptedPortalGuardianPoint()
+		k, gmk := 1, MadOctopode
+		if g.ProcInfo.SingleGuardKind != Player {
+			gmk = g.ProcInfo.SingleGuardKind
+			nE--
+			k = 2
+		}
 		if g.IntN(4) > 0 {
-			g.genMonsterGuardian(MadOctopode, p)
+			for range k {
+				g.genMonsterGuardian(gmk, p)
+			}
 		} else {
-			g.genMonster(MadOctopode)
+			for range k {
+				g.genMonster(gmk)
+			}
 			switch g.IntN(3) {
 			case 0:
 				mk := g.randMonsKind(monsMid)
@@ -1463,12 +1485,19 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 			}
 		}
 	}
+	getGuardKind := func(mk ActorKind) ActorKind {
+		if g.ProcInfo.SingleGuardKind == Player {
+			return mk
+		}
+		// Replaces guard kind (corrupted dungeon feature).
+		return g.ProcInfo.SingleGuardKind
+	}
 	if g.ProcInfo.GuardianTotem2 == g.Map.Level {
 		p := g.corruptedTotemGuardianPoint()
 		if g.IntN(4) > 0 {
-			g.genMonsterGuardian(CrazyDruid, p)
+			g.genMonsterGuardian(getGuardKind(CrazyDruid), p)
 		} else {
-			g.genMonster(CrazyDruid)
+			g.genMonster(getGuardKind(CrazyDruid))
 			if g.IntN(3) > 0 {
 				mk := g.randMonsKind(monsEarly)
 				for range 3 {
@@ -1481,28 +1510,36 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 	if g.ProcInfo.WanderingUnique1 == g.Map.Level {
 		nM--
 		if g.IntN(3) > 0 {
-			g.genMonster(WalkingMushroom)
+			g.genMonster(getGuardKind(WalkingMushroom))
 		} else {
 			p := g.corruptedPortalGuardianPoint()
-			g.genMonsterGuardian(WalkingMushroom, p)
+			g.genMonsterGuardian(getGuardKind(WalkingMushroom), p)
 		}
 	}
 	if g.ProcInfo.WanderingUnique2 == g.Map.Level {
 		nM--
 		if g.IntN(3) > 0 {
-			g.genMonster(NoisyImp)
+			g.genMonster(getGuardKind(NoisyImp))
 		} else {
 			p := g.corruptedPortalGuardianPoint()
-			g.genMonsterGuardian(NoisyImp, p)
+			g.genMonsterGuardian(getGuardKind(NoisyImp), p)
 		}
 	}
 	if g.ProcInfo.GuardianTotem1 == g.Map.Level {
 		nE--
 		p := g.corruptedTotemGuardianPoint()
 		if g.IntN(4) > 0 {
-			g.genMonsterGuardian(TotemWasp, p)
+			mk := TotemWasp
+			if g.IntN(15) == 0 {
+				mk = BurningPhoenix
+				nM -= 2
+			} else if g.ProcInfo.SingleGuardKind != Player {
+				mk = g.ProcInfo.SingleGuardKind
+				nM--
+			}
+			g.genMonsterGuardian(mk, p)
 			if g.IntN(30) > 0 {
-				g.genMonsterGuardian(TotemWasp, p)
+				g.genMonsterGuardian(mk, p)
 			} else {
 				nE++
 			}
@@ -1520,7 +1557,7 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 	if g.ProcInfo.GuardianEarly == g.Map.Level {
 		nM--
 		p := g.earlyGuardianPoint()
-		g.genMonsterGuardian(ChaosMegabat, p)
+		g.genMonsterGuardian(getGuardKind(ChaosMegabat), p)
 		if g.Map.Level >= 3 && g.IntN(3) == 0 {
 			// Rarely, add an imp guardian friend.
 			g.genMonsterGuardian(NoisyImp, p)
@@ -1536,6 +1573,7 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 		if g.IntN(5) == 0 {
 			mk = WarpingWraith
 		}
+		mk = getGuardKind(mk)
 		p := g.corruptedPortalGuardianPoint()
 		if g.IntN(4) > 0 {
 			g.genMonsterGuardian(mk, p)
