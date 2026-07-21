@@ -8,7 +8,6 @@ import (
 	"maps"
 	"slices"
 	"strings"
-	"unicode"
 
 	"codeberg.org/anaseto/gruid"
 	"codeberg.org/anaseto/gruid/ui"
@@ -408,17 +407,13 @@ var Markups = map[rune]gruid.Style{
 	'y': {Fg: ColorYellow, Attrs: AttrInMap},
 }
 
-// MenuMarkups is similar to Markups but lowercase letters change to secondary
-// background instead of to using map tiles.
-var MenuMarkups = maps.Clone(Markups)
+// MarkupsAltBg is similar to Markups but it uses secondary background.
+var MarkupsAltBg = maps.Clone(Markups)
 
 func init() {
-	for r, v := range MenuMarkups {
-		if unicode.IsLower(r) {
-			v.Attrs = AttrNone
-			v.Bg = ColorBackgroundSecondary
-			MenuMarkups[r] = v
-		}
+	for r, v := range MarkupsAltBg {
+		v.Bg = ColorBackgroundSecondary
+		MarkupsAltBg[r] = v
 	}
 }
 
