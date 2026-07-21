@@ -683,7 +683,7 @@ func (md *model) openInventory(bound ID) (gruid.Effect, bool) {
 			entry.Text = ui.Textf("* - %s", ei.Name)
 			entry.Disabled = true
 		} else if ei.IsItem() && (bound == -1 || IsComestible(ei.Item())) {
-			entry.Text = ui.Textf("%c - %s", r, ei.Text())
+			entry.Text = ui.Textf("%c - %s", r, ei.TextWarn(md.g))
 			entry.Keys = []gruid.Key{gruid.Key(r)}
 		} else {
 			entry.Text = ui.Textf("  - %s", ei.Name)
@@ -702,7 +702,7 @@ func (md *model) openInventory(bound ID) (gruid.Effect, bool) {
 			entries = appendMenuHeader(entries, InventorySize)
 			var entry ui.MenuEntry
 			if id != bound {
-				entry.Text = ui.Textf("%c - %s", r, md.g.Entity(id).Name)
+				entry.Text = ui.Textf("%c - %s", r, md.g.Entity(id).TextWarn(md.g))
 				entry.Keys = []gruid.Key{gruid.Key(r)}
 			} else {
 				entry.Text = ui.Textf("* - %s", md.g.Entity(id).Name)

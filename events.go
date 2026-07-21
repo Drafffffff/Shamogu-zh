@@ -27,9 +27,11 @@ func (g *Game) CheckEvent(ev EventType) bool {
 // UpdateEventFilter re-computes which event types affect current spirits
 func (g *Game) UpdateEventFilter() {
 	g.EventFilter = 0
+	g.WarnTypes = 0
 	for _, e := range g.Entities[:NSpirits] {
 		if sp, ok := e.Role.(*Spirit); ok {
 			g.EventFilter |= sp.Condition.EventTypes()
+			g.WarnTypes |= WarnTypes(sp.Condition.leaveWatcher())
 		}
 	}
 }
@@ -45,11 +47,8 @@ func (g *Game) WarnLeave(ev EventType) bool {
 	}
 	for _, e := range g.Entities[:NSpirits] {
 		if sp, ok := e.Role.(*Spirit); ok {
-			c := sp.Condition
-			if c == nil || !ev.Any(c.EventTypes()) {
-				continue
-			}
-			if p, ok := c.Effect.(CondPunish); ok && p.Do == CqLeave {
+			w := sp.Condition.leaveWatcher()
+			if w != nil && ev.Any(w.EventTypes()) {
 				g.LogfStyled("Are you sure? Your %s spirit will leave! [y/N]", logConfirm, e.Name)
 				return true
 			}
@@ -77,6 +76,87 @@ const (
 
 	EventWallBreak                    // wall broken
 )
+
+// WarnType classifies reasons to give comestibles a warning color in the menu
+type WarnType int
+
+func (t WarnType) Has(w WarnType) bool {
+	return t&w != 0
+}
+
+const (
+	WarnHeal WarnType = 1 << iota
+	WarnBerserk
+	WarnClarity
+	WarnFoggySkin
+	WarnLignification
+	WarnTeleport
+)
+
+func WarnTypes(ew EventWatcher) WarnType {
+	switch w := ew.(type) {
+	case WatchEither:
+		return WarnTypes(w.A) | WarnTypes(w.B)
+	case WatchEvent:
+		switch w.Type {
+		case EventTeleport: return WarnTeleport
+		case EventHeal:     return WarnHeal
+		}
+	case WatchPlayerStatus:
+		switch w.EvStatus {
+		case StatusBerserk:       return WarnBerserk
+		case StatusClarity:       return WarnClarity
+		case StatusFoggySkin:     return WarnFoggySkin
+		case StatusLignification: return WarnLignification
+		}
+	}
+	return WarnType(0)
+}
+
+// WarnComestible checks whether a specific comestible needs a warning
+func (g *Game) WarnComestible(c *Comestible) bool {
+	w := g.WarnTypes
+	if w == 0 {
+		return false
+	}
+	if w.Has(WarnHeal) && g.willHeal(c) {
+		return true
+	}
+	switch c.Effect.(type) {
+		case EffectBerserkingFlower:
+			return w.Has(WarnBerserk)
+		case EffectClarityLeaves:
+			return w.Has(WarnClarity)
+		case EffectFoggySkinOnion:
+			return w.Has(WarnFoggySkin)
+		case EffectLignificationFruit:
+			return w.Has(WarnLignification)
+		case EffectTeleportMushroom:
+			return w.Has(WarnTeleport) && !g.PlayerActor().ResistsMove()
+	}
+	return false
+}
+
+func (g *Game) willHeal(c *Comestible) bool {
+	pa := g.PlayerActor()
+	if pa.HP == pa.GetMaxHP() {
+		return false
+	}
+	if g.Mod(ModHealingCombat) {
+		_, ok := c.Effect.(EffectAmbrosiaBerries)
+		return ok
+	}
+	switch c.Effect.(type) {
+		case EffectAmbrosiaBerries, EffectClarityLeaves, EffectFirebreathPepper, EffectFoggySkinOnion:
+			return true
+		case EffectBerserkingFlower, EffectLignificationFruit:
+			return false
+		case EffectTeleportMushroom:
+			return pa.ResistsMove()
+		default:
+			panic("unknown comestible (checking warn-on-heal)")
+	}
+}
 
 // EventWatcher
 type EventWatcher interface {
@@ -511,6 +591,16 @@ func (c *SpiritCond) ApplyEvent(g *Game, sp *Spirit, e Event) Consequence {
 		return CqEndCondition
 	}
 	return c.Effect.ApplyEvent(g, sp, e)
+}
+
+// leaveWatcher returns the EventWatcher that will make the spirit leave, or nil if none
+func (c *SpiritCond) leaveWatcher() EventWatcher {
+	if c != nil {
+		if p, ok := c.Effect.(CondPunish); ok && p.Do == CqLeave {
+			return p.When
+		}
+	}
+	return nil
 }
 
 // SpiritPart allows independently disabling part of a spirit
