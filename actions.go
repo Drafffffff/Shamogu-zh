@@ -10,6 +10,7 @@ import (
 	"slices"
 	"strings"
 	"time"
+	"unicode"
 
 	"codeberg.org/anaseto/gruid"
 	"codeberg.org/anaseto/gruid/paths"
@@ -771,14 +772,35 @@ func appendMenuHeader(entries []ui.MenuEntry, i ID) []ui.MenuEntry {
 }
 
 // altBgEntries updates entries to use alternate background color for entries
-// of odd index.
+// of odd index. It uses MenuMarkups for each entry.
 func altBgEntries(entries []ui.MenuEntry) {
 	for i := range entries {
+		entries[i].Text = entries[i].Text.WithMarkups(MenuMarkups)
 		if i%2 == 1 {
-			st := entries[i].Text.Style()
-			entries[i].Text = entries[i].Text.WithStyle(st.WithBg(ColorBackgroundSecondary))
+			t := entries[i].Text
+			st := t.Style()
+			entries[i].Text = t.WithStyle(st.WithBg(ColorBackgroundSecondary)).WithText(altBgMarkups(t.Text()))
 		}
 	}
+}
+
+func altBgMarkups(s string) string {
+	if !strings.ContainsRune(s, '@') {
+		return s
+	}
+	var sb strings.Builder
+	sb.Grow(len(s))
+	markup := false
+	for _, c := range s {
+		if markup {
+			sb.WriteRune(unicode.ToLower(c))
+			markup = false
+			continue
+		}
+		markup = c == '@'
+		sb.WriteRune(c)
+	}
+	return sb.String()
 }
 
 // updateItemDesc updates the description label with text for the given entity.

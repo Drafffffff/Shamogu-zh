@@ -8,6 +8,7 @@ import (
 	"maps"
 	"slices"
 	"strings"
+	"unicode"
 
 	"codeberg.org/anaseto/gruid"
 	"codeberg.org/anaseto/gruid/ui"
@@ -384,7 +385,8 @@ func (md *model) drawStatusDesc() {
 	md.status.desc.Draw(md.gd.Slice(md.gd.Range().Lines(UIHeight-3-h, UIHeight-1).Shift(x, 0, 0, 0)))
 }
 
-// Markups contains the styling markup-characters we use for StyledText.
+// Markups contains the styling markup-characters we use for StyledText with
+// default background. Lowercase variants use map tiles.
 var Markups = map[rune]gruid.Style{
 	'S': {Fg: ColorForegroundSecondary},
 	'B': {Fg: ColorBlue},
@@ -393,16 +395,31 @@ var Markups = map[rune]gruid.Style{
 	'M': {Fg: ColorMagenta},
 	'O': {Fg: ColorOrange},
 	'R': {Fg: ColorRed},
-	'V': {Fg: ColorViolet}, // unused
+	'V': {Fg: ColorViolet},
 	'Y': {Fg: ColorYellow},
+	's': {Fg: ColorForegroundSecondary, Attrs: AttrInMap},
 	'b': {Fg: ColorBlue, Attrs: AttrInMap},
 	'c': {Fg: ColorCyan, Attrs: AttrInMap},
 	'g': {Fg: ColorGreen, Attrs: AttrInMap},
 	'm': {Fg: ColorMagenta, Attrs: AttrInMap},
 	'o': {Fg: ColorOrange, Attrs: AttrInMap},
 	'r': {Fg: ColorRed, Attrs: AttrInMap},
-	'v': {Fg: ColorViolet, Attrs: AttrInMap}, // unused
+	'v': {Fg: ColorViolet, Attrs: AttrInMap},
 	'y': {Fg: ColorYellow, Attrs: AttrInMap},
+}
+
+// MenuMarkups is similar to Markups but lowercase letters change to secondary
+// background instead of to using map tiles.
+var MenuMarkups = maps.Clone(Markups)
+
+func init() {
+	for r, v := range MenuMarkups {
+		if unicode.IsLower(r) {
+			v.Attrs = AttrNone
+			v.Bg = ColorBackgroundSecondary
+			MenuMarkups[r] = v
+		}
+	}
 }
 
 func (md *model) drawTargInfo() {
