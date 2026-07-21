@@ -99,6 +99,16 @@ func (md *model) update(msg gruid.Msg) gruid.Effect {
 	case modeWizardConfirmation:
 		st := md.updateConfirmation(msg)
 		md.action = ActionWizardConfirm{State: st}
+	case modeUseConfirmation:
+		st := md.updateConfirmation(msg)
+		switch st {
+		case confirmTrue:
+			md.g.confirm = true
+			md.action = ActionInteract{}
+		case confirmFalse:
+			md.g.Log("Don’t touch it, then.")
+			md.mode = modeNormal
+		}
 	case modeQuitConfirmation:
 		st := md.updateConfirmation(msg)
 		md.action = ActionQuitConfirm{State: st}

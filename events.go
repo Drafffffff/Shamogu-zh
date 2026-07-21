@@ -34,6 +34,30 @@ func (g *Game) UpdateEventFilter() {
 	}
 }
 
+// WarnLeave checks whether a warning is needed to interact with a comestible or menhir
+func (g *Game) WarnLeave(ev EventType) bool {
+	if g.confirm { // warning already issued
+		g.confirm = false
+		return false
+	}
+	if !g.CheckEvent(ev) {
+		return false
+	}
+	for _, e := range g.Entities[:NSpirits] {
+		if sp, ok := e.Role.(*Spirit); ok {
+			c := sp.Condition
+			if c == nil || !ev.Any(c.EventTypes()) {
+				continue
+			}
+			if p, ok := c.Effect.(CondPunish); ok && p.Do == CqLeave {
+				g.LogfStyled("Are you sure? Your %s spirit will leave! [y/N]", logConfirm, e.Name)
+				return true
+			}
+		}
+	}
+	return false
+}
+
 const (
 	EventMenhir EventType = 1 << iota // menhir activated
 	EventPortal                       // portal worked (used to record end-of-level properties)

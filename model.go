@@ -61,6 +61,7 @@ const (
 	modeEnd                            // game end: win or death
 	modeQuitConfirmation               // waiting for no-save quit confirmation
 	modeQuitting                       // wait until end message
+	modeUseConfirmation                // menhir or comestible pickup warning
 )
 
 // model describes the gruid.Model of the game.

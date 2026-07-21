@@ -346,6 +346,10 @@ func (m *Menhir) Use(g *Game, i ID) bool {
 		g.Log("The menhir is already inert.")
 		return false
 	}
+	if g.WarnLeave(EventMenhir) {
+		g.md.mode = modeUseConfirmation
+		return false
+	}
 	done := m.Effect.Apply(g)
 	if !done {
 		return false

@@ -607,6 +607,10 @@ func equipItem(md *model, i ID) bool {
 		spirit = true
 		from, to = ID(0), ID(NSpirits)
 	case *Comestible:
+		if g.WarnLeave(EventPickup) {
+			g.md.mode = modeUseConfirmation
+			return false
+		}
 		for i, e := range g.Entities[NSpirits:g.InventoryEnd()] {
 			if !e.IsItem() {
 				// Equip on first empty slot.

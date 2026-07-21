@@ -57,6 +57,7 @@ type Game struct {
 	instant bool       // whether the last action was instant-effect
 	snack   bool       // whether you're eating a snack (without ModGluttonyRework)
 	win     bool       // whether we just won the game
+	confirm bool       // whether action was confirmed after warning
 	rand    *rand.Rand // random number generator
 	md      *model     // reference to the UI model
 }
