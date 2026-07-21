@@ -115,7 +115,14 @@ func (e *Entity) Item() Item {
 func (e *Entity) Text() string {
 	switch r := e.Role.(type) {
 	case *Spirit:
-		return fmt.Sprintf("%s (%s %d/%d)", e.Name, r.Ability[r.Level].Name(), r.Charges, r.MaxCharges[r.Level])
+		f := "%s (%s %d/%d)"
+		if r.Condition != nil {
+			f = "@R%s@N (%s %d/%d)"
+			if !r.Condition.CanInvoke() {
+				f = "@R%s@N @S(%s %d/%d)@N"
+			}
+		}
+		return fmt.Sprintf(f, e.Name, r.Ability[r.Level].Name(), r.Charges, r.MaxCharges[r.Level])
 	default:
 		return e.Name
 	}
