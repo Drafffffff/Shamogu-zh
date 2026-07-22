@@ -844,7 +844,7 @@ func (g *Game) ProgressStatus(i ID, ai *Actor, st Status) {
 // Behavior holds simple Behavior data for a monster.
 type Behavior struct {
 	Path     []gruid.Point // path to destination
-	Guard    gruid.Point   // position to guard (InvalidPos if not)
+	Guard    []gruid.Point // position(s) to guard (empty if not)
 	Target   gruid.Point   // Current goal (if not static)
 	State    Mindstate     // Wandering, Hunting, ...
 	SkipTurn bool          // skip turn (like after swapped positions with another monster)
@@ -872,7 +872,7 @@ func (g *Game) MindStateString(a *Actor) string {
 		if g.Mod(ModCorruptedDungeon) {
 			return ""
 		}
-		if beh.Guard != InvalidPos {
+		if len(beh.Guard) > 0 {
 			return "guarding"
 		}
 		return "wandering"

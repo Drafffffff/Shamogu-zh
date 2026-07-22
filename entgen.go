@@ -1910,7 +1910,7 @@ func (g *Game) genMonsterGuardian(mk ActorKind, at gruid.Point) (ID, *Actor) {
 	p := g.randomFreeNearby(at, 5)
 	id, mons := g.genMonsterAt(mk, p)
 	a := mons.Actor()
-	a.Behavior.Guard = at
+	a.Behavior.Guard = []gruid.Point{at}
 	return id, a
 }
 
@@ -1929,7 +1929,7 @@ func (g *Game) genMonsterAt(mk ActorKind, p gruid.Point) (ID, *Entity) {
 func monster(mk ActorKind) *Entity {
 	mi := MonsData[mk]
 	a := NewActor(mi.Attack, mi.Defense, mi.HP, mk, mi.Traits)
-	a.Behavior = &Behavior{Guard: InvalidPos, Target: InvalidPos}
+	a.Behavior = &Behavior{Target: InvalidPos}
 	return &Entity{
 		Name:   mi.Name,
 		Rune:   mi.R,

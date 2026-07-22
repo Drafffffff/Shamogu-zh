@@ -39,15 +39,18 @@ func (g *Game) HandleMonsterTurn(i ID, ai *Actor) {
 	if beh.Target == ei.P || beh.Target == InvalidPos {
 		// The monster's target has either been reached or is invalid:
 		// we spend a turn chosing a new target.
-		if ai.Is(HungryRat) && g.HungryHunt(ei.P) || g.Marked() && beh.Guard == InvalidPos {
+		if ai.Is(HungryRat) && g.HungryHunt(ei.P) || g.Marked() && len(beh.Guard) == 0 {
 			beh.Target = pl.P
 			beh.State = Hunting
 			return
 		}
 		from, maxdist := ei.P, unreachable
-		if beh.Guard != InvalidPos {
+		if len(beh.Guard) > 0 {
 			maxdist = MaxFOVRange - 1
-			from = beh.Guard
+			from = beh.Guard[0]
+			if len(beh.Guard) > 1 {
+				from = beh.Guard[g.IntN(len(beh.Guard))]
+			}
 		} else if beh.State == Hunting {
 			maxdist = MaxFOVRange + 5
 		}
@@ -436,7 +439,7 @@ func (g *Game) CallToCommonTarget(i ID, ai *Actor) {
 	nodes := g.PR.BreadthFirstMap(dij, []gruid.Point{from}, maxdist)
 	for _, n := range nodes {
 		j, aj := g.ActorAt(n.P)
-		if j < 0 || j == i || j == PlayerID || aj.Behavior.State == Hunting || aj.Behavior.Guard != InvalidPos {
+		if j < 0 || j == i || j == PlayerID || aj.Behavior.State == Hunting || len(aj.Behavior.Guard) > 0 {
 			continue
 		}
 		aj.Behavior.Target = ai.Behavior.Target
