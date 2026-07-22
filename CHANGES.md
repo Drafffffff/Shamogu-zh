@@ -1,5 +1,11 @@
 # v? ?
 
+Reworked and improved content:
+
+* Improved hearing for chaos megabat: “excellent” instead of “good” (see #18).
+* Slightly tweaked down occurrence chance for alligators with respect to golems
+  (see #18).
+
 Corrupted dungeon improvements:
 
 * Monster nests now scale with map level and happen less

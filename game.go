@@ -425,7 +425,14 @@ func (g *Game) MakeNoise(at gruid.Point, nt NoiseType) {
 		g.LogStyled(nt.Msg(), logNotable)
 	}
 	for i, ai := range g.Monsters() {
-		d := g.PRnoise.BreadthFirstMapAt(g.Entity(i).P)
+		pi := g.Entity(i).P
+		if ai.Is(ChaosMegabat) && paths.DistanceManhattan(pi, at) <= 2*maxdist {
+			// Megabats have 2x longer hearing range, and their
+			// hearing ignores walls.
+			g.MonsterUpdateTarget(i, ai, at, true)
+			continue
+		}
+		d := g.PRnoise.BreadthFirstMapAt(pi)
 		if d > maxdist || d > noise && !ai.DoesAny(GoodHearing) {
 			continue
 		}
