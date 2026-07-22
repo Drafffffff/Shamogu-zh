@@ -1353,7 +1353,7 @@ func (g *Game) genGuardians(nE, nM, nL int) (int, int, int) {
 			}
 		}
 		mk := BlazingGolem
-		if g.IntN(5) < 2 {
+		if g.IntN(3) == 0 {
 			mk = DraggingAlligator
 		}
 		g.genMonsterGuardian(mk, p)
@@ -1570,7 +1570,7 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 	if g.ProcInfo.GuardianPortal1 == g.Map.Level {
 		nM--
 		mk := BlazingGolem
-		if g.IntN(5) < 2 {
+		if g.IntN(3) == 0 {
 			mk = DraggingAlligator
 		}
 		if g.IntN(5) == 0 {
@@ -1662,7 +1662,7 @@ func (g *Game) genOrbAlternateGuardiansAt(p gruid.Point, nE, nM, nL int) (int, i
 			g.genMonsterGuardian(CrazyDruid, p)
 		}
 		mk := BlazingGolem
-		if g.IntN(5) < 2 {
+		if g.IntN(2) == 0 {
 			mk = DraggingAlligator
 		}
 		g.genMonsterGuardian(mk, p)
@@ -1709,7 +1709,7 @@ func (g *Game) genOrbComplementaryGuardiansAt(p gruid.Point, nE, nM, nL int) (in
 	switch g.IntN(4) {
 	case 0:
 		g.genMonsterGuardian(CrazyDruid, p)
-		if g.IntN(5) > 2 {
+		if g.IntN(2) == 0 {
 			g.genMonsterGuardian(BlazingGolem, p)
 		} else {
 			g.genMonsterGuardian(DraggingAlligator, p)
