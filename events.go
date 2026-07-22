@@ -661,7 +661,7 @@ func TotemEvents(g *Game, ev Event) {
 			case CqLeave:
 				g.Logf("The %s spirit has left you!", e.Name)
 				g.StoryLogf("Lost the %s spirit", e.Name)
-				g.spiritLeftDaze()
+				g.spiritLeftShock()
 				g.Entities[i] = emptySlot()
 				g.ComputePlayerStats()
 			case CqDischargeAll:
@@ -676,29 +676,29 @@ func TotemEvents(g *Game, ev Event) {
 	}
 }
 
-// curseLiftedFog creates fog in an X shape when a condition is fulfilled
-func (g *Game) curseLiftedFog() {
+// curseClouds makes clouds in an X shape around the player
+func (g *Game) curseClouds(k CloudKind, dur int) {
 	pp := g.PP()
 	for i := -1; i <= 1; i += 2 {
 		for j := -1; j <= 1; j += 2 {
 			q := pp.Shift(i, j)
 			if g.Map.Passable(q) {
-				g.NormalCloudAt(q, 3)
+				g.AddCloud(Cloud{Kind: k, P: q, Duration: dur})
 			}
 		}
 	}
 }
 
-// spiritLeftDaze dazes player and monsters in view when a spirit leaves
-func (g *Game) spiritLeftDaze() {
+// curseLiftedFog creates fog in an X shape when a condition is fulfilled
+func (g *Game) curseLiftedFog() {
+	g.curseClouds(CloudNormal, 3)
+}
+
+// spiritLeftShock makes poison in an X, dazes the player, and stops time
+func (g *Game) spiritLeftShock() {
 	g.PutStatus(PlayerID, g.PlayerActor(), StatusDaze, 2)
-	for i, ai := range g.Monsters() {
-		ei := g.Entity(i)
-		if !g.InFOV(ei.P) {
-			continue
-		}
-		g.PutStatus(i, ai, StatusDaze, 6)
-	}
+	g.PutStatus(PlayerID, g.PlayerActor(), StatusTimeStop, 6)
+	g.curseClouds(CloudPoison, 1)
 	mp := &MapPath{passable: inMap}
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, MaxFOVRange)
 	g.md.FloodAnimation(nodes, ColorViolet)
