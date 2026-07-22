@@ -997,6 +997,12 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 	if ai.IsDead() {
 		return
 	}
+	var xd int
+	if g.IntN(3) == 0 {
+		// Sometimes, extra duration for some special player-specific
+		// positive status effects.
+		xd = 5 + g.IntN(4)
+	}
 	n := 3
 	if i == PlayerID {
 		n += 2
@@ -1028,7 +1034,7 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 			if i == PlayerID && g.IntN(3) == 0 {
 				// Sometimes garden while performing the
 				// drunken-fight style.
-				f(i, ai, StatusGardener, 3)
+				f(i, ai, StatusGardener, 3+2*xd)
 			}
 		}
 	case 2:
@@ -1060,36 +1066,36 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 		switch g.IntN(6) {
 		case 0:
 			d := (1 + DurationClarity) / 2
-			if f(i, ai, StatusClarity, d) &&
+			if f(i, ai, StatusClarity, d+xd) &&
 				g.IntN(2) == 0 && !g.ResistStatusRoll(i, StatusFear) {
 				f(i, ai, StatusFear, d)
 			}
 		case 1:
 			d := (1 + DurationFoggySkin) / 2
-			if f(i, ai, StatusFoggySkin, d) &&
+			if f(i, ai, StatusFoggySkin, d+xd) &&
 				g.IntN(2) == 0 && !g.ResistStatusRoll(i, StatusConfusion) {
 				f(i, ai, StatusConfusion, d)
 			}
 		case 2:
 			d := (1 + DurationTimeStop) / 2
-			if f(i, ai, StatusTimeStop, d) &&
+			if f(i, ai, StatusTimeStop, d+xd/2) &&
 				g.IntN(2) == 0 && !g.ResistStatusRoll(i, StatusImbalance) {
 				f(i, ai, StatusImbalance, d)
 			}
 		case 3:
 			d := (1 + DurationShadow) / 2
-			if f(i, ai, StatusShadow, d) &&
+			if f(i, ai, StatusShadow, d+3*xd/2) &&
 				g.IntN(2) == 0 && !g.ResistStatusRoll(i, StatusImbalance) {
 				f(i, ai, StatusImbalance, d)
 			}
 		case 4:
 			d := (1 + DurationDisorient) / 2
-			if f(i, ai, StatusDisorient, d) &&
+			if f(i, ai, StatusDisorient, d+xd) &&
 				g.IntN(2) == 0 && !g.ResistStatusRoll(i, StatusFear) {
 				f(i, ai, StatusFear, d)
 			}
 		case 5:
-			if f(i, ai, StatusVampirism, DurationVampirism) &&
+			if f(i, ai, StatusVampirism, DurationVampirism+xd) &&
 				g.IntN(2) == 0 && !g.ResistStatusRoll(i, StatusConfusion) {
 				f(i, ai, StatusConfusion, DurationConfusionHit)
 			}
