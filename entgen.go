@@ -908,7 +908,7 @@ var MonsData = []monsterInfo{
 	BlazingGolem:      {"blazing golem", 'G', 2, 3, 4, MonsExplodingDeath | ImmunityFire | ImmunityPoison | ImmunityFear | ImmunityConfusion | MonsHeavyFootsteps | MonsNotable},
 	BlinkButterfly:    {"blinking butterfly", 'b', 2, 3, 2, ImmunityImbalance | ImmunityLignification | MonsWingFlap},
 	BurningPhoenix:    {"burning phoenix", 'P', 2, 1, 5, PatternRampage | BurningHits | ImmunityFire | ImmunityLignification | MonsWingFlap | MonsNotable},
-	ChaosMegabat:      {"chaos megabat", 'm', 2, 2, 4, PatternSneaky | GoodHearing | ImmunityLignification | MonsWingFlap | MonsNotable},
+	ChaosMegabat:      {"chaos megabat", 'm', 2, 2, 2, PatternSneaky | GoodHearing | ImmunityLignification | MonsWingFlap | MonsNotable},
 	ConfusingEye:      {"confusing eye", 'e', 2, 0, 2, PatternRanged | MonsConfusion | ImmunityConfusion | MonsLightFootsteps},
 	CrazyDruid:        {"crazy druid", 'C', 3, 1, 4, PatternSwap | BurningHits | MonsBerserking | MonsNotable},
 	DraggingAlligator: {"dragging alligator", 'A', 3, 1, 4, PatternDragging | MonsScales | ResistanceFire | ResistanceFear | MonsNotable},
@@ -1336,9 +1336,8 @@ func (g *Game) genGuardians(nE, nM, nL int) (int, int, int) {
 	}
 	if g.ProcInfo.GuardianEarly == g.Map.Level {
 		nM--
-		nE++
 		p := g.earlyGuardianPoint()
-		g.genMonsterGuardian(ChaosMegabat, p)
+		g.placeRandomPatrollers(ChaosMegabat, p, 3)
 	}
 	if g.ProcInfo.GuardianPortal1 == g.Map.Level {
 		nM--
@@ -1360,6 +1359,38 @@ func (g *Game) genGuardians(nE, nM, nL int) (int, int, int) {
 		g.genMonsterGuardian(mk, p)
 	}
 	return max(0, nE), max(0, nM), max(0, nL)
+}
+
+// PlaceRandomPatrollers places n monsters with (various) patrolling behaviors
+// chosen at random. NOTE: with chaos megabat in mind only for now (and
+// alternate corruptions).
+func (g *Game) placeRandomPatrollers(mk ActorKind, p gruid.Point, n int) {
+	ps := g.patrolPointCandidates(p)
+	k := g.IntN(4)
+	switch {
+	case len(ps) == 0:
+		// Should usually not happen.
+		for range n {
+			g.genMonsterGuardian(mk, p)
+		}
+	case k == 0:
+		// Random patrol point for each megabat.
+		for range n {
+			g.genMonsterPatroller(mk, []gruid.Point{p, ps[g.IntN(min(len(ps), 4))]})
+		}
+	case k == 1:
+		// Several common patrol points for the megabats.
+		qs := ps[:min(len(ps), 2+g.IntN(2))]
+		for range n {
+			g.genMonsterPatroller(mk, append([]gruid.Point{p}, qs...))
+		}
+	default:
+		// Same patrol point for all the megabats.
+		q := ps[g.IntN(min(len(ps), 4))]
+		for range n {
+			g.genMonsterPatroller(mk, []gruid.Point{p, q})
+		}
+	}
 }
 
 func (g *Game) earlyGuardianPoint() gruid.Point {
@@ -1560,7 +1591,13 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 	if g.ProcInfo.GuardianEarly == g.Map.Level {
 		nM--
 		p := g.earlyGuardianPoint()
-		g.genMonsterGuardian(getGuardKind(ChaosMegabat), p)
+		mk := getGuardKind(ChaosMegabat)
+		g.placeRandomPatrollers(mk, p, 3)
+		if mk != ChaosMegabat {
+			// The alternate ones are stronger, so compensate.
+			nM--
+			nE--
+		}
 		if g.Map.Level >= 3 && g.IntN(3) == 0 {
 			// Rarely, add an imp guardian friend.
 			g.genMonsterGuardian(NoisyImp, p)
@@ -1687,11 +1724,12 @@ func (g *Game) genOrbAlternateGuardiansAt(p gruid.Point, nE, nM, nL int) (int, i
 		nL -= 2
 	default:
 		mk := g.randMonsKind(monsMid)
+		n := 4
 		if g.IntN(1+len(monsMid)) == 0 {
 			// Sneaky megabat nest as rare orb guardians, too.
 			mk = ChaosMegabat
+			n += 3
 		}
-		n := 4
 		if mk == ExplodingNadre {
 			// Nadres are frail, so add an extra one to compensate.
 			n++
@@ -1848,6 +1886,7 @@ func (g *Game) genMonstersCorrupted(nE, nM, nL int) (int, int, int) {
 		if g.IntN(3) == 0 {
 			// Sometimes replace the crazy druid by a bat.
 			mks[2] = ChaosMegabat
+			g.genMonster(ChaosMegabat) // extra one (because weaker)
 		}
 		nMs := min(nM, 1+g.IntN(2), len(mks))
 		monsSpecialMid := g.monsterSelection(mks, len(mks))
@@ -1912,6 +1951,33 @@ func (g *Game) genMonsterGuardian(mk ActorKind, at gruid.Point) (ID, *Actor) {
 	a := mons.Actor()
 	a.Behavior.Guard = []gruid.Point{at}
 	return id, a
+}
+
+// genMonsterPatroller spawns a patrolling monster between certain positions.
+// Assumes a non-empty list of points.
+func (g *Game) genMonsterPatroller(mk ActorKind, ps []gruid.Point) (ID, *Actor) {
+	p := g.randomFreeNearby(ps[g.IntN(len(ps))], 5)
+	id, mons := g.genMonsterAt(mk, p)
+	a := mons.Actor()
+	a.Behavior.Guard = ps
+	return id, a
+}
+
+// patrolPointCandidates returns a list of suitable patrol destinations sorted
+// by distance to from (excluding from).
+func (g *Game) patrolPointCandidates(from gruid.Point) (ps []gruid.Point) {
+	// Collect item positions that aren't too close nor too far.
+	// NOTE: we should maybe replace the check with path distance to avoid
+	// weird cases.
+	for _, e := range g.NPMapEntities() {
+		if e.IsItem() && paths.DistanceManhattan(e.P, from) > 6 && paths.DistanceManhattan(e.P, from) < 4*MaxFOVRange {
+			ps = append(ps, e.P)
+		}
+	}
+	slices.SortFunc(ps, func(p, q gruid.Point) int {
+		return cmp.Compare(paths.DistanceManhattan(from, p), paths.DistanceManhattan(from, q))
+	})
+	return
 }
 
 // genMonsterAt spawns a monster of the given kind on the given position

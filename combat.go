@@ -998,7 +998,7 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 		return
 	}
 	var xd int
-	if g.IntN(3) == 0 {
+	if g.IntN(5) < 2 {
 		// Sometimes, extra duration for some special player-specific
 		// positive status effects.
 		xd = 5 + g.IntN(4)
