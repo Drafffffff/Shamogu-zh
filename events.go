@@ -840,9 +840,9 @@ func (g *Game) GenConditions() []*SpiritCond {
 		case  4: cs[i] = Cond(OnDamage(aqLeave, StatusPoison),        Dies(MadOctopode, TotemWasp))
 		case  5: cs[i] = Cond(OnDamage(CqDischarge,    StatusFire),   Gets(StatusImbalance, BurningPhoenix))
 		case  6: cs[i] = Cond(OnEvent (rqDischargeAll, EventHeal),    Gets(StatusBerserk, FourHeadedHydra))
-		case  7: cs[i] = Dis(HasStats,    Seen(TotemWasp, BlazingGolem, DraggingAlligator))
-		case  8: cs[i] = Dis(HasInvoke,   Gets(StatusImbalance, FourHeadedHydra))
-		default: cs[i] = Dis(HasPassives, Gets(StatusBerserk,   NoisyImp, CrazyDruid, WalkingMushroom))
+		case  7: cs[i] = Dis(HasStats,    WatchHits{PlayerActs: false})
+		case  8: cs[i] = Dis(HasInvoke,   Seen(TotemWasp, BlazingGolem, DraggingAlligator))
+		default: cs[i] = Dis(HasPassives, Gets(StatusBerserk, NoisyImp, CrazyDruid, WalkingMushroom))
 		}
 	}
 	if g.rand.IntN(4) != 0 {
