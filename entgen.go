@@ -1966,7 +1966,8 @@ func (g *Game) genMonsterPatroller(mk ActorKind, ps []gruid.Point) (ID, *Actor) 
 
 // patrolPointCandidates returns a list of suitable patrol destinations sorted
 // by distance to from (excluding from).
-func (g *Game) patrolPointCandidates(from gruid.Point) (ps []gruid.Point) {
+func (g *Game) patrolPointCandidates(from gruid.Point) []gruid.Point {
+	var ps []gruid.Point
 	// Collect item positions that aren't too close nor too far.
 	maxdist := 3 * MaxFOVRange
 	dij := &MapPath{passable: g.Map.PassableWithoutTraps}
@@ -1977,7 +1978,22 @@ func (g *Game) patrolPointCandidates(from gruid.Point) (ps []gruid.Point) {
 			ps = append(ps, e.P)
 		}
 	}
-	return
+	if len(ps) > 0 {
+		return ps
+	}
+	// When there are no nearby items, try choosing a random
+	// waypoint at an appropriate distance.
+	var qs []gruid.Point
+	for _, p := range g.Map.Waypoints {
+		d := g.PR.BreadthFirstMapAt(p)
+		if d >= MaxFOVRange && d <= 2*MaxFOVRange {
+			qs = append(qs, p)
+		}
+	}
+	if len(qs) > 0 {
+		ps = []gruid.Point{g.RandomPassableWithin(qs[g.IntN(len(qs))], 5)}
+	}
+	return ps
 }
 
 // genMonsterAt spawns a monster of the given kind on the given position
