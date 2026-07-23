@@ -1969,12 +1969,13 @@ func (g *Game) genMonsterPatroller(mk ActorKind, ps []gruid.Point) (ID, *Actor) 
 func (g *Game) patrolPointCandidates(from gruid.Point) []gruid.Point {
 	var ps []gruid.Point
 	// Collect item positions that aren't too close nor too far.
+	pp := g.PP()
 	maxdist := 3 * MaxFOVRange
 	dij := &MapPath{passable: g.Map.PassableWithoutTraps}
 	g.PR.BreadthFirstMap(dij, []gruid.Point{from}, maxdist)
 	for _, e := range g.NPMapEntities() {
 		d := g.PR.BreadthFirstMapAt(e.P)
-		if e.IsItem() && d >= MaxFOVRange && d <= maxdist {
+		if e.IsItem() && d >= MaxFOVRange && d <= maxdist && paths.DistanceManhattan(e.P, pp) > MaxFOVRange {
 			ps = append(ps, e.P)
 		}
 	}
@@ -1986,7 +1987,7 @@ func (g *Game) patrolPointCandidates(from gruid.Point) []gruid.Point {
 	var qs []gruid.Point
 	for _, p := range g.Map.Waypoints {
 		d := g.PR.BreadthFirstMapAt(p)
-		if d >= MaxFOVRange && d <= 2*MaxFOVRange {
+		if d >= MaxFOVRange && d <= 2*MaxFOVRange && paths.DistanceManhattan(p, pp) > MaxFOVRange {
 			qs = append(qs, p)
 		}
 	}
