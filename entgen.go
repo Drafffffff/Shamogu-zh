@@ -1361,7 +1361,7 @@ func (g *Game) genGuardians(nE, nM, nL int) (int, int, int) {
 	return max(0, nE), max(0, nM), max(0, nL)
 }
 
-// PlaceRandomPatrollers places n monsters with (various) patrolling behaviors
+// placeRandomPatrollers places n monsters with (various) patrolling behaviors
 // chosen at random. NOTE: with chaos megabat in mind only for now (and
 // alternate corruptions).
 func (g *Game) placeRandomPatrollers(mk ActorKind, p gruid.Point, n int) {
@@ -1374,19 +1374,20 @@ func (g *Game) placeRandomPatrollers(mk ActorKind, p gruid.Point, n int) {
 			g.genMonsterGuardian(mk, p)
 		}
 	case k == 0:
-		// Random patrol point for each megabat.
+		// Random patrol point for each monster.
 		for range n {
-			g.genMonsterPatroller(mk, []gruid.Point{p, ps[g.IntN(min(len(ps), 4))]})
+			g.genMonsterPatroller(mk, []gruid.Point{p, ps[g.IntN(len(ps))]})
 		}
-	case k == 1:
-		// Several common patrol points for the megabats.
-		qs := ps[:min(len(ps), 2+g.IntN(2))]
+	case k == 1 && len(ps) > 1:
+		// Sometimes, extra patrol point.
+		ij := g.rand.Perm(len(ps))[:2]
+		qs := []gruid.Point{ps[ij[0]], ps[ij[1]]}
 		for range n {
 			g.genMonsterPatroller(mk, append([]gruid.Point{p}, qs...))
 		}
 	default:
-		// Same patrol point for all the megabats.
-		q := ps[g.IntN(min(len(ps), 4))]
+		// Same patrol point for all monsters.
+		q := ps[g.IntN(len(ps))]
 		for range n {
 			g.genMonsterPatroller(mk, []gruid.Point{p, q})
 		}
@@ -1728,7 +1729,7 @@ func (g *Game) genOrbAlternateGuardiansAt(p gruid.Point, nE, nM, nL int) (int, i
 		if g.IntN(1+len(monsMid)) == 0 {
 			// Sneaky megabat nest as rare orb guardians, too.
 			mk = ChaosMegabat
-			n += 3
+			n += 2
 		}
 		if mk == ExplodingNadre {
 			// Nadres are frail, so add an extra one to compensate.
@@ -1967,16 +1968,15 @@ func (g *Game) genMonsterPatroller(mk ActorKind, ps []gruid.Point) (ID, *Actor) 
 // by distance to from (excluding from).
 func (g *Game) patrolPointCandidates(from gruid.Point) (ps []gruid.Point) {
 	// Collect item positions that aren't too close nor too far.
-	// NOTE: we should maybe replace the check with path distance to avoid
-	// weird cases.
+	maxdist := 3 * MaxFOVRange
+	dij := &MapPath{passable: g.Map.Passable}
+	g.PR.BreadthFirstMap(dij, []gruid.Point{from}, maxdist)
 	for _, e := range g.NPMapEntities() {
-		if e.IsItem() && paths.DistanceManhattan(e.P, from) > 6 && paths.DistanceManhattan(e.P, from) < 4*MaxFOVRange {
+		d := g.PR.BreadthFirstMapAt(e.P)
+		if e.IsItem() && d >= MaxFOVRange && d <= maxdist {
 			ps = append(ps, e.P)
 		}
 	}
-	slices.SortFunc(ps, func(p, q gruid.Point) int {
-		return cmp.Compare(paths.DistanceManhattan(from, p), paths.DistanceManhattan(from, q))
-	})
 	return
 }
 
