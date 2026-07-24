@@ -126,7 +126,7 @@ func (g *Game) flavoursProcGen() {
 		if g.IntN(MapLevels) == 0 {
 			wanderingUnique2Level = 2
 		}
-		if g.IntN(12) == 0 {
+		if g.IntN(16) == 0 {
 			gpi.SingleGuardKind = g.randMonsKind([]ActorKind{
 				CrazyDruid, DraggingAlligator, BlazingGolem, ChaosMegabat, WalkingMushroom, WarpingWraith})
 		}
