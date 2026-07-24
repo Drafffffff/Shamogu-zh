@@ -128,7 +128,7 @@ func (g *Game) flavoursProcGen() {
 		}
 		if g.IntN(16) == 0 {
 			gpi.SingleGuardKind = g.randMonsKind([]ActorKind{
-				CrazyDruid, DraggingAlligator, BlazingGolem, ChaosMegabat, WalkingMushroom, WarpingWraith})
+				CrazyDruid, DraggingAlligator, BlazingGolem, WalkingMushroom, WarpingWraith})
 		}
 	}
 	randTotemLevel := func(n, m int) int {
