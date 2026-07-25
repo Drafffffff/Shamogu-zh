@@ -268,9 +268,8 @@ func TraitDesc(ak ActorKind, t Traits) string {
 	case BurningPhoenix:
 		desc = append(desc, "imbalance vulnerability (decreased burning chance)")
 	case ChaosMegabat:
-		// Megabat hunts by sound (when out-of-view for noises
-		// originating on the player's tile).
-		desc = append(desc, "hunts by sound")
+		// Megabat hunts toward sound when out of view.
+		desc = append(desc, "hunts toward sound")
 	case EarthDragon:
 		desc = append(desc, "hits may push and @Ounbalance@N foes")
 	case FireLlama:
