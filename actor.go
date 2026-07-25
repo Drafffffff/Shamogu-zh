@@ -234,7 +234,7 @@ func TraitDesc(ak ActorKind, t Traits) string {
 	case DraggingAlligator:
 		desc = append(desc, "confusing bite")
 	case ChaosMegabat:
-		desc = append(desc, "chaos bite (random effect)")
+		desc = append(desc, "chaos bite (random effect), cries upon death")
 	}
 
 	// Extra traits.

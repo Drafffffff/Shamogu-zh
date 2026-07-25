@@ -465,7 +465,7 @@ func (nt NoiseType) Noise() int {
 		return 4
 	case NoiseGrowl, NoiseHeavySteps:
 		return 6
-	case NoiseExplosion, NoiseCry, NoiseFakePortal:
+	case NoiseExplosion, NoiseFakePortal:
 		return MaxFOVRange + 4
 	case NoiseMusic, NoiseEarthMenhir:
 		return 2 * MaxFOVRange
