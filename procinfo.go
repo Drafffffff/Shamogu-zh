@@ -144,17 +144,19 @@ func (g *Game) flavoursProcGen() {
 	switch n := g.IntN(10); {
 	case n == 0:
 		gpi.GuardianEarly = 2 // 10% chance
-	case g.Mod(ModCorruptedDungeon) && n == 1:
-		gpi.GuardianEarly = 2 // extra 10% chance
-	case n >= 8:
-		// 20% chance of late chaos megabats.
+		if g.Mod(ModCorruptedDungeon) && g.IntN(5) == 0 {
+			// Rare chance of very early bats.
+			gpi.GuardianEarly = 1
+		}
+	case n >= 7:
+		// 30% chance of late chaos megabats.
 		gpi.GuardianEarly = 4 + g.IntN(3)
 	}
 	gpi.GuardianTotem2 = randTotemLevel(guardianTotem2Level, 4)
 	if gpi.GuardianTotem2 == gpi.GuardianEarly {
 		// Avoid putting bats with crazy druid, with bats appearing
 		// usually earlier.
-		if g.IntN(3) > 0 {
+		if g.IntN(3) > 0 && gpi.GuardianEarly > 1 {
 			gpi.GuardianEarly--
 		} else {
 			gpi.GuardianEarly++
