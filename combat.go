@@ -246,13 +246,18 @@ func (g *Game) monsterDeath(i, j ID, aj *Actor) {
 			g.AdjustHP(PlayerID, g.PlayerActor(), 1)
 		}
 	}
-	if !aj.DoesAny(MonsExplodingDeath) {
-		return
+	switch {
+	case aj.Is(ChaosMegabat):
+		if g.InFOV(ej.P) {
+			g.Logf("The %s cries upon death.", ej.Name)
+		}
+		g.MakeNoise(ej.P, NoiseCry)
+	case aj.DoesAny(MonsExplodingDeath):
+		if g.InFOV(ej.P) {
+			g.Logf("The %s explodes.", ej.Name)
+		}
+		g.ExplosionAt(i, ej.P)
 	}
-	if g.InFOV(ej.P) {
-		g.Logf("The %s explodes.", ej.Name)
-	}
-	g.ExplosionAt(i, ej.P)
 }
 
 // ExplosionAt makes a fire explosion at the given position. The optional id
@@ -998,9 +1003,9 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 		return
 	}
 	var xd int
-	if g.IntN(5) < 2 {
-		// Sometimes, extra duration for some special player-specific
-		// positive status effects.
+	if g.IntN(5) == 0 {
+		// Occasionally, extra duration for some special
+		// player-specific positive status effects.
 		xd = 5 + g.IntN(4)
 	}
 	n := 3
@@ -1012,7 +1017,7 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 		if g.ResistStatusRoll(i, StatusLignification) || !f(i, ai, StatusLignification, DurationLignificationHit) {
 			break
 		}
-		switch g.IntN(6) {
+		switch g.IntN(5) {
 		case 0, 1:
 			// Sometimes, give Lignification+Fear.
 			if !g.ResistStatusRoll(i, StatusFear) {
@@ -1022,10 +1027,6 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 			// Rarely, Lignification+Fire.
 			if !g.ResistStatusRoll(i, StatusFire) {
 				f(i, ai, StatusFire, DurationFire)
-			}
-		case 3:
-			if !g.ResistStatusRoll(i, StatusDaze) {
-				f(i, ai, StatusDaze, DurationDazeSpines)
 			}
 		}
 	case 1:
@@ -1052,13 +1053,17 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 			break
 		}
 		switch g.IntN(n) {
-		case 0, 1:
+		case 0:
 			if !g.ResistStatusRoll(i, StatusPoison) {
 				f(i, ai, StatusPoison, DurationPoisonBite)
 			}
+		case 1:
+			if !g.ResistStatusRoll(i, StatusFire) {
+				f(i, ai, StatusFire, DurationFire)
+			}
 		case 2:
-			if !g.ResistStatusRoll(i, StatusDaze) {
-				f(i, ai, StatusDaze, DurationDazeSpines)
+			if !g.ResistStatusRoll(i, StatusConfusion) {
+				f(i, ai, StatusConfusion, DurationConfusionHit/2)
 			}
 		}
 	default:

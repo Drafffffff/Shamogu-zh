@@ -253,7 +253,7 @@ func TraitDesc(ak ActorKind, t Traits) string {
 	desc = traitDesc(desc, t, VenomousMelee, "@Ovenomous@N melee attack")
 	desc = traitDesc(desc, t, WoodyLegs, "woody legs (can move while lignified)")
 	switch {
-	case t.Any(GoodHearing) && !t.Any(BadHearing) && ak != ChaosMegabat:
+	case t.Any(GoodHearing) && !t.Any(BadHearing):
 		desc = append(desc, "good hearing")
 	case !t.Any(GoodHearing) && t.Any(BadHearing):
 		desc = append(desc, "bad hearing")
@@ -270,7 +270,7 @@ func TraitDesc(ak ActorKind, t Traits) string {
 	case ChaosMegabat:
 		// Megabat hunts by sound (when out-of-view for noises
 		// originating on the player's tile).
-		desc = append(desc, "excellent hearing, hunts by sound")
+		desc = append(desc, "hunts by sound")
 	case EarthDragon:
 		desc = append(desc, "hits may push and @Ounbalance@N foes")
 	case FireLlama:

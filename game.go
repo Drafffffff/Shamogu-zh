@@ -409,7 +409,7 @@ func noiseColor(e *Entity) gruid.Color {
 func (g *Game) MakeNoise(at gruid.Point, nt NoiseType) {
 	noise := nt.Noise()
 	dij := &MapPath{passable: g.Map.Passable}
-	maxdist := (3 * noise) / 2
+	maxdist := 3 * (1 + noise) / 2
 	g.PRnoise.BreadthFirstMap(dij, []gruid.Point{at}, maxdist)
 	pp := g.PP()
 	pa := g.PlayerActor()
@@ -426,12 +426,6 @@ func (g *Game) MakeNoise(at gruid.Point, nt NoiseType) {
 	}
 	for i, ai := range g.Monsters() {
 		pi := g.Entity(i).P
-		if ai.Is(ChaosMegabat) && paths.DistanceManhattan(pi, at) <= 2*maxdist {
-			// Megabats have 2x longer hearing range, and their
-			// hearing ignores walls.
-			g.MonsterUpdateTarget(i, ai, at, true)
-			continue
-		}
 		d := g.PRnoise.BreadthFirstMapAt(pi)
 		if d > maxdist || d > noise && !ai.DoesAny(GoodHearing) {
 			continue
@@ -448,6 +442,7 @@ const (
 	NoiseCombat
 	NoiseChomp
 	NoiseCackle
+	NoiseCry
 	NoiseDig
 	NoiseExplosion
 	NoiseEarthMenhir
@@ -470,7 +465,7 @@ func (nt NoiseType) Noise() int {
 		return 4
 	case NoiseGrowl, NoiseHeavySteps:
 		return 6
-	case NoiseExplosion, NoiseFakePortal:
+	case NoiseExplosion, NoiseCry, NoiseFakePortal:
 		return MaxFOVRange + 4
 	case NoiseMusic, NoiseEarthMenhir:
 		return 2 * MaxFOVRange
@@ -491,6 +486,8 @@ func (nt NoiseType) Msg() string {
 		return "Chomp!"
 	case NoiseCackle:
 		return "KO-KO-KO!"
+	case NoiseCry:
+		return "SCREECH!"
 	case NoiseDig:
 		return "CRACK!"
 	case NoiseExplosion:

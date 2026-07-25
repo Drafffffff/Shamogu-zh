@@ -1336,8 +1336,11 @@ func (g *Game) genGuardians(nE, nM, nL int) (int, int, int) {
 	}
 	if g.ProcInfo.GuardianEarly == g.Map.Level {
 		nM--
+		if g.ProcInfo.GuardianEarly == 2 {
+			nE-- // compensation for early bats
+		}
 		p := g.earlyGuardianPoint()
-		g.placeRandomPatrollers(ChaosMegabat, p, 3)
+		g.placeRandomPatrollers(ChaosMegabat, p, g.numberOfBats())
 	}
 	if g.ProcInfo.GuardianPortal1 == g.Map.Level {
 		nM--
@@ -1392,6 +1395,14 @@ func (g *Game) placeRandomPatrollers(mk ActorKind, p gruid.Point, n int) {
 			g.genMonsterPatroller(mk, []gruid.Point{p, q})
 		}
 	}
+}
+
+func (g *Game) numberOfBats() int {
+	if g.ProcInfo.GuardianEarly <= 4 || g.IntN(3) == 0 {
+		return 3
+	}
+	// Usually extra bat when they appear late.
+	return 4
 }
 
 func (g *Game) earlyGuardianPoint() gruid.Point {
@@ -1591,9 +1602,12 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 	}
 	if g.ProcInfo.GuardianEarly == g.Map.Level {
 		nM--
+		if g.ProcInfo.GuardianEarly == 2 {
+			nE-- // compensation for early bats
+		}
 		p := g.earlyGuardianPoint()
 		mk := getGuardKind(ChaosMegabat)
-		g.placeRandomPatrollers(mk, p, 3)
+		g.placeRandomPatrollers(mk, p, g.numberOfBats())
 		if mk != ChaosMegabat {
 			// The alternate ones are stronger, so compensate.
 			nM--

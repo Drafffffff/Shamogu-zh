@@ -163,7 +163,7 @@ func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point, noise bool) 
 		return false
 	}
 	unhidden := !g.PlayerIsHidden()
-	if at == pp && (unhidden && g.InFOV(ei.P) || noise && ai.Is(ChaosMegabat)) {
+	if at == pp && unhidden && g.InFOV(ei.P) || noise && ai.Is(ChaosMegabat) {
 		if g.InFOV(ei.P) {
 			g.Logf("The %s notices you.", ei.Name)
 		}

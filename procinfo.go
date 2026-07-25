@@ -140,21 +140,28 @@ func (g *Game) flavoursProcGen() {
 			}
 		}
 	}
-	gpi.GuardianEarly = 2 // 40-50% chance
+	gpi.GuardianEarly = 3 // 60% chance
 	switch n := g.IntN(10); {
-	case n < 3:
-		// 30% chance of being in level 3.
-		gpi.GuardianEarly = 3
-	case g.Mod(ModCorruptedDungeon) && n == 3:
-		// Low 10% chance of being in level 1 when corrupted dungeon is
-		// enabled.
-		gpi.GuardianEarly = 1
+	case n == 0:
+		gpi.GuardianEarly = 2 // 10% chance
+	case g.Mod(ModCorruptedDungeon) && n == 1:
+		gpi.GuardianEarly = 2 // extra 10% chance
 	case n >= 8:
-		// 20% chance of no chaos megabat.
-		gpi.GuardianEarly = 0
+		// 20% chance of late chaos megabats.
+		gpi.GuardianEarly = 4 + g.IntN(3)
 	}
 	gpi.GuardianTotem2 = randTotemLevel(guardianTotem2Level, 4)
-	for gpi.GuardianTotem1 == 0 || gpi.GuardianTotem1 == gpi.GuardianTotem2 {
+	if gpi.GuardianTotem2 == gpi.GuardianEarly {
+		// Avoid putting bats with crazy druid, with bats appearing
+		// usually earlier.
+		if g.IntN(3) > 0 {
+			gpi.GuardianEarly--
+		} else {
+			gpi.GuardianEarly++
+		}
+	}
+	for gpi.GuardianTotem1 == 0 || gpi.GuardianTotem1 == gpi.GuardianTotem2 || gpi.GuardianTotem1 == gpi.GuardianEarly {
+		// Place wasps in level without druid nor bats.
 		// Wasps do not care about the totem being empty or not.
 		gpi.GuardianTotem1 = guardianTotem1Level + g.IntN(4)
 		if gpi.GuardianTotem1 > gpi.GuardianTotem2 && g.IntN(2) == 0 {
@@ -162,10 +169,11 @@ func (g *Game) flavoursProcGen() {
 			gpi.GuardianTotem1 = guardianTotem1Level + g.IntN(4)
 		}
 	}
-	if gpi.GuardianTotem2 == gpi.GuardianEarly && gpi.GuardianEarly > 1 {
-		gpi.GuardianEarly--
-	}
 	gpi.GuardianPortal2 = guardianPortal2Level + g.IntN(3)
+	if gpi.GuardianTotem2 == gpi.GuardianEarly {
+		// Octopode always later than bats.
+		gpi.GuardianTotem2++
+	}
 	for gpi.GuardianPortal1 == 0 || gpi.GuardianPortal1 == gpi.GuardianPortal2 || gpi.GuardianPortal1 == gpi.GuardianEarly {
 		gpi.GuardianPortal1 = guardianPortal1Level + g.IntN(4)
 	}
