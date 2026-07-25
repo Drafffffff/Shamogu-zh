@@ -1336,7 +1336,7 @@ func (g *Game) genGuardians(nE, nM, nL int) (int, int, int) {
 	}
 	if g.ProcInfo.GuardianEarly == g.Map.Level {
 		nM--
-		if g.ProcInfo.GuardianEarly == 2 {
+		if g.ProcInfo.GuardianEarly <= 2 {
 			nE-- // compensation for early bats
 		}
 		p := g.earlyGuardianPoint()
@@ -1602,7 +1602,7 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 	}
 	if g.ProcInfo.GuardianEarly == g.Map.Level {
 		nM--
-		if g.ProcInfo.GuardianEarly == 2 {
+		if g.ProcInfo.GuardianEarly <= 2 {
 			nE-- // compensation for early bats
 		}
 		p := g.earlyGuardianPoint()
