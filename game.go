@@ -453,9 +453,6 @@ const (
 	NoiseStomp
 	NoiseTrumpet
 	NoiseWind
-
-	NoiseHeavySteps
-	NoiseGrowl
 )
 
 // Noise returns the amount of noise associated with the given type of noise.
@@ -463,8 +460,6 @@ func (nt NoiseType) Noise() int {
 	switch nt {
 	case NoiseCombat, NoiseChomp:
 		return 4
-	case NoiseGrowl, NoiseHeavySteps:
-		return 6
 	case NoiseExplosion, NoiseFakePortal:
 		return MaxFOVRange + 4
 	case NoiseMusic, NoiseEarthMenhir:
@@ -494,8 +489,6 @@ func (nt NoiseType) Msg() string {
 		return "POP-BOOM!"
 	case NoiseFakePortal:
 		return "THRUM!"
-	case NoiseGrowl:
-		return "Growl!"
 	case NoiseLightning:
 		return "PANG!"
 	case NoiseEarthMenhir:
@@ -510,9 +503,6 @@ func (nt NoiseType) Msg() string {
 		return "TARARA!"
 	case NoiseWind:
 		return "WHIZ!"
-	case NoiseHeavySteps:
-		// Don't log heavy steps from mod.
-		return ""
 	default:
 		// should not happen.
 		return "NOISE!"
