@@ -1262,14 +1262,14 @@ func (a ActionDump) Handle(md *model) (gruid.Effect, bool) {
 }
 
 func (a ActionDump) String() string {
-	return "Dump game statistics"
+	return "Game summary"
 }
 
 func (a ActionDump) Desc() string {
 	if runtime.GOOS == "js" {
-		return "Writes game statistics below."
+		return "Writes game statistics below. Also opens in-game pager with the summary."
 	}
-	return "Writes game statistics to a dump.txt file in the game’s data directory."
+	return "Writes game statistics to a dump.txt file in the game’s data directory. Also opens in-game pager with the summary."
 }
 
 // ActionSaveQuit asks for quitting the game after saving.
