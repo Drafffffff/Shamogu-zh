@@ -126,7 +126,7 @@ func (g *Game) TriggerTrap(i ID, ai *Actor) {
 	case i == PlayerID:
 		g.LogfStyled("You trigger the %s.", logSpecial, rt.Rune.String())
 		g.StoryLogf("Triggered %s", One(rt.Rune.String()))
-		g.Stats.PlayerTrapTriggers++
+		g.Stats.PlayerTriggers++
 		rt.KnownUsed = true
 	case g.InFOV(pi):
 		g.LogfStyled("The %s triggers the %s.", logSpecial, ei.Name, rt.Rune.String())
@@ -136,7 +136,7 @@ func (g *Game) TriggerTrap(i ID, ai *Actor) {
 		rt.KnownUsed = true
 	}
 	if i != PlayerID {
-		g.Stats.MonsterTrapTriggers++
+		g.Stats.MonsterTriggers++
 	}
 	g.Stats.MapTriggeredTraps[g.Map.Level-1]++
 	rt.Used = true

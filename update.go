@@ -109,8 +109,9 @@ func (md *model) update(msg gruid.Msg) gruid.Effect {
 		if md.more(msg) {
 			md.gameEnded = true
 			md.mode = modePager
-			md.pager.mode = modeDump
-			md.dump(md.g.WriteDump())
+			md.pager.mode = modePagerEnd
+			_, msg, err := md.g.WriteDump()
+			md.dump(msg, err)
 		}
 	}
 	md.g.UpdateFirePos(PlayerID, md.g.PlayerActor())

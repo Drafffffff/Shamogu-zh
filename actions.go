@@ -1216,7 +1216,7 @@ func (a ActionViewMessages) Handle(md *model) (gruid.Effect, bool) {
 	md.pager.pg.SetCursor(gruid.Point{0, len(md.pager.lines)})
 	md.pager.pg.SetBox(&ui.Box{Title: ui.Text("Messages").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
 	md.mode = modePager
-	md.pager.mode = modeLogs
+	md.pager.mode = modePagerNormal
 	return nil, false
 }
 
@@ -1232,12 +1232,32 @@ func (a ActionViewMessages) Desc() string {
 type ActionDump struct{}
 
 func (a ActionDump) Handle(md *model) (gruid.Effect, bool) {
-	if msg, err := md.g.WriteDump(); err != nil {
+	dump, msg, err := md.g.WriteDump()
+	if err != nil {
 		log.Printf("error writing dump: %v", err)
 		md.g.LogStyled("Error writing statistics.", logError)
 	} else {
 		md.g.Log(msg)
 	}
+	md.mode = modePager
+	md.pager.mode = modePagerNormal
+	dump = strings.ReplaceAll(dump, "@", "@@")
+	stts := ui.Text(strings.TrimRight(dump, "\n")).WithMarkups(Markups).Lines()
+	for i, t := range stts {
+		if strings.HasPrefix(t.Text(), "Map:") {
+			// Cut the map part (useless in-game).
+			stts = append(stts[:i], stts[min(i+MapHeight+2, len(stts)):]...)
+			break
+		}
+	}
+	for i, t := range stts {
+		if strings.HasSuffix(t.Text(), ":") {
+			stts[i] = t.WithTextf("@C%s@N", t.Text())
+		}
+	}
+	md.pager.pg.SetLines(stts)
+	md.pager.pg.SetCursor(gruid.Point{0, 0})
+	md.pager.pg.SetBox(&ui.Box{Title: ui.Text("Game Summary").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
 	return nil, false
 }
 
@@ -1573,7 +1593,7 @@ func (a ActionHelpDefaultKeys) Desc() string {
 }
 
 func (md *model) updateKeysDescription(title string, actions []string) {
-	md.pager.mode = modeHelp
+	md.pager.mode = modePagerNormal
 	md.mode = modePager
 	if CustomKeys {
 		title = fmt.Sprintf(" Default %s ", title)
@@ -1635,7 +1655,7 @@ func (md *model) helpTopic(title, content string) {
 	md.pager.pg.SetLines(stts)
 	md.pager.pg.SetCursor(gruid.Point{0, 0})
 	md.mode = modePager
-	md.pager.mode = modeHelp
+	md.pager.mode = modePagerNormal
 	md.pager.pg.SetBox(&ui.Box{Title: ui.Text(title).WithStyle(gruid.Style{}.WithFg(ColorYellow))})
 }
 

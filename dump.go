@@ -16,17 +16,23 @@ type Stats struct {
 	Cornered            int            // number of times you felt cornered
 	Damage              int            // total damage you got
 	Deaths              map[string]int // monster deaths by name
+	DeathsPast          map[string]int // monster deaths by name (past levels)
 	Digs                int            // number of digs (destroyed walls)
+	DigsPast            int            // number of digs (past levels)
 	EatenComestibles    int            // number of eaten comestibles
 	FireClouds          int            // number of spawn fire clouds
+	FireCloudsPast      int            // number of spawn fire clouds (past levels)
 	Hits                int            // number of times you hit with a bump-attack
 	Hurt                int            // number of times you got hurt
 	Lucky               int            // number of times you were lucky (could die to bad roll but got lucky roll)
 	Misses              int            // number of times you missed a bump-attack
-	MonsterTrapTriggers int            // number of triggered traps by the monsters
+	MonsterTriggers     int            // number of triggered traps by the monsters
+	MonsterTriggersPast int            // number of triggered traps by the monsters (past levels)
 	NDeaths             int            // number of monster deaths
-	PlayerTrapTriggers  int            // number of triggered traps by the player
+	NDeathsPast         int            // number of monster deaths (past levels)
+	PlayerTriggers      int            // number of triggered traps by the player
 	PoisonClouds        int            // number of spawn poison clouds
+	PoisonCloudsPast    int            // number of spawn poison clouds (past levels)
 	SpiritUses          int            // number of ability uses
 	Statuses            []int          // times you got each status
 	Waits               int            // number of times you waited
@@ -90,8 +96,61 @@ func (g *Game) LevelStats() {
 	} else {
 		gs.MapDeathPerc[g.Map.Level-1] = int(100 * float64(n) / float64(total))
 	}
-
+	// Save information that we show only up to last level for in-progress
+	// non-debug runs.
+	gs.DeathsPast = maps.Clone(gs.Deaths)
+	gs.DigsPast = gs.Digs
+	gs.FireCloudsPast = gs.FireClouds
+	gs.MonsterTriggersPast = gs.MonsterTriggers
+	gs.NDeathsPast = gs.NDeaths
+	gs.PoisonCloudsPast = gs.PoisonClouds
 }
+
+func (g *Game) getStatDeaths() map[string]int {
+	if g.showAllStats() {
+		return g.Stats.Deaths
+	}
+	return g.Stats.DeathsPast
+}
+
+func (g *Game) getStatFireClouds() int {
+	if g.showAllStats() {
+		return g.Stats.FireClouds
+	}
+	return g.Stats.FireCloudsPast
+}
+
+func (g *Game) getStatMonsterTriggers() int {
+	if g.showAllStats() {
+		return g.Stats.MonsterTriggers
+	}
+	return g.Stats.MonsterTriggersPast
+}
+
+func (g *Game) getStatNDeaths() int {
+	if g.showAllStats() {
+		return g.Stats.NDeaths
+	}
+	return g.Stats.NDeathsPast
+}
+
+func (g *Game) getStatPoisonClouds() int {
+	if g.showAllStats() {
+		return g.Stats.PoisonClouds
+	}
+	return g.Stats.PoisonCloudsPast
+}
+
+func (g *Game) getStatExcludeStr() string {
+	if g.showAllStats() {
+		return ""
+	}
+	return " (excluding current level)"
+}
+
+// showAllStats reports whether game statistics should show everything, including
+// informations of current level that could be unknown yet to the player.
+func (g *Game) showAllStats() bool { return g.Wizard.Extra || g.win || g.PlayerActor().IsDead() }
 
 // DumpSummary produces the game statistics short summary displayed at the end
 // of the game.
@@ -122,7 +181,7 @@ func (g *Game) DumpSummary() string {
 		fmt.Fprintf(&sb, "You are exploring level %d of the dungeon.\n", g.Map.Level)
 	}
 	fmt.Fprintf(&sb, "You spent %d turns in the dungeon.\n", g.Turn)
-	fmt.Fprintf(&sb, "Your adventure resulted in %s.\n", CountNoun("monster death", g.Stats.NDeaths))
+	fmt.Fprintf(&sb, "Your adventure resulted in %s%s.\n", CountNoun("monster death", g.getStatNDeaths()), g.getStatExcludeStr())
 	if g.modCount() > 0 {
 		sb.WriteString("\nMods:\n")
 		g.dumpMods(&sb)
@@ -157,8 +216,8 @@ func (g *Game) Dump() string {
 	}
 	sb.WriteString("\nMap:\n")
 	g.dumpDungeon(&sb)
-	if g.Stats.NDeaths > 0 {
-		sb.WriteString("\nMonster deaths:\n")
+	if g.getStatNDeaths() > 0 {
+		fmt.Fprintf(&sb, "\nMonster deaths%s:\n", g.getStatExcludeStr())
 		g.dumpKilledMonsters(&sb)
 	}
 	if g.Stats.EatenComestibles > 0 {
@@ -263,9 +322,10 @@ func (g *Game) dumpDungeon(sb *strings.Builder) {
 }
 
 func (g *Game) dumpKilledMonsters(sb *strings.Builder) {
-	monsters := slices.Sorted(maps.Keys(g.Stats.Deaths))
+	deaths := g.getStatDeaths()
+	monsters := slices.Sorted(maps.Keys(deaths))
 	for _, mons := range monsters {
-		fmt.Fprintf(sb, "- %s: %d\n", mons, g.Stats.Deaths[mons])
+		fmt.Fprintf(sb, "- %s: %d\n", mons, deaths[mons])
 	}
 }
 
@@ -289,7 +349,7 @@ func (g *Game) dumpStatistics(sb *strings.Builder) {
 		times(g.Stats.SpiritUses),
 		CountNoun("comestible", g.Stats.EatenComestibles),
 		CountNoun("menhir", g.Stats.ActivatedMenhirs))
-	fmt.Fprintf(sb, "You triggered %s.\n", CountNoun("trap", g.Stats.PlayerTrapTriggers))
+	fmt.Fprintf(sb, "You triggered %s.\n", CountNoun("trap", g.Stats.PlayerTriggers))
 	fmt.Fprintf(sb, "You hit foes %s.\n", timesPer100(g.Stats.Hits))
 	fmt.Fprintf(sb, "You missed foes %s.\n", timesPer100(g.Stats.Misses))
 	fmt.Fprintf(sb, "You waited %s.\n", timesPer100(g.Stats.Waits))
@@ -310,11 +370,13 @@ func (g *Game) dumpStatistics(sb *strings.Builder) {
 			fmt.Fprintf(sb, "You were %s %s.\n", st, times(n))
 		}
 	}
-	fmt.Fprintf(sb, "There were %s and %s.\n",
-		CountNoun("fire cloud", g.Stats.FireClouds),
-		CountNoun("poison cloud", g.Stats.PoisonClouds))
-	fmt.Fprintf(sb, "%s.\n", there("destroyed wall", g.Stats.Digs))
-	fmt.Fprintf(sb, "%s triggered by monsters.\n", there("trap", g.Stats.MonsterTrapTriggers))
+	ses := g.getStatExcludeStr()
+	fmt.Fprintf(sb, "There were %s and %s%s.\n",
+		CountNoun("fire cloud", g.getStatFireClouds()),
+		CountNoun("poison cloud", g.getStatPoisonClouds()),
+		ses)
+	fmt.Fprintf(sb, "%s%s.\n", there("destroyed wall", g.Stats.Digs), ses)
+	fmt.Fprintf(sb, "%s triggered by monsters%s.\n", there("trap", g.getStatMonsterTriggers()), ses)
 	// Statistics per map level.
 	levels := g.Map.Level - 1
 	if g.win || g.PlayerActor().IsDead() {

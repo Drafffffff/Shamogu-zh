@@ -66,7 +66,7 @@ func (md *model) Draw() gruid.Grid {
 	case modeQuitting:
 		return md.gd.Slice(gruid.Range{})
 	case modePager:
-		if md.pager.mode == modeDump {
+		if md.pager.mode == modePagerEnd {
 			md.gd.Copy(md.pager.pg.Draw())
 			return md.gd
 		}
