@@ -53,6 +53,7 @@ type Stats struct {
 func newStats() *Stats {
 	return &Stats{
 		Deaths:      map[string]int{},
+		DeathsPast:  map[string]int{},
 		Comestibles: map[string]int{},
 		Statuses:    make([]int, NStatuses),
 	}
