@@ -1003,9 +1003,9 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 		return
 	}
 	var xd int
-	if g.IntN(5) == 0 {
-		// Occasionally, extra duration for some special
-		// player-specific positive status effects.
+	if g.IntN(10) == 0 {
+		// Rarely, extra duration for some special player-specific
+		// positive status effects.
 		xd = 5 + g.IntN(4)
 	}
 	n := 3
@@ -1053,17 +1053,14 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 			break
 		}
 		switch g.IntN(n) {
-		case 0:
-			if !g.ResistStatusRoll(i, StatusPoison) {
-				f(i, ai, StatusPoison, DurationPoisonBite)
-			}
-		case 1:
-			if !g.ResistStatusRoll(i, StatusFire) {
-				f(i, ai, StatusFire, DurationFire)
-			}
-		case 2:
+		case 0, 1:
 			if !g.ResistStatusRoll(i, StatusConfusion) {
 				f(i, ai, StatusConfusion, DurationConfusionHit/2)
+			}
+		case 2:
+			// More rarely, short-lived early poison with berserk.
+			if !g.ResistStatusRoll(i, StatusPoison) {
+				f(i, ai, StatusPoison, DurationPoisonBite/2)
 			}
 		}
 	default:
@@ -1085,7 +1082,7 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 			d := (1 + DurationTimeStop) / 2
 			if f(i, ai, StatusTimeStop, d+xd/2) &&
 				g.IntN(2) == 0 && !g.ResistStatusRoll(i, StatusImbalance) {
-				f(i, ai, StatusImbalance, d)
+				f(i, ai, StatusImbalance, d+xd/2)
 			}
 		case 3:
 			d := (1 + DurationShadow) / 2
@@ -1100,9 +1097,9 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 				f(i, ai, StatusFear, d)
 			}
 		case 5:
-			if f(i, ai, StatusVampirism, DurationVampirism+xd) &&
-				g.IntN(2) == 0 && !g.ResistStatusRoll(i, StatusConfusion) {
-				f(i, ai, StatusConfusion, DurationConfusionHit)
+			if f(i, ai, StatusVampirism, DurationVampirism+(2*xd)/3) &&
+				g.IntN(2) == 0 && !g.ResistStatusRoll(i, StatusPoison) {
+				f(i, ai, StatusConfusion, DurationVampirism)
 			}
 		}
 	}
