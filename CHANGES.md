@@ -2,7 +2,13 @@
 
 Reworked and improved content:
 
-* Improved hearing for chaos megabat: “excellent” instead of “good” (see #18).
+* Reworked chaos megabat (see discussion in issue #18). The megabats are now
+  weaker (2 HP instead of 4 HP) but appear usually in groups of three and
+  patrol between a couple of locations in a chaotic manner. They also cry upon
+  death.  There were some minor chaos bite effect tweaks, too, with occasional
+  extra duration for positive effects as a surprise.
+* Slightly improved “good hearing” for non-footstep noises by an average of 1.5
+  tiles to make it a bit more significant for small noises.
 * Slightly tweaked down occurrence chance for alligators with respect to golems
   (see #18).
 
@@ -20,6 +26,9 @@ Corrupted dungeon improvements:
 UI, graphics, QoL:
 
 * Make Runic Chicken players not avoid traps in auto-explore and travel.
+* The “game summary” action (shortcut `#`) now opens the pager with a
+  simplified summary for in-game viewing, in addition to writing full
+  statistics to a file (or “below” for the browser version).
 
 Fixes:
 
