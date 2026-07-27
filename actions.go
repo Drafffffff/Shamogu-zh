@@ -1232,7 +1232,7 @@ func (a ActionViewMessages) Desc() string {
 type ActionDump struct{}
 
 func (a ActionDump) Handle(md *model) (gruid.Effect, bool) {
-	dump, msg, err := md.g.WriteDump()
+	msg, err := md.g.WriteDump()
 	if err != nil {
 		log.Printf("error writing dump: %v", err)
 		md.g.LogStyled("Error writing statistics.", logError)
@@ -1241,20 +1241,8 @@ func (a ActionDump) Handle(md *model) (gruid.Effect, bool) {
 	}
 	md.mode = modePager
 	md.pager.mode = modePagerNormal
-	dump = strings.ReplaceAll(dump, "@", "@@")
+	dump := md.g.DumpInGame()
 	stts := ui.Text(strings.TrimRight(dump, "\n")).WithMarkups(Markups).Lines()
-	for i, t := range stts {
-		if strings.HasPrefix(t.Text(), "Map:") {
-			// Cut the map part (useless in-game).
-			stts = append(stts[:i], stts[min(i+MapHeight+2, len(stts)):]...)
-			break
-		}
-	}
-	for i, t := range stts {
-		if strings.HasSuffix(t.Text(), ":") {
-			stts[i] = t.WithTextf("@C%s@N", t.Text())
-		}
-	}
 	md.pager.pg.SetLines(stts)
 	md.pager.pg.SetCursor(gruid.Point{0, 0})
 	md.pager.pg.SetBox(&ui.Box{Title: ui.Text("Game Summary").WithStyle(gruid.Style{}.WithFg(ColorYellow))})

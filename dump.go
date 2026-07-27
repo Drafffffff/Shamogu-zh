@@ -142,9 +142,12 @@ func (g *Game) getStatPoisonClouds() int {
 	return g.Stats.PoisonCloudsPast
 }
 
-func (g *Game) getStatExcludeStr() string {
+func (g *Game) getStatExcludeStr(markup bool) string {
 	if g.showAllStats() {
 		return ""
+	}
+	if markup {
+		return " @S(excluding current level)@N"
 	}
 	return " (excluding current level)"
 }
@@ -153,9 +156,9 @@ func (g *Game) getStatExcludeStr() string {
 // informations of current level that could be unknown yet to the player.
 func (g *Game) showAllStats() bool { return g.Wizard.Extra || g.win || g.PlayerActor().IsDead() }
 
-// DumpSummary produces the game statistics short summary displayed at the end
-// of the game.
-func (g *Game) DumpSummary() string {
+// DumpEndSummary produces the game statistics short summary displayed at the end
+// of the game. When markup is enabled, in-game viewing is assumed.
+func (g *Game) DumpEndSummary(markup bool) string {
 	var sb strings.Builder
 	var version string
 	info, ok := debug.ReadBuildInfo()
@@ -173,21 +176,20 @@ func (g *Game) DumpSummary() string {
 		}
 		sb.WriteString(").\n")
 	}
-	pa := g.PlayerActor()
-	if g.win {
-		fmt.Fprintf(&sb, "You destroyed the Orb of Corruption!\n")
-	} else if pa.IsDead() {
-		fmt.Fprintf(&sb, "You died while exploring level %d of the dungeon.\n", g.Map.Level)
-	} else {
-		fmt.Fprintf(&sb, "You are exploring level %d of the dungeon.\n", g.Map.Level)
+	if !markup {
+		pa := g.PlayerActor()
+		if g.win {
+			fmt.Fprintf(&sb, "You destroyed the Orb of Corruption!\n")
+		} else if pa.IsDead() {
+			fmt.Fprintf(&sb, "You died while exploring level %d of the dungeon.\n", g.Map.Level)
+		} else {
+			fmt.Fprintf(&sb, "You are exploring level %d of the dungeon.\n", g.Map.Level)
+		}
+		fmt.Fprintf(&sb, "You spent %d turns in the dungeon.\n", g.Turn)
 	}
-	fmt.Fprintf(&sb, "You spent %d turns in the dungeon.\n", g.Turn)
-	fmt.Fprintf(&sb, "Your adventure resulted in %s%s.\n", CountNoun("monster death", g.getStatNDeaths()), g.getStatExcludeStr())
-	if g.modCount() > 0 {
-		sb.WriteString("\nMods:\n")
-		g.dumpMods(&sb)
-	}
-	g.dumpPlayer(&sb)
+	fmt.Fprintf(&sb, "Your adventure resulted in %s%s.\n", CountNoun("monster death", g.getStatNDeaths()), g.getStatExcludeStr(markup))
+	g.dumpMods(&sb, markup)
+	g.dumpPlayer(&sb, markup)
 	return sb.String()
 }
 
@@ -204,38 +206,34 @@ func (g *Game) modCount() int {
 // Dump produces the game statistics full summary.
 func (g *Game) Dump() string {
 	var sb strings.Builder
-	summary := g.DumpSummary()
-	sb.WriteString(summary)
-	sb.WriteString("\nComestibles:\n")
-	for i := range g.PlayerComestibles() {
-		ei := g.Entity(i)
-		fmt.Fprintf(&sb, "- %s\n", ei.Name)
-	}
-	sb.WriteString("\nLast messages:\n")
-	for _, e := range g.Logs.Entries[max(0, len(g.Logs.Entries)-20):] {
-		fmt.Fprintf(&sb, "%s\n", e.dumpString())
-	}
-	sb.WriteString("\nMap:\n")
-	g.dumpDungeon(&sb)
-	if g.getStatNDeaths() > 0 {
-		fmt.Fprintf(&sb, "\nMonster deaths%s:\n", g.getStatExcludeStr())
-		g.dumpKilledMonsters(&sb)
-	}
-	if g.Stats.EatenComestibles > 0 {
-		sb.WriteString("\nEaten comestibles:\n")
-		g.dumpEatenComestibles(&sb)
-	}
-	sb.WriteString("\nStatistics:\n")
-	g.dumpStatistics(&sb)
-	sb.WriteString("\nTimeline:\n")
-	for _, s := range g.Logs.Story {
-		sb.WriteString(s)
-		sb.WriteByte('\n')
-	}
+	sb.WriteString(g.DumpEndSummary(false))
+	g.dumpComestibles(&sb, false)
+	g.dumpLastMessages(&sb, false)
+	g.dumpMap(&sb, false)
+	g.dumpMonsterDeaths(&sb, false)
+	g.dumpEatenComestibles(&sb, false)
+	g.dumpStatistics(&sb, false)
+	g.dumpTimeline(&sb, false)
 	return sb.String()
 }
 
-func (g *Game) dumpMods(sb *strings.Builder) {
+// DumpInGame produces the statistics summary for in-game pager viewing (with
+// markup enabled).
+func (g *Game) DumpInGame() string {
+	var sb strings.Builder
+	sb.WriteString(g.DumpEndSummary(true))
+	g.dumpMonsterDeaths(&sb, true)
+	g.dumpEatenComestibles(&sb, true)
+	g.dumpStatistics(&sb, true)
+	g.dumpTimeline(&sb, true)
+	return sb.String()
+}
+
+func (g *Game) dumpMods(sb *strings.Builder, markup bool) {
+	if g.modCount() == 0 {
+		return
+	}
+	sb.WriteString(section("Mods", markup))
 	for i, b := range g.Mods {
 		if !b {
 			continue
@@ -244,20 +242,22 @@ func (g *Game) dumpMods(sb *strings.Builder) {
 	}
 }
 
-func (g *Game) dumpPlayer(sb *strings.Builder) {
+func (g *Game) dumpPlayer(sb *strings.Builder, markup bool) {
 	pa := g.PlayerActor()
-	fmt.Fprintf(sb, "\nHP:%d/%d A:%d D:%d",
-		pa.HP, pa.GetMaxHP(), pa.GetAttack(), pa.GetDefense())
-	for i, turns := range pa.Statuses {
-		if turns <= 0 {
-			continue
+	if !markup {
+		fmt.Fprintf(sb, "\nHP:%d/%d A:%d D:%d",
+			pa.HP, pa.GetMaxHP(), pa.GetAttack(), pa.GetDefense())
+		for i, turns := range pa.Statuses {
+			if turns <= 0 {
+				continue
+			}
+			sb.WriteByte(' ')
+			st := Status(i)
+			fmt.Fprintf(sb, "%s(%d)", g.StatusAbbr(pa, st), turns)
 		}
-		sb.WriteByte(' ')
-		st := Status(i)
-		fmt.Fprintf(sb, "%s(%d)", g.StatusAbbr(pa, st), turns)
+		sb.WriteByte('\n')
 	}
-	sb.WriteByte('\n')
-	sb.WriteString("\nSpirits:\n")
+	sb.WriteString(section("Spirits", markup))
 	for i, sp := range g.PlayerSpirits() {
 		ei := g.Entity(i)
 		fmt.Fprintf(sb, "- %s (%s %d/%d, used %s)\n",
@@ -267,7 +267,23 @@ func (g *Game) dumpPlayer(sb *strings.Builder) {
 	}
 }
 
-func (g *Game) dumpDungeon(sb *strings.Builder) {
+func (g *Game) dumpComestibles(sb *strings.Builder, markup bool) {
+	sb.WriteString(section("Comestibles", markup))
+	for i := range g.PlayerComestibles() {
+		ei := g.Entity(i)
+		fmt.Fprintf(sb, "- %s\n", ei.Name)
+	}
+}
+
+func (g *Game) dumpLastMessages(sb *strings.Builder, markup bool) {
+	sb.WriteString(section("Last messages", markup))
+	for _, e := range g.Logs.Entries[max(0, len(g.Logs.Entries)-20):] {
+		fmt.Fprintf(sb, "%s\n", e.dumpString())
+	}
+}
+
+func (g *Game) dumpMap(sb *strings.Builder, markup bool) {
+	sb.WriteString(section("Map", markup))
 	// Entities.
 	var ids CacheGrid[ID]
 	ids = ids.New()
@@ -322,7 +338,17 @@ func (g *Game) dumpDungeon(sb *strings.Builder) {
 	sb.WriteString("|\n")
 }
 
-func (g *Game) dumpKilledMonsters(sb *strings.Builder) {
+func (g *Game) dumpMonsterDeaths(sb *strings.Builder, markup bool) {
+	if g.getStatNDeaths() == 0 {
+		return
+	}
+	var t string
+	if markup {
+		t = section(fmt.Sprintf("Monster deaths%s@C", g.getStatExcludeStr(markup)), markup)
+	} else {
+		t = section(fmt.Sprintf("Monster deaths%s", g.getStatExcludeStr(markup)), markup)
+	}
+	sb.WriteString(t)
 	deaths := g.getStatDeaths()
 	monsters := slices.Sorted(maps.Keys(deaths))
 	for _, mons := range monsters {
@@ -330,14 +356,19 @@ func (g *Game) dumpKilledMonsters(sb *strings.Builder) {
 	}
 }
 
-func (g *Game) dumpEatenComestibles(sb *strings.Builder) {
+func (g *Game) dumpEatenComestibles(sb *strings.Builder, markup bool) {
+	if g.Stats.EatenComestibles == 0 {
+		return
+	}
+	sb.WriteString(section("Eaten comestibles", markup))
 	comestibles := slices.Sorted(maps.Keys(g.Stats.Comestibles))
 	for _, co := range comestibles {
 		fmt.Fprintf(sb, "- %s: %d\n", co, g.Stats.Comestibles[co])
 	}
 }
 
-func (g *Game) dumpStatistics(sb *strings.Builder) {
+func (g *Game) dumpStatistics(sb *strings.Builder, markup bool) {
+	sb.WriteString(section("Statistics", markup))
 	// NOTE: if the player dumps game statistics while playing, there are
 	// some minor information leaks (like number of destroyed walls or trap
 	// triggers including out of view ones you might not still be aware
@@ -371,7 +402,7 @@ func (g *Game) dumpStatistics(sb *strings.Builder) {
 			fmt.Fprintf(sb, "You were %s %s.\n", st, times(n))
 		}
 	}
-	ses := g.getStatExcludeStr()
+	ses := g.getStatExcludeStr(markup)
 	fmt.Fprintf(sb, "There were %s and %s%s.\n",
 		CountNoun("fire cloud", g.getStatFireClouds()),
 		CountNoun("poison cloud", g.getStatPoisonClouds()),
@@ -408,6 +439,22 @@ func (g *Game) dumpStatistics(sb *strings.Builder) {
 	perLevel("Spirit uses", g.Stats.MapSpiritUses[:levels])
 	perLevel("Activated menhirs", g.Stats.MapActivatedMenhirs[:levels])
 	perLevel("Triggered traps", g.Stats.MapTriggeredTraps[:levels])
+}
+
+func (g *Game) dumpTimeline(sb *strings.Builder, markup bool) {
+	sb.WriteString(section("Timeline", markup))
+	for _, s := range g.Logs.Story {
+		sb.WriteString(s)
+		sb.WriteByte('\n')
+	}
+}
+
+func section(s string, markup bool) string {
+	if markup {
+		return "\n@C" + s + ":@N\n"
+	}
+	return "\n" + s + ":\n"
+
 }
 
 func there(s string, n int) string {

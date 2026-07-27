@@ -110,8 +110,7 @@ func (md *model) update(msg gruid.Msg) gruid.Effect {
 			md.gameEnded = true
 			md.mode = modePager
 			md.pager.mode = modePagerEnd
-			_, msg, err := md.g.WriteDump()
-			md.dump(msg, err)
+			md.dump(md.g.WriteDump())
 		}
 	}
 	md.g.UpdateFirePos(PlayerID, md.g.PlayerActor())
@@ -419,7 +418,7 @@ func (md *model) logConfirmContinue() {
 }
 
 func (md *model) dump(msg string, err error) {
-	s := md.g.DumpSummary()
+	s := md.g.DumpEndSummary(false)
 	lines := strings.Split(s, "\n")
 	stts := []ui.StyledText{}
 	for _, l := range lines {
