@@ -973,11 +973,10 @@ func (g *Game) teleportOther(i, j ID, ai, aj *Actor) {
 	if aj.IsDead() || aj.ResistsMove() {
 		return
 	}
-	ei := g.Entity(i)
+	ei, ej := g.Entity(i), g.Entity(j)
 	if j == PlayerID {
 		g.Logf("The %s teleports you away!", ei.Name)
-	} else {
-		ej := g.Entity(j)
+	} else if g.InFOV(ei.P) && g.InFOV(ej.P) {
 		g.Logf("The confused %s teleports the %s away!", ei.Name, ej.Name)
 	}
 	g.TeleportActor(j, aj, 0)
