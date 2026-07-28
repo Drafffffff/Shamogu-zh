@@ -36,6 +36,7 @@ type MapGen struct {
 	xtunnel   []gruid.Point   // points belonging to extra tunnels
 	vault     CacheGrid[bool] // in vault
 	itemPlace CacheGrid[bool] // item/static vault place
+	half      bool            // only generate cave for half of the map
 	PR        *paths.PathRange
 	rand      *rand.Rand
 }
@@ -85,13 +86,26 @@ func (g *Game) generateMap(ml MapLayout) (*MapGen, bool) {
 		}
 		return left, right
 	}
+	getTerrain := func() rl.Grid {
+		if !g.Mod(ModCorruptedDungeon) || g.IntN(2*MapLevels) > 0 {
+			return mg.terrain
+		}
+		// Rarely, only use half of the terrain for the cave (excluding
+		// vaults).
+		gd, _ := halves()
+		mg.half = true
+		return gd
+	}
 	switch ml {
 	case CellularAutomataCave:
-		mg.genCellularAutomataCaveMap(mg.terrain)
+		gd := getTerrain()
+		mg.genCellularAutomataCaveMap(gd)
 	case RandomWalkCave:
-		mg.genCaveMap(mg.terrain)
+		gd := getTerrain()
+		mg.genCaveMap(gd)
 	case RandomWalkTreeCave:
-		mg.genTreeCaveMap(mg.terrain)
+		gd := getTerrain()
+		mg.genTreeCaveMap(gd)
 	case MixedAutomataWalkCave:
 		gd1, gd2 := halves()
 		mg.genCellularAutomataCaveMap(gd1)
@@ -573,6 +587,10 @@ func (mg *MapGen) connectAllVaults() {
 		extraTunnels = 3
 	case 1:
 		extraTunnels = 5
+	}
+	if mg.half {
+		// Half-map of walls corruption: compensate with extra tunnels.
+		extraTunnels += 3
 	}
 	count := 0
 	for n := range 2 {

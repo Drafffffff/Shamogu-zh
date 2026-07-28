@@ -21,6 +21,8 @@ Corrupted dungeon improvements:
 * Rarely spawn lone golem or wasp guardian (see #11).
 * New rare spooky level with empty totem, runes and menhirs (see #11).
 * New kind of map corruption that performs wall-thickening (see #11).
+* New kind of rare map corruption that reduces size of the natural cave
+  (excluding vaults) to about half, but adds extra tunnels to vaults (see #11).
 * New rare variations of alternative guardians (see #11).
 
 UI, graphics, QoL:
