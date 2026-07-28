@@ -1414,8 +1414,11 @@ func (a ActionWizardNextLevel) Handle(md *model) (gruid.Effect, bool) {
 		return nil, false
 	}
 	if g.Map.Level == MapLevels {
-		g.Log("You’re already at the last level.")
-		md.mode = modeNormal
+		g.Log("You’re already at the last level. Starting again!")
+		spirits := getPrimarySpirits(modeNewGameAdvanced)
+		*g = Game{rand: g.rand, Mods: g.Mods, md: md, Wizard: g.Wizard}
+		spe := spiritEntity(g.Mods, spirits[g.IntN(len(spirits))])
+		md.startNewGame(spe)
 		return nil, false
 	}
 	md.g.StoryLog("Wizard Mode: used “go to next level” cheat")
