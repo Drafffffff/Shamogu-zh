@@ -10,7 +10,7 @@ import (
 
 // Event represents an occurrence that might trigger a spirit condition
 type Event interface {
-	Type()  EventType
+	Type() EventType
 }
 
 // EventType categorizes condition events
@@ -58,23 +58,23 @@ func (g *Game) WarnLeave(ev EventType) bool {
 }
 
 const (
-	EventMenhir EventType = 1 << iota // menhir activated
-	EventPortal                       // portal worked (used to record end-of-level properties)
-	EventNewLevel                     // new level starts (when condition actually triggers)
-	EventFakePortal                   // portal malfunctioned
+	EventMenhir     EventType = 1 << iota // menhir activated
+	EventPortal                           // portal worked (used to record end-of-level properties)
+	EventNewLevel                         // new level starts (when condition actually triggers)
+	EventFakePortal                       // portal malfunctioned
 
-	EventPickup                       // picked up a comestible
-	EventHeal                         // player gained permanent HP
-	EventTeleport                     // player teleported
-	EventDamage                       // player takes status-based damage
-	EventPlayerTurn                   // player's turn starts
+	EventPickup     // picked up a comestible
+	EventHeal       // player gained permanent HP
+	EventTeleport   // player teleported
+	EventDamage     // player takes status-based damage
+	EventPlayerTurn // player's turn starts
 
-	EventStatus                       // actor status started
-	EventMonsDeath                    // monster died
-	EventMonsSeen                     // you see a monster
-	EventHits                         // actor hits another
+	EventStatus    // actor status started
+	EventMonsDeath // monster died
+	EventMonsSeen  // you see a monster
+	EventHits      // actor hits another
 
-	EventWallBreak                    // wall broken
+	EventWallBreak // wall broken
 )
 
 // WarnType classifies reasons to give comestibles a warning color in the menu
@@ -99,15 +99,21 @@ func WarnTypes(ew EventWatcher) WarnType {
 		return WarnTypes(w.A) | WarnTypes(w.B)
 	case WatchEvent:
 		switch w.Type {
-		case EventTeleport: return WarnTeleport
-		case EventHeal:     return WarnHeal
+		case EventTeleport:
+			return WarnTeleport
+		case EventHeal:
+			return WarnHeal
 		}
 	case WatchPlayerStatus:
 		switch w.EvStatus {
-		case StatusBerserk:       return WarnBerserk
-		case StatusClarity:       return WarnClarity
-		case StatusFoggySkin:     return WarnFoggySkin
-		case StatusLignification: return WarnLignification
+		case StatusBerserk:
+			return WarnBerserk
+		case StatusClarity:
+			return WarnClarity
+		case StatusFoggySkin:
+			return WarnFoggySkin
+		case StatusLignification:
+			return WarnLignification
 		}
 	}
 	return WarnType(0)
@@ -123,16 +129,16 @@ func (g *Game) WarnComestible(c *Comestible) bool {
 		return true
 	}
 	switch c.Effect.(type) {
-		case EffectBerserkingFlower:
-			return w.Has(WarnBerserk)
-		case EffectClarityLeaves:
-			return w.Has(WarnClarity)
-		case EffectFoggySkinOnion:
-			return w.Has(WarnFoggySkin)
-		case EffectLignificationFruit:
-			return w.Has(WarnLignification)
-		case EffectTeleportMushroom:
-			return w.Has(WarnTeleport) && !g.PlayerActor().ResistsMove()
+	case EffectBerserkingFlower:
+		return w.Has(WarnBerserk)
+	case EffectClarityLeaves:
+		return w.Has(WarnClarity)
+	case EffectFoggySkinOnion:
+		return w.Has(WarnFoggySkin)
+	case EffectLignificationFruit:
+		return w.Has(WarnLignification)
+	case EffectTeleportMushroom:
+		return w.Has(WarnTeleport) && !g.PlayerActor().ResistsMove()
 	}
 	return false
 }
@@ -147,22 +153,22 @@ func (g *Game) willHeal(c *Comestible) bool {
 		return ok
 	}
 	switch c.Effect.(type) {
-		case EffectAmbrosiaBerries, EffectClarityLeaves, EffectFirebreathPepper, EffectFoggySkinOnion:
-			return true
-		case EffectBerserkingFlower, EffectLignificationFruit:
-			return false
-		case EffectTeleportMushroom:
-			return pa.ResistsMove()
-		default:
-			panic("unknown comestible (checking warn-on-heal)")
+	case EffectAmbrosiaBerries, EffectClarityLeaves, EffectFirebreathPepper, EffectFoggySkinOnion:
+		return true
+	case EffectBerserkingFlower, EffectLignificationFruit:
+		return false
+	case EffectTeleportMushroom:
+		return pa.ResistsMove()
+	default:
+		panic("unknown comestible (checking warn-on-heal)")
 	}
 }
 
 // EventWatcher
 type EventWatcher interface {
-	EventTypes()  EventType
+	EventTypes() EventType
 	CheckEvent(*Game, *Spirit, Event) bool
-	Desc()  string
+	Desc() string
 }
 
 // EventHappened is used for an EventType with no extra information
@@ -175,21 +181,31 @@ func (ev *EventHappened) Type() EventType {
 }
 
 type WatchEvent struct {
-	Type  EventType
+	Type EventType
 }
 
 func (w WatchEvent) Desc() string {
 	switch w.Type {
-	case EventMenhir:      return "you activate a Menhir"
-	case EventNewLevel:    return "you reach the next level"
-	case EventPickup:      return "you pick up a comestible"
-	case EventFakePortal:  return "a portal you use malfunctions"
-	case EventHeal:        return "a comestible heals your HP"
-	case EventTeleport:    return "you teleport"
-	case EventDamage:      return "you are hurt by fire or poison"
-	case EventMonsDeath:   return "a monster dies"
-	case EventWallBreak:   return "a wall breaks"
-	default: return "(unknown)" // includes some generic events that shouldn't be used
+	case EventMenhir:
+		return "you activate a Menhir"
+	case EventNewLevel:
+		return "you reach the next level"
+	case EventPickup:
+		return "you pick up a comestible"
+	case EventFakePortal:
+		return "a portal you use malfunctions"
+	case EventHeal:
+		return "a comestible heals your HP"
+	case EventTeleport:
+		return "you teleport"
+	case EventDamage:
+		return "you are hurt by fire or poison"
+	case EventMonsDeath:
+		return "a monster dies"
+	case EventWallBreak:
+		return "a wall breaks"
+	default:
+		return "(unknown)" // includes some generic events that shouldn't be used
 	}
 }
 
@@ -316,7 +332,7 @@ func (ev *EventWithStatus) onPlayer() bool {
 
 // WatchPlayerStatus triggers when the player begins a specific status
 type WatchPlayerStatus struct {
-	MatchAny bool    // ignore EvStatus; allow any
+	MatchAny bool // ignore EvStatus; allow any
 	EvStatus Status
 }
 
@@ -394,7 +410,6 @@ func (w WatchEither) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	return w.A.CheckEvent(g, sp, e) || w.B.CheckEvent(g, sp, e)
 }
 
-
 // WatchTwoStatus triggers when the player gets a combination of statuses
 type WatchTwoStatus struct {
 	A Status
@@ -450,7 +465,7 @@ func (w *WatchMoveFar) EventTypes() EventType {
 }
 
 func (w *WatchMoveFar) CheckEvent(g *Game, sp *Spirit, e Event) bool {
-	if (e.Type() == EventNewLevel) {
+	if e.Type() == EventNewLevel {
 		w.PrevPos = InvalidPos
 		return false
 	}
@@ -486,8 +501,8 @@ type WatchCompleteLevel struct {
 type CompleteType int
 
 const (
-	Charges CompleteType = iota // still have ability charges
-	EmptyInventory              // no comestibles left
+	Charges        CompleteType = iota // still have ability charges
+	EmptyInventory                     // no comestibles left
 )
 
 func (w *WatchCompleteLevel) Desc() string {
@@ -529,9 +544,9 @@ func (w *WatchCompleteLevel) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 type UpgradePolicy int
 
 const (
-	UpgradeIgnores UpgradePolicy = iota // never used on upgrade
-	UpgradeContinues                    // replaces an unfulfilled condition
-	UpgradeReplaces                     // replaces any condition
+	UpgradeIgnores   UpgradePolicy = iota // never used on upgrade
+	UpgradeContinues                      // replaces an unfulfilled condition
+	UpgradeReplaces                       // replaces any condition
 )
 
 func (p UpgradePolicy) Applies(existing bool) bool {
@@ -556,10 +571,10 @@ type SpiritCond struct {
 	Upgrade UpgradePolicy
 }
 type CondEffect interface {
-	EventTypes()                       EventType
-	ApplyEvent(*Game, *Spirit, Event)  Consequence
-	Enabled()                          SpiritPart
-	Desc()                             string
+	EventTypes() EventType
+	ApplyEvent(*Game, *Spirit, Event) Consequence
+	Enabled() SpiritPart
+	Desc() string
 }
 
 func (c *SpiritCond) EventTypes() EventType {
@@ -615,7 +630,7 @@ const (
 	HasStats
 	HasTraits
 	HasPassives = HasStats | HasTraits
-	HasAll = HasInvoke | HasPassives
+	HasAll      = HasInvoke | HasPassives
 )
 
 // Consequence represents a result of a condition being met
@@ -670,7 +685,7 @@ func TotemEvents(g *Game, ev Event) {
 					sp.Charges = 0
 				}
 			case CqDischarge:
-				sp.Charges = max(0, sp.Charges - 1)
+				sp.Charges = max(0, sp.Charges-1)
 			}
 		}
 	}
@@ -833,30 +848,46 @@ func (g *Game) GenConditions() []*SpiritCond {
 			aqLeave = CqDischargeAll
 		}
 		switch j {
-		case  0: cs[i] = Cond(OnStatus(aqLeave, StatusLignification), WatchEither{A: Gets(StatusFire, WalkingTree), B: Seen(WalkingMushroom)})
-		case  1: cs[i] = Cond(OnStatus(aqLeave, StatusFoggySkin),     Gets(StatusFire, FireLlama, ExplodingNadre))
-		case  2: cs[i] = Cond(OnStatus(aqLeave, StatusClarity),       Gets(StatusConfusion, BlinkButterfly))
-		case  3: cs[i] = Cond(OnEvent (aqLeave, EventTeleport),       Seen(WarpingWraith))
-		case  4: cs[i] = Cond(OnDamage(aqLeave, StatusPoison),        Dies(MadOctopode, TotemWasp))
-		case  5: cs[i] = Cond(OnDamage(CqDischarge,    StatusFire),   Gets(StatusImbalance, BurningPhoenix))
-		case  6: cs[i] = Cond(OnEvent (rqDischargeAll, EventHeal),    Gets(StatusBerserk, FourHeadedHydra))
-		case  7: cs[i] = Dis(HasStats,    WatchHits{PlayerActs: false})
-		case  8: cs[i] = Dis(HasInvoke,   Seen(TotemWasp, BlazingGolem, DraggingAlligator))
-		default: cs[i] = Dis(HasPassives, Gets(StatusBerserk, NoisyImp, CrazyDruid, WalkingMushroom))
+		case 0:
+			cs[i] = Cond(OnStatus(aqLeave, StatusLignification), WatchEither{A: Gets(StatusFire, WalkingTree), B: Seen(WalkingMushroom)})
+		case 1:
+			cs[i] = Cond(OnStatus(aqLeave, StatusFoggySkin), Gets(StatusFire, FireLlama, ExplodingNadre))
+		case 2:
+			cs[i] = Cond(OnStatus(aqLeave, StatusClarity), Gets(StatusConfusion, BlinkButterfly))
+		case 3:
+			cs[i] = Cond(OnEvent(aqLeave, EventTeleport), Seen(WarpingWraith))
+		case 4:
+			cs[i] = Cond(OnDamage(aqLeave, StatusPoison), Dies(MadOctopode, TotemWasp))
+		case 5:
+			cs[i] = Cond(OnDamage(CqDischarge, StatusFire), Gets(StatusImbalance, BurningPhoenix))
+		case 6:
+			cs[i] = Cond(OnEvent(rqDischargeAll, EventHeal), Gets(StatusBerserk, FourHeadedHydra))
+		case 7:
+			cs[i] = Dis(HasStats, WatchHits{PlayerActs: false})
+		case 8:
+			cs[i] = Dis(HasInvoke, Seen(TotemWasp, BlazingGolem, DraggingAlligator))
+		default:
+			cs[i] = Dis(HasPassives, Gets(StatusBerserk, NoisyImp, CrazyDruid, WalkingMushroom))
 		}
 	}
 	if g.rand.IntN(4) != 0 {
 		var w EventWatcher
 		switch g.rand.IntN(6) {
-		case  0: w = WatchEither{A: WatchPlayerStatus{EvStatus: StatusDaze},      B: WatchPlayerStatus{EvStatus: StatusImbalance}}
-		case  1: w = WatchEither{A: WatchPlayerStatus{EvStatus: StatusConfusion}, B: WatchPlayerStatus{EvStatus: StatusBerserk}}
-		case  2: w = WatchEither{A: WatchPlayerStatus{EvStatus: StatusFire},      B: WatchPlayerStatus{EvStatus: StatusPoison}}
-		case  3: w = WatchEither{A: WatchEvent{Type: EventMenhir}, B: WatchEvent{Type: EventHeal}}
-		case  4: w = WatchEvent{Type: EventPickup}
-		default: w = Dies(ThunderPorcupine)
+		case 0:
+			w = WatchEither{A: WatchPlayerStatus{EvStatus: StatusDaze}, B: WatchPlayerStatus{EvStatus: StatusImbalance}}
+		case 1:
+			w = WatchEither{A: WatchPlayerStatus{EvStatus: StatusConfusion}, B: WatchPlayerStatus{EvStatus: StatusBerserk}}
+		case 2:
+			w = WatchEither{A: WatchPlayerStatus{EvStatus: StatusFire}, B: WatchPlayerStatus{EvStatus: StatusPoison}}
+		case 3:
+			w = WatchEither{A: WatchEvent{Type: EventMenhir}, B: WatchEvent{Type: EventHeal}}
+		case 4:
+			w = WatchEvent{Type: EventPickup}
+		default:
+			w = Dies(ThunderPorcupine)
 		}
 		c := CondPunish{When: w, Do: CqLeave}
-		cs[g.rand.IntN(5) / 3] = Cond(c, WatchReachLevel{Level: 4})
+		cs[g.rand.IntN(5)/3] = Cond(c, WatchReachLevel{Level: 4})
 	}
 	for _, j := range g.rand.Perm(5)[0:2] {
 		i := 2 + g.IntN(4) // levels 3 to 6
@@ -864,27 +895,39 @@ func (g *Game) GenConditions() []*SpiritCond {
 			continue // too hard
 		}
 		switch j {
-		case 0: cs[i] = Compl(EmptyInventory, CqLeave, WatchEvent{Type: EventPickup})
-		case 1: cs[i] = Compl(Charges, CqDischargeAll, &WatchMoveFar{PrevPos: InvalidPos})
-		case 2: cs[i] = Compl(Charges, CqDischargeAll, WatchEvent{Type: EventMonsDeath})
-		case 3: cs[i] = Compl(Charges, CqDischarge,    WatchPlayerStatus{MatchAny: true})
-		case 4: cs[i] = Compl(Charges, CqDischarge,    WatchHits{PlayerActs: true})
+		case 0:
+			cs[i] = Compl(EmptyInventory, CqLeave, WatchEvent{Type: EventPickup})
+		case 1:
+			cs[i] = Compl(Charges, CqDischargeAll, &WatchMoveFar{PrevPos: InvalidPos})
+		case 2:
+			cs[i] = Compl(Charges, CqDischargeAll, WatchEvent{Type: EventMonsDeath})
+		case 3:
+			cs[i] = Compl(Charges, CqDischarge, WatchPlayerStatus{MatchAny: true})
+		case 4:
+			cs[i] = Compl(Charges, CqDischarge, WatchHits{PlayerActs: true})
 		}
 	}
 	nu := 1 + g.IntN(2)
 	for _, j := range g.rand.Perm(7)[0:nu] {
-		i := 3 + g.IntN(5) // levels 4 to 8
+		i := 3 + g.IntN(5)        // levels 4 to 8
 		if noRecharges && j < 2 { // single-discharge
 			continue
 		}
 		switch j {
-		case 0: cs[i] = CondU(OnEvent (CqDischarge,    EventPickup),     Gets(StatusPoison, HungryRat))
-		case 1: cs[i] = CondU(OnEvent (CqDischarge,    EventWallBreak),  Gets(StatusPoison, RampagingBoar, EarthDragon))
-		case 2: cs[i] = CondU(OnStatus(rqDischargeAll, StatusDaze),      Dies(TemporalCat))
-		case 3: cs[i] = CondU(OnStatus(rqDischargeAll, StatusFear),      Gets(StatusConfusion, BarkingHound))
-		case 4: cs[i] = CondU(OnStatus(rqDischargeAll, StatusImbalance), Gets(StatusImbalance, LashingFrog, RampagingBoar))
-		case 5: cs[i] = DisU(HasAll, WatchTwoStatus{A:StatusConfusion, B:StatusImbalance})
-		case 6: cs[i] = DisU(HasAll, WatchTwoStatus{A:StatusLignification, B:StatusFear})
+		case 0:
+			cs[i] = CondU(OnEvent(CqDischarge, EventPickup), Gets(StatusPoison, HungryRat))
+		case 1:
+			cs[i] = CondU(OnEvent(CqDischarge, EventWallBreak), Gets(StatusPoison, RampagingBoar, EarthDragon))
+		case 2:
+			cs[i] = CondU(OnStatus(rqDischargeAll, StatusDaze), Dies(TemporalCat))
+		case 3:
+			cs[i] = CondU(OnStatus(rqDischargeAll, StatusFear), Gets(StatusConfusion, BarkingHound))
+		case 4:
+			cs[i] = CondU(OnStatus(rqDischargeAll, StatusImbalance), Gets(StatusImbalance, LashingFrog, RampagingBoar))
+		case 5:
+			cs[i] = DisU(HasAll, WatchTwoStatus{A: StatusConfusion, B: StatusImbalance})
+		case 6:
+			cs[i] = DisU(HasAll, WatchTwoStatus{A: StatusLignification, B: StatusFear})
 		}
 	}
 	if g.IntN(3) == 0 {

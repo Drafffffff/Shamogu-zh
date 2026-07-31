@@ -241,7 +241,7 @@ func (g *Game) spiritProcGen() {
 			}
 		}
 		// Empty totem on a random level, and the last one
-		ts = slices.Insert(ts, 1 + g.IntN(len(ts)), spiritProcInfo{Idx: -1})
+		ts = slices.Insert(ts, 1+g.IntN(len(ts)), spiritProcInfo{Idx: -1})
 		ts = append(ts, spiritProcInfo{Idx: -1})
 		g.ProcInfo.Spirits = ts
 		// Generate totem conditions
