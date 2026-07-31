@@ -155,12 +155,10 @@ func (g *Game) willHeal(c *Comestible) bool {
 	switch c.Effect.(type) {
 	case EffectAmbrosiaBerries, EffectClarityLeaves, EffectFirebreathPepper, EffectFoggySkinOnion:
 		return true
-	case EffectBerserkingFlower, EffectLignificationFruit:
-		return false
 	case EffectTeleportMushroom:
 		return pa.ResistsMove()
 	default:
-		panic("unknown comestible (checking warn-on-heal)")
+		return false
 	}
 }
 
@@ -934,4 +932,167 @@ func (g *Game) GenConditions() []*SpiritCond {
 		cs[7] = DisU(HasInvoke, Seen(FearsomeLich, UndeadKnight))
 	}
 	return cs
+}
+
+// Conditional comestibles, only usable if conditions are met
+type ConditionalComestible interface {
+	CanApply(*Game, ID) bool
+}
+
+type EffectForProtection struct{}
+
+func (eff EffectForProtection) CanApply(g *Game, i ID) bool {
+	count := 0
+	for _, turns := range g.PlayerActor().Statuses {
+		if turns > 0 {
+			count++
+		}
+	}
+	return count >= 2
+}
+
+func (eff EffectForProtection) Apply(g *Game) bool {
+	pa := g.PlayerActor()
+	for i := range pa.Statuses {
+		pa.Statuses[i] = 0
+	}
+	g.PutStatus1(PlayerID, pa, StatusFoggySkin, 8)
+	g.PutStatus1(PlayerID, pa, StatusClarity, 8)
+	return true
+}
+
+func (eff EffectForProtection) Desc(g *Game) string {
+	return "Use only if you currently have at least 2 statuses. Remove all your statuses without the usual effects, and become foggy-skinned and clear-minded for 8 turns."
+}
+
+type EffectForVigor struct{}
+
+func (eff EffectForVigor) CanApply(g *Game, i ID) bool {
+	count := 0
+	for range g.AdjacentActors(g.PP()) {
+		count++
+	}
+	return count >= 2
+}
+
+func (eff EffectForVigor) Apply(g *Game) bool {
+	pa := g.PlayerActor()
+	g.PutStatus1(PlayerID, pa, StatusLignification, 5)
+	g.PutStatus1(PlayerID, pa, StatusBerserk, 5)
+	g.PutStatus1(PlayerID, pa, StatusVampirism, 5)
+	return true
+}
+
+func (eff EffectForVigor) Desc(g *Game) string {
+	return "Use only if you are next to at least 2 monsters. Become lignified, berserk, and vampiric for 5 turns."
+}
+
+type EffectForEscape struct{}
+
+func (eff EffectForEscape) CanApply(g *Game, i ID) bool {
+	count := 0
+	for _, ei := range g.NPMapEntities() {
+		if ei.IsActor() && ei.Actor().Behavior.State == Hunting {
+			count++
+		}
+	}
+	return count >= 3
+}
+
+func (eff EffectForEscape) Apply(g *Game) bool {
+	for _, ei := range g.NPMapEntities() {
+		a, ok := ei.Role.(*Actor)
+		if ok && a.Behavior.State == Hunting {
+			a.Behavior.State = Wandering
+		}
+	}
+	pa := g.PlayerActor()
+	for p := range g.Map.PassableNeighbors(g.PP()) {
+		if k, ak := g.ActorAt(p); k >= 0 && !ak.ResistsMove() {
+			ek := g.Entity(k)
+			if to, ok := g.BlinkPos(ek.P); ok {
+				g.MoveActor(k, ak, to, MovTeleport)
+			}
+		}
+	}
+	g.PutStatus1(PlayerID, pa, StatusShadow, 10)
+	return true
+}
+
+func (eff EffectForEscape) Desc(g *Game) string {
+	return "Use only if at least 3 monsters are hunting you. All monsters stop hunting and any that are next to you blink away. Become shadowy for 10 turns."
+}
+
+type EffectForInformation struct{}
+
+func (eff EffectForInformation) CanApply(g *Game, i ID) bool {
+	j, _ := g.ItemAt(g.PP())
+	return i == j
+}
+
+func (eff EffectForInformation) Apply(g *Game) bool {
+	pp := g.PP()
+	for i, ei := range g.NPMapEntities() {
+		if !ei.IsActor() && SensingRange(pp, ei.P) {
+			g.SenseEntity(i, "sense")
+		}
+	}
+	return true
+}
+
+func (eff EffectForInformation) Desc(g *Game) string {
+	return "Use only from the ground and not your inventory. Sense all items, totems, portals, menhirs, and runes within 16 spaces."
+}
+
+type EffectForAssurance struct{}
+
+func (eff EffectForAssurance) CanApply(g *Game, i ID) bool {
+	pp := g.PP()
+	for _, id := range g.AllPortalIDs() {
+		ei := g.Entity(id)
+		if ei.P == pp && ei.Role.(*Portal).Used {
+			return true
+		}
+	}
+	j := g.TotemID()
+	return j >= 0 && g.Entity(j).P == g.PP()
+}
+
+func (eff EffectForAssurance) Apply(g *Game) bool {
+	j := g.TotemID()
+	if j >= 0 && g.Entity(j).P == g.PP() {
+		// Drain totem
+		for _, e := range g.Entities[:NSpirits] {
+			if sp, ok := e.Role.(*Spirit); ok {
+				sp.Charges = sp.MaxCharges[sp.Level]
+			}
+		}
+		g.Entity(g.TotemID()).P = InvalidPos
+		et := g.Entity(g.genEmptyTotemAt(g.PP()))
+		et.Seen = true
+	} else {
+		// Use portal
+		g.StoryLog("Transported to the next level!")
+		g.LogStyled("You feel a spirit transporting you.", logSpecial)
+		TotemEvents(g, &EventHappened{EvType: EventPortal})
+		g.NextLevel()
+		TotemEvents(g, &EventHappened{EvType: EventNewLevel})
+	}
+	return true
+}
+
+func (eff EffectForAssurance) Desc(g *Game) string {
+	return "Use if you are standing on a broken portal, to proceed to the next level.\nUse if you are standing on an unused totem, to empty the totem, and restore all your spirits to full charges."
+}
+
+var CondComs = []itemInfo{
+	{"for your protection", EffectForProtection{}},
+	{"for your vigor", EffectForVigor{}},
+	{"for your escape", EffectForEscape{}},
+	{"for your information", EffectForInformation{}},
+	{"for your assurance", EffectForAssurance{}},
+}
+
+func (g *Game) GetConditionalComestible() itemInfo {
+	return CondComs[g.IntN(len(CondComs))]
 }

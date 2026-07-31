@@ -222,8 +222,14 @@ func (c *Comestible) ExamineDesc(g *Game) string {
 }
 
 func (c *Comestible) Use(g *Game, i ID) bool {
+	ef := c.Effect
+	et, cond := ef.(ConditionalComestible)
+	if cond && !et.CanApply(g, i) {
+		g.Log("You can't use this now.")
+		return false
+	}
 	pp := g.PP()
-	done := c.Effect.Apply(g)
+	done := ef.Apply(g)
 	if !done {
 		// Should never happen with comestibles.
 		log.Printf("BUG: did not eat the %s.", g.Entity(i).Name)

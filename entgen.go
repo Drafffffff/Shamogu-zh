@@ -584,7 +584,11 @@ func (g *Game) genItems(mg *MapGen) {
 		nitems += 4
 	}
 	for i := range nitems {
-		addComestible(i, (g.GetComestibleData())[comestibleIdx()])
+		if g.Mod(ModTotemConditions) && g.IntN(8) == 0 {
+			addComestible(i, g.GetConditionalComestible())
+		} else {
+			addComestible(i, (g.GetComestibleData())[comestibleIdx()])
+		}
 	}
 	// Runic traps.
 	rto, rtt := 1, 1 // runes in open areas and in tunnels
