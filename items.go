@@ -172,7 +172,7 @@ func (sp *Spirit) Use(g *Game, i ID) bool {
 	if !done {
 		return false
 	}
-	sp.Charges--
+	sp.Charges = max(0, sp.Charges-1)
 	sp.Uses++
 	g.Stats.SpiritUses++
 	g.Stats.MapSpiritUses[g.Map.Level-1]++
