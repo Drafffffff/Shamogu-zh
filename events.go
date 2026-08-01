@@ -994,7 +994,8 @@ type EffectVanishingSnail struct{}
 func (eff EffectVanishingSnail) CanApply(g *Game, i ID) bool {
 	count := 0
 	for _, ei := range g.NPMapEntities() {
-		if ei.IsActor() && ei.Actor().Behavior.State == Hunting {
+		ea, ok := ei.Role.(*Actor)
+		if ok && !ea.IsDead() && ea.Behavior.State == Hunting {
 			count++
 		}
 	}
@@ -1030,7 +1031,7 @@ type EffectSeeingPotato struct{}
 
 func (eff EffectSeeingPotato) CanApply(g *Game, i ID) bool {
 	j, _ := g.ItemAt(g.PP())
-	return i == j
+	return i >= 0 && i == j
 }
 
 func (eff EffectSeeingPotato) Apply(g *Game) bool {
