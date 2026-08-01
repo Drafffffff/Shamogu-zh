@@ -187,7 +187,7 @@ type WatchEvent struct {
 func (w WatchEvent) Desc() string {
 	switch w.Type {
 	case EventMenhir:
-		return "you activate a Menhir"
+		return "you activate a menhir"
 	case EventNewLevel:
 		return "you reach the next level"
 	case EventPickup:
