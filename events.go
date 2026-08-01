@@ -939,9 +939,9 @@ type ConditionalComestible interface {
 	CanApply(*Game, ID) bool
 }
 
-type EffectForProtection struct{}
+type EffectSlipperyPea struct{}
 
-func (eff EffectForProtection) CanApply(g *Game, i ID) bool {
+func (eff EffectSlipperyPea) CanApply(g *Game, i ID) bool {
 	count := 0
 	for _, turns := range g.PlayerActor().Statuses {
 		if turns > 0 {
@@ -951,8 +951,9 @@ func (eff EffectForProtection) CanApply(g *Game, i ID) bool {
 	return count >= 2
 }
 
-func (eff EffectForProtection) Apply(g *Game) bool {
+func (eff EffectSlipperyPea) Apply(g *Game) bool {
 	pa := g.PlayerActor()
+	g.eatMsg("slippery pea", "")
 	for i := range pa.Statuses {
 		pa.Statuses[i] = 0
 	}
@@ -961,13 +962,13 @@ func (eff EffectForProtection) Apply(g *Game) bool {
 	return true
 }
 
-func (eff EffectForProtection) Desc(g *Game) string {
-	return "Use only if you currently have at least 2 statuses. Remove all your statuses without the usual effects, and become foggy-skinned and clear-minded for 8 turns."
+func (eff EffectSlipperyPea) Desc(g *Game) string {
+	return "Eat only if you currently have at least 2 statuses. Removes all your statuses without the usual effects, then makes you @BFoggy-Skinned@N and @BClear-Minded@N for 8 turns."
 }
 
-type EffectForVigor struct{}
+type EffectFortressOyster struct{}
 
-func (eff EffectForVigor) CanApply(g *Game, i ID) bool {
+func (eff EffectFortressOyster) CanApply(g *Game, i ID) bool {
 	count := 0
 	for range g.AdjacentActors(g.PP()) {
 		count++
@@ -975,21 +976,22 @@ func (eff EffectForVigor) CanApply(g *Game, i ID) bool {
 	return count >= 2
 }
 
-func (eff EffectForVigor) Apply(g *Game) bool {
+func (eff EffectFortressOyster) Apply(g *Game) bool {
 	pa := g.PlayerActor()
+	g.eatMsg("fortress oyster", "")
 	g.PutStatus1(PlayerID, pa, StatusLignification, 5)
 	g.PutStatus1(PlayerID, pa, StatusBerserk, 5)
 	g.PutStatus1(PlayerID, pa, StatusVampirism, 5)
 	return true
 }
 
-func (eff EffectForVigor) Desc(g *Game) string {
-	return "Use only if you are next to at least 2 monsters. Become lignified, berserk, and vampiric for 5 turns."
+func (eff EffectFortressOyster) Desc(g *Game) string {
+	return "Eat only if you are next to at least 2 monsters. Makes you @BLignified@N, @BBerserk@N, and @BVampiric@N for 5 turns."
 }
 
-type EffectForEscape struct{}
+type EffectVanishingSnail struct{}
 
-func (eff EffectForEscape) CanApply(g *Game, i ID) bool {
+func (eff EffectVanishingSnail) CanApply(g *Game, i ID) bool {
 	count := 0
 	for _, ei := range g.NPMapEntities() {
 		if ei.IsActor() && ei.Actor().Behavior.State == Hunting {
@@ -999,7 +1001,8 @@ func (eff EffectForEscape) CanApply(g *Game, i ID) bool {
 	return count >= 3
 }
 
-func (eff EffectForEscape) Apply(g *Game) bool {
+func (eff EffectVanishingSnail) Apply(g *Game) bool {
+	g.eatMsg("vanishing snail", "")
 	for _, ei := range g.NPMapEntities() {
 		a, ok := ei.Role.(*Actor)
 		if ok && a.Behavior.State == Hunting {
@@ -1019,18 +1022,19 @@ func (eff EffectForEscape) Apply(g *Game) bool {
 	return true
 }
 
-func (eff EffectForEscape) Desc(g *Game) string {
-	return "Use only if at least 3 monsters are hunting you. All monsters stop hunting and any that are next to you blink away. Become shadowy for 10 turns."
+func (eff EffectVanishingSnail) Desc(g *Game) string {
+	return "Eat only if at least 3 monsters are hunting you. All monsters stop hunting and any that are next to you blink away. Become @BShadowy@N for 10 turns."
 }
 
-type EffectForInformation struct{}
+type EffectSeeingPotato struct{}
 
-func (eff EffectForInformation) CanApply(g *Game, i ID) bool {
+func (eff EffectSeeingPotato) CanApply(g *Game, i ID) bool {
 	j, _ := g.ItemAt(g.PP())
 	return i == j
 }
 
-func (eff EffectForInformation) Apply(g *Game) bool {
+func (eff EffectSeeingPotato) Apply(g *Game) bool {
+	g.eatMsg("seeing potato's stalk", "")
 	const maxdist = 2 * MaxFOVRange
 	mp := &MappingPath{passable: func(p gruid.Point) bool { return inMap(p) }}
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, maxdist)
@@ -1061,13 +1065,13 @@ func (eff EffectForInformation) Apply(g *Game) bool {
 	return true
 }
 
-func (eff EffectForInformation) Desc(g *Game) string {
-	return "Use only from the ground and not your inventory. Sense all floor tiles within 16 spaces, and anything on those tiles."
+func (eff EffectSeeingPotato) Desc(g *Game) string {
+	return "Eat only from the ground and not your inventory. Sense all floor tiles within 16 spaces, and anything on those tiles."
 }
 
-type EffectForAssurance struct{}
+type EffectTrickyChestnut struct{}
 
-func (eff EffectForAssurance) CanApply(g *Game, i ID) bool {
+func (eff EffectTrickyChestnut) CanApply(g *Game, i ID) bool {
 	pp := g.PP()
 	for _, id := range g.AllPortalIDs() {
 		ei := g.Entity(id)
@@ -1079,7 +1083,8 @@ func (eff EffectForAssurance) CanApply(g *Game, i ID) bool {
 	return j >= 0 && g.Entity(j).P == g.PP()
 }
 
-func (eff EffectForAssurance) Apply(g *Game) bool {
+func (eff EffectTrickyChestnut) Apply(g *Game) bool {
+	g.eatMsg("tricky chestnut", "")
 	j := g.TotemID()
 	if j >= 0 && g.Entity(j).P == g.PP() {
 		// Drain totem
@@ -1102,16 +1107,29 @@ func (eff EffectForAssurance) Apply(g *Game) bool {
 	return true
 }
 
-func (eff EffectForAssurance) Desc(g *Game) string {
-	return "Use if you are standing on a broken portal, to proceed to the next level.\nUse if you are standing on an unused totem, to empty the totem, and restore all your spirits to full charges."
+func (eff EffectTrickyChestnut) Desc(g *Game) string {
+	return "Eat if you are standing on a broken portal, to proceed to the next level.\nEat if you are standing on an unused totem, to empty the totem, and restore all your spirits to full charges."
+}
+
+func CantEatMsg(ef Effect) string {
+	switch ef.(type) {
+	case EffectSlipperyPea, EffectVanishingSnail:
+		return "You can't grab it!"
+	case EffectFortressOyster, EffectTrickyChestnut:
+		return "It won't open!"
+	case EffectSeeingPotato:
+		return "It has to be planted in the ground!"
+	default:
+		panic("unexpected inedible comestible")
+	}
 }
 
 var CondComs = []itemInfo{
-	{"for your protection", EffectForProtection{}},
-	{"for your vigor", EffectForVigor{}},
-	{"for your escape", EffectForEscape{}},
-	{"for your information", EffectForInformation{}},
-	{"for your assurance", EffectForAssurance{}},
+	{"slippery pea", EffectSlipperyPea{}},
+	{"fortress oyster", EffectFortressOyster{}},
+	{"vanishing snail", EffectVanishingSnail{}},
+	{"seeing potato", EffectSeeingPotato{}},
+	{"tricky chestnut", EffectTrickyChestnut{}},
 }
 
 func (g *Game) GetConditionalComestible() itemInfo {

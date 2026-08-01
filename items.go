@@ -225,7 +225,7 @@ func (c *Comestible) Use(g *Game, i ID) bool {
 	ef := c.Effect
 	et, cond := ef.(ConditionalComestible)
 	if cond && !et.CanApply(g, i) {
-		g.Log("You can't use this now.")
+		g.Log(CantEatMsg(ef))
 		return false
 	}
 	pp := g.PP()

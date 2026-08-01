@@ -145,12 +145,7 @@ func (g *Game) SenseEntity(i ID, verb string) {
 				g.PutStatus(i, ri, StatusFear, d)
 			}
 		case *Comestible:
-			n := ei.Name
-			_, cond := ei.Role.(*Comestible).Effect.(ConditionalComestible)
-			if cond {
-				n = "intriguing baked good marked \"" + n + "\""
-			}
-			g.LogfStyled("You %s %s.", logNotable, verb, One(n))
+			g.LogfStyled("You %s %s.", logNotable, verb, One(ei.Name))
 			g.StoryLogf("Spotted %s (distance: %d)", One(ei.Name), g.ppDist(ei.P))
 		case *Spirit:
 			g.LogfStyled("You %s %s totem.", logNotable, verb, One(ei.Name))
