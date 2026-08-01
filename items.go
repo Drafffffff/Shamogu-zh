@@ -261,24 +261,29 @@ func (g *Game) EquipItemAt(i ID) bool {
 		return false
 	}
 	ej := g.Entity(j)
-	switch it.(type) {
+	switch it := it.(type) {
 	case *Spirit:
 		pa := g.PlayerActor()
 		ohpmax := pa.MaxHP
-		if ev, ok := ei.Role.(*Spirit); ok {
-			if ev.Level >= 1 {
+		itc := it.Condition // nil if ModTotemConditions is not enabled
+		if spi, ok := ei.Role.(*Spirit); ok {
+			if spi.Level >= 1 {
 				// Should not happen.
 				g.Log("Spirit cannot be upgraded anymore.")
 				return false
 			}
-			ev.Level++
-			ev.Charges += ev.MaxCharges[1] - ev.MaxCharges[0]
-			if c := it.(*Spirit).Condition; c.Upgrade.Applies(ev.Condition != nil) {
-				ev.Condition = c
+			spi.Level++
+			spi.Charges += spi.MaxCharges[1] - spi.MaxCharges[0]
+			if itc != nil && itc.Upgrade.Applies(spi.Condition != nil) {
+				g.recordCurse(ei.Name, itc)
+				spi.Condition = itc
 			}
 			g.Logf("You upgrade your %s spirit.", ei.Name)
 			g.StoryLogf("Upgraded your %s spirit", ei.Name)
 		} else {
+			if itc != nil {
+				g.recordCurse(ej.Name, itc)
+			}
 			g.Entities[i], g.Entities[j] = g.Entities[j], g.Entities[i]
 			g.Logf("You choose the %s spirit.", ej.Name)
 			g.StoryLogf("Chose the %s spirit", ej.Name)

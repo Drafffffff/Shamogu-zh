@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"runtime/debug"
+
+	"codeberg.org/anaseto/gruid/ui"
 )
 
 // Stats gathers various game statistics from a run.
@@ -14,6 +16,7 @@ type Stats struct {
 	ActivatedMenhirs    int            // number of activated menhirs
 	Comestibles         map[string]int // number of eaten comestibles (per type)
 	Cornered            int            // number of times you felt cornered
+	CurseHistory        []string       // record of curse history
 	Damage              int            // total damage you got
 	Deaths              map[string]int // monster deaths by name
 	DeathsPast          map[string]int // monster deaths by name (past levels)
@@ -213,6 +216,7 @@ func (g *Game) Dump() string {
 	g.dumpMonsterDeaths(&sb, false)
 	g.dumpEatenComestibles(&sb, false)
 	g.dumpStatistics(&sb, false)
+	g.dumpCurseHistory(&sb, false)
 	g.dumpTimeline(&sb, false)
 	return sb.String()
 }
@@ -225,6 +229,7 @@ func (g *Game) DumpInGame() string {
 	g.dumpMonsterDeaths(&sb, true)
 	g.dumpEatenComestibles(&sb, true)
 	g.dumpStatistics(&sb, true)
+	g.dumpCurseHistory(&sb, true)
 	g.dumpTimeline(&sb, true)
 	return sb.String()
 }
@@ -439,6 +444,21 @@ func (g *Game) dumpStatistics(sb *strings.Builder, markup bool) {
 	perLevel("Spirit uses", g.Stats.MapSpiritUses[:levels])
 	perLevel("Activated menhirs", g.Stats.MapActivatedMenhirs[:levels])
 	perLevel("Triggered traps", g.Stats.MapTriggeredTraps[:levels])
+}
+
+func (g *Game) dumpCurseHistory(sb *strings.Builder, markup bool) {
+	sb.WriteString(section("Curses", markup))
+	for _, s := range g.Stats.CurseHistory {
+		stt := ui.Text(s).Format(76)
+		sb.WriteString(strings.ReplaceAll(stt.Text(), "\n", "\n  "))
+		sb.WriteByte('\n')
+	}
+}
+
+func (g *Game) recordCurse(spname string, c *SpiritCond) {
+	s := fmt.Sprintf("- Curse on %s at level %d: %s.\nUntil: %s.",
+		spname, g.Map.Level, UpperFirst(c.Effect.Desc()), UpperFirst(c.Until.Desc()))
+	g.Stats.CurseHistory = append(g.Stats.CurseHistory, s)
 }
 
 func (g *Game) dumpTimeline(sb *strings.Builder, markup bool) {
