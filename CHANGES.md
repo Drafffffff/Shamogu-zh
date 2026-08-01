@@ -1,5 +1,13 @@
 # v? ?
 
+New content:
+
+* New expansion mod: **Totem Conditions** (contributed by @mlochbaum, see
+  discussion in issue #19 and PR #20). Read the fine print: each spirit will
+  curse you to play by its rules or lose its benefits. Think ahead when
+  choosing spirits; the run will have one fewer empty totem to expand your
+  options.
+
 Reworked and improved content:
 
 * Reworked chaos megabat (see discussion in issue #18). The megabats are now
