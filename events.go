@@ -1031,9 +1031,30 @@ func (eff EffectForInformation) CanApply(g *Game, i ID) bool {
 }
 
 func (eff EffectForInformation) Apply(g *Game) bool {
+	const maxdist = 2 * MaxFOVRange
+	mp := &MappingPath{passable: func(p gruid.Point) bool { return inMap(p) }}
+	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, maxdist)
+	var draw bool
+	cost := 1
+	for _, n := range nodes {
+		if n.Cost > cost && draw {
+			g.md.AnimationFrameFast()
+			draw = false
+			cost = n.Cost
+		}
+		t := g.Map.Terrain.At(n.P)
+		if t != Floor {
+			continue
+		}
+		if g.Map.KnownTerrain.At(n.P) != t {
+			g.Map.KnownTerrain.Set(n.P, t)
+			draw = true
+		}
+	}
 	pp := g.PP()
 	for i, ei := range g.NPMapEntities() {
-		if !ei.IsActor() && SensingRange(pp, ei.P) {
+		p := ei.P
+		if paths.DistanceManhattan(pp, p) <= maxdist && g.Map.Terrain.At(p) == Floor {
 			g.SenseEntity(i, "sense")
 		}
 	}
@@ -1041,7 +1062,7 @@ func (eff EffectForInformation) Apply(g *Game) bool {
 }
 
 func (eff EffectForInformation) Desc(g *Game) string {
-	return "Use only from the ground and not your inventory. Sense all items, totems, portals, menhirs, and runes within 16 spaces."
+	return "Use only from the ground and not your inventory. Sense all floor tiles within 16 spaces, and anything on those tiles."
 }
 
 type EffectForAssurance struct{}
