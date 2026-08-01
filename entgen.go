@@ -1854,14 +1854,11 @@ func (g *Game) hideFrom(lt *lighter, from, dir gruid.Point) {
 			g.Map.Terrain.Set(p, Foliage)
 		}
 	}
-	tp, tq := g.Map.Terrain.At(p), g.Map.Terrain.At(q)
-	if tp == Floor {
+	if g.Map.Terrain.At(p) == Floor {
 		fill(p)
-		tp = g.Map.Terrain.At(p)
 	}
-	if tq == Floor {
+	if g.Map.Terrain.At(q) == Floor {
 		fill(q)
-		tq = g.Map.Terrain.At(q)
 	}
 	vis := lt.diagonalVisibility(from, to)
 	switch vis {

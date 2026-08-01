@@ -1052,7 +1052,7 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 			d /= 2
 			n = 4
 		}
-		if g.ResistStatusRoll(i, StatusBerserk) || !f(i, ai, StatusBerserk, DurationBerserkHit) {
+		if g.ResistStatusRoll(i, StatusBerserk) || !f(i, ai, StatusBerserk, d) {
 			break
 		}
 		switch g.IntN(n) {
