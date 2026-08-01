@@ -447,6 +447,9 @@ func (g *Game) dumpStatistics(sb *strings.Builder, markup bool) {
 }
 
 func (g *Game) dumpCurseHistory(sb *strings.Builder, markup bool) {
+	if !g.Mod(ModTotemConditions) {
+		return
+	}
 	sb.WriteString(section("Curses", markup))
 	for _, s := range g.Stats.CurseHistory {
 		stt := ui.Text(s).Format(76)
