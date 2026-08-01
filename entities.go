@@ -128,7 +128,7 @@ func (e *Entity) TextWarn(g *Game, id ID) string {
 			return e.Name
 		}
 		co, cond := r.Effect.(ConditionalComestible)
-		if cond && !co.CanApply(g, id) {
+		if cond && !g.PlayerActor().DoesAny(Gluttony) && !co.CanApply(g, id) {
 			return fmt.Sprintf("@S%s@N", e.Name)
 		} else if g.WarnComestible(r) {
 			// Comestible will cause a spirit to leave

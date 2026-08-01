@@ -1071,38 +1071,42 @@ func (eff EffectSeeingPotato) Desc(g *Game) string {
 
 type EffectTrickyChestnut struct{}
 
-func (eff EffectTrickyChestnut) CanApply(g *Game, i ID) bool {
-	pp := g.PP()
+func (g *Game) isBrokenPortal(pp gruid.Point) bool {
 	for _, id := range g.AllPortalIDs() {
 		ei := g.Entity(id)
 		if ei.P == pp && ei.Role.(*Portal).Used {
 			return true
 		}
 	}
+	return false
+}
+
+func (eff EffectTrickyChestnut) CanApply(g *Game, i ID) bool {
+	pp := g.PP()
 	j := g.TotemID()
-	return j >= 0 && g.Entity(j).P == g.PP()
+	return (j >= 0 && g.Entity(j).P == pp) || g.isBrokenPortal(pp)
 }
 
 func (eff EffectTrickyChestnut) Apply(g *Game) bool {
 	g.eatMsg("tricky chestnut", "")
-	j := g.TotemID()
-	if j >= 0 && g.Entity(j).P == g.PP() {
-		// Drain totem
-		for _, e := range g.Entities[:NSpirits] {
-			if sp, ok := e.Role.(*Spirit); ok {
-				sp.Charges = sp.MaxCharges[sp.Level]
-			}
-		}
-		g.Entity(g.TotemID()).P = InvalidPos
-		et := g.Entity(g.genEmptyTotemAt(g.PP()))
-		et.Seen = true
-	} else {
+	if g.isBrokenPortal(g.PP()) {
 		// Use portal
 		g.StoryLog("Transported to the next level!")
 		g.LogStyled("You feel a spirit transporting you.", logSpecial)
 		TotemEvents(g, &EventHappened{EvType: EventPortal})
 		g.NextLevel()
 		TotemEvents(g, &EventHappened{EvType: EventNewLevel})
+	} else {
+		// Drain totem
+		for _, e := range g.Entities[:NSpirits] {
+			if sp, ok := e.Role.(*Spirit); ok {
+				sp.Charges = sp.MaxCharges[sp.Level]
+			}
+		}
+		g.LogStyled("Your spirits are recharged!", logSpecial)
+		g.Entity(g.TotemID()).P = InvalidPos
+		et := g.Entity(g.genEmptyTotemAt(g.PP()))
+		et.Seen = true
 	}
 	return true
 }

@@ -243,7 +243,11 @@ func (g *Game) TraitDesc(ak ActorKind, t Traits) string {
 	desc = traitDesc(desc, t, Dazzling, "dazzling (redirect attacks just behind you, easily noticed)")
 	desc = traitDesc(desc, t, Elephanty, "rat phobia, difficult rotation when facing a wall, unnoticed in dead-ends, immune to berserk after-effects")
 	desc = traitDesc(desc, t, Gawalt, "wall-jumping movement and attack, weakened hits, menhir sensing and hiding")
-	desc = traitDesc(desc, t, Gluttony, "gluttony (needs to eat in pairs)")
+	if !g.Mod(ModTotemConditions) {
+		desc = traitDesc(desc, t, Gluttony, "gluttony (needs to eat in pairs)")
+	} else {
+		desc = traitDesc(desc, t, Gluttony, "gluttony (needs to eat in pairs, but ignores other requirements)")
+	}
 	desc = traitDesc(desc, t, GoodSmell, "smells food from afar")
 	desc = traitDesc(desc, t, NocturnalFlying, "nocturnal (reduced view range), flies over foliage")
 	desc = traitDesc(desc, t, PushingCharge, "charging pushes and @Ounbalances@N foes")
