@@ -1072,48 +1072,50 @@ func (eff EffectSeeingPotato) Desc(g *Game) string {
 
 type EffectTrickyChestnut struct{}
 
-func (g *Game) isBrokenPortal(pp gruid.Point) bool {
-	for _, id := range g.AllPortalIDs() {
-		ei := g.Entity(id)
-		if ei.P == pp && ei.Role.(*Portal).Used {
+func (eff EffectTrickyChestnut) CanApply(g *Game, i ID) bool {
+	if i, it := g.ItemAt(g.PP()); i >= 0 {
+		switch o := it.(type) {
+		case *Portal:
+			return o.Used
+		case *Spirit:
 			return true
 		}
 	}
 	return false
 }
 
-func (eff EffectTrickyChestnut) CanApply(g *Game, i ID) bool {
-	pp := g.PP()
-	j := g.TotemID()
-	return (j >= 0 && g.Entity(j).P == pp) || g.isBrokenPortal(pp)
-}
-
 func (eff EffectTrickyChestnut) Apply(g *Game) bool {
 	g.eatMsg("tricky chestnut", "")
-	if g.isBrokenPortal(g.PP()) {
-		// Use portal
-		g.StoryLog("Transported to the next level!")
-		g.LogStyled("You feel a spirit transporting you.", logSpecial)
-		TotemEvents(g, &EventHappened{EvType: EventPortal})
-		g.NextLevel()
-		TotemEvents(g, &EventHappened{EvType: EventNewLevel})
-	} else {
-		// Drain totem
-		for _, e := range g.Entities[:NSpirits] {
-			if sp, ok := e.Role.(*Spirit); ok {
-				sp.Charges = sp.MaxCharges[sp.Level]
-			}
+	pp := g.PP()
+	var tot *Spirit
+	if i, it := g.ItemAt(pp); i >= 0 {
+		switch o := it.(type) {
+		case *Portal:
+			o.Fake = false
+			o.Used = false
+			g.LogStyled("The portal is fixed!", logSpecial)
+			return true
+		case *Spirit:
+			tot = o
 		}
-		g.LogStyled("Your spirits are recharged!", logSpecial)
+	}
+	// Recharge spirits by default
+	for _, e := range g.Entities[:NSpirits] {
+		if sp, ok := e.Role.(*Spirit); ok {
+			sp.Charges = sp.MaxCharges[sp.Level]
+		}
+	}
+	g.LogStyled("Your spirits are recharged!", logSpecial)
+	if tot != nil { // turn totem to empty if present
 		g.Entity(g.TotemID()).P = InvalidPos
-		et := g.Entity(g.genEmptyTotemAt(g.PP()))
+		et := g.Entity(g.genEmptyTotemAt(pp))
 		et.Seen = true
 	}
 	return true
 }
 
 func (eff EffectTrickyChestnut) Desc(g *Game) string {
-	return "Eat if you are standing on a broken portal, to proceed to the next level.\nEat if you are standing on an unused totem, to empty the totem, and restore all your spirits to full charges."
+	return "Eat if you are standing on a broken portal, to make it work again.\nEat if you are standing on an unused totem, to empty the totem, and restore all your spirits to full charges."
 }
 
 func CantEatMsg(ef Effect) string {
