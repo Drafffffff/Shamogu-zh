@@ -1028,14 +1028,16 @@ func (eff EffectVanishingSnail) Desc(g *Game) string {
 	return "Eat only if at least 3 monsters are hunting you. All monsters stop hunting and any that are next to you blink away. Become @BShadowy@N for 10 turns."
 }
 
-type EffectTunnellingPeanut struct{}
+type EffectTunnellingAcorn struct{}
 
-func (eff EffectTunnellingPeanut) CanApply(g *Game, i ID) bool {
-	return g.Map.AdjacentNonPassableCount(g.PP()) >= 3
+func (eff EffectTunnellingAcorn) CanApply(g *Game, i ID) bool {
+	pp := g.PP()
+	n := pp.Add(g.Dir)
+	return inMap(n) && !g.Map.Passable(n) && g.Map.AdjacentNonPassableCount(pp) >= 3
 }
 
-func (eff EffectTunnellingPeanut) Apply(g *Game) bool {
-	g.eatMsg("tunnelling peanut", "")
+func (eff EffectTunnellingAcorn) Apply(g *Game) bool {
+	g.eatMsg("tunnelling acorn", "")
 	p := g.PP().Add(g.Dir)
 	for inMap(p) && !g.Map.Passable(p) {
 		g.BreakWall(p)
@@ -1044,8 +1046,8 @@ func (eff EffectTunnellingPeanut) Apply(g *Game) bool {
 	return true
 }
 
-func (eff EffectTunnellingPeanut) Desc(g *Game) string {
-	return "Eat only if you are next to 3 walls. Silently break all walls in front of you, until reaching a non-wall."
+func (eff EffectTunnellingAcorn) Desc(g *Game) string {
+	return "Eat only if you are next to 3 walls, and facing one of them. Silently break all walls in front of you, until reaching a non-wall."
 }
 
 type EffectSeeingPotato struct{}
@@ -1143,7 +1145,7 @@ func CantEatMsg(ef Effect) string {
 	switch ef.(type) {
 	case EffectSlipperyPea, EffectVanishingSnail:
 		return "You can't grab it!"
-	case EffectFortressOyster, EffectTunnellingPeanut, EffectTrickyChestnut:
+	case EffectFortressOyster, EffectTunnellingAcorn, EffectTrickyChestnut:
 		return "It won't open!"
 	case EffectSeeingPotato:
 		return "It has to be planted in the ground!"
@@ -1156,7 +1158,7 @@ var CondComs = []itemInfo{
 	{"slippery pea", EffectSlipperyPea{}},
 	{"fortress oyster", EffectFortressOyster{}},
 	{"vanishing snail", EffectVanishingSnail{}},
-	{"tunnelling peanut", EffectTunnellingPeanut{}},
+	{"tunnelling acorn", EffectTunnellingAcorn{}},
 	{"seeing potato", EffectSeeingPotato{}},
 	{"tricky chestnut", EffectTrickyChestnut{}},
 }
