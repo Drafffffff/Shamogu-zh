@@ -72,6 +72,7 @@ func init() {
 	gob.Register(EffectSlipperyPea{})
 	gob.Register(EffectFortressOyster{})
 	gob.Register(EffectVanishingSnail{})
+	gob.Register(EffectTunnellingPeanut{})
 	gob.Register(EffectSeeingPotato{})
 	gob.Register(EffectTrickyChestnut{})
 

@@ -957,6 +957,7 @@ func (eff EffectSlipperyPea) Apply(g *Game) bool {
 	for i := range pa.Statuses {
 		pa.Statuses[i] = 0
 	}
+	pa.HP = min(pa.HP, pa.GetMaxHP())
 	g.PutStatus1(PlayerID, pa, StatusFoggySkin, 8)
 	g.PutStatus1(PlayerID, pa, StatusClarity, 8)
 	return true
@@ -973,7 +974,7 @@ func (eff EffectFortressOyster) CanApply(g *Game, i ID) bool {
 	for range g.AdjacentActors(g.PP()) {
 		count++
 	}
-	return count >= 2
+	return count >= 3
 }
 
 func (eff EffectFortressOyster) Apply(g *Game) bool {
@@ -986,7 +987,7 @@ func (eff EffectFortressOyster) Apply(g *Game) bool {
 }
 
 func (eff EffectFortressOyster) Desc(g *Game) string {
-	return "Eat only if you are next to at least 2 monsters. Makes you @BLignified@N, @BBerserk@N, and @BVampiric@N for 5 turns."
+	return "Eat only if you are next to at least 3 monsters. Makes you @BLignified@N, @BBerserk@N, and @BVampiric@N for 5 turns."
 }
 
 type EffectVanishingSnail struct{}
@@ -1025,6 +1026,26 @@ func (eff EffectVanishingSnail) Apply(g *Game) bool {
 
 func (eff EffectVanishingSnail) Desc(g *Game) string {
 	return "Eat only if at least 3 monsters are hunting you. All monsters stop hunting and any that are next to you blink away. Become @BShadowy@N for 10 turns."
+}
+
+type EffectTunnellingPeanut struct{}
+
+func (eff EffectTunnellingPeanut) CanApply(g *Game, i ID) bool {
+	return g.Map.AdjacentNonPassableCount(g.PP()) >= 3
+}
+
+func (eff EffectTunnellingPeanut) Apply(g *Game) bool {
+	g.eatMsg("tunnelling peanut", "")
+	p := g.PP().Add(g.Dir)
+	for inMap(p) && !g.Map.Passable(p) {
+		g.BreakWall(p)
+		p = p.Add(g.Dir)
+	}
+	return true
+}
+
+func (eff EffectTunnellingPeanut) Desc(g *Game) string {
+	return "Eat only if you are next to 3 walls. Silently break all walls in front of you, until reaching a non-wall."
 }
 
 type EffectSeeingPotato struct{}
@@ -1122,7 +1143,7 @@ func CantEatMsg(ef Effect) string {
 	switch ef.(type) {
 	case EffectSlipperyPea, EffectVanishingSnail:
 		return "You can't grab it!"
-	case EffectFortressOyster, EffectTrickyChestnut:
+	case EffectFortressOyster, EffectTunnellingPeanut, EffectTrickyChestnut:
 		return "It won't open!"
 	case EffectSeeingPotato:
 		return "It has to be planted in the ground!"
@@ -1135,6 +1156,7 @@ var CondComs = []itemInfo{
 	{"slippery pea", EffectSlipperyPea{}},
 	{"fortress oyster", EffectFortressOyster{}},
 	{"vanishing snail", EffectVanishingSnail{}},
+	{"tunnelling peanut", EffectTunnellingPeanut{}},
 	{"seeing potato", EffectSeeingPotato{}},
 	{"tricky chestnut", EffectTrickyChestnut{}},
 }

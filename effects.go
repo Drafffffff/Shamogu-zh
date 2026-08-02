@@ -172,7 +172,7 @@ func (eff EffectLignificationFruit) Apply(g *Game) bool {
 		d = (d + 1) / 2
 	}
 	if pa.Has(StatusLignification) {
-		// The lignification ruit can be used to renew lignification
+		// The lignification fruit can be used to renew lignification
 		// duration and temporary HP bonus.
 		pa.Statuses[StatusLignification] = d
 		bonusHP := pa.HP - max(min(3, pa.HP), pa.HP-pa.HPBonus())
