@@ -958,13 +958,14 @@ func (eff EffectSlipperyPea) Apply(g *Game) bool {
 		pa.Statuses[i] = 0
 	}
 	pa.HP = min(pa.HP, pa.GetMaxHP())
-	g.PutStatus1(PlayerID, pa, StatusFoggySkin, 8)
-	g.PutStatus1(PlayerID, pa, StatusClarity, 8)
+	g.PutStatus1(PlayerID, pa, StatusClarity, DurationSprint)
+	g.PutStatus1(PlayerID, pa, StatusSprint, DurationSprint)
 	return true
 }
 
 func (eff EffectSlipperyPea) Desc(g *Game) string {
-	return "Eat only if you currently have at least 2 statuses. Removes all your statuses without the usual effects, then makes you @BFoggy-Skinned@N and @BClear-Minded@N for 8 turns."
+	return fmt.Sprintf("Eat only if you currently have at least 2 statuses. Removes all your statuses without the usual effects, then makes you @BClear-Minded@N and @BSprinting@N and for %d turns.",
+		DurationSprint)
 }
 
 type EffectFortressOyster struct{}
