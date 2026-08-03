@@ -1000,7 +1000,7 @@ func (eff EffectVanishingSnail) CanApply(g *Game, i ID) bool {
 			count++
 		}
 	}
-	return count >= 3
+	return count >= 4
 }
 
 func (eff EffectVanishingSnail) Apply(g *Game) bool {
@@ -1025,7 +1025,7 @@ func (eff EffectVanishingSnail) Apply(g *Game) bool {
 }
 
 func (eff EffectVanishingSnail) Desc(g *Game) string {
-	return "Eat only if at least 3 monsters are hunting you. All monsters stop hunting and any that are next to you blink away. Become @BShadowy@N for 10 turns."
+	return "Eat only if at least 4 monsters are hunting you. All monsters stop hunting and any that are next to you blink away. Become @BShadowy@N for 10 turns."
 }
 
 type EffectTunnellingAcorn struct{}
@@ -1163,6 +1163,10 @@ var CondComs = []itemInfo{
 	{"tricky chestnut", EffectTrickyChestnut{}},
 }
 
-func (g *Game) GetConditionalComestible() itemInfo {
-	return CondComs[g.IntN(len(CondComs))]
+func (g *Game) GetConditionalComestible(level int) itemInfo {
+	n := len(CondComs)
+	if level == 9 {
+		n-- // chestnuts are useless on the last level
+	}
+	return CondComs[g.IntN(n)]
 }

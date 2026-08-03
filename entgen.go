@@ -584,8 +584,8 @@ func (g *Game) genItems(mg *MapGen) {
 		nitems += 4
 	}
 	for i := range nitems {
-		if g.Mod(ModTotemConditions) && g.IntN(8) == 0 {
-			addComestible(i, g.GetConditionalComestible())
+		if g.Mod(ModTotemConditions) && g.IntN(14-g.Map.Level) == 0 { // 1/13 to 1/5
+			addComestible(i, g.GetConditionalComestible(g.Map.Level))
 		} else {
 			addComestible(i, (g.GetComestibleData())[comestibleIdx()])
 		}
