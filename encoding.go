@@ -71,8 +71,10 @@ func init() {
 	// Conditional comestible effects.
 	gob.Register(EffectSlipperyPea{})
 	gob.Register(EffectFortressOyster{})
+	gob.Register(EffectRunethornRose{})
 	gob.Register(EffectVanishingSnail{})
 	gob.Register(EffectTunnellingAcorn{})
+	gob.Register(EffectWarpingBean{})
 	gob.Register(EffectSeeingPotato{})
 	gob.Register(EffectTrickyChestnut{})
 

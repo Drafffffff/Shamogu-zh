@@ -991,6 +991,50 @@ func (eff EffectFortressOyster) Desc(g *Game) string {
 	return "Eat only if you are next to at least 3 monsters. Makes you @BLignified@N, @BBerserk@N, and @BVampiric@N for 5 turns."
 }
 
+type EffectRunethornRose struct{}
+
+func (g *Game) anyRuneAt(p gruid.Point) (*RunicTrap, bool) {
+	if i, it := g.ItemAt(p); i >= 0 {
+		rt, ok := it.(*RunicTrap)
+		return rt, ok
+	}
+	return nil, false
+}
+
+func (eff EffectRunethornRose) CanApply(g *Game, i ID) bool {
+	_, ok := g.anyRuneAt(g.PP())
+	return ok
+}
+
+func (eff EffectRunethornRose) Apply(g *Game) bool {
+	g.eatMsg("runethorn rose", "")
+	pp := g.PP()
+	var t MagicRune // type of rune
+	if r, ok := g.anyRuneAt(pp); ok {
+		t = r.Rune
+	} else {
+		t = MagicRune(g.IntN(NRunes))
+	}
+	for i := -1; i <= 1; i += 2 {
+		for j := -1; j <= 1; j += 2 {
+			q := pp
+			for range 2 {
+				q = q.Shift(i, j)
+				if g.Map.Terrain.At(q) != Floor {
+					break
+				}
+				_, e := g.genRunicTrapAt(t, q)
+				e.Seen = true
+			}
+		}
+	}
+	return true
+}
+
+func (eff EffectRunethornRose) Desc(g *Game) string {
+	return "Eat only if you standing on a runic trap. Add runes of the same type at the diagonals, extending for up to two runes."
+}
+
 type EffectVanishingSnail struct{}
 
 func (eff EffectVanishingSnail) CanApply(g *Game, i ID) bool {
@@ -1049,6 +1093,40 @@ func (eff EffectTunnellingAcorn) Apply(g *Game) bool {
 
 func (eff EffectTunnellingAcorn) Desc(g *Game) string {
 	return "Eat only if you are next to 3 walls, and facing one of them. Silently break all walls in front of you, until reaching a non-wall."
+}
+
+type EffectWarpingBean struct{}
+
+func (g *Game) nearestBeanTarget(allowNone bool) gruid.Point {
+	p := g.PP().Add(g.Dir)
+	for inMap(p) && g.InFOV(p) {
+		if i, it := g.ItemAt(p); i >= 0 {
+			switch it.(type) {
+			case *Spirit, *EmptyTotem, *Menhir, *Portal, *CorruptionOrb:
+				return p
+			}
+		}
+		p = p.Add(g.Dir)
+	}
+	if allowNone {
+		return p.Sub(g.Dir)
+	}
+	return InvalidPos
+}
+
+func (eff EffectWarpingBean) CanApply(g *Game, i ID) bool {
+	return g.nearestBeanTarget(false) != InvalidPos
+}
+
+func (eff EffectWarpingBean) Apply(g *Game) bool {
+	g.eatMsg("warping bean", "")
+	p := g.nearestBeanTarget(true)
+	g.MoveActor(PlayerID, g.PlayerActor(), p, MovTeleport)
+	return true
+}
+
+func (eff EffectWarpingBean) Desc(g *Game) string {
+	return "Eat only if you see a totem, menhir, portal, or orb directly in front of you. Warp to the nearest one, exchanging places with any monster on it."
 }
 
 type EffectSeeingPotato struct{}
@@ -1144,10 +1222,12 @@ func (eff EffectTrickyChestnut) Desc(g *Game) string {
 
 func CantEatMsg(ef Effect) string {
 	switch ef.(type) {
-	case EffectSlipperyPea, EffectVanishingSnail:
+	case EffectSlipperyPea, EffectVanishingSnail, EffectWarpingBean:
 		return "You can't grab it!"
 	case EffectFortressOyster, EffectTunnellingAcorn, EffectTrickyChestnut:
 		return "It won't open!"
+	case EffectRunethornRose:
+		return "You can't get past its thorns!"
 	case EffectSeeingPotato:
 		return "It has to be planted in the ground!"
 	default:
@@ -1158,8 +1238,10 @@ func CantEatMsg(ef Effect) string {
 var CondComs = []itemInfo{
 	{"slippery pea", EffectSlipperyPea{}},
 	{"fortress oyster", EffectFortressOyster{}},
+	{"runethorn rose", EffectRunethornRose{}},
 	{"vanishing snail", EffectVanishingSnail{}},
 	{"tunnelling acorn", EffectTunnellingAcorn{}},
+	{"warping bean", EffectWarpingBean{}},
 	{"seeing potato", EffectSeeingPotato{}},
 	{"tricky chestnut", EffectTrickyChestnut{}},
 }
