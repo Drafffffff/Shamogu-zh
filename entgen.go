@@ -401,7 +401,7 @@ func (g *Game) genItems(mg *MapGen) {
 		if g.ProcInfo.FakePortal[g.Map.Level-1] {
 			extraStatic++
 			addPortal(true)
-			if g.Mod(ModCorruptedDungeon) && g.IntN(2) == 0 {
+			if g.Mod(ModCorruptedDungeon) && g.IntN(3) == 0 {
 				extraStatic++
 				addPortal(true)
 				if g.IntN(2) == 0 {
@@ -1628,7 +1628,7 @@ func (g *Game) genGuardiansCorrupted(nE, nM, nL int) (int, int, int) {
 		if g.IntN(3) == 0 {
 			mk = DraggingAlligator
 		}
-		if g.IntN(5) == 0 {
+		if g.IntN(9) == 0 {
 			mk = WarpingWraith
 		}
 		mk = getGuardKind(mk)
