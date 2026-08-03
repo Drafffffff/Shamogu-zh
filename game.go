@@ -179,9 +179,11 @@ func (g *Game) HandleTurnCount() {
 // handleCorruptionEvent handles a corruption event for the corrupted dungeon
 // mod.
 func (g *Game) handleCorruptionEvent() {
+	log := false
 	g.CorruptionTurn = g.Turn + 25 + g.IntN(300)
 	switch g.IntN(10) {
 	case 0:
+		log = true
 		g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
 			if g.InFOV(p) {
 				return t
@@ -209,6 +211,7 @@ func (g *Game) handleCorruptionEvent() {
 			if g.IntN(160) > 0 && (!inFOV || g.IntN(40) > 0) {
 				return t
 			}
+			log = log || inFOV
 			switch t {
 			case Foliage:
 				return Floor
@@ -231,15 +234,17 @@ func (g *Game) handleCorruptionEvent() {
 			return t
 		})
 	}
-	switch g.IntN(4) {
-	case 0:
-		g.Log("Uh.")
-	case 1:
-		g.Log("Um.")
-	case 2:
-		g.Log("Oh.")
-	default:
-		g.Log("Eh.")
+	if log {
+		switch g.IntN(4) {
+		case 0:
+			g.Log("Uh.")
+		case 1:
+			g.Log("Um.")
+		case 2:
+			g.Log("Oh.")
+		default:
+			g.Log("Eh.")
+		}
 	}
 	g.UpdateFOV()
 	g.UpdateKnowledge()
