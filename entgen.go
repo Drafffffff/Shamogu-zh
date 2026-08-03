@@ -1795,7 +1795,7 @@ func (g *Game) corruptedPortalGuardianPoint() gruid.Point {
 			p = g.Map.Portal
 		}
 	}
-	if g.IntN(4) == 0 && (g.Map.Orb == InvalidPos || g.IntN(3) > 0) {
+	if g.IntN(5) == 0 && (g.Map.Orb == InvalidPos || g.IntN(3) > 0) {
 		// Occasionally guard a random non-player vault.
 		p = g.RandomWaypoint()
 	}
@@ -1811,10 +1811,13 @@ func (g *Game) corruptedPortalGuardianPoint() gruid.Point {
 }
 
 func (g *Game) corruptedTotemGuardianPoint() gruid.Point {
-	if g.IntN(9) > 0 {
+	if g.IntN(5) > 0 {
 		return g.Map.Totem
 	}
-	return g.corruptedPortalGuardianPoint()
+	if g.IntN(3) > 0 {
+		g.hideLocation(g.Map.Totem)
+	}
+	return g.RandomWaypoint()
 }
 
 // hideLocation attempts to hide the given point by adding foliage or rubble
