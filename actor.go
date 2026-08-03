@@ -1102,9 +1102,7 @@ func (g *Game) TeleportActor(i ID, ai *Actor, n int) bool {
 	if i == PlayerID && g.Map.Orb != InvalidPos && g.IntN(2) == 0 {
 		// On last level, give the orb a chance to drive the player
 		// away from it, to make teleport-based strategies less
-		// reliable (but still viable enough!). Greater chance with
-		// ModCorruptedDungeon, because even more unpredictability
-		// sounds thematic there.
+		// reliable (but still viable enough!).
 		//
 		// Result: teleport to furthest point from the orb among 3
 		// random possible teleport points.
