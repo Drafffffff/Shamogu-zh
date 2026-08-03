@@ -32,6 +32,8 @@ Corrupted dungeon improvements:
 * New kind of rare map corruption that reduces size of the natural cave
   (excluding vaults) to about half, but adds extra tunnels to vaults (see #11).
 * New rare variations of alternative guardians (see #11).
+* Lower a bit frequency for various corruptions, in part to compensate for new
+  ones (see #11).
 
 UI, graphics, QoL:
 
