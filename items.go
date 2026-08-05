@@ -56,7 +56,15 @@ type Spirit struct {
 	Condition    *SpiritCond
 }
 
-func (sp *Spirit) EitherDesc(descUpgrade bool) string {
+func (sp *Spirit) ExamineDesc() string {
+	return sp.eitherDesc(true)
+}
+
+func (sp *Spirit) Desc() string {
+	return sp.eitherDesc(false)
+}
+
+func (sp *Spirit) eitherDesc(descUpgrade bool) string {
 	var sb strings.Builder
 	if descUpgrade {
 		sb.WriteString("@CTotemic spirit.@N\n")
@@ -100,14 +108,6 @@ func (sp *Spirit) EitherDesc(descUpgrade bool) string {
 	sb.WriteByte('\n')
 	fmt.Fprintf(&sb, "@CTraits:@N %s.", TraitDesc(Player, sp.BonusTraits[sp.Level]))
 	return sb.String()
-}
-
-func (sp *Spirit) ExamineDesc() string {
-	return sp.EitherDesc(true)
-}
-
-func (sp *Spirit) Desc() string {
-	return sp.EitherDesc(false)
 }
 
 func (sp *Spirit) UpgradeDesc(enew *Entity) string {
