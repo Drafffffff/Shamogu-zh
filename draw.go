@@ -542,7 +542,7 @@ func (md *model) drawTargInfo() {
 			sb.WriteByte('\n')
 			fmt.Fprintf(&sb, "@CTraits:@N %s.", TraitDesc(r.Kind, r.Traits))
 		case *Spirit:
-			sb.WriteString(r.FullDesc())
+			sb.WriteString(r.ExamineDesc())
 		case *Menhir:
 			sb.WriteString(r.Desc())
 			if r.Used {
@@ -553,6 +553,8 @@ func (md *model) drawTargInfo() {
 			if r.KnownUsed || r.Used && g.Wizard.Mode.Reveal() {
 				name += " (inert)"
 			}
+		case *Comestible:
+			sb.WriteString(r.ExamineDesc())
 		case Item:
 			sb.WriteString(r.Desc())
 		}

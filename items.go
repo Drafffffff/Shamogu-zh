@@ -58,15 +58,19 @@ type Spirit struct {
 
 func (sp *Spirit) EitherDesc(descUpgrade bool) string {
 	var sb strings.Builder
+	if descUpgrade {
+		sb.WriteString("@CTotemic spirit.@N\n")
+	}
 	if cond := sp.Condition; cond != nil {
 		if descUpgrade {
-			sb.WriteString(cond.Upgrade.Desc())
+			udesc := cond.Upgrade.Desc()
+			if udesc != "" {
+				sb.WriteString(udesc)
+				sb.WriteByte('\n')
+			}
 		}
 		sb.WriteString(cond.Desc())
 		sb.WriteByte('\n')
-	}
-	if descUpgrade {
-		sb.WriteString("@CTotemic spirit.@N\n")
 	}
 	bonuses := []string{}
 	if attack := sp.BonusAttack[sp.Level]; attack > 0 {
@@ -79,7 +83,7 @@ func (sp *Spirit) EitherDesc(descUpgrade bool) string {
 		bonuses = append(bonuses, fmt.Sprintf("%+d HP", hp))
 	}
 	if len(bonuses) > 0 {
-		sb.WriteString("Gives")
+		sb.WriteString("@CStats:@N")
 		for i, bonus := range bonuses {
 			sb.WriteByte(' ')
 			sb.WriteString(bonus)
@@ -91,14 +95,14 @@ func (sp *Spirit) EitherDesc(descUpgrade bool) string {
 		}
 		sb.WriteByte('\n')
 	}
-	fmt.Fprintf(&sb, "@CAbility:@N %s (%d/%d charges). %s",
+	fmt.Fprintf(&sb, "@CAbility@S(%s %d/%d charges)@C:@N %s",
 		sp.Ability[sp.Level].Name(), sp.Charges, sp.MaxCharges[sp.Level], sp.Ability[sp.Level].Desc())
 	sb.WriteByte('\n')
 	fmt.Fprintf(&sb, "@CTraits:@N %s.", TraitDesc(Player, sp.BonusTraits[sp.Level]))
 	return sb.String()
 }
 
-func (sp *Spirit) FullDesc() string {
+func (sp *Spirit) ExamineDesc() string {
 	return sp.EitherDesc(true)
 }
 
@@ -113,7 +117,7 @@ func (sp *Spirit) UpgradeDesc(enew *Entity) string {
 	hasCond := sp.Condition != nil
 	if cond := enew.Role.(*Spirit).Condition; cond != nil && cond.Upgrade.Applies(hasCond) {
 		if hasCond {
-			sb.WriteString("Replacing existing curse:\n")
+			sb.WriteString("@RReplacing@N ")
 		}
 		sb.WriteString(cond.Desc())
 		sb.WriteByte('\n')
@@ -129,7 +133,7 @@ func (sp *Spirit) UpgradeDesc(enew *Entity) string {
 		bonuses = append(bonuses, fmt.Sprintf("%+d HP", hp))
 	}
 	if len(bonuses) > 0 {
-		sb.WriteString("Gives ")
+		sb.WriteString("@BStats:@N")
 		for i, bonus := range bonuses {
 			sb.WriteString(bonus)
 			if i < len(bonuses)-1 {
@@ -210,6 +214,10 @@ type Comestible struct {
 }
 
 func (c *Comestible) Desc() string {
+	return c.Effect.Desc()
+}
+
+func (c *Comestible) ExamineDesc() string {
 	return fmt.Sprintf("@CComestible.@N\n%s", c.Effect.Desc())
 }
 

@@ -556,9 +556,9 @@ func (p UpgradePolicy) Applies(existing bool) bool {
 func (p UpgradePolicy) Desc() string {
 	switch p {
 	case UpgradeContinues:
-		return "(Including when upgrading an unfulfilled spirit:)\n"
+		return "(Including when upgrading an unfulfilled spirit:)"
 	case UpgradeReplaces:
-		return "(Including on any upgrade:)\n"
+		return "(Including on any upgrade:)"
 	default:
 		return ""
 	}
@@ -586,7 +586,7 @@ func (c *SpiritCond) EventTypes() EventType {
 func (c *SpiritCond) Desc() string {
 	var sb strings.Builder
 	fmt.Fprintf(&sb, "@RCurse:@N %s.\n", UpperFirst(c.Effect.Desc()))
-	fmt.Fprintf(&sb, "@YUntil:@N %s.\n", UpperFirst(c.Until.Desc()))
+	fmt.Fprintf(&sb, "@YUntil:@N %s.", UpperFirst(c.Until.Desc()))
 	return sb.String()
 }
 func (c *SpiritCond) Enabled() SpiritPart {
