@@ -583,8 +583,19 @@ func (g *Game) genItems(mg *MapGen) {
 	default:
 		nitems += 4
 	}
+	var ccMap []bool // where conditional comestibles go
+	if g.Mod(ModTotemConditions) {
+		k := g.ProcInfo.NCondCom[g.Map.Level-1]
+		ccMap = make([]bool, nitems)
+		for i := range nitems {
+			ccMap[i] = i < k
+		}
+		g.rand.Shuffle(nitems, func(i, j int) {
+			ccMap[i], ccMap[j] = ccMap[j], ccMap[i]
+		})
+	}
 	for i := range nitems {
-		if g.Mod(ModTotemConditions) && g.IntN(14-g.Map.Level) == 0 { // 1/13 to 1/5
+		if g.Mod(ModTotemConditions) && ccMap[i] {
 			addComestible(i, g.GetConditionalComestible(g.Map.Level))
 		} else {
 			addComestible(i, (g.GetComestibleData())[comestibleIdx()])

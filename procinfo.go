@@ -39,6 +39,7 @@ type ProcInfo struct {
 	Comestibles      []int            // comestible-generation data
 	ComestibleIdx    int              // current index in Comestibles
 	NComestibles     []int            // number of comestibles per level
+	NCondCom         []int            // number of conditional comestibles
 	NMenhirs         []int            // number of menhirs per level
 	Runes            []int            // rune-generation data
 	RuneIdx          int              // current index in Runes
@@ -405,6 +406,31 @@ func (g *Game) comestiblesProcGen() {
 	g.ProcInfo.NComestibles[7+g.IntN(2)]++
 	g.ProcInfo.NComestibles[1+g.IntN(8)]++
 	g.ProcInfo.NComestibles[1+g.IntN(8)]--
+
+	if !g.Mod(ModTotemConditions) {
+		return
+	}
+	g.ProcInfo.NCondCom = make([]int, MapLevels)
+	tot := 0
+	for i, n := range g.ProcInfo.NComestibles {
+		// Per-comestible probability is 1/13 to 1/5
+		// Generate in groups of size k to reduce variability
+		f := 13 - i
+		k := 3
+		for n > 0 {
+			k = min(n, k)
+			if g.IntN(f) < k {
+				g.ProcInfo.NCondCom[i]++
+				tot++
+			}
+			n -= k
+		}
+	}
+	if tot < 3 {
+		for range 2 {
+			g.ProcInfo.NCondCom[g.rand.IntN(MapLevels)]++
+		}
+	}
 }
 
 func (g *Game) menhirsProcGen() {
