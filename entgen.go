@@ -320,24 +320,9 @@ var ComestibleData = []itemInfo{
 	TeleportMushroom:   {"teleport mushroom", EffectTeleportMushroom{}},
 }
 
-// HealingCombatComestibleData provides information about the various kinds of
-// comestibles (for ModHealingCombat).
-var HealingCombatComestibleData = []itemInfo{
-	AmbrosiaBerries:    {"ambrosia berries", EffectAmbrosiaBerries{HealingCombat: true}},
-	BerserkingFlower:   {"berserking flower", EffectBerserkingFlower{}},
-	ClarityLeaves:      {"clarity leaves", EffectClarityLeaves{HealingCombat: true}},
-	FirebreathPepper:   {"firebreath pepper", EffectFirebreathPepper{HealingCombat: true}},
-	FoggySkinOnion:     {"foggy-skin onion", EffectFoggySkinOnion{HealingCombat: true}},
-	LignificationFruit: {"lignification fruit", EffectLignificationFruit{}},
-	TeleportMushroom:   {"teleport mushroom", EffectTeleportMushroom{HealingCombat: true}},
-}
-
 // GetComestibleData returns the appropriate comestible data for current mod
 // selection.
 func (g *Game) GetComestibleData() []itemInfo {
-	if g.Mod(ModHealingCombat) {
-		return HealingCombatComestibleData
-	}
 	return ComestibleData
 }
 

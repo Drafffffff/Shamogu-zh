@@ -798,9 +798,9 @@ func (md *model) updateItemDesc(e *Entity) {
 		if it.Level == 1 {
 			l.Box.Title = ui.Textf("%s (upgraded)", e.Name)
 		}
-		l.Content = stt.WithText(it.Desc()).Format(UIWidth/2 - 1 - 2)
+		l.Content = stt.WithText(it.Desc(md.g)).Format(UIWidth/2 - 1 - 2)
 	case Item:
-		l.Content = stt.WithText(it.Desc()).Format(UIWidth/2 - 1 - 2)
+		l.Content = stt.WithText(it.Desc(md.g)).Format(UIWidth/2 - 1 - 2)
 	default:
 		// Should not happen.
 		l.Content = stt.WithText(e.Name).Format(UIWidth/2 - 1 - 2)
@@ -862,18 +862,19 @@ func (a ActionUseTwoItems) Handle(md *model) (gruid.Effect, bool) {
 
 // updateEquipItemDesc updates the label for equipping ei on ej.
 func (md *model) updateEquipItemDesc(ei, ej *Entity) {
+	g := md.g
 	stt := ui.StyledText{}.WithMarkups(Markups)
 	switch rj := ej.Role.(type) {
 	case *Spirit:
 		md.desc.Content = stt // empty (not drawn)
 		md.equipPager.SetBox(&ui.Box{Title: stt.WithTextf("%s (ugprade)", ej.Name)})
-		md.equipPager.SetLines(stt.WithText(rj.UpgradeDesc(ei)).Format(UIWidth/2 - 1 - 2).Lines())
+		md.equipPager.SetLines(stt.WithText(rj.UpgradeDesc(g, ei)).Format(UIWidth/2 - 1 - 2).Lines())
 	case *Comestible:
 		md.desc.Box = &ui.Box{Title: stt.WithTextf("%s (replace)", ej.Name)}
-		md.desc.Content = stt.WithText(rj.Desc()).Format(UIWidth/2 - 1 - 2)
+		md.desc.Content = stt.WithText(rj.Desc(g)).Format(UIWidth/2 - 1 - 2)
 		if ri, ok := ei.Role.(*Comestible); ok {
 			md.equipPager.SetBox(&ui.Box{Title: stt.WithTextf("%s (ground)", ei.Name)})
-			md.equipPager.SetLines(stt.WithText(ri.Desc()).Format(UIWidth/2 - 1 - 2).Lines())
+			md.equipPager.SetLines(stt.WithText(ri.Desc(g)).Format(UIWidth/2 - 1 - 2).Lines())
 		}
 	default:
 		// Empty slot: should only happen with a spirit.
@@ -882,7 +883,7 @@ func (md *model) updateEquipItemDesc(ei, ej *Entity) {
 			s := "@MThe spirit on the ground can be equipped on this empty slot.@N"
 			md.desc.Content = stt.WithText(s).Format(UIWidth/2 - 1 - 2)
 			md.equipPager.SetBox(&ui.Box{Title: stt.WithTextf("%s (ground)", ei.Name)})
-			md.equipPager.SetLines(stt.WithText(ri.Desc()).Format(UIWidth/2 - 1 - 2).Lines())
+			md.equipPager.SetLines(stt.WithText(ri.Desc(g)).Format(UIWidth/2 - 1 - 2).Lines())
 		}
 	}
 }

@@ -16,7 +16,7 @@ const (
 
 // Effect represents any kind of applicable effect.
 type Effect interface {
-	Desc() string
+	Desc(*Game) string
 	Apply(*Game) bool
 }
 
@@ -29,7 +29,7 @@ type Ability interface {
 // Item holds an item that can be used and equipped.
 type Item interface {
 	// Desc returns a description of the item.
-	Desc() string
+	Desc(*Game) string
 	// Use takes a game state and the item's id and reports whether a
 	// turn-taking action was performed.
 	Use(*Game, ID) bool
@@ -56,15 +56,15 @@ type Spirit struct {
 	Condition    *SpiritCond
 }
 
-func (sp *Spirit) ExamineDesc() string {
-	return sp.eitherDesc(true)
+func (sp *Spirit) ExamineDesc(g *Game) string {
+	return sp.eitherDesc(g, true)
 }
 
-func (sp *Spirit) Desc() string {
-	return sp.eitherDesc(false)
+func (sp *Spirit) Desc(g *Game) string {
+	return sp.eitherDesc(g, false)
 }
 
-func (sp *Spirit) eitherDesc(descUpgrade bool) string {
+func (sp *Spirit) eitherDesc(g *Game, descUpgrade bool) string {
 	var sb strings.Builder
 	if descUpgrade {
 		sb.WriteString("@CTotemic spirit.@N\n")
@@ -104,14 +104,14 @@ func (sp *Spirit) eitherDesc(descUpgrade bool) string {
 		sb.WriteByte('\n')
 	}
 	fmt.Fprintf(&sb, "@CAbility@S(%s %d/%d charges)@C:@N %s",
-		sp.Ability[sp.Level].Name(), sp.Charges, sp.MaxCharges[sp.Level], sp.Ability[sp.Level].Desc())
+		sp.Ability[sp.Level].Name(), sp.Charges, sp.MaxCharges[sp.Level], sp.Ability[sp.Level].Desc(g))
 	sb.WriteByte('\n')
-	fmt.Fprintf(&sb, "@CTraits:@N %s.", TraitDesc(Player, sp.BonusTraits[sp.Level]))
+	fmt.Fprintf(&sb, "@CTraits:@N %s.", g.TraitDesc(Player, sp.BonusTraits[sp.Level]))
 	return sb.String()
 }
 
-func (sp *Spirit) UpgradeDesc(enew *Entity) string {
-	desc := sp.Desc()
+func (sp *Spirit) UpgradeDesc(g *Game, enew *Entity) string {
+	desc := sp.Desc(g)
 	var sb strings.Builder
 	sb.WriteString("@MThe spirit essence can be used to upgrade this spirit.@N\n")
 	hasCond := sp.Condition != nil
@@ -147,7 +147,7 @@ func (sp *Spirit) UpgradeDesc(enew *Entity) string {
 	fmt.Fprintf(&sb, "@BCharges:@N %+d", sp.MaxCharges[1]-sp.MaxCharges[0])
 	if sp.BonusTraits[1] != sp.BonusTraits[0] {
 		sb.WriteByte('\n')
-		fmt.Fprintf(&sb, "@BNew traits:@N %s.", TraitDesc(Player, sp.BonusTraits[1]&^sp.BonusTraits[0]))
+		fmt.Fprintf(&sb, "@BNew traits:@N %s.", g.TraitDesc(Player, sp.BonusTraits[1]&^sp.BonusTraits[0]))
 	}
 	return desc + "\n\n" + sb.String()
 }
@@ -199,7 +199,7 @@ const ConfusionDamage = 1
 // EmptyTotem represents a totem without spirit.
 type EmptyTotem struct{}
 
-func (sp *EmptyTotem) Desc() string {
+func (sp *EmptyTotem) Desc(_ *Game) string {
 	return "The totem does not have a spirit or it already left."
 }
 
@@ -213,12 +213,12 @@ type Comestible struct {
 	Effect Effect // effect on use
 }
 
-func (c *Comestible) Desc() string {
-	return c.Effect.Desc()
+func (c *Comestible) Desc(g *Game) string {
+	return c.Effect.Desc(g)
 }
 
-func (c *Comestible) ExamineDesc() string {
-	return fmt.Sprintf("@CComestible.@N\n%s", c.Effect.Desc())
+func (c *Comestible) ExamineDesc(g *Game) string {
+	return fmt.Sprintf("@CComestible.@N\n%s", c.Effect.Desc(g))
 }
 
 func (c *Comestible) Use(g *Game, i ID) bool {
@@ -347,11 +347,11 @@ type Menhir struct {
 	Effect Effect // effect on use
 }
 
-func (m *Menhir) Desc() string {
+func (m *Menhir) Desc(g *Game) string {
 	if !m.Used {
-		return fmt.Sprintf("@CActivable@N.\n%s", m.Effect.Desc())
+		return fmt.Sprintf("@CActivable@N.\n%s", m.Effect.Desc(g))
 	}
-	return m.Effect.Desc()
+	return m.Effect.Desc(g)
 }
 
 func (m *Menhir) Use(g *Game, i ID) bool {
@@ -381,7 +381,7 @@ type Portal struct {
 	Used bool // whether fake but already activated
 }
 
-func (p *Portal) Desc() string {
+func (p *Portal) Desc(_ *Game) string {
 	if p.Used {
 		return "Malfunctioning magical portal that doesn’t lead anywhere, despite looking normal."
 	}
@@ -444,7 +444,7 @@ type CorruptionOrb struct {
 	Broken bool // whether you broke the orb of corruption or not
 }
 
-func (o *CorruptionOrb) Desc() string {
+func (o *CorruptionOrb) Desc(_ *Game) string {
 	if o.Broken {
 		// Should not happen in practice for now, unless we add extra
 		// content after destroying the orb.

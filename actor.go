@@ -207,7 +207,7 @@ const (
 // TraitDesc returns a suitable trait description for the given actor kind and
 // extra traits. For monsters, it includes the description of some
 // monster-specific traits.
-func TraitDesc(ak ActorKind, t Traits) string {
+func (g *Game) TraitDesc(ak ActorKind, t Traits) string {
 	desc := []string{}
 
 	// Attack patterns.

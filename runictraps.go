@@ -69,7 +69,7 @@ func (rt *RunicTrap) Color() gruid.Color {
 }
 
 // Desc returns the description of the runic trap.
-func (rt *RunicTrap) Desc() string {
+func (rt *RunicTrap) Desc(_ *Game) string {
 	if rt.KnownUsed {
 		return "The rune has already been triggered."
 	}

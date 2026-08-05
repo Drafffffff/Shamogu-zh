@@ -540,23 +540,23 @@ func (md *model) drawTargInfo() {
 				fmt.Fprintf(&sb, "HP:?/%d A:%d D:%d", r.MaxHP, r.Attack, r.Defense)
 			}
 			sb.WriteByte('\n')
-			fmt.Fprintf(&sb, "@CTraits:@N %s.", TraitDesc(r.Kind, r.Traits))
+			fmt.Fprintf(&sb, "@CTraits:@N %s.", g.TraitDesc(r.Kind, r.Traits))
 		case *Spirit:
-			sb.WriteString(r.ExamineDesc())
+			sb.WriteString(r.ExamineDesc(g))
 		case *Menhir:
-			sb.WriteString(r.Desc())
+			sb.WriteString(r.Desc(g))
 			if r.Used {
 				name += " (inert)"
 			}
 		case *RunicTrap:
-			sb.WriteString(r.Desc())
+			sb.WriteString(r.Desc(g))
 			if r.KnownUsed || r.Used && g.Wizard.Mode.Reveal() {
 				name += " (inert)"
 			}
 		case *Comestible:
-			sb.WriteString(r.ExamineDesc())
+			sb.WriteString(r.ExamineDesc(g))
 		case Item:
-			sb.WriteString(r.Desc())
+			sb.WriteString(r.Desc(g))
 		}
 		formatBox(name, sb.String(), cl)
 	}
