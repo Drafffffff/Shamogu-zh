@@ -590,7 +590,7 @@ func (g *Game) genItems(mg *MapGen) {
 	case ThemeNone:
 	case ThemeWarp:
 		nitems += 6
-	case ThemePoison:
+	case ThemePoison, ThemeFootsteps:
 		// Only one extra comestible, because it can be more difficult
 		// than a normal level, in particular early on, but it still
 		// has varied comestibles.
@@ -1155,6 +1155,19 @@ func (g *Game) genThemedMonsters(mg *MapGen, nE, nM, nL int) {
 		}
 		for range nL + 2 {
 			g.genMonster(WalkingTree)
+		}
+	case ThemeFootsteps:
+		mids := []ActorKind{BarkingHound, ExplodingNadre, FireLlama, LashingFrog, RampagingBoar}
+		midlates := []ActorKind{CrazyDruid, CrazyDruid, DraggingAlligator, DraggingAlligator, WalkingMushroom}
+		lates := []ActorKind{UndeadKnight, FearsomeLich}
+		for range nE + 2*nM/3 {
+			g.genMonster(g.randMonsKind(mids))
+		}
+		for range (1 + nM) / 3 {
+			g.genMonster(g.randMonsKind(midlates))
+		}
+		for range max(1, nL-1) {
+			g.genMonster(g.randMonsKind(lates))
 		}
 	case ThemeLignification:
 		switch g.IntN(4) {

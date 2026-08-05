@@ -49,6 +49,7 @@ const (
 	ThemeNone mapTheme = iota
 	ThemeBerserk
 	ThemeFire
+	ThemeFootsteps
 	ThemeLignification
 	ThemePoison
 	ThemeWarp
@@ -178,7 +179,7 @@ func (g *Game) generateMap(ml MapLayout) (*MapGen, bool) {
 // choseTheme choses the theme for thematic levels.
 func (g *Game) choseTheme(mg *MapGen) {
 	if g.ProcInfo.ThemedLevel == g.Map.Level {
-		switch g.IntN(11) {
+		switch g.IntN(12) {
 		case 0, 1:
 			mg.theme = ThemeBerserk
 		case 2, 3:
@@ -187,6 +188,8 @@ func (g *Game) choseTheme(mg *MapGen) {
 			mg.theme = ThemeLignification
 		case 6, 7:
 			mg.theme = ThemePoison
+		case 8:
+			mg.theme = ThemeFootsteps
 		default:
 			// Higher chance for the warp theme.
 			mg.theme = ThemeWarp
