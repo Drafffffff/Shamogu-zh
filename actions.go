@@ -862,26 +862,27 @@ func (a ActionUseTwoItems) Handle(md *model) (gruid.Effect, bool) {
 
 // updateEquipItemDesc updates the label for equipping ei on ej.
 func (md *model) updateEquipItemDesc(ei, ej *Entity) {
-	l := md.desc
 	stt := ui.StyledText{}.WithMarkups(Markups)
-	l.Box = &ui.Box{Title: ui.Text(ej.Name)}
 	switch rj := ej.Role.(type) {
 	case *Spirit:
-		l.Box.Title = ui.Textf("%s (upgrade)", ej.Name)
-		l.Content = stt.WithText(rj.UpgradeDesc(ei)).Format(UIWidth/2 - 1 - 2)
+		md.desc.Content = stt // empty (not drawn)
+		md.equipPager.SetBox(&ui.Box{Title: stt.WithTextf("%s (ugprade)", ej.Name)})
+		md.equipPager.SetLines(stt.WithText(rj.UpgradeDesc(ei)).Format(UIWidth/2 - 1 - 2).Lines())
 	case *Comestible:
-		l.Box.Title = ui.Textf("%s (replace)", ej.Name)
-		l.Content = stt.WithText(rj.Desc()).Format(UIWidth/2 - 1 - 2)
+		md.desc.Box = &ui.Box{Title: stt.WithTextf("%s (replace)", ej.Name)}
+		md.desc.Content = stt.WithText(rj.Desc()).Format(UIWidth/2 - 1 - 2)
 		if ri, ok := ei.Role.(*Comestible); ok {
-			md.equipLabel.Box = &ui.Box{Title: ui.Textf("%s (ground)", ei.Name)}
-			md.equipLabel.Content = stt.WithText(ri.Desc()).Format(UIWidth/2 - 1 - 2)
+			md.equipPager.SetBox(&ui.Box{Title: stt.WithTextf("%s (ground)", ei.Name)})
+			md.equipPager.SetLines(stt.WithText(ri.Desc()).Format(UIWidth/2 - 1 - 2).Lines())
 		}
 	default:
 		// Empty slot: should only happen with a spirit.
 		if ri, ok := ei.Role.(*Spirit); ok {
-			l.Content = stt.WithText("@MThe spirit on the ground can be equipped on this empty slot.@N").Format(UIWidth/2 - 1 - 2)
-			md.equipLabel.Box = &ui.Box{Title: ui.Textf("%s (ground)", ei.Name)}
-			md.equipLabel.Content = stt.WithText(ri.Desc()).Format(UIWidth/2 - 1 - 2)
+			md.desc.Box = &ui.Box{Title: stt.WithText(ej.Name)}
+			s := "@MThe spirit on the ground can be equipped on this empty slot.@N"
+			md.desc.Content = stt.WithText(s).Format(UIWidth/2 - 1 - 2)
+			md.equipPager.SetBox(&ui.Box{Title: stt.WithTextf("%s (ground)", ei.Name)})
+			md.equipPager.SetLines(stt.WithText(ri.Desc()).Format(UIWidth/2 - 1 - 2).Lines())
 		}
 	}
 }

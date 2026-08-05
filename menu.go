@@ -43,6 +43,24 @@ func (md *model) updateMenu(msg gruid.Msg) {
 }
 
 func (md *model) updateMainMenu(msg gruid.Msg) {
+	if md.menu.mode == modeEquip {
+		// When equipping, send scrolling messages to the pager instead
+		// of the menu.
+		switch msg := msg.(type) {
+		case gruid.MsgKeyDown:
+			if msg.Key == gruid.KeyPageDown || msg.Key == gruid.KeyPageUp {
+				md.equipPager.Update(msg)
+				return
+			}
+		case gruid.MsgMouse:
+			if msg.Action == gruid.MouseWheelDown || msg.Action == gruid.MouseWheelUp {
+				msg.P.X = 0
+				msg.P.Y = 0
+				md.equipPager.Update(msg)
+				return
+			}
+		}
+	}
 	md.menu.main.Update(msg)
 	switch act := md.menu.main.Action(); act {
 	case ui.MenuQuit:

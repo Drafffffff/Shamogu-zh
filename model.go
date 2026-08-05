@@ -70,7 +70,7 @@ type model struct {
 	anims          Animations // animations
 	auto           *auto      // auto-travel mode info
 	desc           *ui.Label  // description label (for monsters, terrain)
-	equipLabel     *ui.Label  // description label for equipping item
+	equipPager     *ui.Pager  // description pager for equipping item
 	gameEnded      bool       // whether the game ended
 	drawGroundDesc bool       // whether to draw extra equipping desc
 	g              *Game      // game state
@@ -137,8 +137,10 @@ func (md *model) initWidgets() {
 	md.log = ui.NewLabel(ui.StyledText{}.WithMarkups(Markups))
 	md.desc = ui.NewLabel(ui.StyledText{}.WithMarkups(Markups))
 	md.desc.AdjustWidth = false
-	md.equipLabel = ui.NewLabel(ui.StyledText{}.WithMarkups(Markups))
-	md.equipLabel.AdjustWidth = false
+	md.equipPager = ui.NewPager(ui.PagerConfig{
+		Grid: gruid.NewGrid(UIWidth/2, UIHeight-1),
+		Box:  &ui.Box{},
+	})
 	md.pager = &pager{}
 	md.pager.pg = ui.NewPager(ui.PagerConfig{
 		Grid: gruid.NewGrid(UIWidth, UIHeight-1),

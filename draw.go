@@ -637,16 +637,17 @@ func drawGamePicture(gd gruid.Grid) {
 func (md *model) drawInventory() {
 	menugd := md.menu.main.Draw()
 	md.gd.Copy(menugd)
-	if md.desc.Content.Text() == "" {
-		return
+	var y int
+	if md.desc.Content.Text() != "" && (md.menu.mode != modeEquip || md.drawGroundDesc) {
+		descgd := md.desc.Draw(md.gd.Slice(md.gd.Range().Columns(UIWidth/2, UIWidth)))
+		y = descgd.Size().Y
 	}
-	descgd := md.desc.Draw(md.gd.Slice(md.gd.Range().Columns(UIWidth/2, UIWidth)))
-	if md.menu.mode != modeEquip || !md.drawGroundDesc {
+	if md.menu.mode != modeEquip {
 		return
 	}
 	// We draw the description of the item on the ground below the other
-	// one, unless we use it to upgrade (then description doesn't matter).
-	md.equipLabel.Draw(md.gd.Slice(gruid.NewRange(UIWidth/2, descgd.Size().Y, UIWidth, UIHeight-1)))
+	// one (if any).
+	md.gd.Slice(gruid.NewRange(UIWidth/2, y, UIWidth, UIHeight-1)).Copy(md.equipPager.Draw())
 }
 
 func (md *model) drawKeySettings() {
