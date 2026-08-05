@@ -193,11 +193,11 @@ type EffectClarityLeaves struct{}
 func (eff EffectClarityLeaves) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	var hpstr string
-	if g.Mod(ModHealingCombat) {
-		hpstr = ""
-	} else if pa.Has(StatusBerserk) {
+	switch {
+	case g.Mod(ModHealingCombat):
+	case pa.Has(StatusBerserk):
 		hpstr = newHPWithoutBonus(pa, 1, HealClarityLeaves)
-	} else {
+	default:
 		hpstr = newHPMsg(pa, HealClarityLeaves)
 	}
 	extraTurns := pa.Statuses[StatusClarity]
@@ -230,11 +230,11 @@ type EffectFoggySkinOnion struct{}
 func (eff EffectFoggySkinOnion) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	var hpstr string
-	if g.Mod(ModHealingCombat) {
-		hpstr = ""
-	} else if pa.Has(StatusLignification) {
+	switch {
+	case g.Mod(ModHealingCombat):
+	case pa.Has(StatusLignification):
 		hpstr = newHPWithoutBonus(pa, 3, HealFoggySkinOnion)
-	} else {
+	default:
 		hpstr = newHPMsg(pa, HealFoggySkinOnion)
 	}
 	extraTurns := pa.Statuses[StatusFoggySkin]
@@ -257,9 +257,7 @@ func (eff EffectFirebreathPepper) Apply(g *Game) bool {
 	pp := g.PP()
 	pa := g.PlayerActor()
 	var hpstr string
-	if g.Mod(ModHealingCombat) {
-		hpstr = ""
-	} else {
+	if !g.Mod(ModHealingCombat) {
 		hpstr = newHPMsg(pa, HealFirebreathPepper)
 	}
 	g.eatMsg("firebreath pepper", hpstr)
