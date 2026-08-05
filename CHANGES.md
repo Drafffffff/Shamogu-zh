@@ -28,6 +28,7 @@ Corrupted dungeon improvements:
 * Only 3/4 chance of relief comestible in warp, berserk and lignification thematic levels (see #11).
 * Rarely spawn lone golem or wasp guardian (see #11).
 * New rare spooky level with empty totem, runes and menhirs (see #11).
+* New rare footstep-themed level (see #11).
 * New kind of map corruption that performs wall-thickening (see #11).
 * New kind of rare map corruption that reduces size of the natural cave
   (excluding vaults) to about half, but adds extra tunnels to vaults (see #11).
