@@ -75,16 +75,8 @@ func newHPMsg(a *Actor, hp int) string {
 	return fmt.Sprintf("%d/%d", max(0, min(a.GetMaxHP(), a.HP+hp)), a.GetMaxHP())
 }
 
-// newHPMsg is like newHPMsg but returns an empty string if noheal is true.
-func (g *Game) newHPMsg(a *Actor, hp int) string {
-	if g.Mod(ModHealingCombat) {
-		return ""
-	}
-	return newHPMsg(a, hp)
-}
-
-// healMsg returns an HP restoring description for the given amount if healing
-// is not disabled.
+// healMsg returns an HP restoring description for the given amount if Healing
+// Combat is not enabled.
 func (g *Game) healMsg(amount int) string {
 	if g.Mod(ModHealingCombat) {
 		return ""
@@ -264,7 +256,13 @@ type EffectFirebreathPepper struct{}
 func (eff EffectFirebreathPepper) Apply(g *Game) bool {
 	pp := g.PP()
 	pa := g.PlayerActor()
-	g.eatMsg("firebreath pepper", g.newHPMsg(pa, HealFirebreathPepper))
+	var hpstr string
+	if g.Mod(ModHealingCombat) {
+		hpstr = ""
+	} else {
+		hpstr = newHPMsg(pa, HealFirebreathPepper)
+	}
+	g.eatMsg("firebreath pepper", hpstr)
 	g.MakeNoise(pp, NoiseRoar)
 	if !g.Mod(ModHealingCombat) {
 		g.healPlayer(pa, HealFirebreathPepper)
