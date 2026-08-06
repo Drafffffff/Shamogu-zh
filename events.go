@@ -1018,21 +1018,35 @@ func (eff EffectRunethornRose) Apply(g *Game) bool {
 	for i := -1; i <= 1; i += 2 {
 		for j := -1; j <= 1; j += 2 {
 			q := pp
+			cont := true
 			for range 2 {
 				q = q.Shift(i, j)
-				if g.Map.Terrain.At(q) != Floor {
-					break
+				cont = cont && g.validRunePlace(q)
+				if !cont {
+					size := g.Map.Terrain.Size()
+					for !g.validRunePlace(q) {
+						q = gruid.Point{g.rand.IntN(size.X), g.rand.IntN(size.Y)}
+					}
 				}
 				_, e := g.genRunicTrapAt(t, q)
-				e.Seen = true
+				e.Seen = cont
 			}
 		}
 	}
 	return true
 }
 
+func (g *Game) validRunePlace(p gruid.Point) bool {
+	m := g.Map
+	if m.Terrain.At(p) != Floor || m.RuneCache.At(p) > 0 {
+		return false
+	}
+	i, _ := g.ItemAt(p)
+	return i < 0
+}
+
 func (eff EffectRunethornRose) Desc(g *Game) string {
-	return "Eat only if you standing on a runic trap. Add runes of the same type at the diagonals, extending for up to two runes."
+	return "Eat only if you standing on a runic trap. Create 8 runes of its type: up to two at each diagonal, or randomly around the map."
 }
 
 type EffectVanishingSnail struct{}
