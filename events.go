@@ -1028,8 +1028,8 @@ func (eff EffectRunethornRose) Apply(g *Game) bool {
 						q = gruid.Point{g.rand.IntN(size.X), g.rand.IntN(size.Y)}
 					}
 				}
-				_, e := g.genRunicTrapAt(t, q)
-				e.Seen = cont
+				i, _ := g.genRunicTrapAt(t, q)
+				g.SenseEntity(i, "sense")
 			}
 		}
 	}
