@@ -224,7 +224,7 @@ func (c *Comestible) ExamineDesc(g *Game) string {
 func (c *Comestible) Use(g *Game, i ID) bool {
 	ef := c.Effect
 	et, cond := ef.(ConditionalComestible)
-	if cond && !g.PlayerActor().DoesAny(Gluttony) && !et.CanApply(g, i) {
+	if cond && !g.snack && !g.PlayerActor().DoesAny(Gluttony) && !et.CanApply(g, i) {
 		g.Log(CantEatMsg(ef))
 		return false
 	}

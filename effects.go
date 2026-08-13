@@ -922,8 +922,8 @@ func (eff EffectSnack) Apply(g *Game) bool {
 	g.MoveActor(PlayerID, pa, to, MovTeleport)
 	g.UpdateFOV()
 	g.UpdateKnowledge()
-	if !eff.NoGluttonyStatus {
-		// Eating a snack doesn't trigger gluttony.
+	if !eff.NoGluttonyStatus || g.Mod(ModTotemConditions) {
+		// Eating a snack doesn't trigger gluttony, and bypasses conditions.
 		g.snack = true
 		defer func() { g.snack = false }()
 	}
