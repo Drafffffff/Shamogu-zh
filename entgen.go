@@ -257,10 +257,6 @@ var challengeSpirits = []spiritInfo{
 
 // spiritEntity generates a new spirit entity using the given data.
 func spiritEntity(mods []bool, si spiritInfo) *Entity {
-	if HasMod(mods, ModGluttonyRework) && si.BonusTraits[0].Any(Gluttony) {
-		snack := EffectSnack{NoGluttonyStatus: true}
-		si.Ability[0], si.Ability[1] = snack, snack
-	}
 	if HasMod(mods, ModHealingCombat) {
 		if _, ok := si.Ability[0].(EffectVampirism); ok {
 			si.MaxCharges[0]++

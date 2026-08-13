@@ -895,7 +895,7 @@ func (eff EffectShadows) Desc(_ *Game) string {
 		DurationShadow, statusDesc[StatusShadow])
 }
 
-type EffectSnack struct{ NoGluttonyStatus bool }
+type EffectSnack struct{}
 
 func (eff EffectSnack) Apply(g *Game) bool {
 	pa := g.PlayerActor()
@@ -922,11 +922,8 @@ func (eff EffectSnack) Apply(g *Game) bool {
 	g.MoveActor(PlayerID, pa, to, MovTeleport)
 	g.UpdateFOV()
 	g.UpdateKnowledge()
-	if !eff.NoGluttonyStatus || g.Mod(ModTotemConditions) {
-		// Eating a snack doesn't trigger gluttony, and bypasses conditions.
-		g.snack = true
-		defer func() { g.snack = false }()
-	}
+	g.snack = true
+	defer func() { g.snack = false }()
 	return ci.Use(g, i)
 }
 
@@ -934,9 +931,9 @@ func (eff EffectSnack) Name() string {
 	return "snack"
 }
 
-func (eff EffectSnack) Desc(_ *Game) string {
+func (eff EffectSnack) Desc(g *Game) string {
 	desc := "You teleport to the nearest comestible, if any, and eat it."
-	if eff.NoGluttonyStatus {
+	if g.Mod(ModGluttonyRework) {
 		return desc
 	}
 	return desc + " It doesn’t trigger @BGluttony@N."
