@@ -1117,7 +1117,9 @@ func (g *Game) nearestBeanTarget(allowNone bool) gruid.Point {
 		if i, it := g.ItemAt(p); i >= 0 {
 			switch it.(type) {
 			case *Spirit, *EmptyTotem, *Menhir, *Portal, *CorruptionOrb:
-				return p
+				if i, ai := g.ActorAt(p); i < 0 || !ai.ResistsMove() {
+					return p
+				}
 			}
 		}
 		p = p.Add(g.Dir)
@@ -1129,18 +1131,26 @@ func (g *Game) nearestBeanTarget(allowNone bool) gruid.Point {
 }
 
 func (eff EffectWarpingBean) CanApply(g *Game, i ID) bool {
+	if g.PlayerActor().ResistsMove() {
+		return false
+	}
 	return g.nearestBeanTarget(false) != InvalidPos
 }
 
 func (eff EffectWarpingBean) Apply(g *Game) bool {
 	g.eatMsg("warping bean", "")
-	p := g.nearestBeanTarget(true)
-	g.MoveActor(PlayerID, g.PlayerActor(), p, MovTeleport)
+	to := g.nearestBeanTarget(true)
+	for p := g.PP().Add(g.Dir); p != to; p = p.Add(g.Dir) {
+		if i, ai := g.ActorAt(p); i >= 0 {
+			g.TeleportActor(i, ai, 0)
+		}
+	}
+	g.MoveActor(PlayerID, g.PlayerActor(), to, MovTeleport)
 	return true
 }
 
 func (eff EffectWarpingBean) Desc(g *Game) string {
-	return "Eat only if you see a totem, menhir, portal, or orb directly in front of you. Warp to the nearest one, exchanging places with any monster on it."
+	return "Eat only if you see a totem, menhir, portal, or orb directly in front of you and not blocked by a woody monster. Warp to the nearest one, teleporting away monsters on the way to it."
 }
 
 type EffectSeeingPotato struct{}
