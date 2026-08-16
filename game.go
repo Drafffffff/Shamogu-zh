@@ -167,7 +167,7 @@ func (g *Game) HandleTurnCount() {
 		}
 		g.WarningPrompt()
 	case 1000:
-		g.LogStyled("You've been found by the dungeon core!", logSpecial)
+		g.LogStyled("You’ve been found by the dungeon core!", logSpecial)
 		g.StoryLog("Found by the dungeon core!")
 		g.WarningPrompt()
 		g.genMonster(BlazingGolem)
