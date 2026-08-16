@@ -731,9 +731,9 @@ func (cond CondDisabled) Desc() string {
 	case HasInvoke:
 		return "This spirit cannot be invoked"
 	case HasStats:
-		return "This spirit doesn't affect your Attack, Defense, or max HP"
+		return "This spirit doesn’t affect your Attack, Defense, or max HP"
 	case HasTraits:
-		return "This spirit's special traits don't apply"
+		return "This spirit’s special traits don’t apply"
 	case HasAll:
 		return "This spirit has no effect"
 	case HasPassives:
@@ -1161,7 +1161,7 @@ func (eff EffectSeeingPotato) CanApply(g *Game, i ID) bool {
 }
 
 func (eff EffectSeeingPotato) Apply(g *Game) bool {
-	g.eatMsg("seeing potato's stalk", "")
+	g.eatMsg("seeing potato’s stalk", "")
 	const maxdist = 2 * MaxFOVRange
 	mp := &MappingPath{passable: func(p gruid.Point) bool { return inMap(p) }}
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, maxdist)
@@ -1247,11 +1247,11 @@ func (eff EffectTrickyChestnut) Desc(g *Game) string {
 func CantEatMsg(ef Effect) string {
 	switch ef.(type) {
 	case EffectSlipperyPea, EffectVanishingSnail, EffectWarpingBean:
-		return "You can't grab it!"
+		return "You can’t grab it!"
 	case EffectFortressOyster, EffectTunnellingAcorn, EffectTrickyChestnut:
-		return "It won't open!"
+		return "It won’t open!"
 	case EffectRunethornRose:
-		return "You can't get past its thorns!"
+		return "You can’t get past its thorns!"
 	case EffectSeeingPotato:
 		return "It has to be planted in the ground!"
 	default:
