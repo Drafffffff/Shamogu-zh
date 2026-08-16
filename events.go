@@ -628,6 +628,7 @@ const (
 	HasStats
 	HasTraits
 	HasPassives = HasStats | HasTraits
+	HasInvStats = HasInvoke | HasStats
 	HasAll      = HasInvoke | HasPassives
 )
 
@@ -732,6 +733,8 @@ func (cond CondDisabled) Desc() string {
 		return "This spirit cannot be invoked"
 	case HasStats:
 		return "This spirit doesn’t affect your Attack, Defense, or max HP"
+	case HasInvStats:
+		return "This spirit can’t be invoked and doesn’t affect your Attack, Defense, or max HP"
 	case HasTraits:
 		return "This spirit’s special traits don’t apply"
 	case HasAll:
@@ -923,9 +926,9 @@ func (g *Game) GenConditions() []*SpiritCond {
 		case 4:
 			cs[i] = CondU(OnStatus(rqDischargeAll, StatusImbalance), Gets(StatusImbalance, LashingFrog, RampagingBoar))
 		case 5:
-			cs[i] = DisU(HasAll, WatchTwoStatus{A: StatusConfusion, B: StatusImbalance})
+			cs[i] = DisU(HasInvStats, WatchTwoStatus{A: StatusConfusion, B: StatusImbalance})
 		case 6:
-			cs[i] = DisU(HasAll, WatchTwoStatus{A: StatusLignification, B: StatusFear})
+			cs[i] = DisU(HasInvStats, WatchTwoStatus{A: StatusLignification, B: StatusFear})
 		}
 	}
 	if g.IntN(3) == 0 {
