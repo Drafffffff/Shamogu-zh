@@ -732,13 +732,13 @@ func (cond CondDisabled) Desc() string {
 	case HasInvoke:
 		return "This spirit cannot be invoked"
 	case HasStats:
-		return "This spirit doesn’t affect your Attack, Defense, or max HP"
+		return "This spirit doesn’t affect your Stats"
 	case HasInvStats:
-		return "This spirit can’t be invoked and doesn’t affect your Attack, Defense, or max HP"
+		return "This spirit can’t be invoked and doesn’t affect your Stats"
 	case HasTraits:
-		return "This spirit’s special traits don’t apply"
+		return "This spirit’s Traits don’t apply" // unused
 	case HasAll:
-		return "This spirit has no effect"
+		return "This spirit has no effect" // unused
 	case HasPassives:
 		return "This spirit can be invoked but has no other effects"
 	default:
