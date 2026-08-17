@@ -554,7 +554,7 @@ func (g *Game) genItems(mg *MapGen) {
 			return TeleportMushroom
 		}
 	}
-	if g.Mod(ModCorruptedDungeon) && mg.theme == ThemeNone && g.IntN(3*MapLevels) == 0 {
+	if g.Mod(ModCorruptedDungeon) && mg.theme == ThemeNone && g.IntN(4*MapLevels) == 0 {
 		if g.IntN(2) == 0 {
 			// Field of comestibles of same kind.
 			cod := (g.GetComestibleData())[comestibleIdx()]
@@ -1055,13 +1055,50 @@ func (g *Game) genMonsters(mg *MapGen) {
 		if g.Map.Level >= 4 && g.Map.Level < MapLevels && g.IntN(5*4) == 0 {
 			switch g.IntN(4) {
 			case 0:
-				// Rare level with many imps.
-				for range nE*2 + nM*2 + nL*3 {
-					g.genMonster(NoisyImp)
+				impPatrol := func(mk ActorKind) {
+					p := g.RandomWaypoint()
+					ps := append(g.patrolPointCandidates(p), p)
+					ps = ps[:min(len(ps), 2+g.IntN(2))]
+					g.genMonsterPatroller(mk, ps)
+					g.genMonsterPatroller(NoisyImp, ps)
+					g.genMonsterPatroller(NoisyImp, ps)
+				}
+				// Rare level with many imps and different
+				// possible behaviors.
+				switch g.IntN(4) {
+				case 0:
+					// Patrolling imp+imp+(butterfly|nadre) trio.
+					mk := g.randMonsKind([]ActorKind{BlinkButterfly, ExplodingNadre})
+					for range (1 + nE + nM + nL) / 2 {
+						impPatrol(mk)
+					}
+				case 1:
+					// Patrolling imp+imp+bat trio.
+					for range (1 + nE + nM + nL) / 2 {
+						impPatrol(ChaosMegabat)
+					}
+				default:
+					// Wandering imps in great numbers.
+					for range nE*2 + nM*2 + nL*3 {
+						g.genMonster(NoisyImp)
+					}
 				}
 			case 1:
 				// Rare spooky level with no remaining
 				// wandering monsters with no drawback!
+			case 2:
+				// Rare level where all remaining monsters
+				// become patrolling pairs between random
+				// waypoints.
+				for range (1 + nE) / 2 {
+					g.placeRandomPatrollers(g.randMonsKind(monsEarly), g.RandomWaypoint(), 2)
+				}
+				for range nM / 2 {
+					g.placeRandomPatrollers(g.randMonsKind(monsMid), g.RandomWaypoint(), 2)
+				}
+				for range (1 + nL) / 2 {
+					g.placeRandomPatrollers(g.randMonsKind(monsLate), g.RandomWaypoint(), 2)
+				}
 			default:
 				// Rare level where all remaining monsters
 				// become guardians scattered around.
@@ -1367,7 +1404,7 @@ func (g *Game) genGuardians(nE, nM, nL int) (int, int, int) {
 
 // placeRandomPatrollers places n monsters with (various) patrolling behaviors
 // chosen at random. NOTE: with chaos megabat in mind only for now (and
-// alternate corruptions).
+// some special corruptions).
 func (g *Game) placeRandomPatrollers(mk ActorKind, p gruid.Point, n int) {
 	ps := g.patrolPointCandidates(p)
 	k := g.IntN(4)

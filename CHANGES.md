@@ -20,21 +20,23 @@ Reworked and improved content:
 * Slightly tweaked down occurrence chance for alligators with respect to golems
   (see #18).
 
-Corrupted dungeon improvements:
+Corrupted dungeon improvements (see discussion in #11):
 
 * Monster nests now scale with map level and happen less
   often early on, to make (very) rare cases that could feel a bit too unfair
   even rarer (see #18).
-* Only 3/4 chance of relief comestible in warp, berserk and lignification thematic levels (see #11).
-* Rarely spawn lone golem or wasp guardian (see #11).
-* New rare spooky level with empty totem, runes and menhirs (see #11).
-* New rare footstep-themed level (see #11).
-* New kind of map corruption that performs wall-thickening (see #11).
+* Only 3/4 chance of relief comestible in warp, berserk and lignification thematic levels.
+* Rarely spawn lone golem or wasp guardian.
+* New rare spooky level with empty totem, runes and menhirs.
+* New rare footstep-themed level.
+* New kind of map corruption that performs wall-thickening.
 * New kind of rare map corruption that reduces size of the natural cave
-  (excluding vaults) to about half, but adds extra tunnels to vaults (see #11).
-* New rare variations of alternative guardians (see #11).
+  (excluding vaults) to about half, but adds extra tunnels to vaults.
+* New rare variations of alternative guardians.
+* New variant of rare imp levels with patrolling trios with 2 imps and another
+  frail mid-level monster, so that imp levels feel less the same.
 * Lower a bit frequency for various corruptions, in part to compensate for new
-  ones (see #11).
+  ones.
 
 UI, graphics, QoL:
 
