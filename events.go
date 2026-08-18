@@ -942,35 +942,6 @@ type ConditionalComestible interface {
 	CanApply(*Game, ID) bool
 }
 
-type EffectSlipperyPea struct{}
-
-func (eff EffectSlipperyPea) CanApply(g *Game, i ID) bool {
-	count := 0
-	for _, turns := range g.PlayerActor().Statuses {
-		if turns > 0 {
-			count++
-		}
-	}
-	return count >= 2
-}
-
-func (eff EffectSlipperyPea) Apply(g *Game) bool {
-	pa := g.PlayerActor()
-	g.eatMsg("slippery pea", "")
-	for i := range pa.Statuses {
-		pa.Statuses[i] = 0
-	}
-	pa.HP = min(pa.HP, pa.GetMaxHP())
-	g.PutStatus1(PlayerID, pa, StatusClarity, DurationSprint)
-	g.PutStatus1(PlayerID, pa, StatusSprint, DurationSprint)
-	return true
-}
-
-func (eff EffectSlipperyPea) Desc(g *Game) string {
-	return fmt.Sprintf("Eat only if you currently have at least 2 statuses. Removes all your statuses without the usual effects, then makes you @BClear-Minded@N and @BSprinting@N and for %d turns.",
-		DurationSprint)
-}
-
 type EffectFortressOyster struct{}
 
 func (eff EffectFortressOyster) CanApply(g *Game, i ID) bool {
@@ -1114,46 +1085,45 @@ func (eff EffectTunnellingAcorn) Desc(g *Game) string {
 
 type EffectWarpingBean struct{}
 
-func (g *Game) nearestBeanTarget(allowNone bool) gruid.Point {
-	p := g.PP().Add(g.Dir)
-	for inMap(p) && g.InFOV(p) {
-		if i, it := g.ItemAt(p); i >= 0 {
-			switch it.(type) {
-			case *Spirit, *EmptyTotem, *Menhir, *Portal, *CorruptionOrb:
-				if i, ai := g.ActorAt(p); i < 0 || !ai.ResistsMove() {
-					return p
-				}
-			}
-		}
-		p = p.Add(g.Dir)
-	}
-	if allowNone {
-		return p.Sub(g.Dir)
-	}
-	return InvalidPos
-}
-
 func (eff EffectWarpingBean) CanApply(g *Game, i ID) bool {
-	if g.PlayerActor().ResistsMove() {
-		return false
-	}
-	return g.nearestBeanTarget(false) != InvalidPos
+	s := g.PlayerActor().Statuses
+	return s.Has(StatusLignification) || s.Has(StatusDaze) || s.Has(StatusPoison)
 }
 
 func (eff EffectWarpingBean) Apply(g *Game) bool {
+	pa := g.PlayerActor()
 	g.eatMsg("warping bean", "")
-	to := g.nearestBeanTarget(true)
-	for p := g.PP().Add(g.Dir); p != to; p = p.Add(g.Dir) {
-		if i, ai := g.ActorAt(p); i >= 0 {
-			g.TeleportActor(i, ai, 0)
+	for i := range pa.Statuses {
+		pa.Statuses[i] = 0
+	}
+	pa.HP = min(pa.HP, pa.GetMaxHP())
+	g.UpdateFOV() // in case the bear teleported or warped first
+	r := g.MaxFOVRange()
+	pp := g.PP()
+	var ps []gruid.Point
+	dist := -1
+	for _, p := range g.Map.FOVPts {
+		if paths.DistanceManhattan(p, pp) > r || p == pp {
+			continue
+		}
+		if d, ok := g.Map.FOV.At(p); ok && d <= r && g.IsFree(p) {
+			if d > dist {
+				dist = d
+				ps = []gruid.Point{p}
+			} else if d == dist {
+				ps = append(ps, p)
+			}
 		}
 	}
-	g.MoveActor(PlayerID, g.PlayerActor(), to, MovTeleport)
+	if dist > 0 {
+		to := ps[g.IntN(len(ps))]
+		g.MoveActor(PlayerID, pa, to, MovTeleport)
+	}
 	return true
 }
 
 func (eff EffectWarpingBean) Desc(g *Game) string {
-	return "Eat only if you see a totem, menhir, portal, or orb directly in front of you and not blocked by a woody monster. Warp to the nearest one, teleporting away monsters on the way to it."
+	return "Eat only if you are @BLignified@N, @BDazed@N, or @BPoisoned@N. Removes all your statuses without the usual effects, then warps you to one of the furthest tiles in your view."
 }
 
 type EffectSeeingPotato struct{}
@@ -1249,7 +1219,7 @@ func (eff EffectTrickyChestnut) Desc(g *Game) string {
 
 func CantEatMsg(ef Effect) string {
 	switch ef.(type) {
-	case EffectSlipperyPea, EffectVanishingSnail, EffectWarpingBean:
+	case EffectVanishingSnail, EffectWarpingBean:
 		return "You can’t grab it!"
 	case EffectFortressOyster, EffectTunnellingAcorn, EffectTrickyChestnut:
 		return "It won’t open!"
@@ -1263,7 +1233,6 @@ func CantEatMsg(ef Effect) string {
 }
 
 var CondComs = []itemInfo{
-	{"slippery pea", EffectSlipperyPea{}},
 	{"fortress oyster", EffectFortressOyster{}},
 	{"runethorn rose", EffectRunethornRose{}},
 	{"vanishing snail", EffectVanishingSnail{}},
