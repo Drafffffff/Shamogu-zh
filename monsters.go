@@ -78,15 +78,14 @@ func (g *Game) HandleMonsterTurn(i ID, ai *Actor) {
 // monster, instead of their normal action. It reports whether such an attack
 // was performed.
 func (g *Game) monsterDiscord(i ID, ai *Actor) bool {
-	if ai.Has(StatusFear) {
-		return false
-	}
+	afraid := ai.afraid()
 	ei := g.Entity(i)
 	var ids []ID
 	var actors []*Actor
 	for p := range Neighbors(ei.P) {
 		if j, aj := g.ActorAt(p); j >= 0 {
-			if j == PlayerID && ai.Behavior.State == Wandering && g.PlayerIsHidden() {
+			if j == PlayerID && (ai.Behavior.State == Hunting && afraid ||
+				ai.Behavior.State == Wandering && g.PlayerIsHidden()) {
 				continue
 			}
 			ids = append(ids, j)
@@ -121,7 +120,7 @@ func (g *Game) monsterBumpDisoriented(i ID, ai *Actor) bool {
 	to := ei.P.Add(g.Dir.Mul(-1)) // redirection target due to disorientation
 	if to == pl.P || paths.DistanceManhattan(pl.P, to) < paths.DistanceManhattan(pl.P, ei.P) &&
 		g.ActorInRange(ei.P, pl.P) == PlayerID {
-		if ai.Has(StatusFear) || (ai.Is(NoisyImp) && !ai.Has(StatusBerserk)) {
+		if ai.afraid() {
 			// The disoriented and afraid monster loses a turn when
 			// it wants to go toward the player.
 			return true
@@ -332,7 +331,7 @@ func (g *Game) monsterBumpNext(i ID, ai *Actor) {
 // a straight direction from the player, they'll flee randomly in a direction
 // that avoids them (if any is free). Reports whether turn is finished.
 func (g *Game) monsterFlee(i ID, ai *Actor) bool {
-	if !ai.Has(StatusFear) && (!ai.Is(NoisyImp) || ai.Has(StatusBerserk)) {
+	if !ai.afraid() {
 		return false
 	}
 	ei, pl := g.Entity(i), g.PlayerEntity()
@@ -371,6 +370,11 @@ func (g *Game) monsterFlee(i ID, ai *Actor) bool {
 	}
 	g.BumpMoveActor(i, ai, to)
 	return true
+}
+
+// afraid reports whether the monster actor avoids fighting the player.
+func (a *Actor) afraid() bool {
+	return a.Has(StatusFear) || a.Is(NoisyImp) && !a.Has(StatusBerserk)
 }
 
 // HungryHunt reports whether the player is within a hungry hunt's range.

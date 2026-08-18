@@ -279,7 +279,7 @@ func (g *Game) TraitDesc(ak ActorKind, t Traits) string {
 	case HungryRat:
 		desc = append(desc, "hunts you by smell, becomes berserk if you eat in view")
 	case NoisyImp:
-		desc = append(desc, "plays guitar for you, avoids fights")
+		desc = append(desc, "plays guitar for you, afraid of you")
 	case WalkingMushroom:
 		desc = append(desc, "releases @Blignifying@N spores on sight")
 	case WalkingTree:
@@ -588,7 +588,7 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 			return false
 		}
 	case StatusFear:
-		if ai.Has(StatusBerserk) || ai.DoesAny(ImmunityFear) {
+		if ai.Has(StatusBerserk) || ai.DoesAny(ImmunityFear) || ai.Is(NoisyImp) {
 			return false
 		}
 		if ai.DoesAny(ResistanceFear) {

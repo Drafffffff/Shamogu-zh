@@ -19,6 +19,9 @@ Reworked and improved content:
   tiles to make it a bit more significant for small noises.
 * Slightly tweaked down occurrence chance for alligators with respect to golems
   (see #18).
+* Now the noisy imp behaves as if afraid of you even when confused. Also,
+  afraid and confused monsters now can hit nearby monsters despite the fear, as
+  they are only afraid from the player.
 
 Corrupted dungeon improvements (see discussion in #11):
 
