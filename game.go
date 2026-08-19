@@ -81,7 +81,6 @@ func (g *Game) Init(spe *Entity) {
 	g.PR = paths.NewPathRange(gruid.NewRange(0, 0, MapWidth, MapHeight))
 	g.PRnoise = paths.NewPathRange(gruid.NewRange(0, 0, MapWidth, MapHeight))
 	g.Dir = gruid.Point{1, 0}
-	g.CorruptionTurn = 50 + g.IntN(250)
 	g.InitPlayer(spe)
 }
 
@@ -92,6 +91,9 @@ func (g *Game) InitLevel() {
 	g.ResetKnowledge()
 	g.UpdateFOV()
 	g.UpdateKnowledge()
+	if g.Mod(ModCorruptedDungeon) {
+		g.CorruptionTurn = g.Turn + 25 + g.IntN(250)
+	}
 }
 
 // EndTurn processes everything that happens between the end of last player's
@@ -153,10 +155,10 @@ func (g *Game) EndTurn() {
 // HandleTurnCount() increments the turn count and handles watching.
 func (g *Game) HandleTurnCount() {
 	g.IncrTurn()
-	if g.Mod(ModCorruptedDungeon) && g.Turn >= g.CorruptionTurn {
-		g.handleCorruptionEvent()
-	}
 	nmt := g.Stats.MapTurns[g.Map.Level-1]
+	if g.Mod(ModCorruptedDungeon) && g.Turn >= g.CorruptionTurn {
+		g.handleCorruptionEvent(nmt)
+	}
 	switch nmt {
 	case 950:
 		g.LogStyled("You feel a presence searching for intruders.", logSpecial)
@@ -178,11 +180,14 @@ func (g *Game) HandleTurnCount() {
 
 // handleCorruptionEvent handles a corruption event for the corrupted dungeon
 // mod.
-func (g *Game) handleCorruptionEvent() {
+func (g *Game) handleCorruptionEvent(nmt int) {
 	log := false
-	g.CorruptionTurn = g.Turn + 25 + g.IntN(300)
-	switch g.IntN(10) {
-	case 0:
+	// Set next turn for next corruption event. Less likely as time passes
+	// in the same map level.
+	g.CorruptionTurn = g.Turn + 25 + g.IntN(250+nmt/3)
+	switch {
+	case g.IntN(max(100, nmt/2)) < 10:
+		// Fog level. Chance decreases with number of map turns.
 		log = true
 		g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
 			if g.InFOV(p) {
@@ -206,6 +211,7 @@ func (g *Game) handleCorruptionEvent() {
 			return t
 		})
 	default:
+		// Minor map corruptions.
 		g.Map.Terrain.Map(func(p gruid.Point, t rl.Cell) rl.Cell {
 			inFOV := g.InFOV(p)
 			if g.IntN(160) > 0 && (!inFOV || g.IntN(40) > 0) {
