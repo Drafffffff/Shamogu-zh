@@ -112,7 +112,7 @@ func (e *Entity) Item() Item {
 }
 
 // Text returns short text for the entity, for one-line display purposes.
-func (e *Entity) TextWarn(g *Game) string {
+func (e *Entity) TextWarn(g *Game, id ID) string {
 	switch r := e.Role.(type) {
 	case *Spirit:
 		f := "%s (%s %d/%d)"
@@ -124,19 +124,24 @@ func (e *Entity) TextWarn(g *Game) string {
 		}
 		return fmt.Sprintf(f, e.Name, r.Ability[r.Level].Name(), r.Charges, r.MaxCharges[r.Level])
 	case *Comestible:
-		if g != nil && g.WarnComestible(r) {
-			// Comestible will cause a spirit to leave
-			return fmt.Sprintf("@M%s@N", e.Name)
-		} else {
+		if g == nil {
 			return e.Name
 		}
+		co, cond := r.Effect.(ConditionalComestible)
+		if cond && !g.PlayerActor().DoesAny(Gluttony) && !co.CanApply(g, id) {
+			return fmt.Sprintf("@S%s@N", e.Name)
+		} else if g.WarnComestible(r) {
+			// Comestible will cause a spirit to leave
+			return fmt.Sprintf("@M%s@N", e.Name)
+		}
+		return e.Name
 	default:
 		return e.Name
 	}
 }
 
 func (e *Entity) Text() string {
-	return e.TextWarn(nil)
+	return e.TextWarn(nil, -1)
 }
 
 // movementKind represents various kinds of movement.

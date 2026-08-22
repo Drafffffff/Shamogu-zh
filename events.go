@@ -155,12 +155,10 @@ func (g *Game) willHeal(c *Comestible) bool {
 	switch c.Effect.(type) {
 	case EffectAmbrosiaBerries, EffectClarityLeaves, EffectFirebreathPepper, EffectFoggySkinOnion:
 		return true
-	case EffectBerserkingFlower, EffectLignificationFruit:
-		return false
 	case EffectTeleportMushroom:
 		return pa.ResistsMove()
 	default:
-		panic("unknown comestible (checking warn-on-heal)")
+		return false
 	}
 }
 
@@ -630,6 +628,7 @@ const (
 	HasStats
 	HasTraits
 	HasPassives = HasStats | HasTraits
+	HasInvStats = HasInvoke | HasStats
 	HasAll      = HasInvoke | HasPassives
 )
 
@@ -733,11 +732,13 @@ func (cond CondDisabled) Desc() string {
 	case HasInvoke:
 		return "This spirit cannot be invoked"
 	case HasStats:
-		return "This spirit doesn't affect your Attack, Defense, or max HP"
+		return "This spirit doesn’t affect your Stats"
+	case HasInvStats:
+		return "This spirit can’t be invoked and doesn’t affect your Stats"
 	case HasTraits:
-		return "This spirit's special traits don't apply"
+		return "This spirit’s Traits don’t apply" // unused
 	case HasAll:
-		return "This spirit has no effect"
+		return "This spirit has no effect" // unused
 	case HasPassives:
 		return "This spirit can be invoked but has no other effects"
 	default:
@@ -925,13 +926,326 @@ func (g *Game) GenConditions() []*SpiritCond {
 		case 4:
 			cs[i] = CondU(OnStatus(rqDischargeAll, StatusImbalance), Gets(StatusImbalance, LashingFrog, RampagingBoar))
 		case 5:
-			cs[i] = DisU(HasAll, WatchTwoStatus{A: StatusConfusion, B: StatusImbalance})
+			cs[i] = DisU(HasInvStats, WatchTwoStatus{A: StatusConfusion, B: StatusImbalance})
 		case 6:
-			cs[i] = DisU(HasAll, WatchTwoStatus{A: StatusLignification, B: StatusFear})
+			cs[i] = DisU(HasInvStats, WatchTwoStatus{A: StatusLignification, B: StatusFear})
 		}
 	}
 	if g.IntN(3) == 0 {
 		cs[7] = DisU(HasInvoke, Seen(FearsomeLich, UndeadKnight))
 	}
 	return cs
+}
+
+// Conditional comestibles, only usable if conditions are met
+type ConditionalComestible interface {
+	CanApply(*Game, ID) bool
+}
+
+type EffectFortressOyster struct{}
+
+func (eff EffectFortressOyster) CanApply(g *Game, i ID) bool {
+	count := 0
+	for range g.AdjacentActors(g.PP()) {
+		count++
+	}
+	return count >= 3
+}
+
+func (eff EffectFortressOyster) Apply(g *Game) bool {
+	pa := g.PlayerActor()
+	g.eatMsg("fortress oyster", "")
+	g.PutStatus1(PlayerID, pa, StatusLignification, 5)
+	g.PutStatus1(PlayerID, pa, StatusBerserk, 5)
+	g.PutStatus1(PlayerID, pa, StatusVampirism, 5)
+	return true
+}
+
+func (eff EffectFortressOyster) Desc(g *Game) string {
+	return "Eat only if you are next to at least 3 monsters. Makes you @BLignified@N, @BBerserk@N, and @BVampiric@N for 5 turns."
+}
+
+type EffectRunethornRose struct{}
+
+func (g *Game) anyRuneAt(p gruid.Point) (*RunicTrap, bool) {
+	if i, it := g.ItemAt(p); i >= 0 {
+		rt, ok := it.(*RunicTrap)
+		return rt, ok
+	}
+	return nil, false
+}
+
+func (eff EffectRunethornRose) CanApply(g *Game, i ID) bool {
+	_, ok := g.anyRuneAt(g.PP())
+	return ok
+}
+
+func (eff EffectRunethornRose) Apply(g *Game) bool {
+	g.eatMsg("runethorn rose", "")
+	pp := g.PP()
+	var t MagicRune // type of rune
+	if r, ok := g.anyRuneAt(pp); ok {
+		t = r.Rune
+	} else {
+		t = MagicRune(g.IntN(NRunes))
+	}
+	for i := -1; i <= 1; i += 2 {
+		for j := -1; j <= 1; j += 2 {
+			q := pp
+			cont := true
+			for range 2 {
+				q = q.Shift(i, j)
+				cont = cont && g.validRunePlace(q)
+				if !cont {
+					size := g.Map.Terrain.Size()
+					for !g.validRunePlace(q) {
+						q = gruid.Point{g.rand.IntN(size.X), g.rand.IntN(size.Y)}
+					}
+				}
+				i, _ := g.genRunicTrapAt(t, q)
+				g.SenseEntity(i, "sense")
+			}
+		}
+	}
+	return true
+}
+
+func (g *Game) validRunePlace(p gruid.Point) bool {
+	m := g.Map
+	if m.Terrain.At(p) != Floor || m.RuneCache.At(p) > 0 {
+		return false
+	}
+	i, _ := g.ItemAt(p)
+	return i < 0
+}
+
+func (eff EffectRunethornRose) Desc(g *Game) string {
+	return "Eat only if you standing on a runic trap. Create 8 runes of its type: up to two at each diagonal, or randomly around the map."
+}
+
+type EffectVanishingSnail struct{}
+
+func (eff EffectVanishingSnail) CanApply(g *Game, i ID) bool {
+	count := 0
+	for _, ei := range g.NPMapEntities() {
+		ea, ok := ei.Role.(*Actor)
+		if ok && !ea.IsDead() && ea.Behavior.State == Hunting {
+			count++
+		}
+	}
+	return count >= 4
+}
+
+func (eff EffectVanishingSnail) Apply(g *Game) bool {
+	g.eatMsg("vanishing snail", "")
+	for _, ei := range g.NPMapEntities() {
+		a, ok := ei.Role.(*Actor)
+		if ok && a.Behavior.State == Hunting {
+			a.Behavior.State = Wandering
+		}
+	}
+	pa := g.PlayerActor()
+	for p := range g.Map.PassableNeighbors(g.PP()) {
+		if k, ak := g.ActorAt(p); k >= 0 && !ak.ResistsMove() {
+			ek := g.Entity(k)
+			if to, ok := g.BlinkPos(ek.P); ok {
+				g.MoveActor(k, ak, to, MovTeleport)
+			}
+		}
+	}
+	g.PutStatus1(PlayerID, pa, StatusShadow, 10)
+	return true
+}
+
+func (eff EffectVanishingSnail) Desc(g *Game) string {
+	return "Eat only if at least 4 monsters are hunting you. All monsters stop hunting and any that are next to you blink away. Become @BShadowy@N for 10 turns."
+}
+
+type EffectTunnellingAcorn struct{}
+
+func (eff EffectTunnellingAcorn) CanApply(g *Game, i ID) bool {
+	pp := g.PP()
+	n := pp.Add(g.Dir)
+	return inMap(n) && !g.Map.Passable(n) && g.Map.AdjacentNonPassableCount(pp) >= 3
+}
+
+func (eff EffectTunnellingAcorn) Apply(g *Game) bool {
+	g.eatMsg("tunnelling acorn", "")
+	p := g.PP().Add(g.Dir)
+	for inMap(p) && !g.Map.Passable(p) {
+		g.BreakWall(p)
+		p = p.Add(g.Dir)
+	}
+	return true
+}
+
+func (eff EffectTunnellingAcorn) Desc(g *Game) string {
+	return "Eat only if you are next to 3 walls, and facing one of them. Silently break all walls in front of you, until reaching a non-wall."
+}
+
+type EffectWarpingBean struct{}
+
+func (eff EffectWarpingBean) CanApply(g *Game, i ID) bool {
+	s := g.PlayerActor().Statuses
+	return s.Has(StatusLignification) || s.Has(StatusDaze) || s.Has(StatusPoison)
+}
+
+func (eff EffectWarpingBean) Apply(g *Game) bool {
+	pa := g.PlayerActor()
+	g.eatMsg("warping bean", "")
+	for i := range pa.Statuses {
+		pa.Statuses[i] = 0
+	}
+	pa.HP = min(pa.HP, pa.GetMaxHP())
+	g.UpdateFOV() // in case the bear teleported or warped first
+	r := g.MaxFOVRange()
+	pp := g.PP()
+	var ps []gruid.Point
+	dist := -1
+	for _, p := range g.Map.FOVPts {
+		if paths.DistanceManhattan(p, pp) > r || p == pp {
+			continue
+		}
+		if d, ok := g.Map.FOV.At(p); ok && d <= r && g.IsFree(p) {
+			if d > dist {
+				dist = d
+				ps = []gruid.Point{p}
+			} else if d == dist {
+				ps = append(ps, p)
+			}
+		}
+	}
+	if dist > 0 {
+		to := ps[g.IntN(len(ps))]
+		g.MoveActor(PlayerID, pa, to, MovTeleport)
+	}
+	return true
+}
+
+func (eff EffectWarpingBean) Desc(g *Game) string {
+	return "Eat only if you are lignified, dazed, or poisoned. Removes all your statuses without the usual effects, then warps you to one of the furthest tiles in your view."
+}
+
+type EffectSeeingPotato struct{}
+
+func (eff EffectSeeingPotato) CanApply(g *Game, i ID) bool {
+	j, _ := g.ItemAt(g.PP())
+	return i >= 0 && i == j
+}
+
+func (eff EffectSeeingPotato) Apply(g *Game) bool {
+	g.eatMsg("seeing potato’s stalk", "")
+	const maxdist = 2 * MaxFOVRange
+	mp := &MappingPath{passable: func(p gruid.Point) bool { return inMap(p) }}
+	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, maxdist)
+	var draw bool
+	cost := 1
+	for _, n := range nodes {
+		if n.Cost > cost && draw {
+			g.md.AnimationFrameFast()
+			draw = false
+			cost = n.Cost
+		}
+		t := g.Map.Terrain.At(n.P)
+		if t != Floor {
+			continue
+		}
+		if g.Map.KnownTerrain.At(n.P) != t {
+			g.Map.KnownTerrain.Set(n.P, t)
+			draw = true
+		}
+	}
+	pp := g.PP()
+	for i, ei := range g.NPMapEntities() {
+		p := ei.P
+		if paths.DistanceManhattan(pp, p) <= maxdist && g.Map.Terrain.At(p) == Floor {
+			g.SenseEntity(i, "sense")
+		}
+	}
+	return true
+}
+
+func (eff EffectSeeingPotato) Desc(g *Game) string {
+	return "Eat only from the ground and not your inventory. Sense all floor tiles within 16 spaces, and anything on those tiles."
+}
+
+type EffectTrickyChestnut struct{}
+
+func (eff EffectTrickyChestnut) CanApply(g *Game, i ID) bool {
+	if i, it := g.ItemAt(g.PP()); i >= 0 {
+		switch o := it.(type) {
+		case *Portal:
+			return o.Used
+		case *Spirit:
+			return true
+		}
+	}
+	return false
+}
+
+func (eff EffectTrickyChestnut) Apply(g *Game) bool {
+	g.eatMsg("tricky chestnut", "")
+	pp := g.PP()
+	var tot *Spirit
+	if i, it := g.ItemAt(pp); i >= 0 {
+		switch o := it.(type) {
+		case *Portal:
+			o.Fake = false
+			o.Used = false
+			g.LogStyled("The portal is fixed!", logSpecial)
+			return true
+		case *Spirit:
+			tot = o
+		}
+	}
+	// Recharge spirits by default
+	for _, e := range g.Entities[:NSpirits] {
+		if sp, ok := e.Role.(*Spirit); ok {
+			sp.Charges = sp.MaxCharges[sp.Level]
+		}
+	}
+	g.LogStyled("Your spirits are recharged!", logSpecial)
+	if tot != nil { // turn totem to empty if present
+		g.Entity(g.TotemID()).P = InvalidPos
+		et := g.Entity(g.genEmptyTotemAt(pp))
+		et.Seen = true
+	}
+	return true
+}
+
+func (eff EffectTrickyChestnut) Desc(g *Game) string {
+	return "Eat if you are standing on a broken portal, to make it work again.\nEat if you are standing on an unused totem, to empty the totem, and restore all your spirits to full charges."
+}
+
+func CantEatMsg(ef Effect) string {
+	switch ef.(type) {
+	case EffectVanishingSnail, EffectWarpingBean:
+		return "You can’t grab it!"
+	case EffectFortressOyster, EffectTunnellingAcorn, EffectTrickyChestnut:
+		return "It won’t open!"
+	case EffectRunethornRose:
+		return "You can’t get past its thorns!"
+	case EffectSeeingPotato:
+		return "It has to be planted in the ground!"
+	default:
+		panic("unexpected inedible comestible")
+	}
+}
+
+var CondComs = []itemInfo{
+	{"fortress oyster", EffectFortressOyster{}},
+	{"runethorn rose", EffectRunethornRose{}},
+	{"vanishing snail", EffectVanishingSnail{}},
+	{"tunnelling acorn", EffectTunnellingAcorn{}},
+	{"warping bean", EffectWarpingBean{}},
+	{"seeing potato", EffectSeeingPotato{}},
+	{"tricky chestnut", EffectTrickyChestnut{}},
+}
+
+func (g *Game) GetConditionalComestible(level int) itemInfo {
+	n := len(CondComs)
+	if level == 9 {
+		n-- // chestnuts are useless on the last level
+	}
+	return CondComs[g.IntN(n)]
 }

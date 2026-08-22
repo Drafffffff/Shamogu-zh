@@ -68,6 +68,15 @@ func init() {
 	gob.Register(WatchReachLevel{})
 	gob.Register(&WatchCompleteLevel{})
 
+	// Conditional comestible effects.
+	gob.Register(EffectFortressOyster{})
+	gob.Register(EffectRunethornRose{})
+	gob.Register(EffectVanishingSnail{})
+	gob.Register(EffectTunnellingAcorn{})
+	gob.Register(EffectWarpingBean{})
+	gob.Register(EffectSeeingPotato{})
+	gob.Register(EffectTrickyChestnut{})
+
 	// Actions in key-config.
 	gob.Register(ActionAutoExplore{})
 	gob.Register(ActionBump{})

@@ -257,10 +257,6 @@ var challengeSpirits = []spiritInfo{
 
 // spiritEntity generates a new spirit entity using the given data.
 func spiritEntity(mods []bool, si spiritInfo) *Entity {
-	if HasMod(mods, ModGluttonyRework) && si.BonusTraits[0].Any(Gluttony) {
-		snack := EffectSnack{NoGluttonyStatus: true}
-		si.Ability[0], si.Ability[1] = snack, snack
-	}
 	if HasMod(mods, ModHealingCombat) {
 		if _, ok := si.Ability[0].(EffectVampirism); ok {
 			si.MaxCharges[0]++
@@ -583,8 +579,23 @@ func (g *Game) genItems(mg *MapGen) {
 	default:
 		nitems += 4
 	}
+	var ccMap []bool // where conditional comestibles go
+	if g.Mod(ModTotemConditions) {
+		k := g.ProcInfo.NCondCom[g.Map.Level-1]
+		ccMap = make([]bool, nitems)
+		for i := range nitems {
+			ccMap[i] = i < k
+		}
+		g.rand.Shuffle(nitems, func(i, j int) {
+			ccMap[i], ccMap[j] = ccMap[j], ccMap[i]
+		})
+	}
 	for i := range nitems {
-		addComestible(i, (g.GetComestibleData())[comestibleIdx()])
+		if g.Mod(ModTotemConditions) && ccMap[i] {
+			addComestible(i, g.GetConditionalComestible(g.Map.Level))
+		} else {
+			addComestible(i, (g.GetComestibleData())[comestibleIdx()])
+		}
 	}
 	// Runic traps.
 	rto, rtt := 1, 1 // runes in open areas and in tunnels
