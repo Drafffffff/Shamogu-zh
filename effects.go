@@ -184,7 +184,7 @@ func (eff EffectLignificationFruit) Apply(g *Game) bool {
 }
 
 func (eff EffectLignificationFruit) Desc(_ *Game) string {
-	return fmt.Sprintf("@BLignifies@N you for %d turns. %s",
+	return fmt.Sprintf("@BLignification@N for %d turns. %s",
 		DurationLignification, statusDesc[StatusLignification])
 }
 

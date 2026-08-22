@@ -962,7 +962,11 @@ func (eff EffectFortressOyster) Apply(g *Game) bool {
 }
 
 func (eff EffectFortressOyster) Desc(g *Game) string {
-	return "Eat only if you are next to at least 3 monsters. Makes you @BLignified@N, @BBerserk@N, and @BVampiric@N for 5 turns."
+	cond := "Eat only if you are next to at least 3 monsters. "
+	if g.PlayerActor().DoesAny(Gluttony) {
+		cond = ""
+	}
+	return cond + "Gives @BLignification@N, @BBerserk@N, and @BVampirism@N for 5 turns."
 }
 
 type EffectRunethornRose struct{}
@@ -1020,16 +1024,18 @@ func (g *Game) validRunePlace(p gruid.Point) bool {
 }
 
 func (eff EffectRunethornRose) Desc(g *Game) string {
-	return "Eat only if you standing on a runic trap. Create 8 runes of its type: up to two at each diagonal, or randomly around the map."
+	if g.PlayerActor().DoesAny(Gluttony) {
+		return "If you are standing on a runic trap, create 8 runes of its type: up to two at each diagonal, or randomly around the map. Otherwise, the rune type is chosen randomly."
+	}
+	return "Eat only if you are standing on a runic trap. Create 8 runes of its type: up to two at each diagonal, or randomly around the map."
 }
 
 type EffectVanishingSnail struct{}
 
 func (eff EffectVanishingSnail) CanApply(g *Game, i ID) bool {
 	count := 0
-	for _, ei := range g.NPMapEntities() {
-		ea, ok := ei.Role.(*Actor)
-		if ok && !ea.IsDead() && ea.Behavior.State == Hunting {
+	for _, a := range g.Monsters() {
+		if !a.IsDead() && a.Behavior.State == Hunting {
 			count++
 		}
 	}
@@ -1038,9 +1044,8 @@ func (eff EffectVanishingSnail) CanApply(g *Game, i ID) bool {
 
 func (eff EffectVanishingSnail) Apply(g *Game) bool {
 	g.eatMsg("vanishing snail", "")
-	for _, ei := range g.NPMapEntities() {
-		a, ok := ei.Role.(*Actor)
-		if ok && a.Behavior.State == Hunting {
+	for _, a := range g.Monsters() {
+		if a.Behavior.State == Hunting {
 			a.Behavior.State = Wandering
 		}
 	}
@@ -1058,7 +1063,11 @@ func (eff EffectVanishingSnail) Apply(g *Game) bool {
 }
 
 func (eff EffectVanishingSnail) Desc(g *Game) string {
-	return "Eat only if at least 4 monsters are hunting you. All monsters stop hunting and any that are next to you blink away. Become @BShadowy@N for 10 turns."
+	cond := "Eat only if at least 4 monsters are hunting you. "
+	if g.PlayerActor().DoesAny(Gluttony) {
+		cond = ""
+	}
+	return cond + "All monsters stop hunting and any that are next to you blink away. Gives @BShadow@N for 10 turns."
 }
 
 type EffectTunnellingAcorn struct{}
@@ -1080,7 +1089,11 @@ func (eff EffectTunnellingAcorn) Apply(g *Game) bool {
 }
 
 func (eff EffectTunnellingAcorn) Desc(g *Game) string {
-	return "Eat only if you are next to 3 walls, and facing one of them. Silently break all walls in front of you, until reaching a non-wall."
+	cond := "Eat only if you are next to 3 walls, and facing one of them. "
+	if g.PlayerActor().DoesAny(Gluttony) {
+		cond = ""
+	}
+	return cond + "Silently break all walls in front of you, until reaching a non-wall."
 }
 
 type EffectWarpingBean struct{}
@@ -1123,7 +1136,11 @@ func (eff EffectWarpingBean) Apply(g *Game) bool {
 }
 
 func (eff EffectWarpingBean) Desc(g *Game) string {
-	return "Eat only if you are lignified, dazed, or poisoned. Removes all your statuses without the usual effects, then warps you to one of the furthest tiles in your view."
+	cond := "Eat only if you are lignified, dazed, or poisoned. "
+	if g.PlayerActor().DoesAny(Gluttony) {
+		cond = ""
+	}
+	return cond + "Removes all your statuses without the usual effects, then warps you to one of the furthest tiles in your view."
 }
 
 type EffectSeeingPotato struct{}
@@ -1166,7 +1183,11 @@ func (eff EffectSeeingPotato) Apply(g *Game) bool {
 }
 
 func (eff EffectSeeingPotato) Desc(g *Game) string {
-	return "Eat only from the ground and not your inventory. Sense all floor tiles within 16 spaces, and anything on those tiles."
+	cond := "Eat only from the ground and not your inventory. "
+	if g.PlayerActor().DoesAny(Gluttony) {
+		cond = ""
+	}
+	return cond + "Sense nearby floor tiles and items (2× view range)."
 }
 
 type EffectTrickyChestnut struct{}
@@ -1199,22 +1220,43 @@ func (eff EffectTrickyChestnut) Apply(g *Game) bool {
 		}
 	}
 	// Recharge spirits by default
-	for _, e := range g.Entities[:NSpirits] {
-		if sp, ok := e.Role.(*Spirit); ok {
-			sp.Charges = sp.MaxCharges[sp.Level]
-		}
-	}
 	g.LogStyled("Your spirits are recharged!", logSpecial)
 	if tot != nil { // turn totem to empty if present
 		g.Entity(g.TotemID()).P = InvalidPos
 		et := g.Entity(g.genEmptyTotemAt(pp))
 		et.Seen = true
+		for _, sp := range g.PlayerSpirits() {
+			if g.Mod(ModNoRecharges) {
+				sp.Charges = min(sp.Charges+2, sp.MaxCharges[sp.Level])
+			} else {
+				sp.Charges = sp.MaxCharges[sp.Level]
+			}
+		}
+	} else {
+		// Bear outside of conditions.
+		for _, sp := range g.PlayerSpirits() {
+			sp.Charges = min(sp.Charges+1, sp.MaxCharges[sp.Level])
+		}
 	}
 	return true
 }
 
 func (eff EffectTrickyChestnut) Desc(g *Game) string {
-	return "Eat if you are standing on a broken portal, to make it work again.\nEat if you are standing on an unused totem, to empty the totem, and restore all your spirits to full charges."
+	gluttony := g.PlayerActor().DoesAny(Gluttony)
+	recharges := "Eat if you are standing on an inhabited totem, to empty the totem, and restore all your spirit charges."
+	if g.Mod(ModNoRecharges) {
+		recharges = "Eat if you are standing on an inhabited totem, to empty the totem, and restore two charges per spirit."
+		if gluttony {
+			recharges = "If you are standing on an inhabited totem, empties it, and restores two charges per spirit."
+		}
+	} else if gluttony {
+		recharges = "If you are standing on an inhabited totem, empties it, and restores all your spirit charges."
+	}
+	if gluttony {
+		return fmt.Sprintf("If you are standing on a broken portal, makes it work again.\n%s\nOtherwise, restores one charge per spirit.",
+			recharges)
+	}
+	return "Eat if you are standing on a broken portal, to make it work again.\n" + recharges
 }
 
 func CantEatMsg(ef Effect) string {
