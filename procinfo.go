@@ -413,9 +413,9 @@ func (g *Game) comestiblesProcGen() {
 	g.ProcInfo.NCondCom = make([]int, MapLevels)
 	tot := 0
 	for i, n := range g.ProcInfo.NComestibles {
-		// Per-comestible probability is 1/13 to 1/5
+		// Per-comestible probability is 1/14 to 1/6
 		// Generate in groups of size k to reduce variability
-		f := 13 - i
+		f := 14 - i
 		k := 3
 		for n > 0 {
 			k = min(n, k)
