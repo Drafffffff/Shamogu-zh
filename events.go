@@ -1123,7 +1123,7 @@ func (eff EffectWarpingBean) Apply(g *Game) bool {
 }
 
 func (eff EffectWarpingBean) Desc(g *Game) string {
-	return "Eat only if you are @BLignified@N, @BDazed@N, or @BPoisoned@N. Removes all your statuses without the usual effects, then warps you to one of the furthest tiles in your view."
+	return "Eat only if you are lignified, dazed, or poisoned. Removes all your statuses without the usual effects, then warps you to one of the furthest tiles in your view."
 }
 
 type EffectSeeingPotato struct{}
