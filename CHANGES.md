@@ -3,10 +3,16 @@
 New content:
 
 * New expansion mod: **Totem Conditions** (contributed by @mlochbaum, see
-  discussion in issue #19 and PR #20). Read the fine print: each spirit will
-  curse you to play by its rules or lose its benefits. Think ahead when
-  choosing spirits; the run will have one fewer empty totem to expand your
-  options.
+  discussion in issue #19 and PRs #20 and #21). In-game description is as
+  follows: “Read the fine print: each spirit will curse you to play by its
+  rules or lose its benefits. You may also find comestibles that aren’t so easy
+  to eat! Think ahead when choosing spirits; the run will have one fewer empty
+  totem to expand your options”.  The expansion provides lots of different
+  challenging spirit curses, found on totems and imposing varied conditions on
+  the player until fulfilled, as well as seven new rare comestibles that can
+  only be eaten when the right conditions are met. Like with all mods, the new
+  expansion is compatible with any mod combination, and in particular with the
+  other expansions. Be sure to give it a try!
 
 Reworked and improved content:
 
@@ -47,6 +53,10 @@ UI, graphics, QoL:
 * The “game summary” action (shortcut `#`) now opens the pager with a
   simplified summary for in-game viewing, in addition to writing full
   statistics to a file (or “below” for the browser version).
+* A few minor improvements in descriptions (for example `Gives +1 Attack` shows
+  now as `Stats: +1 Attack` in spirit descriptions). Also, when a description
+  doesn't fit in equip menu, as can now rarely happen with some curse
+  descriptions, it's now possible to scroll with page down/up and wheel.
 
 Fixes:
 
