@@ -96,7 +96,7 @@ func (sp *Spirit) eitherDesc(g *Game, descUpgrade bool) string {
 			sb.WriteByte(' ')
 			sb.WriteString(bonus)
 			if i < len(bonuses)-1 {
-				sb.WriteByte(',')
+				sb.WriteString(", ")
 			} else {
 				sb.WriteByte('.')
 			}
@@ -135,6 +135,7 @@ func (sp *Spirit) UpgradeDesc(g *Game, enew *Entity) string {
 	if len(bonuses) > 0 {
 		sb.WriteString("@BStats:@N")
 		for i, bonus := range bonuses {
+			sb.WriteByte(' ')
 			sb.WriteString(bonus)
 			if i < len(bonuses)-1 {
 				sb.WriteString(", ")
