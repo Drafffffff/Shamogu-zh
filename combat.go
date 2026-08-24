@@ -1025,15 +1025,13 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 			f(i, ai, StatusFear, DurationFearUndead)
 		}
 	case 1:
-		if !g.ResistStatusRoll(i, StatusConfusion) && f(i, ai, StatusConfusion, 3) {
-			if g.IntN(3) == 0 {
-				// Sometimes, Confusion+Imbalance.
-				f(i, ai, StatusImbalance, 3)
-				if i == PlayerID {
-					// Garden while performing the
-					// drunken-fight style.
-					f(i, ai, StatusGardener, 3+2*xd)
-				}
+		if !g.ResistStatusRoll(i, StatusConfusion) && f(i, ai, StatusConfusion, 3) && g.IntN(3) == 0 {
+			// Sometimes, Confusion+Imbalance.
+			f(i, ai, StatusImbalance, 3)
+			if i == PlayerID {
+				// Garden while performing the
+				// drunken-fight style.
+				f(i, ai, StatusGardener, 3+2*xd)
 			}
 		}
 	case 2:
