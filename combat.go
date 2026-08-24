@@ -1069,9 +1069,8 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 			}
 		case 1:
 			d := (1 + DurationFoggySkin) / 2
-			if f(i, ai, StatusFoggySkin, d+xd) &&
-				g.IntN(3) == 0 && !g.ResistStatusRoll(i, StatusConfusion) {
-				f(i, ai, StatusConfusion, d)
+			if f(i, ai, StatusFoggySkin, d+xd) && g.IntN(3) == 0 {
+				f(i, ai, StatusSprint, d)
 			}
 		case 2:
 			d := (1 + DurationTimeStop) / 2
