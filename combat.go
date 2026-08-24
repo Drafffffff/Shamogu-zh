@@ -1075,7 +1075,7 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 		case 2:
 			d := (1 + DurationTimeStop) / 2
 			if f(i, ai, StatusTimeStop, d+xd/2) &&
-				g.IntN(3) == 0 && !g.ResistStatusRoll(i, StatusFire) && g.PlayerActor().HP > 1 {
+				g.IntN(3) == 0 && !g.ResistStatusRoll(i, StatusFire) && ai.HP > 1 {
 				f(i, ai, StatusFire, d)
 			}
 		case 3:
