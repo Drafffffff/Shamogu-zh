@@ -499,13 +499,13 @@ type WatchCompleteLevel struct {
 type CompleteType int
 
 const (
-	Charges        CompleteType = iota // still have ability charges
+	RemCharges     CompleteType = iota // still have ability charges
 	EmptyInventory                     // no comestibles left
 )
 
 func (w *WatchCompleteLevel) Desc() string {
 	switch w.Test {
-	case Charges:
+	case RemCharges:
 		return "you complete a full level with some charges remaining"
 	case EmptyInventory:
 		return "you enter a portal with no comestibles in your inventory"
@@ -522,7 +522,7 @@ func (w *WatchCompleteLevel) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	switch e.Type() {
 	case EventPortal:
 		switch w.Test {
-		case Charges:
+		case RemCharges:
 			if w.CanComplete {
 				w.CanComplete = sp.Charges > 0
 			}
@@ -899,13 +899,13 @@ func (g *Game) GenConditions() []*SpiritCond {
 		case 0:
 			cs[i] = Compl(EmptyInventory, CqLeave, WatchEvent{Type: EventPickup})
 		case 1:
-			cs[i] = Compl(Charges, CqDischargeAll, &WatchMoveFar{PrevPos: InvalidPos})
+			cs[i] = Compl(RemCharges, CqDischargeAll, &WatchMoveFar{PrevPos: InvalidPos})
 		case 2:
-			cs[i] = Compl(Charges, CqDischargeAll, WatchEvent{Type: EventMonsDeath})
+			cs[i] = Compl(RemCharges, CqDischargeAll, WatchEvent{Type: EventMonsDeath})
 		case 3:
-			cs[i] = Compl(Charges, CqDischarge, WatchPlayerStatus{MatchAny: true})
+			cs[i] = Compl(RemCharges, CqDischarge, WatchPlayerStatus{MatchAny: true})
 		case 4:
-			cs[i] = Compl(Charges, CqDischarge, WatchHits{PlayerActs: true})
+			cs[i] = Compl(RemCharges, CqDischarge, WatchHits{PlayerActs: true})
 		}
 	}
 	nu := 1 + g.IntN(2)
