@@ -353,9 +353,13 @@ func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
 				msg = "Save mod selection and continue to advanced primary spirit selection menu.\n\n"
 			}
 			msg += "Mod selection in Expansions and Small Mods sections is preserved between runs, " +
-				"but Challenges have to be enabled manually each time."
+				"but Challenges have to be enabled manually each time.\n\n"
+			if !GameConfig.AdvancedNewGame {
+				msg += "@CNote:@N you may want to make the advanced new game menu the default through in-game options."
+			}
+
 			md.desc.Box = &ui.Box{Title: ui.Text("Save and continue")}
-			md.desc.Content = ui.Text(msg).Format(UIWidth/2 - 1 - 2)
+			md.desc.Content = ui.Text(msg).Format(UIWidth/2 - 1 - 2).WithMarkups(Markups)
 			if act != ui.MenuInvoke {
 				break
 			}
