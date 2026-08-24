@@ -1029,11 +1029,11 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 			if g.IntN(3) == 0 {
 				// Sometimes, Confusion+Imbalance.
 				f(i, ai, StatusImbalance, 3)
-			}
-			if i == PlayerID && g.IntN(3) == 0 {
-				// Sometimes garden while performing the
-				// drunken-fight style.
-				f(i, ai, StatusGardener, 3+2*xd)
+				if i == PlayerID {
+					// Garden while performing the
+					// drunken-fight style.
+					f(i, ai, StatusGardener, 3+2*xd)
+				}
 			}
 		}
 	case 2:
