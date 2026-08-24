@@ -1082,10 +1082,17 @@ func (eff EffectTunnellingAcorn) Apply(g *Game) bool {
 	g.eatMsg("tunnelling acorn", "")
 	p := g.PP().Add(g.Dir)
 	for inMap(p) && !g.Map.Passable(p) {
-		g.BreakWall(p)
+		g.disintegrateWall(p)
 		p = p.Add(g.Dir)
 	}
 	return true
+}
+
+func (g *Game) disintegrateWall(at gruid.Point) {
+	g.Stats.Digs++
+	TotemEvents(g, &EventHappened{EvType: EventWallBreak})
+	g.Map.Terrain.Set(at, Floor)
+	g.NormalCloudAt(at, 10+g.IntN(30))
 }
 
 func (eff EffectTunnellingAcorn) Desc(g *Game) string {
@@ -1093,7 +1100,7 @@ func (eff EffectTunnellingAcorn) Desc(g *Game) string {
 	if g.PlayerActor().DoesAny(Gluttony) {
 		cond = ""
 	}
-	return cond + "Silently break all walls in front of you, until reaching a non-wall."
+	return cond + "Silently disintegrate all walls in front of you, until reaching a non-wall."
 }
 
 type EffectWarpingBean struct{}
