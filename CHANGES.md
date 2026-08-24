@@ -20,7 +20,8 @@ Reworked and improved content:
   weaker (2 HP instead of 4 HP) but appear usually in groups of three and
   patrol between a couple of locations in a chaotic manner. They also cry upon
   death.  There were some minor chaos bite effect tweaks, too, with occasional
-  extra duration for positive effects as a surprise.
+  extra duration for positive effects as a surprise, and less secondary
+  negative effects overall.
 * Slightly improved “good hearing” for non-footstep noises by an average of 1.5
   tiles to make it a bit more significant for small noises.
 * Slightly tweaked down occurrence chance for alligators with respect to golems

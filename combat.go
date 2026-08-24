@@ -1020,21 +1020,16 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 		if g.ResistStatusRoll(i, StatusLignification) || !f(i, ai, StatusLignification, DurationLignificationHit) {
 			break
 		}
-		switch g.IntN(5) {
-		case 0, 1:
-			// Sometimes, give Lignification+Fear.
-			if !g.ResistStatusRoll(i, StatusFear) {
-				f(i, ai, StatusFear, DurationFearUndead)
-			}
-		case 2:
-			// Rarely, Lignification+Fire.
-			if !g.ResistStatusRoll(i, StatusFire) {
-				f(i, ai, StatusFire, DurationFire)
-			}
+		// Sometimes, Lignification+Fear.
+		if g.IntN(3) == 0 && !g.ResistStatusRoll(i, StatusFear) {
+			f(i, ai, StatusFear, DurationFearUndead)
 		}
 	case 1:
-		if !g.ResistStatusRoll(i, StatusImbalance) && f(i, ai, StatusImbalance, 3) {
-			f(i, ai, StatusConfusion, 3)
+		if !g.ResistStatusRoll(i, StatusConfusion) && f(i, ai, StatusConfusion, 3) {
+			if g.IntN(3) == 0 {
+				// Sometimes, Confusion+Imbalance.
+				f(i, ai, StatusImbalance, 3)
+			}
 			if i == PlayerID && g.IntN(3) == 0 {
 				// Sometimes garden while performing the
 				// drunken-fight style.
@@ -1042,26 +1037,23 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 			}
 		}
 	case 2:
-		n := 5
 		d := DurationBerserkHit
 		if i != PlayerID {
 			// Reduce berserk time for confusion-reflected berserk,
 			// as that's a bit too dangerous (though possibly fun
-			// occasionally). Also increase chances of negative
-			// effects.
+			// occasionally).
 			d /= 2
-			n = 4
 		}
 		if g.ResistStatusRoll(i, StatusBerserk) || !f(i, ai, StatusBerserk, d) {
 			break
 		}
-		switch g.IntN(n) {
-		case 0, 1:
+		// Sometimes, either extra Confusion or early Poison.
+		switch g.IntN(6) {
+		case 0:
 			if !g.ResistStatusRoll(i, StatusConfusion) {
 				f(i, ai, StatusConfusion, DurationConfusionHit/2)
 			}
-		case 2:
-			// More rarely, short-lived early poison with berserk.
+		case 1:
 			if !g.ResistStatusRoll(i, StatusPoison) {
 				f(i, ai, StatusPoison, DurationPoisonBite/2)
 			}
@@ -1072,36 +1064,36 @@ func (g *Game) inflictChaos(i ID, ai *Actor, f func(ID, *Actor, Status, int) boo
 		case 0:
 			d := (1 + DurationClarity) / 2
 			if f(i, ai, StatusClarity, d+xd) &&
-				g.IntN(2) == 0 && !g.ResistStatusRoll(i, StatusFear) {
+				g.IntN(3) == 0 && !g.ResistStatusRoll(i, StatusFear) {
 				f(i, ai, StatusFear, d)
 			}
 		case 1:
 			d := (1 + DurationFoggySkin) / 2
 			if f(i, ai, StatusFoggySkin, d+xd) &&
-				g.IntN(2) == 0 && !g.ResistStatusRoll(i, StatusConfusion) {
+				g.IntN(3) == 0 && !g.ResistStatusRoll(i, StatusConfusion) {
 				f(i, ai, StatusConfusion, d)
 			}
 		case 2:
 			d := (1 + DurationTimeStop) / 2
 			if f(i, ai, StatusTimeStop, d+xd/2) &&
-				g.IntN(2) == 0 && !g.ResistStatusRoll(i, StatusImbalance) {
+				g.IntN(3) == 0 && !g.ResistStatusRoll(i, StatusImbalance) {
 				f(i, ai, StatusImbalance, d+xd/2)
 			}
 		case 3:
 			d := (1 + DurationShadow) / 2
 			if f(i, ai, StatusShadow, d+3*xd/2) &&
-				g.IntN(2) == 0 && !g.ResistStatusRoll(i, StatusImbalance) {
+				g.IntN(3) == 0 && !g.ResistStatusRoll(i, StatusImbalance) {
 				f(i, ai, StatusImbalance, d)
 			}
 		case 4:
 			d := (1 + DurationDisorient) / 2
 			if f(i, ai, StatusDisorient, d+xd) &&
-				g.IntN(2) == 0 && !g.ResistStatusRoll(i, StatusFear) {
+				g.IntN(3) == 0 && !g.ResistStatusRoll(i, StatusFear) {
 				f(i, ai, StatusFear, d)
 			}
 		case 5:
 			if f(i, ai, StatusVampirism, DurationVampirism+(2*xd)/3) &&
-				g.IntN(2) == 0 && !g.ResistStatusRoll(i, StatusPoison) {
+				g.IntN(3) == 0 && !g.ResistStatusRoll(i, StatusPoison) {
 				f(i, ai, StatusConfusion, DurationVampirism)
 			}
 		}
