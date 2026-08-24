@@ -269,8 +269,8 @@ func (md *model) updateSpiritSelectionMenu(msg gruid.Msg) gruid.Effect {
 		msg = msgmouse
 	}
 	if msgkey, ok := msg.(gruid.MsgKeyDown); ok && (msgkey.Key == gruid.KeyTab || msgkey.Key == gruid.KeySpace) {
-		if md.mode == modeNewGame && len(GameConfig.Mods) == NMods {
-			md.g.Mods = slices.Clone(GameConfig.Mods)
+		if md.mode == modeNewGame && len(GameConfig.Mods) == NSavedMods {
+			copy(md.g.Mods[:NSavedMods], GameConfig.Mods)
 		}
 		md.modSelectionMenu()
 		return nil
@@ -312,8 +312,8 @@ func (md *model) startNewGame(spe *Entity) {
 func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
 	md.menu.main.Update(msg)
 	resetChanges := func() {
-		if len(GameConfig.Mods) == NMods {
-			md.g.Mods = slices.Clone(GameConfig.Mods)
+		if len(GameConfig.Mods) == NSavedMods {
+			copy(md.g.Mods[:NSavedMods], GameConfig.Mods)
 		} else {
 			clear(md.g.Mods)
 		}
@@ -348,17 +348,19 @@ func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
 		case idx == len(g.Mods):
 			var msg string
 			if GameConfig.AdvancedNewGame {
-				msg = "Save mod selection and return to advanced primary spirit selection menu."
+				msg = "Save mod selection and return to advanced primary spirit selection menu.\n\n" +
+					"Challenge mods are not saved."
 			} else {
-				msg = "Save mod selection and continue to advanced primary spirit selection menu."
+				msg = "Save mod selection and continue to advanced primary spirit selection menu.\n\n" +
+					"Challenge mods are not saved."
 			}
 			md.desc.Box = &ui.Box{Title: ui.Text("Save and continue")}
 			md.desc.Content = ui.Text(msg).Format(UIWidth/2 - 1 - 2)
 			if act != ui.MenuInvoke {
 				break
 			}
-			if !slices.Equal(GameConfig.Mods, g.Mods) {
-				GameConfig.Mods = slices.Clone(g.Mods)
+			if !slices.Equal(GameConfig.Mods, g.Mods[:NSavedMods]) {
+				GameConfig.Mods = slices.Clone(g.Mods[:NSavedMods])
 				if err := SaveConfig(); err != nil {
 					log.Printf("error saving config: %v", err)
 				}

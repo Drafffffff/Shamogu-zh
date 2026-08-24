@@ -137,7 +137,7 @@ type Config struct {
 	AdvancedNewGame bool                 // whether to go to advanced new game menu directly
 	DarkColors      bool                 // whether to use a dark color theme
 	ExamineModeKeys map[gruid.Key]Action // custom examine mode keys
-	Mods            []bool               // selected mods (in previous advanced game)
+	Mods            []bool               // selected (non-challenge) mods (in previous advanced game)
 	NormalModeKeys  map[gruid.Key]Action // custom normal mode keys
 	Tiles           bool                 // whether to use Tiles or Unicode
 	VersionNumber   int                  // config-compatibility version number

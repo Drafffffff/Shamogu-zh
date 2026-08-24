@@ -50,6 +50,10 @@ Corrupted dungeon improvements (see discussion in #11):
 
 UI, graphics, QoL:
 
+* In mod selection menu, the selection of Challenges is not saved anymore
+  between runs, only Expansions and Small Mods selection is saved, as those are
+  more likely to be preserved between runs, while Challenges are usually chosen
+  on specific occasions and typically not repeated twice in a row.
 * Make Runic Chicken players not avoid traps in auto-explore and travel.
 * The “game summary” action (shortcut `#`) now opens the pager with a
   simplified summary for in-game viewing, in addition to writing full

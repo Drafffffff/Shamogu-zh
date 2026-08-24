@@ -19,6 +19,9 @@ const (
 	modCount // dummy mod (for NMods)
 )
 
+// Number of non-challenge saved mods.
+const NSavedMods = int(ModSmallInventory)
+
 // Number of mods.
 const NMods = int(modCount)
 
