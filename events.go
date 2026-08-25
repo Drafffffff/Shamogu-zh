@@ -1042,9 +1042,9 @@ func (g *Game) validRunePlace(p gruid.Point) bool {
 
 func (eff EffectRunethornRose) Desc(g *Game) string {
 	if g.PlayerActor().DoesAny(Gluttony) {
-		return "If you are standing on a runic trap, create 8 runes of its type: up to two at each diagonal, or randomly around the map. Otherwise, the rune type is chosen randomly."
+		return "If you are standing on a runic trap, creates 8 runes of its type: up to two at each diagonal, or randomly around the map. Otherwise, the rune type is chosen randomly."
 	}
-	return "Eat only if you are standing on a runic trap. Create 8 runes of its type: up to two at each diagonal, or randomly around the map."
+	return "Eat only if you are standing on a runic trap. Creates 8 runes of its type: up to two at each diagonal, or randomly around the map."
 }
 
 type EffectVanishingSnail struct{}
@@ -1084,7 +1084,7 @@ func (eff EffectVanishingSnail) Desc(g *Game) string {
 	if g.PlayerActor().DoesAny(Gluttony) {
 		cond = ""
 	}
-	return cond + "All monsters stop hunting and any that are next to you blink away. Gives @BShadow@N for 10 turns."
+	return cond + "Makes all monsters stop hunting and blinks away any that are next to you. Gives @BShadow@N for 10 turns."
 }
 
 type EffectTunnellingAcorn struct{}
@@ -1113,11 +1113,10 @@ func (g *Game) disintegrateWall(at gruid.Point) {
 }
 
 func (eff EffectTunnellingAcorn) Desc(g *Game) string {
-	cond := "Eat only if you are next to 3 walls, and facing one of them. "
 	if g.PlayerActor().DoesAny(Gluttony) {
-		cond = ""
+		return "If you are facing a wall, makes you silently disintegrate all walls in front of you, until reaching a non-wall. Otherwise, does nothing."
 	}
-	return cond + "Silently disintegrate all walls in front of you, until reaching a non-wall."
+	return "Eat only if you are next to 3 walls, and facing one of them. Makes you silently disintegrate all walls in front of you, until reaching a non-wall."
 }
 
 type EffectWarpingBean struct{}
@@ -1211,7 +1210,7 @@ func (eff EffectSeeingPotato) Desc(g *Game) string {
 	if g.PlayerActor().DoesAny(Gluttony) {
 		cond = ""
 	}
-	return cond + "Sense nearby floor tiles and items (2× view range)."
+	return cond + "Makes you sense nearby floor tiles and items (2× view range)."
 }
 
 type EffectTrickyChestnut struct{}
