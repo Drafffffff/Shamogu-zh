@@ -13,6 +13,8 @@ New content:
   only be eaten when the right conditions are met. Like with all mods, the new
   expansion is compatible with any mod combination, and in particular with the
   other expansions. Be sure to give it a try!
+* While playing the classic game, you may now find one of those new rare
+  conditional comestibles in most runs!
 
 Reworked and improved content:
 
@@ -61,6 +63,7 @@ UI, graphics, QoL:
 * Improvements in configuration menu: now current setting is shown greyed in
   the description, and toggling a setting does not immediately quit the menu
   anymore.
+* Extra information in help about Corrupted Dungeon.
 
 Fixes:
 
