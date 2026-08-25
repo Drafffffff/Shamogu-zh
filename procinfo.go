@@ -38,6 +38,7 @@ type ProcInfo struct {
 	MenhirIdx        int              // current index in Menhirs
 	Comestibles      []int            // comestible-generation data
 	ComestibleIdx    int              // current index in Comestibles
+	RareComestible   int              // level with unique conditional comestible
 	NComestibles     []int            // number of comestibles per level
 	NCondCom         []int            // number of conditional comestibles
 	NMenhirs         []int            // number of menhirs per level
@@ -379,6 +380,7 @@ func (g *Game) NextMenhirKind() menhirKind {
 // ensures that all comestibles appear at least once in a while.
 func (g *Game) comestibleProcGen() {
 	g.ProcInfo.Comestibles = g.genRandomIndices(len(g.GetComestibleData()))
+	g.ProcInfo.RareComestible = 4 + g.IntN(6) // levels 4-9
 }
 
 // NextComestibleKind returns the next comestible kind (index of

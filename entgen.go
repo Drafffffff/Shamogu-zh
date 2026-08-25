@@ -318,9 +318,7 @@ var ComestibleData = []itemInfo{
 
 // GetComestibleData returns the appropriate comestible data for current mod
 // selection.
-func (g *Game) GetComestibleData() []itemInfo {
-	return ComestibleData
-}
+func (g *Game) GetComestibleData() []itemInfo { return ComestibleData }
 
 // comestibleEntity generates a new comestible Entity entity using the given
 // data.
@@ -553,7 +551,7 @@ func (g *Game) genItems(mg *MapGen) {
 	if g.Mod(ModCorruptedDungeon) && mg.theme == ThemeNone && g.IntN(4*MapLevels) == 0 {
 		if g.IntN(2) == 0 {
 			// Field of comestibles of same kind.
-			cod := (g.GetComestibleData())[comestibleIdx()]
+			cod := g.GetComestibleData()[comestibleIdx()]
 			for i := range nitems + 7 {
 				addComestible(i, cod)
 			}
@@ -593,8 +591,14 @@ func (g *Game) genItems(mg *MapGen) {
 	for i := range nitems {
 		if g.Mod(ModTotemConditions) && ccMap[i] {
 			addComestible(i, g.GetConditionalComestible(g.Map.Level))
+		} else if !g.Mod(ModTotemConditions) && g.Map.Level == g.ProcInfo.RareComestible {
+			// Once in (most) games, a rare condition-based
+			// comestible usually only found with
+			// ModTotemConditions.
+			addComestible(i, g.GetConditionalComestible(g.Map.Level))
+			g.ProcInfo.RareComestible = -1
 		} else {
-			addComestible(i, (g.GetComestibleData())[comestibleIdx()])
+			addComestible(i, g.GetComestibleData()[comestibleIdx()])
 		}
 	}
 	// Runic traps.
