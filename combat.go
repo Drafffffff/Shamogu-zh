@@ -478,11 +478,11 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 }
 
 // Percentage chances for damage and absorption rolls based on attack
-// and defense. Currently, maximum attack is 10 (surrounded berserk
-// hydra with offensive spirits) and maximum defense is 7 (lignified
-// frog with the most defensive spirits), but we add some extra values
-// in case those limits go up.
-var probA = [12]int{0, 35, 44, 52, 59, 66, 72, 78, 84, 90, 95, 100}
+// and defense. Currently, maximum attack is 12 (surrounded berserk
+// hydra with offensive spirits and vampirism) and maximum defense is 7
+// (lignified frog with the most defensive spirits), but we add some extra
+// values in case those limits go up.
+var probA = [13]int{0, 35, 44, 52, 59, 66, 72, 78, 84, 90, 95, 100, 100}
 var probD = [10]int{0, 29, 42, 53, 62, 70, 76, 81, 86, 90}
 
 // computeDamage computes a damage roll with given attack and defense values.
