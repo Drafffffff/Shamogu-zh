@@ -111,7 +111,8 @@ func (e *Entity) Item() Item {
 	return e.Role.(Item)
 }
 
-// Text returns short text for the entity, for one-line display purposes.
+// TextWarn returns short text for the entity, for one-line display purposes.
+// If g is non-nil, comestible inventory name highlighting will be performed.
 func (e *Entity) TextWarn(g *Game, id ID) string {
 	switch r := e.Role.(type) {
 	case *Spirit:
@@ -140,6 +141,7 @@ func (e *Entity) TextWarn(g *Game, id ID) string {
 	}
 }
 
+// Text returns short text for the entity, for one-line display purposes.
 func (e *Entity) Text() string {
 	return e.TextWarn(nil, -1)
 }
