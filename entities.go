@@ -123,7 +123,7 @@ func (e *Entity) TextWarn(g *Game, id ID) string {
 				f = "@R%s@N @S(%s %d/%d)@N"
 			}
 		}
-		return fmt.Sprintf(f, e.Name, r.Ability[r.Level].Name(), r.Charges, r.MaxCharges[r.Level])
+		return fmt.Sprintf(f, e.Name, r.GetAbility().Name(), r.Charges, r.GetMaxCharges())
 	case *Comestible:
 		if g == nil {
 			return e.Name

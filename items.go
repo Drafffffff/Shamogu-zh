@@ -104,7 +104,7 @@ func (sp *Spirit) eitherDesc(g *Game, descUpgrade bool) string {
 		sb.WriteByte('\n')
 	}
 	fmt.Fprintf(&sb, "@CAbility@S(%s %d/%d charges)@C:@N %s",
-		sp.Ability[sp.Level].Name(), sp.Charges, sp.MaxCharges[sp.Level], sp.Ability[sp.Level].Desc(g))
+		sp.GetAbility().Name(), sp.Charges, sp.GetMaxCharges(), sp.GetAbility().Desc(g))
 	sb.WriteByte('\n')
 	fmt.Fprintf(&sb, "@CTraits:@N %s.", g.TraitDesc(Player, sp.BonusTraits[sp.Level]))
 	return sb.String()
@@ -173,7 +173,7 @@ func (sp *Spirit) Use(g *Game, i ID) bool {
 		return false
 	}
 	ohp := pa.HP
-	done := sp.Ability[sp.Level].Apply(g)
+	done := sp.GetAbility().Apply(g)
 	if !done {
 		return false
 	}
@@ -181,18 +181,30 @@ func (sp *Spirit) Use(g *Game, i ID) bool {
 	sp.Uses++
 	g.Stats.SpiritUses++
 	g.Stats.MapSpiritUses[g.Map.Level-1]++
-	name := sp.Ability[sp.Level].Name()
+	name := sp.GetAbility().Name()
 	if confused {
 		g.LogfStyled("Invoking the spirit while confused hurts you (%d dmg).", logHurtPlayer, ConfusionDamage)
 		g.InflictDamage(PlayerID, pa, ConfusionDamage, AttackOther)
-		g.StoryLogf("Used the “%s” ability while confused (HP: %d/%d)",
-			name, pa.HP, pa.GetMaxHP())
+		g.StoryLogf("Used the “%s” ability while confused (HP: %d/%d, charges: %d/%d)",
+			name, pa.HP, pa.GetMaxHP(), sp.Charges, sp.GetMaxCharges())
 	} else if hp := pa.HP; hp == ohp {
-		g.StoryLogf("Used the “%s” ability", name)
+		g.StoryLogf("Used the “%s” ability (charges: %d/%d)", name, sp.Charges, sp.GetMaxCharges())
 	} else {
-		g.StoryLogf("Used the “%s” ability (HP: %d/%d)", name, hp, pa.GetMaxHP())
+		g.StoryLogf("Used the “%s” ability (HP: %d/%d, charges: %d/%d)", name, hp, pa.GetMaxHP(), sp.Charges, sp.GetMaxCharges())
 	}
 	return true
+}
+
+// GetMaxCharges returns the maximum number of charges given the current spirit
+// upgrade level.
+func (sp *Spirit) GetMaxCharges() int {
+	return sp.MaxCharges[sp.Level]
+}
+
+// GetAbility returns the maximum number of charges given the current spirit
+// upgrade level.
+func (sp *Spirit) GetAbility() Ability {
+	return sp.Ability[sp.Level]
 }
 
 const ConfusionDamage = 1
@@ -319,7 +331,7 @@ func (g *Game) EquipItemAt(i ID) bool {
 			ei.P = ej.P
 		} else {
 			g.Logf("You pick the %s.", ej.Name)
-			g.StoryLogf("Picked %s", One(ej.Name))
+			g.StoryLogf("Picked %s (comestibles: %d)", One(ej.Name), g.ComestibleCount()+1)
 		}
 		ej.P = InvalidPos
 		g.Entities[i], g.Entities[j] = g.Entities[j], g.Entities[i]

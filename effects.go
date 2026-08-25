@@ -87,11 +87,21 @@ func (g *Game) healMsg(amount int) string {
 // eatMsg returns an eating message with the given optional new hp info.
 func (g *Game) eatMsg(name string, hpstr string) {
 	g.Logf("You eat the %s.", name)
+	n := g.ComestibleCount() - 1
 	if hpstr != "" {
-		g.StoryLogf("Ate %s (HP: %s)", One(name), hpstr)
+		g.StoryLogf("Ate %s (HP: %s, comestibles: %d)", One(name), hpstr, n)
 	} else {
-		g.StoryLogf("Ate %s", One(name))
+		g.StoryLogf("Ate %s (comestibles: %d)", One(name), n)
 	}
+}
+
+// ComestibleCount returns the number of comestibles in the inventory.
+func (g *Game) ComestibleCount() int {
+	var n int
+	for range g.PlayerComestibles() {
+		n++
+	}
+	return n
 }
 
 // healPlayer restores HP and emits a healing event for spirit conditions

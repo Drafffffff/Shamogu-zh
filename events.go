@@ -658,33 +658,40 @@ func descCq(c Consequence) string {
 	}
 }
 
+// TotemEvents performs condition-breaking checks for the given event.
 func TotemEvents(g *Game, ev Event) {
 	ty := ev.Type()
 	if !g.CheckEvent(ty) {
 		return
 	}
-	for i, e := range g.Entities[:NSpirits] {
-		if sp, ok := e.Role.(*Spirit); ok {
-			switch sp.Condition.ApplyEvent(g, sp, ev) {
-			case CqEndCondition:
-				g.Logf("Your %s spirit has been fulfilled!", e.Name)
-				g.StoryLogf("Fulfilled the %s spirit", e.Name)
-				g.curseLiftedFog()
-				sp.Condition = nil
-				g.ComputePlayerStats()
-			case CqLeave:
-				g.Logf("The %s spirit has left you!", e.Name)
-				g.StoryLogf("Lost the %s spirit", e.Name)
-				g.spiritLeftShock()
-				g.Entities[i] = emptySlot()
-				g.ComputePlayerStats()
-			case CqDischargeAll:
-				if sp.Charges > 0 {
-					g.Logf("Your %s spirit loses its charges!", e.Name)
-					sp.Charges = 0
-				}
-			case CqDischarge:
-				sp.Charges = max(0, sp.Charges-1)
+	for i, sp := range g.PlayerSpirits() {
+		ei := g.Entity(i)
+		switch sp.Condition.ApplyEvent(g, sp, ev) {
+		case CqEndCondition:
+			g.Logf("Your %s spirit has been fulfilled!", ei.Name)
+			g.StoryLogf("Fulfilled the %s spirit", ei.Name)
+			g.curseLiftedFog()
+			sp.Condition = nil
+			g.ComputePlayerStats()
+		case CqLeave:
+			g.Logf("The %s spirit has left you!", ei.Name)
+			g.StoryLogf("Lost the %s spirit", ei.Name)
+			g.spiritLeftShock()
+			g.Entities[i] = emptySlot()
+			g.ComputePlayerStats()
+		case CqDischargeAll:
+			if sp.Charges > 0 {
+				name := sp.GetAbility().Name()
+				g.Logf("You lose all “%s” charges!", name)
+				g.StoryLogf("Lost all “%s” charges", name)
+				sp.Charges = 0
+			}
+		case CqDischarge:
+			if sp.Charges > 0 {
+				name := sp.GetAbility().Name()
+				g.Logf("You lose one “%s” charge!", name)
+				g.StoryLogf("Lost one “%s” charge (remaining %d/%d)", name, sp.Charges-1, sp.GetMaxCharges())
+				sp.Charges--
 			}
 		}
 	}
@@ -1250,15 +1257,15 @@ func (eff EffectTrickyChestnut) Apply(g *Game) bool {
 		et.Seen = true
 		for _, sp := range g.PlayerSpirits() {
 			if g.Mod(ModNoRecharges) {
-				sp.Charges = min(sp.Charges+2, sp.MaxCharges[sp.Level])
+				sp.Charges = min(sp.Charges+2, sp.GetMaxCharges())
 			} else {
-				sp.Charges = sp.MaxCharges[sp.Level]
+				sp.Charges = sp.GetMaxCharges()
 			}
 		}
 	} else {
 		// Bear outside of conditions.
 		for _, sp := range g.PlayerSpirits() {
-			sp.Charges = min(sp.Charges+1, sp.MaxCharges[sp.Level])
+			sp.Charges = min(sp.Charges+1, sp.GetMaxCharges())
 		}
 	}
 	return true

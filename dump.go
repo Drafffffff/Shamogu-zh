@@ -266,8 +266,8 @@ func (g *Game) dumpPlayer(sb *strings.Builder, markup bool) {
 	for i, sp := range g.PlayerSpirits() {
 		ei := g.Entity(i)
 		fmt.Fprintf(sb, "- %s (%s %d/%d, used %s)\n",
-			ei.Name, sp.Ability[sp.Level].Name(),
-			sp.Charges, sp.MaxCharges[sp.Level],
+			ei.Name, sp.GetAbility().Name(),
+			sp.Charges, sp.GetMaxCharges(),
 			times(sp.Uses))
 	}
 }

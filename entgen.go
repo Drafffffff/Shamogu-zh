@@ -72,7 +72,7 @@ func (g *Game) genPlayerOnNewLevel(mg *MapGen) {
 	g.Map.ActorCache.SetU(p.P, PlayerID)
 	if g.Mod(ModHealingCombat) && g.Map.Level == 5 {
 		sp := g.Entity(0).Role.(*Spirit)
-		if _, ok := sp.Ability[sp.Level].(EffectVampirism); ok {
+		if _, ok := sp.GetAbility().(EffectVampirism); ok {
 			n := 1
 			if g.Mod(ModNoRecharges) {
 				n *= 2
@@ -84,7 +84,7 @@ func (g *Game) genPlayerOnNewLevel(mg *MapGen) {
 	}
 	if !g.Mod(ModNoRecharges) {
 		for _, sp := range g.PlayerSpirits() {
-			sp.Charges = sp.MaxCharges[sp.Level]
+			sp.Charges = sp.GetMaxCharges()
 		}
 	}
 	pa := g.PlayerActor()
@@ -420,7 +420,7 @@ func (g *Game) genItems(mg *MapGen) {
 			sp = spiritEntity(g.Mods, secondarySpirits[spi.Idx])
 		}
 		spr := sp.Role.(*Spirit)
-		spr.Charges = spr.MaxCharges[spr.Level]
+		spr.Charges = spr.GetMaxCharges()
 		if g.Mod(ModTotemConditions) {
 			spr.Condition = g.ProcInfo.Conditions[g.Map.Level-1]
 		}
