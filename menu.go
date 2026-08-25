@@ -269,8 +269,8 @@ func (md *model) updateSpiritSelectionMenu(msg gruid.Msg) gruid.Effect {
 		msg = msgmouse
 	}
 	if msgkey, ok := msg.(gruid.MsgKeyDown); ok && (msgkey.Key == gruid.KeyTab || msgkey.Key == gruid.KeySpace) {
-		if md.mode == modeNewGame && len(GameConfig.Mods) == NSavedMods {
-			copy(md.g.Mods[:NSavedMods], GameConfig.Mods)
+		if md.mode == modeNewGame && len(GameConfig.Mods) == NMods {
+			md.g.Mods = slices.Clone(GameConfig.Mods)
 		}
 		md.modSelectionMenu()
 		return nil
@@ -312,8 +312,8 @@ func (md *model) startNewGame(spe *Entity) {
 func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
 	md.menu.main.Update(msg)
 	resetChanges := func() {
-		if len(GameConfig.Mods) == NSavedMods {
-			copy(md.g.Mods[:NSavedMods], GameConfig.Mods)
+		if len(GameConfig.Mods) == NMods {
+			md.g.Mods = slices.Clone(GameConfig.Mods)
 		} else {
 			clear(md.g.Mods)
 		}
@@ -363,8 +363,8 @@ func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
 			if act != ui.MenuInvoke {
 				break
 			}
-			if !slices.Equal(GameConfig.Mods, g.Mods[:NSavedMods]) {
-				GameConfig.Mods = slices.Clone(g.Mods[:NSavedMods])
+			if !slices.Equal(GameConfig.Mods, g.Mods) {
+				GameConfig.Mods = slices.Clone(g.Mods)
 				if err := SaveConfig(); err != nil {
 					log.Printf("error saving config: %v", err)
 				}

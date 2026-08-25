@@ -995,9 +995,10 @@ var configActions = []Action{
 	ActionToggleDarkLight{},
 	ActionToggleExtraWarnings{},
 	ActionToggleAdvancedNewGame{},
+	ActionToggleResetChallenges{},
 }
 
-var configKeys = []rune{':', 'c', 'w', 'n', 't'}
+var configKeys = []rune{':', 'c', 'w', 'n', 's', 't'}
 
 func (a ActionConfig) Handle(md *model) (gruid.Effect, bool) {
 	md.menuActions = configActions
@@ -1104,9 +1105,39 @@ func (a ActionToggleAdvancedNewGame) String() string {
 
 func (a ActionToggleAdvancedNewGame) Desc() string {
 	if GameConfig.AdvancedNewGame {
-		return "This option makes the “classic” new game menu the default on game startup. It only has an effect when starting a new game.\n\nThe classic new game menu only gives access to the core primary spirits and disables all mods.\n\nYou can still access “advanced” new game settings by pressing TAB or SPACE there."
+		return "This option makes the “classic” new game menu the default on game startup. It only has an effect when starting a new game.\n\nThe classic new game menu only gives access to the core primary spirits and disables all mods.\n\nYou can still access “advanced” new game settings by pressing TAB or SPACE there.\n\nCurrently using “advanced new game menu”."
 	}
-	return "This option makes the “advanced” new game menu the default on game startup. It only has an effect when starting a new game.\n\nThe advanced new game menu gives access to extra advanced primary spirits (Spinning Crocodile, Vampiric Bat) and makes use of any enabled mods."
+	return "This option makes the “advanced” new game menu the default on game startup. It only has an effect when starting a new game.\n\nThe advanced new game menu gives access to extra advanced primary spirits (Spinning Crocodile, Vampiric Bat) and makes use of any enabled mods.\n\nCurrently using “classic new game menu”."
+}
+
+// ActionToggleResetChallenges enables/disables resetting of mods in Challenges
+// section on new game.
+type ActionToggleResetChallenges struct{}
+
+func (a ActionToggleResetChallenges) Handle(md *model) (gruid.Effect, bool) {
+	GameConfig.ResetChallengeMods = !GameConfig.ResetChallengeMods
+	err := SaveConfig()
+	if err != nil {
+		log.Printf("error saving config: %v", err)
+	}
+	clearCache()
+	eff := gruid.Cmd(func() gruid.Msg { return gruid.MsgScreen{} })
+	md.mode = modeNormal
+	return eff, false
+}
+
+func (a ActionToggleResetChallenges) String() string {
+	if GameConfig.ResetChallengeMods {
+		return "Default to restoring all mods"
+	}
+	return "Default to resetting Challenges"
+}
+
+func (a ActionToggleResetChallenges) Desc() string {
+	if GameConfig.ResetChallengeMods {
+		return "Enabling this option will restore the default mod selection saving policy, saving full mod selection for the next game.\n\nCurrently, Challenges are disabled by default when starting a new game."
+	}
+	return "Enabling this option will make it so any mods in the Challenges section are always disabled by default on a new game unless you enable them manually.\n\nCurrently, the full mod selection is saved between runs, including Challenges."
 }
 
 // ActionSetKeys opens the keymap settings.
