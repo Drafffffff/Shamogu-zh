@@ -1893,11 +1893,25 @@ func (a ActionHelpMods) Handle(md *model) (gruid.Effect, bool) {
 			continue
 		}
 		fmt.Fprintf(&sb, "\n\n@Y%s@N\n\n%s", m.String(), m.Desc())
-		if m == ModAdvancedSpirits {
-			sb.WriteString("\n\n")
-			sb.WriteString(`@CExtra Info@N
+		if s := modExtraInfo(m); s != "" {
+			sb.WriteString("\n\n@CExtra Info@N\n\n")
+			sb.WriteString(s)
+		}
+	}
+	md.helpTopic(title, sb.String())
+	return nil, false
+}
 
-Some advanced secondary spirit traits are a bit tricky to use or understand.
+func modExtraInfo(m Mod) string {
+	switch m {
+	case ModCorruptedDungeon:
+		return `The wandering or guarding behavior of monsters is hidden with Corrupted Dungeon. While most of the time the roles remain the same as in the classic game, you’ll occasionally have to guess based on actual behavior.
+
+Various thematic levels of diverse rarity may appear. They can be quite surprising!
+
+Sometimes, map corruption events happen. In particular, lots of long-lasting fog may spawn at once in the whole level. Beware however that this event is accompanied by a reduction in foliage and rubble around the map, so the temporarily reduced visibility progressively switches to an increased visibility.`
+	case ModAdvancedSpirits:
+		return `Some advanced secondary spirit traits are a bit tricky to use or understand.
 
 The Gawalt’s weakens by 1 damage any hits doing more than 2 base damage and two thirds of the hits doing 2 base damage. Accuracy is preserved.
 
@@ -1907,11 +1921,20 @@ The Lion’s roaring happens on first sight, but detecting a monster first beyon
 
 When the Elephant is in a dead-end or the Gawalt is on a menhir tile, wandering monsters don’t notice you, but hunting monsters still see you.
 
-The Chicken not triggering traps is as simple as it sounds, but given how wandering monsters avoid traps, it has subtle stealth implications.`)
-		}
+The Chicken not triggering traps is as simple as it sounds, but given how wandering monsters avoid traps, it has subtle stealth implications.`
+	case ModTotemConditions:
+		return `Be careful while choosing spirits: some totem curses may replace existing curses on upgrade or even apply a curse on any upgrade (including primary spirit!). Also watch closely the nature of punishment: often, difficult restrictions have softer punishments when you fail.
+
+Some curses ask to “complete a full level”: note that this excludes the level in which you got the curse.
+
+Conditional rare comestibles are more frequent later on, and you’ll typically find a few of them per run.
+
+When this mod is combined with Advanced Spirits, those aren’t more frequent than regular ones early on anymore. However, they sometimes get softer curses to help make them more appealing.
+
+When No Recharges is on, some curses are disabled or adjusted for balance.`
+	default:
+		return ""
 	}
-	md.helpTopic(title, sb.String())
-	return nil, false
 }
 
 func (a ActionHelpMods) String() string {
