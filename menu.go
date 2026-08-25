@@ -219,7 +219,7 @@ func (md *model) updateKeysMenu(msg gruid.Msg) {
 		if !ok {
 			return
 		}
-		if msg.Key == "R" {
+		if msg.Key == "R" || msg.Key == "r" {
 			md.resetKeys()
 			md.action = ActionSetKeys{}
 		}
@@ -259,6 +259,7 @@ func (md *model) updateKeysChange(msg gruid.Msg) {
 		if err != nil {
 			log.Printf("error saving config: %v", err)
 		}
+		md.setKeyBindingsTitle()
 		md.action = ActionSetKeys{}
 	}
 }

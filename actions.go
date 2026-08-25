@@ -6,6 +6,7 @@ import (
 	"cmp"
 	"fmt"
 	"log"
+	"maps"
 	"runtime"
 	"slices"
 	"strings"
@@ -29,7 +30,7 @@ type Action interface {
 type ActionDesc interface {
 	Action
 	String() string
-	Desc() string
+	Desc(*model) string
 }
 
 // updateActionDesc updates the description label for the given described action.
@@ -37,7 +38,7 @@ func (md *model) updateActionDesc(a ActionDesc) {
 	l := md.desc
 	stt := ui.StyledText{}.WithMarkups(Markups)
 	l.Box = &ui.Box{Title: ui.Text(a.String())}
-	l.Content = stt.WithText(a.Desc()).Format(UIWidth/2 - 2)
+	l.Content = stt.WithText(a.Desc(md)).Format(UIWidth/2 - 2)
 }
 
 // ActionNone does nothing.
@@ -811,7 +812,7 @@ func (a ActionInventory) String() string {
 	return "Open inventory"
 }
 
-func (a ActionInventory) Desc() string {
+func (a ActionInventory) Desc(_ *model) string {
 	return "Shows your spirits and comestibles. Selecting a spirit will use a charge, while selecting a comestible makes you eat it."
 }
 
@@ -1001,6 +1002,11 @@ var configActions = []Action{
 var configKeys = []rune{':', 'c', 'w', 'n', 's', 't'}
 
 func (a ActionConfig) Handle(md *model) (gruid.Effect, bool) {
+	md.openConfig(true)
+	return nil, false
+}
+
+func (md *model) openConfig(reset bool) {
 	md.menuActions = configActions
 	entries := []ui.MenuEntry{}
 	for i, it := range md.menuActions {
@@ -1013,18 +1019,22 @@ func (a ActionConfig) Handle(md *model) (gruid.Effect, bool) {
 	altBgEntries(entries)
 	md.menu.main.SetBox(&ui.Box{Title: ui.Text("Config").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
 	md.menu.main.SetEntries(entries)
-	md.menu.main.SetActiveInvokable(0)
-	md.updateMenuActionDesc(0)
+	if reset {
+		// Reset active entry.
+		md.menu.main.SetActiveInvokable(0)
+	}
+	if idx := md.menu.main.ActiveInvokable(); idx >= 0 {
+		md.updateMenuActionDesc(idx)
+	}
 	md.mode = modeMenu
 	md.menu.mode = modeConfigMenu
-	return nil, false
 }
 
 func (a ActionConfig) String() string {
 	return "Configure settings"
 }
 
-func (a ActionConfig) Desc() string {
+func (a ActionConfig) Desc(_ *model) string {
 	return "Opens a configuration menu with various options."
 }
 
@@ -1039,7 +1049,7 @@ func (a ActionToggleDarkLight) Handle(md *model) (gruid.Effect, bool) {
 	}
 	clearCache()
 	eff := gruid.Cmd(func() gruid.Msg { return gruid.MsgScreen{} })
-	md.mode = modeNormal
+	md.openConfig(false)
 	return eff, false
 }
 
@@ -1048,6 +1058,13 @@ func (a ActionToggleDarkLight) String() string {
 		return "Switch to light color theme"
 	}
 	return "Switch to dark color theme"
+}
+
+func (a ActionToggleDarkLight) Desc(_ *model) string {
+	if GameConfig.DarkColors {
+		return "Toggling this option switches to a light color theme.\n\n@SCurrent setting: dark color theme.@N"
+	}
+	return "Toggling this option switches to a dark color theme.\n\n@SCurrent setting: light color theme.@N"
 }
 
 // ActionToggleExtraWarnings enables/disables extra warnings.
@@ -1061,7 +1078,7 @@ func (a ActionToggleExtraWarnings) Handle(md *model) (gruid.Effect, bool) {
 	}
 	clearCache()
 	eff := gruid.Cmd(func() gruid.Msg { return gruid.MsgScreen{} })
-	md.mode = modeNormal
+	md.openConfig(false)
 	return eff, false
 }
 
@@ -1072,12 +1089,14 @@ func (a ActionToggleExtraWarnings) String() string {
 	return "Enable extra warnings"
 }
 
-func (a ActionToggleExtraWarnings) Desc() string {
-	verb := "enables"
+func (a ActionToggleExtraWarnings) Desc(_ *model) string {
+	var verb, current string
 	if GameConfig.WarningsExtra {
-		verb = "disables"
+		verb, current = "disables", "enabled"
+	} else {
+		verb, current = "enables", "disabled"
 	}
-	return fmt.Sprintf("This option %s extra confirmation prompt warnings.\n\nThose are triggered when getting @OFire@N or @OPoison@N, but also when some specific statuses like @BBerserk@N or @BLignification@N only have one turn remaining.", verb)
+	return fmt.Sprintf("Toggling this option %s extra confirmation prompt warnings.\n\nThose are triggered when getting @OFire@N or @OPoison@N, but also when some specific statuses like @BBerserk@N or @BLignification@N only have one turn remaining.\n\n@SCurrent setting: %s.@N", verb, current)
 }
 
 // ActionToggleAdvancedNewGame enables/disables advanced new game menu (by
@@ -1092,7 +1111,7 @@ func (a ActionToggleAdvancedNewGame) Handle(md *model) (gruid.Effect, bool) {
 	}
 	clearCache()
 	eff := gruid.Cmd(func() gruid.Msg { return gruid.MsgScreen{} })
-	md.mode = modeNormal
+	md.openConfig(false)
 	return eff, false
 }
 
@@ -1103,11 +1122,11 @@ func (a ActionToggleAdvancedNewGame) String() string {
 	return "Default to advanced new game menu"
 }
 
-func (a ActionToggleAdvancedNewGame) Desc() string {
+func (a ActionToggleAdvancedNewGame) Desc(_ *model) string {
 	if GameConfig.AdvancedNewGame {
-		return "This option makes the “classic” new game menu the default on game startup. It only has an effect when starting a new game.\n\nThe classic new game menu only gives access to the core primary spirits and disables all mods.\n\nYou can still access “advanced” new game settings by pressing TAB or SPACE there.\n\nCurrently using “advanced new game menu”."
+		return "Toggling this option makes the “classic” new game menu the default on game startup. It only has an effect when starting a new game.\n\nThe classic new game menu only gives access to the core primary spirits and disables all mods.\n\nYou can still access “advanced” new game settings by pressing TAB or SPACE there.\n\n@SCurrent setting: advanced new game menu.@N"
 	}
-	return "This option makes the “advanced” new game menu the default on game startup. It only has an effect when starting a new game.\n\nThe advanced new game menu gives access to extra advanced primary spirits (Spinning Crocodile, Vampiric Bat) and makes use of any enabled mods.\n\nCurrently using “classic new game menu”."
+	return "Toggling this option makes the “advanced” new game menu the default on game startup. It only has an effect when starting a new game.\n\nThe advanced new game menu gives access to extra advanced primary spirits (Spinning Crocodile, Vampiric Bat) and makes use of any enabled mods.\n\n@SCurrent setting: classic new game menu.@N"
 }
 
 // ActionToggleResetChallenges enables/disables resetting of mods in Challenges
@@ -1122,22 +1141,22 @@ func (a ActionToggleResetChallenges) Handle(md *model) (gruid.Effect, bool) {
 	}
 	clearCache()
 	eff := gruid.Cmd(func() gruid.Msg { return gruid.MsgScreen{} })
-	md.mode = modeNormal
+	md.openConfig(false)
 	return eff, false
 }
 
 func (a ActionToggleResetChallenges) String() string {
 	if GameConfig.ResetChallengeMods {
-		return "Default to restoring all mods"
+		return "Keep full mod selection"
 	}
-	return "Default to resetting Challenges"
+	return "Reset challenges in mod selection"
 }
 
-func (a ActionToggleResetChallenges) Desc() string {
+func (a ActionToggleResetChallenges) Desc(_ *model) string {
 	if GameConfig.ResetChallengeMods {
-		return "Enabling this option will restore the default mod selection saving policy, saving full mod selection for the next game.\n\nCurrently, Challenges are disabled by default when starting a new game."
+		return "Toggling this option will restore the default mod selection saving policy, saving full mod selection for the next game.\n\n@SCurrent setting: reset challenges.@N"
 	}
-	return "Enabling this option will make it so any mods in the Challenges section are always disabled by default on a new game unless you enable them manually.\n\nCurrently, the full mod selection is saved between runs, including Challenges."
+	return "Toggling this option will make it so any mods in the Challenges section are always disabled by default on a new game unless you enable them manually.\n\n@SCurrent setting: save full mod selection.@N"
 }
 
 // ActionSetKeys opens the keymap settings.
@@ -1201,12 +1220,20 @@ func (a ActionSetKeys) Handle(md *model) (gruid.Effect, bool) {
 		r = nextRuneKey(r)
 	}
 	altBgEntries(entries)
-	md.menu.keys.SetBox(&ui.Box{Title: ui.Text("Key Bindings").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
+	md.setKeyBindingsTitle()
 	md.menu.keys.SetEntries(entries)
 	md.menu.main.SetActiveInvokable(0)
 	md.mode = modeMenu
 	md.menu.mode = modeKeysView
 	return nil, false
+}
+
+func (md *model) setKeyBindingsTitle() {
+	if md.UsesDefaultKeybindings() {
+		md.menu.keys.SetBox(&ui.Box{Title: ui.Text("Key Bindings (default)").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
+	} else {
+		md.menu.keys.SetBox(&ui.Box{Title: ui.Text("Key Bindings (custom)").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
+	}
 }
 
 func (md *model) keysForAction(a Action) string {
@@ -1239,6 +1266,23 @@ func (a ActionSetKeys) String() string {
 	return "View/Customize keybindings"
 }
 
+func (a ActionSetKeys) Desc(md *model) string {
+	var s string
+	if md.UsesDefaultKeybindings() {
+		s = "\n\n@SCurrently: default keybindings.@N"
+	} else {
+		s = "\n\n@SCurrently: custom keybindings.@N"
+	}
+	return fmt.Sprintf("Opens a menu that allows to view and customize keybindings.%s", s)
+}
+
+// UsesDefaultKeybindings reports whether default keybindings are currently in
+// use.
+func (md *model) UsesDefaultKeybindings() bool {
+	return maps.Equal(md.keysNormal, DefaultKeysNormal) &&
+		maps.Equal(md.keysTarget, DefaultKeysTarget)
+}
+
 // ActionViewMessages opens the log message viewer.
 type ActionViewMessages struct{}
 
@@ -1261,7 +1305,7 @@ func (a ActionViewMessages) String() string {
 	return "View messages"
 }
 
-func (a ActionViewMessages) Desc() string {
+func (a ActionViewMessages) Desc(_ *model) string {
 	return "Opens a pager with previous message logs. The pager supports page up/down, mouse scrolling, and other basic less-like keybindings."
 }
 
@@ -1290,7 +1334,7 @@ func (a ActionDump) String() string {
 	return "Game summary"
 }
 
-func (a ActionDump) Desc() string {
+func (a ActionDump) Desc(_ *model) string {
 	if runtime.GOOS == "js" {
 		return "Writes game statistics below. Also opens in-game pager with the summary."
 	}
@@ -1313,7 +1357,7 @@ func (a ActionSaveQuit) String() string {
 	return "Save and Quit"
 }
 
-func (a ActionSaveQuit) Desc() string {
+func (a ActionSaveQuit) Desc(_ *model) string {
 	return "Saves current progress and quits the game. The next time you start the game, it will directly resume from here."
 }
 
@@ -1330,7 +1374,7 @@ func (a ActionQuit) String() string {
 	return "Quit (without saving)"
 }
 
-func (a ActionQuit) Desc() string {
+func (a ActionQuit) Desc(_ *model) string {
 	return "Deletes any saved progress for current playthrough and quits the game."
 }
 
@@ -1600,7 +1644,7 @@ func (a ActionHelp) String() string {
 	return "Help"
 }
 
-func (a ActionHelp) Desc() string {
+func (a ActionHelp) Desc(_ *model) string {
 	return "Opens a menu leading to various help topics."
 }
 
@@ -1616,18 +1660,14 @@ func (a ActionHelpDefaultKeys) String() string {
 	return "Keybindings (default values)"
 }
 
-func (a ActionHelpDefaultKeys) Desc() string {
+func (a ActionHelpDefaultKeys) Desc(_ *model) string {
 	return "Shows a short one-page summary with most default keybindings."
 }
 
 func (md *model) updateKeysDescription(title string, actions []string) {
 	md.pager.mode = modePagerNormal
 	md.mode = modePager
-	if CustomKeys {
-		title = fmt.Sprintf(" Default %s ", title)
-	} else {
-		title = fmt.Sprintf(" %s ", title)
-	}
+	title = fmt.Sprintf(" %s ", title)
 	md.pager.pg.SetBox(&ui.Box{Title: ui.Text(title).WithStyle(gruid.Style{}.WithFg(ColorYellow))})
 	lines := []ui.StyledText{}
 	for i := 0; i < len(actions)-1; i += 2 {
@@ -1699,7 +1739,7 @@ func (a ActionHelpCombat) String() string {
 	return "Combat"
 }
 
-func (a ActionHelpCombat) Desc() string {
+func (a ActionHelpCombat) Desc(_ *model) string {
 	return "Explains how various combat-related features work, including attack patterns and on-hit effects."
 }
 
@@ -1773,7 +1813,7 @@ func (a ActionHelpStealth) String() string {
 	return "Stealth"
 }
 
-func (a ActionHelpStealth) Desc() string {
+func (a ActionHelpStealth) Desc(_ *model) string {
 	return "Explains how various stealth-related features work, including monster mindstate and noise."
 }
 
@@ -1814,7 +1854,7 @@ func (a ActionHelpItems) String() string {
 	return "Items"
 }
 
-func (a ActionHelpItems) Desc() string {
+func (a ActionHelpItems) Desc(_ *model) string {
 	return "Gives an overview about the various kinds of items found in the game."
 }
 
@@ -1878,7 +1918,7 @@ func (a ActionHelpMods) String() string {
 	return "Mods"
 }
 
-func (a ActionHelpMods) Desc() string {
+func (a ActionHelpMods) Desc(_ *model) string {
 	return "Lists enabled mods along with their descriptions."
 }
 
@@ -1894,7 +1934,7 @@ func (a ActionHelpStatuses) String() string {
 	return "Statuses"
 }
 
-func (a ActionHelpStatuses) Desc() string {
+func (a ActionHelpStatuses) Desc(_ *model) string {
 	return "Explains in detail how the various status effects work, as well as the color conventions."
 }
 
@@ -1939,7 +1979,7 @@ func (a ActionHelpTips) String() string {
 	return "Tips"
 }
 
-func (a ActionHelpTips) Desc() string {
+func (a ActionHelpTips) Desc(_ *model) string {
 	return "Provides various tips for new players."
 }
 

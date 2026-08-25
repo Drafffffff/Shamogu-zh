@@ -58,6 +58,9 @@ UI, graphics, QoL:
   now as `Stats: +1 Attack` in spirit descriptions). Also, when a description
   doesn't fit in equip menu, as can now rarely happen with some curse
   descriptions, it's now possible to scroll with page down/up and wheel.
+* Improvements in configuration menu: now current setting is shown greyed in
+  the description, and toggling a setting does not immediately quit the menu
+  anymore.
 
 Fixes:
 

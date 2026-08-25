@@ -5,6 +5,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"maps"
 	"math/rand/v2"
 	"runtime"
 	"slices"
@@ -34,9 +35,6 @@ const (
 	ColorMode256             // use solarized 256-color approximation
 	ColorMode24bit           // use true color selenized palette
 )
-
-// CustomKeys tracks whether we're using custom key bindings.
-var CustomKeys bool
 
 // GameConfig contains the current game config.
 var GameConfig = Config{
@@ -175,68 +173,74 @@ func (md *model) initWidgets() {
 	})
 }
 
+// DefaultKeysNormal represents the default keybindings in normal mode (map).
+var DefaultKeysNormal = map[gruid.Key]Action{
+	gruid.KeyEscape:     ActionNone{},
+	gruid.KeyArrowLeft:  ActionBump{Delta: gruid.Point{-1, 0}},
+	gruid.KeyArrowDown:  ActionBump{Delta: gruid.Point{0, 1}},
+	gruid.KeyArrowUp:    ActionBump{Delta: gruid.Point{0, -1}},
+	gruid.KeyArrowRight: ActionBump{Delta: gruid.Point{1, 0}},
+	"h":                 ActionBump{Delta: gruid.Point{-1, 0}},
+	"j":                 ActionBump{Delta: gruid.Point{0, 1}},
+	"k":                 ActionBump{Delta: gruid.Point{0, -1}},
+	"l":                 ActionBump{Delta: gruid.Point{1, 0}},
+	"H":                 ActionRun{Delta: gruid.Point{-1, 0}},
+	"J":                 ActionRun{Delta: gruid.Point{0, 1}},
+	"K":                 ActionRun{Delta: gruid.Point{0, -1}},
+	"L":                 ActionRun{Delta: gruid.Point{1, 0}},
+	".":                 ActionWait{},
+	gruid.KeyEnter:      ActionWait{},
+	"o":                 ActionAutoExplore{},
+	"+":                 ActionNextMonster{},
+	"-":                 ActionPreviousMonster{},
+	"%":                 ActionNextItem{itemComestible},
+	"!":                 ActionNextItem{itemTotem},
+	"&":                 ActionNextItem{itemMenhir},
+	">":                 ActionNextItem{itemPortal},
+	"=":                 ActionNextItem{itemRune},
+	"x":                 ActionExamineModeToggle{},
+	"e":                 ActionInteract{},
+	"i":                 ActionInventory{},
+	gruid.KeySpace:      ActionMenu{},
+	"?":                 ActionHelp{},
+	"#":                 ActionDump{},
+	"S":                 ActionSaveQuit{},
+	"C":                 ActionConfig{},
+	gruid.KeyTab:        ActionConfig{},
+	":":                 ActionSetKeys{},
+	"m":                 ActionViewMessages{},
+	"Q":                 ActionQuit{},
+	"W":                 ActionWizard{},
+	gruid.KeyPageDown:   ActionScroll{Delta: gruid.Point{0, -1}},
+	"d":                 ActionScroll{Delta: gruid.Point{0, -1}},
+	gruid.KeyPageUp:     ActionScroll{Delta: gruid.Point{0, 1}},
+	"u":                 ActionScroll{Delta: gruid.Point{0, 1}},
+	"»":                 ActionWizardNextLevel{},
+}
+
+// DefaultKeysNormal represents the default keybindings changes in
+// targeting/examine mode with respect to normal mode.
+var DefaultKeysTarget = map[gruid.Key]Action{
+	gruid.KeyArrowLeft:  ActionCursorBump{Delta: gruid.Point{-1, 0}},
+	gruid.KeyArrowDown:  ActionCursorBump{Delta: gruid.Point{0, 1}},
+	gruid.KeyArrowUp:    ActionCursorBump{Delta: gruid.Point{0, -1}},
+	gruid.KeyArrowRight: ActionCursorBump{Delta: gruid.Point{1, 0}},
+	"h":                 ActionCursorBump{Delta: gruid.Point{-1, 0}},
+	"j":                 ActionCursorBump{Delta: gruid.Point{0, 1}},
+	"k":                 ActionCursorBump{Delta: gruid.Point{0, -1}},
+	"l":                 ActionCursorBump{Delta: gruid.Point{1, 0}},
+	"H":                 ActionCursorRun{Delta: gruid.Point{-1, 0}},
+	"J":                 ActionCursorRun{Delta: gruid.Point{0, 1}},
+	"K":                 ActionCursorRun{Delta: gruid.Point{0, -1}},
+	"L":                 ActionCursorRun{Delta: gruid.Point{1, 0}},
+	gruid.KeyEnter:      ActionTravel{},
+	".":                 ActionTravel{},
+	gruid.KeyEscape:     ActionExamineModeToggle{},
+}
+
 func (md *model) initKeys() {
-	md.keysNormal = map[gruid.Key]Action{
-		gruid.KeyEscape:     ActionNone{},
-		gruid.KeyArrowLeft:  ActionBump{Delta: gruid.Point{-1, 0}},
-		gruid.KeyArrowDown:  ActionBump{Delta: gruid.Point{0, 1}},
-		gruid.KeyArrowUp:    ActionBump{Delta: gruid.Point{0, -1}},
-		gruid.KeyArrowRight: ActionBump{Delta: gruid.Point{1, 0}},
-		"h":                 ActionBump{Delta: gruid.Point{-1, 0}},
-		"j":                 ActionBump{Delta: gruid.Point{0, 1}},
-		"k":                 ActionBump{Delta: gruid.Point{0, -1}},
-		"l":                 ActionBump{Delta: gruid.Point{1, 0}},
-		"H":                 ActionRun{Delta: gruid.Point{-1, 0}},
-		"J":                 ActionRun{Delta: gruid.Point{0, 1}},
-		"K":                 ActionRun{Delta: gruid.Point{0, -1}},
-		"L":                 ActionRun{Delta: gruid.Point{1, 0}},
-		".":                 ActionWait{},
-		gruid.KeyEnter:      ActionWait{},
-		"o":                 ActionAutoExplore{},
-		"+":                 ActionNextMonster{},
-		"-":                 ActionPreviousMonster{},
-		"%":                 ActionNextItem{itemComestible},
-		"!":                 ActionNextItem{itemTotem},
-		"&":                 ActionNextItem{itemMenhir},
-		">":                 ActionNextItem{itemPortal},
-		"=":                 ActionNextItem{itemRune},
-		"x":                 ActionExamineModeToggle{},
-		"e":                 ActionInteract{},
-		"i":                 ActionInventory{},
-		gruid.KeySpace:      ActionMenu{},
-		"?":                 ActionHelp{},
-		"#":                 ActionDump{},
-		"S":                 ActionSaveQuit{},
-		"C":                 ActionConfig{},
-		gruid.KeyTab:        ActionConfig{},
-		":":                 ActionSetKeys{},
-		"m":                 ActionViewMessages{},
-		"Q":                 ActionQuit{},
-		"W":                 ActionWizard{},
-		gruid.KeyPageDown:   ActionScroll{Delta: gruid.Point{0, -1}},
-		"d":                 ActionScroll{Delta: gruid.Point{0, -1}},
-		gruid.KeyPageUp:     ActionScroll{Delta: gruid.Point{0, 1}},
-		"u":                 ActionScroll{Delta: gruid.Point{0, 1}},
-		"»":                 ActionWizardNextLevel{},
-	}
-	md.keysTarget = map[gruid.Key]Action{
-		gruid.KeyArrowLeft:  ActionCursorBump{Delta: gruid.Point{-1, 0}},
-		gruid.KeyArrowDown:  ActionCursorBump{Delta: gruid.Point{0, 1}},
-		gruid.KeyArrowUp:    ActionCursorBump{Delta: gruid.Point{0, -1}},
-		gruid.KeyArrowRight: ActionCursorBump{Delta: gruid.Point{1, 0}},
-		"h":                 ActionCursorBump{Delta: gruid.Point{-1, 0}},
-		"j":                 ActionCursorBump{Delta: gruid.Point{0, 1}},
-		"k":                 ActionCursorBump{Delta: gruid.Point{0, -1}},
-		"l":                 ActionCursorBump{Delta: gruid.Point{1, 0}},
-		"H":                 ActionCursorRun{Delta: gruid.Point{-1, 0}},
-		"J":                 ActionCursorRun{Delta: gruid.Point{0, 1}},
-		"K":                 ActionCursorRun{Delta: gruid.Point{0, -1}},
-		"L":                 ActionCursorRun{Delta: gruid.Point{1, 0}},
-		gruid.KeyEnter:      ActionTravel{},
-		".":                 ActionTravel{},
-		gruid.KeyEscape:     ActionExamineModeToggle{},
-	}
-	CustomKeys = false
+	md.keysNormal = maps.Clone(DefaultKeysNormal)
+	md.keysTarget = maps.Clone(DefaultKeysTarget)
 }
 
 func (md *model) applyKeyConfig() {
@@ -260,7 +264,7 @@ func (md *model) applyKeyConfig() {
 
 // InitConfig loads saved config, if any, and initializes GameConfig.
 func InitConfig() error {
-	load, err := LoadConfig()
+	_, err := LoadConfig()
 	if err != nil {
 		err = fmt.Errorf("error loading config: %v", err)
 		saverr := SaveConfig()
@@ -269,10 +273,7 @@ func InitConfig() error {
 		}
 		return err
 	}
-	if load {
-		CustomKeys = true
-	}
-	return err
+	return nil
 }
 
 var spiritKeys = []rune{'H', 'B', 'F', 'f', 'c'}
