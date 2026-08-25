@@ -953,11 +953,28 @@ func (eff EffectFortressOyster) CanApply(g *Game, i ID) bool {
 }
 
 func (eff EffectFortressOyster) Apply(g *Game) bool {
+	const d = 5 // common status duration
 	pa := g.PlayerActor()
 	g.eatMsg("fortress oyster", "")
-	g.PutStatus1(PlayerID, pa, StatusLignification, 5)
-	g.PutStatus1(PlayerID, pa, StatusBerserk, 5)
-	g.PutStatus1(PlayerID, pa, StatusVampirism, 5)
+	g.RemoveStatus(PlayerID, pa, StatusClarity)
+	if pa.Has(StatusBerserk) {
+		pa.Statuses[StatusBerserk] = max(pa.Statuses[StatusBerserk], d+1)
+		bonusHP := pa.HP - max(1, pa.HP-pa.HPBonus())
+		g.AdjustHP(PlayerID, pa, pa.HPBonus()-bonusHP)
+	} else {
+		g.PutStatus1(PlayerID, pa, StatusBerserk, d)
+	}
+	g.RemoveStatus(PlayerID, pa, StatusFoggySkin)
+	if pa.Has(StatusLignification) {
+		// We handle lignification after berserk, because at low HP it
+		// can result in higher final bonuses due to the HP floor of 3.
+		pa.Statuses[StatusLignification] = max(pa.Statuses[StatusLignification], d+1)
+		bonusHP := pa.HP - max(min(3, pa.HP), pa.HP-pa.HPBonus())
+		g.AdjustHP(PlayerID, pa, pa.HPBonus()-bonusHP)
+	} else {
+		g.PutStatus1(PlayerID, pa, StatusLignification, d)
+	}
+	g.PutStatus1(PlayerID, pa, StatusVampirism, d)
 	return true
 }
 
@@ -966,7 +983,7 @@ func (eff EffectFortressOyster) Desc(g *Game) string {
 	if g.PlayerActor().DoesAny(Gluttony) {
 		cond = ""
 	}
-	return cond + "Gives @BLignification@N, @BBerserk@N, and @BVampirism@N for 5 turns."
+	return cond + "Gives @BBerserk@N, @BLignification@N, and @BVampirism@N for 5 turns. Removes incompatible statuses. Renews duration and temporary HP bonuses if applicable."
 }
 
 type EffectRunethornRose struct{}

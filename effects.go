@@ -145,7 +145,7 @@ func (eff EffectBerserkingFlower) Apply(g *Game) bool {
 	if pa.Has(StatusBerserk) {
 		// The berserking flower can be used to renew berserk duration
 		// and temporary HP bonus.
-		pa.Statuses[StatusBerserk] = d
+		pa.Statuses[StatusBerserk] = max(pa.Statuses[StatusBerserk], d+1)
 		bonusHP := pa.HP - max(1, pa.HP-pa.HPBonus())
 		g.AdjustHP(PlayerID, pa, pa.HPBonus()-bonusHP)
 		return true
@@ -174,7 +174,7 @@ func (eff EffectLignificationFruit) Apply(g *Game) bool {
 	if pa.Has(StatusLignification) {
 		// The lignification fruit can be used to renew lignification
 		// duration and temporary HP bonus.
-		pa.Statuses[StatusLignification] = d
+		pa.Statuses[StatusLignification] = max(pa.Statuses[StatusLignification], d+1)
 		bonusHP := pa.HP - max(min(3, pa.HP), pa.HP-pa.HPBonus())
 		g.AdjustHP(PlayerID, pa, pa.HPBonus()-bonusHP)
 		return true
@@ -982,7 +982,7 @@ func (eff EffectStomp) Apply(g *Game) bool {
 	}
 	if pa.Has(StatusBerserk) {
 		// Stomp renews berserk duration (if lower) and temporary HP bonus.
-		pa.Statuses[StatusBerserk] = max(pa.Statuses[StatusBerserk], d)
+		pa.Statuses[StatusBerserk] = max(pa.Statuses[StatusBerserk], d+1)
 		bonusHP := pa.HP - max(1, pa.HP-pa.HPBonus())
 		g.AdjustHP(PlayerID, pa, pa.HPBonus()-bonusHP)
 	} else {
