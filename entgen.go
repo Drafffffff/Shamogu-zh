@@ -589,8 +589,9 @@ func (g *Game) genItems(mg *MapGen) {
 		} else if !g.Mod(ModTotemConditions) && g.Map.Level == g.ProcInfo.RareComestible {
 			// Once in (most) games, a rare condition-based
 			// comestible usually only found with
-			// ModTotemConditions.
-			addComestible(i, g.GetConditionalComestible(g.Map.Level))
+			// ModTotemConditions (no chestnut, because kinda
+			// complicated).
+			addComestible(i, g.GetConditionalComestible(MapLevels))
 			g.ProcInfo.RareComestible = -1
 		} else {
 			addComestible(i, g.GetComestibleData()[comestibleIdx()])
