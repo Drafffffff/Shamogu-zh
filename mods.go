@@ -77,7 +77,7 @@ func (m Mod) Desc() string {
 	case ModNoRecharges:
 		return "Spirit ability charges are doubled but don’t recharge when going to the next map level. Use them wisely!"
 	case ModHealingCombat:
-		return fmt.Sprintf("Healing happens through combat. When a monster dies, you may heal for 1 HP, with higher chance at low HP. However, comestibles don’t provide healing anymore, except for ambrosia berries still healing %d HP.\n\nVampiric Bat players start with an extra “vampirism” charge and get another one at map level 5, instead of healing on monster death. Less frequent healing but better tactical control over it!\n\n@SRecommended for players that want to try an alternate experience with a single source of healing.@N", HealAmbrosiaHC)
+		return fmt.Sprintf("Healing happens through combat. When a monster dies, you may heal for 1 HP, with higher chance at low HP. However, comestibles don’t provide healing anymore, except for ambrosia berries still healing %d HP.\n\nVampiric Bat players start with an extra “vampirism” charge and get another one at map level 5, instead of healing on monster death. Less frequent healing but more active control over it!\n\n@SRecommended for players that want to try an alternate experience with a single source of healing.@N", HealAmbrosiaHC)
 	default:
 		return "(unknown mod)"
 	}
