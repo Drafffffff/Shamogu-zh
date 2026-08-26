@@ -52,7 +52,18 @@ Corrupted dungeon improvements (see discussion in #11):
 
 UI, graphics, QoL:
 
-* Make Runic Chicken players not avoid traps in auto-explore and travel.
+* The classic New Game menu has been merged with the advanced one. Now the menu
+  simply shows all primary spirits and signals Crocodile and Bat are “advanced”
+  in the menu itself. The previous system was not worth the complexity and the
+  extra easy-to-miss config setting, and it was making things more confusing
+  even for new players in the end.
+* The Mod Selection menu has now improved highlighting, so that it's harder to
+  miss which mods are selected. The mod count in the New Game menu uses color
+  now, too, so that it's easier to check. There is also now a new “Reset
+  selection” action to quickly clear the mod selection.
+* Improvements in configuration menu: now current setting is shown greyed in
+  the description, and toggling a setting does not immediately quit the menu
+  anymore.
 * The “game summary” action (shortcut `#`) now opens the pager with a
   simplified summary for in-game viewing, in addition to writing full
   statistics to a file (or “below” for the browser version).
@@ -60,10 +71,9 @@ UI, graphics, QoL:
   now as `Stats: +1 Attack` in spirit descriptions). Also, when a description
   doesn't fit in equip menu, as can now rarely happen with some curse
   descriptions, it's now possible to scroll with page down/up and wheel.
-* Improvements in configuration menu: now current setting is shown greyed in
-  the description, and toggling a setting does not immediately quit the menu
-  anymore.
-* Extra information in help about Corrupted Dungeon.
+* Extra information in help about Corrupted Dungeon, and a few other
+  improvements in mod descriptions.
+* Make Runic Chicken players not avoid traps in auto-explore and travel.
 
 Fixes:
 

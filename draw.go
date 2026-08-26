@@ -70,7 +70,7 @@ func (md *model) Draw() gruid.Grid {
 			md.gd.Copy(md.pager.pg.Draw())
 			return md.gd
 		}
-	case modeNewGame, modeNewGameAdvanced:
+	case modeNewGame:
 		md.drawSpiritSelection()
 		return md.gd
 	case modeNewGameMods:
@@ -571,18 +571,16 @@ func (md *model) drawSpiritSelection() {
 	md.desc.Draw(gdslice.Slice(gdslice.Range().Columns(UIWidth/2, UIWidth)))
 	ui.Textf("Shamanic Mountain Guardian - Shamogu %s", Version).WithStyle(gruid.Style{}.WithFg(ColorMagenta)).
 		Draw(md.gd.Slice(gruid.NewRange(-25+UIWidth/2, 3, UIWidth, UIHeight)))
-	y := 13
-	tabtext := `(TAB for advanced new game settings)`
-	if md.mode == modeNewGameAdvanced {
-		y += len(primarySpiritsAdvanced)
-		tabtext = fmt.Sprintf(`(TAB for mod selection - %d enabled)`, md.g.modCount())
+	y := 8 + len(primarySpirits)
+	n := md.g.modCount()
+	ns := "@S"
+	if n > 0 {
+		ns = "@V"
 	}
-	ui.Text(tabtext).WithStyle(gruid.Style{Fg: ColorGreen}).
+	tabtext := fmt.Sprintf(`@G(TAB for mod selection - %s%d@G enabled)@N`, ns, md.g.modCount())
+	ui.Text(tabtext).WithMarkups(Markups).
 		Draw(md.gd.Slice(gruid.NewRange(0, y, UIWidth/2, y+1)))
-	y = 16
-	if md.mode == modeNewGameAdvanced {
-		y += len(primarySpiritsAdvanced) - 1
-	}
+	y = 10 + len(primarySpirits)
 	ui.Text(`All life in your mountain is being corrupted. Beasts are losing their minds and ` +
 		`becoming aggressive. These disturbing events started to happen after a dungeon portal suddenly ` +
 		`appeared at the top of the mountain. As the guardian, you decide to explore ` +

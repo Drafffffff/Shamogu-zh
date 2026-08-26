@@ -9,6 +9,7 @@ import (
 	"math/rand/v2"
 	"runtime"
 	"slices"
+	"strings"
 
 	"codeberg.org/anaseto/gruid"
 	"codeberg.org/anaseto/gruid/paths"
@@ -48,9 +49,8 @@ type mode int
 
 const (
 	modeLoadGame           mode = iota // game load screen (load game)
-	modeNewGame                        // primary spirit selection (new game)
-	modeNewGameAdvanced                // primary spirit selection (advanced settings)
-	modeNewGameMods                    // mod selection (advanced settings)
+	modeNewGame                        // primary spirit selection
+	modeNewGameMods                    // mod selection
 	modeNormal                         // map game mode
 	modeCritical                       // hp critical warning pause
 	modePager                          // pager (logs, help, lore)
@@ -98,21 +98,13 @@ func (md *model) init() gruid.Effect {
 	if !load {
 		// Start a new game: go to spirit selection menu.
 		// Initialize mods before starting the game, because we need
-		// that information during the advanced new game settings.
-		if GameConfig.ResetChallengeMods && len(GameConfig.Mods) >= NSavedMods {
-			clear(GameConfig.Mods[NSavedMods:])
-		}
-		if GameConfig.AdvancedNewGame {
-			if len(GameConfig.Mods) == NMods {
-				g.Mods = slices.Clone(GameConfig.Mods)
-			} else {
-				g.Mods = make([]bool, NMods)
-			}
-			md.openSpiritSelectionMenu(modeNewGameAdvanced)
+		// that information during the new game settings.
+		if len(GameConfig.Mods) == NMods {
+			g.Mods = slices.Clone(GameConfig.Mods)
 		} else {
 			g.Mods = make([]bool, NMods)
-			md.openSpiritSelectionMenu(modeNewGame)
 		}
+		md.openSpiritSelectionMenu(modeNewGame)
 	}
 	if err != nil {
 		log.Printf("Error: %v", err)
@@ -276,20 +268,14 @@ func InitConfig() error {
 	return nil
 }
 
-var spiritKeys = []rune{'H', 'B', 'F', 'f', 'c'}
-var spiritKeysAdvanced = []rune{'C', 'b'}
+var spiritKeys = []rune{'H', 'B', 'F', 'f', 'c', 'C', 'b'}
 
 func (md *model) openSpiritSelectionMenu(m mode) {
 	hstyle := gruid.Style{Fg: ColorCyan}
 	entries := []ui.MenuEntry{}
-	spirits := getPrimarySpirits(m)
 	title := "New Game"
-	if m == modeNewGameAdvanced {
-		title = "New Game (advanced)"
-	}
-	keys := getPrimarySpiritKeys(m)
-	for i, si := range spirits {
-		r := keys[i]
+	for i, si := range primarySpirits {
+		r := spiritKeys[i]
 		switch r {
 		case 'H':
 			entries = append(entries, ui.MenuEntry{
@@ -297,8 +283,12 @@ func (md *model) openSpiritSelectionMenu(m mode) {
 				Disabled: true,
 			})
 		}
+		advanced := ""
+		if i >= 5 {
+			advanced = strings.Repeat(" ", 24-len(si.Name)) + "@S(advanced)@N"
+		}
 		entries = append(entries, ui.MenuEntry{
-			Text: ui.Textf("%c - %s", r, si.Name),
+			Text: ui.Textf("%c - %s%s", r, si.Name, advanced).WithMarkups(Markups),
 			Keys: []gruid.Key{gruid.Key(r)},
 		})
 	}
@@ -306,25 +296,7 @@ func (md *model) openSpiritSelectionMenu(m mode) {
 	md.menu.main.SetBox(&ui.Box{Title: ui.Text(title).WithStyle(gruid.Style{Fg: ColorYellow})})
 	md.menu.main.SetEntries(entries)
 	md.menu.main.SetActiveInvokable(0)
-	md.updateItemDesc(spiritEntity(md.g.Mods, spirits[0]))
+	md.updateItemDesc(spiritEntity(md.g.Mods, primarySpirits[0]))
 	md.mode = m
 	md.menu.mode = modeSelection // not really needed
-}
-
-// getPrimarySpirits returns the spirit info for primary spirits in the new
-// game menu.
-func getPrimarySpirits(m mode) []spiritInfo {
-	if m == modeNewGameAdvanced {
-		return append(slices.Clone(primarySpirits), primarySpiritsAdvanced...)
-	}
-	return primarySpirits
-}
-
-// getPrimarySpiritKeys returns the spirit info for primary spirits in the new
-// game menu.
-func getPrimarySpiritKeys(m mode) []rune {
-	if m == modeNewGameAdvanced {
-		return append(slices.Clone(spiritKeys), spiritKeysAdvanced...)
-	}
-	return spiritKeys
 }

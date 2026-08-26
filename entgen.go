@@ -135,11 +135,6 @@ var primarySpirits = []spiritInfo{
 		MaxCharges:  [2]int{1, 2},
 		Ability:     [2]Ability{EffectTimeStop{}, EffectTimeStop{}},
 		BonusTraits: [2]Traits{PatternSwapDaze, PatternSwapDaze}},
-}
-
-// primarySpiritsAdvanced represents the various kinds of advanced primary
-// spirits.
-var primarySpiritsAdvanced = []spiritInfo{
 	{
 		Name:         "Spinning Crocodile",
 		MaxCharges:   [2]int{3, 4},

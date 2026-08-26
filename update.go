@@ -81,7 +81,7 @@ func (md *model) update(msg gruid.Msg) gruid.Effect {
 				md.mode = modeNormal
 			}
 		}
-	case modeNewGame, modeNewGameAdvanced:
+	case modeNewGame:
 		return md.updateSpiritSelectionMenu(msg)
 	case modeNewGameMods:
 		return md.updateModSelectionMenu(msg)

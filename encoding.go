@@ -134,15 +134,13 @@ func (g *Game) GameSave() ([]byte, error) {
 
 // Config describes available configuration options.
 type Config struct {
-	AdvancedNewGame    bool                 // whether to go to advanced new game menu directly
-	DarkColors         bool                 // whether to use a dark color theme
-	ExamineModeKeys    map[gruid.Key]Action // custom examine mode keys
-	Mods               []bool               // selected mods (in previous advanced game)
-	ResetChallengeMods bool                 // reset challenge mods when starting a new game
-	NormalModeKeys     map[gruid.Key]Action // custom normal mode keys
-	Tiles              bool                 // whether to use Tiles or Unicode
-	VersionNumber      int                  // config-compatibility version number
-	WarningsExtra      bool                 // whether to stop and warn about fire/poison and some statuses about to expire
+	DarkColors      bool                 // whether to use a dark color theme
+	ExamineModeKeys map[gruid.Key]Action // custom examine mode keys
+	Mods            []bool               // selected mods (in previous game)
+	NormalModeKeys  map[gruid.Key]Action // custom normal mode keys
+	Tiles           bool                 // whether to use Tiles or Unicode
+	VersionNumber   int                  // config-compatibility version number
+	WarningsExtra   bool                 // whether to stop and warn about fire/poison and some statuses about to expire
 }
 
 // ConfigVersionNumber is the current config version number (for compatibility

@@ -995,11 +995,9 @@ var configActions = []Action{
 	ActionSetKeys{},
 	ActionToggleDarkLight{},
 	ActionToggleExtraWarnings{},
-	ActionToggleAdvancedNewGame{},
-	ActionToggleResetChallenges{},
 }
 
-var configKeys = []rune{':', 'c', 'w', 'n', 's', 't'}
+var configKeys = []rune{':', 'c', 'w', 't'}
 
 func (a ActionConfig) Handle(md *model) (gruid.Effect, bool) {
 	md.openConfig(true)
@@ -1097,66 +1095,6 @@ func (a ActionToggleExtraWarnings) Desc(_ *model) string {
 		verb, current = "enables", "disabled"
 	}
 	return fmt.Sprintf("Toggling this option %s extra confirmation prompt warnings.\n\nThose are triggered when getting @OFire@N or @OPoison@N, but also when some specific statuses like @BBerserk@N or @BLignification@N only have one turn remaining.\n\n@SCurrent setting: %s.@N", verb, current)
-}
-
-// ActionToggleAdvancedNewGame enables/disables advanced new game menu (by
-// default).
-type ActionToggleAdvancedNewGame struct{}
-
-func (a ActionToggleAdvancedNewGame) Handle(md *model) (gruid.Effect, bool) {
-	GameConfig.AdvancedNewGame = !GameConfig.AdvancedNewGame
-	err := SaveConfig()
-	if err != nil {
-		log.Printf("error saving config: %v", err)
-	}
-	clearCache()
-	eff := gruid.Cmd(func() gruid.Msg { return gruid.MsgScreen{} })
-	md.openConfig(false)
-	return eff, false
-}
-
-func (a ActionToggleAdvancedNewGame) String() string {
-	if GameConfig.AdvancedNewGame {
-		return "Default to classic new game menu"
-	}
-	return "Default to advanced new game menu"
-}
-
-func (a ActionToggleAdvancedNewGame) Desc(_ *model) string {
-	if GameConfig.AdvancedNewGame {
-		return "Toggling this option makes the “classic” new game menu the default on game startup. It only has an effect when starting a new game.\n\nThe classic new game menu only gives access to the core primary spirits and disables all mods.\n\nYou can still access “advanced” new game settings by pressing TAB or SPACE there.\n\n@SCurrent setting: advanced new game menu.@N"
-	}
-	return "Toggling this option makes the “advanced” new game menu the default on game startup. It only has an effect when starting a new game.\n\nThe advanced new game menu gives access to extra advanced primary spirits (Spinning Crocodile, Vampiric Bat) and makes use of any enabled mods.\n\n@SCurrent setting: classic new game menu.@N"
-}
-
-// ActionToggleResetChallenges enables/disables resetting of mods in Challenges
-// section on new game.
-type ActionToggleResetChallenges struct{}
-
-func (a ActionToggleResetChallenges) Handle(md *model) (gruid.Effect, bool) {
-	GameConfig.ResetChallengeMods = !GameConfig.ResetChallengeMods
-	err := SaveConfig()
-	if err != nil {
-		log.Printf("error saving config: %v", err)
-	}
-	clearCache()
-	eff := gruid.Cmd(func() gruid.Msg { return gruid.MsgScreen{} })
-	md.openConfig(false)
-	return eff, false
-}
-
-func (a ActionToggleResetChallenges) String() string {
-	if GameConfig.ResetChallengeMods {
-		return "Keep full mod selection"
-	}
-	return "Reset challenges in mod selection"
-}
-
-func (a ActionToggleResetChallenges) Desc(_ *model) string {
-	if GameConfig.ResetChallengeMods {
-		return "Toggling this option will restore the default mod selection saving policy, saving full mod selection for the next game.\n\n@SCurrent setting: reset challenges.@N"
-	}
-	return "Toggling this option will make it so any mods in the Challenges section are always disabled by default on a new game unless you enable them manually.\n\n@SCurrent setting: save full mod selection.@N"
 }
 
 // ActionSetKeys opens the keymap settings.
@@ -1496,9 +1434,8 @@ func (a ActionWizardNextLevel) Handle(md *model) (gruid.Effect, bool) {
 	}
 	if g.Map.Level == MapLevels {
 		g.Log("You’re already at the last level. Starting again!")
-		spirits := getPrimarySpirits(modeNewGameAdvanced)
 		*g = Game{rand: g.rand, Mods: g.Mods, md: md, Wizard: g.Wizard}
-		spe := spiritEntity(g.Mods, spirits[g.IntN(len(spirits))])
+		spe := spiritEntity(g.Mods, primarySpirits[g.IntN(len(primarySpirits))])
 		md.startNewGame(spe)
 		return nil, false
 	}
@@ -1879,7 +1816,7 @@ func (a ActionHelpMods) Handle(md *model) (gruid.Effect, bool) {
 	title := "Mods (Help)"
 	n := md.g.modCount()
 	if n == 0 {
-		md.helpTopic(title, "You haven’t enabled any expansion or challenge mods. You’re playing the vanilla game.\n\nMods are enabled through the advanced new game settings. You can access those from the new game menu by pressing TAB or SPACE.")
+		md.helpTopic(title, "You haven’t enabled any expansion or challenge mods. You’re playing the vanilla game.\n\nMods are enabled through the Mod Selection menu. You can access it from the New Game menu by pressing TAB or SPACE.")
 		return nil, false
 	}
 	var sb strings.Builder
@@ -1888,7 +1825,7 @@ func (a ActionHelpMods) Handle(md *model) (gruid.Effect, bool) {
 	} else {
 		fmt.Fprintf(&sb, "You have enabled the %d mods below.", n)
 	}
-	for _, m := range gameMods {
+	for _, m := range GameMods {
 		if !md.g.Mod(m) {
 			continue
 		}
@@ -1921,7 +1858,9 @@ The Lion’s roaring happens on first sight, but detecting a monster first beyon
 
 When the Elephant is in a dead-end or the Gawalt is on a menhir tile, wandering monsters don’t notice you, but hunting monsters still see you.
 
-The Chicken not triggering traps is as simple as it sounds, but given how wandering monsters avoid traps, it has subtle stealth implications.`
+The Chicken not triggering traps is as simple as it sounds, but given how wandering monsters avoid traps, it has subtle stealth implications.
+
+@MNote.@N Unless combined with Totem Conditions, this mod makes regular spirits are rarer early on than advanced ones, to make it harder to skip those.`
 	case ModTotemConditions:
 		return `Be careful while choosing spirits: some totem curses may replace existing curses on upgrade or even apply a curse on any upgrade (including primary spirit!). Also watch closely the nature of punishment: often, difficult restrictions have softer punishments when you fail.
 
@@ -1929,9 +1868,7 @@ Some curses ask to “complete a full level”: note that this excludes the leve
 
 Conditional rare comestibles are more frequent later on, and you’ll typically find a few of them per run.
 
-When this mod is combined with Advanced Spirits, those aren’t more frequent than regular ones early on anymore. However, they sometimes get softer curses to help make them more appealing.
-
-When No Recharges is on, some curses are disabled or adjusted for balance.`
+@MNote.@N When this mod is combined with Advanced Spirits, those aren’t more frequent than regular ones early on anymore. Instead, they sometimes get softer curses to help make them more appealing. Also, when No Recharges is on, some curses are disabled or adjusted for balance.`
 	default:
 		return ""
 	}
