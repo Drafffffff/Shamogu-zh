@@ -287,8 +287,12 @@ func (md *model) openSpiritSelectionMenu(m mode) {
 		if i >= 5 {
 			advanced = strings.Repeat(" ", 24-len(si.Name)) + "@S(advanced)@N"
 		}
+		name := si.Name
+		if md.g.Mod(ModHealingCombat) && name == "Vampiric Bat" {
+			name = "@RVampiric@N Bat"
+		}
 		entries = append(entries, ui.MenuEntry{
-			Text: ui.Textf("%c - %s%s", r, si.Name, advanced).WithMarkups(Markups),
+			Text: ui.Textf("%c - %s%s", r, name, advanced).WithMarkups(Markups),
 			Keys: []gruid.Key{gruid.Key(r)},
 		})
 	}
