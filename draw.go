@@ -573,11 +573,12 @@ func (md *model) drawSpiritSelection() {
 		Draw(md.gd.Slice(gruid.NewRange(-25+UIWidth/2, 3, UIWidth, UIHeight)))
 	y := 8 + len(primarySpirits)
 	n := md.g.modCount()
-	ns := "@S"
+	var tabtext string
 	if n > 0 {
-		ns = "@V"
+		tabtext = fmt.Sprintf(`@G(TAB for mod selection - @V%d@G enabled)@N`, n)
+	} else {
+		tabtext = `@G(TAB for mod selection)@N`
 	}
-	tabtext := fmt.Sprintf(`@G(TAB for mod selection - %s%d@G enabled)@N`, ns, md.g.modCount())
 	ui.Text(tabtext).WithMarkups(Markups).
 		Draw(md.gd.Slice(gruid.NewRange(0, y, UIWidth/2, y+1)))
 	y = 10 + len(primarySpirits)
