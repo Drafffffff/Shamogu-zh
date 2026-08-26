@@ -1862,11 +1862,15 @@ The Chicken not triggering traps is as simple as it sounds, but given how wander
 
 @MNote.@N Unless combined with Totem Conditions, this mod makes regular spirits are rarer early on than advanced ones, to make it harder to skip those.`
 	case ModTotemConditions:
-		return `Be careful while choosing spirits: some totem curses may replace existing curses on upgrade or even apply a curse on any upgrade (including primary spirit!). Also watch closely the nature of punishment: often, difficult restrictions have softer punishments when you fail.
+		return `Be careful while choosing spirits: some totem curses may replace existing curses on upgrade or even apply a curse on any upgrade (including for primary spirit!). Watch closely the nature of punishment: often, difficult restrictions have softer punishments when you fail.
 
-Some curses ask to “complete a full level”: note that this excludes the level in which you got the curse.
+Don’t be too afraid of losing a spirit or two: each run generates an extra non-empty totem, so there are now two extra more than necessary to complete your build.
 
-Conditional rare comestibles are more frequent later on, and you’ll typically find a few of them per run.
+Curses that ask to “complete a full level” exclude the level in which you got the curse.
+
+The curse that says “you move by more than one tile in a turn” only cares about your final position after a full turn, so beware of frogs catching you from afar or butterflies blinking you away!
+
+Conditional rare comestibles are more frequent later on.
 
 @MNote.@N When this mod is combined with Advanced Spirits, those aren’t more frequent than regular ones early on anymore. Instead, they sometimes get softer curses to help make them more appealing. Also, when No Recharges is on, some curses are disabled or adjusted for balance.`
 	default:

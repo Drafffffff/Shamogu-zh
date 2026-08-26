@@ -5,14 +5,14 @@ New content:
 * New expansion mod: **Totem Conditions** (contributed by @mlochbaum, see
   discussion in issue #19 and PRs #20 and #21). In-game description is as
   follows: “Read the fine print: each spirit will curse you to play by its
-  rules or lose its benefits. You may also find comestibles that aren’t so easy
-  to eat! Think ahead when choosing spirits; the run will have one fewer empty
-  totem to expand your options”.  The expansion provides lots of different
-  challenging spirit curses, found on totems and imposing varied conditions on
-  the player until fulfilled, as well as seven new rare comestibles that can
-  only be eaten when the right conditions are met. Like with all mods, the new
-  expansion is compatible with any mod combination, and in particular with the
-  other expansions. Be sure to give it a try!
+  rules or lose its benefits. You may also find a few comestibles that aren’t
+  so easy to eat! Think ahead when choosing spirits; the run will have one
+  fewer empty totem to expand your options”.  The expansion provides lots of
+  different challenging spirit curses, found on totems and imposing varied
+  conditions on the player until fulfilled, as well as seven new rare
+  comestibles that can only be eaten when the right conditions are met. Like
+  with all mods, the new expansion is compatible with any mod combination, and
+  in particular with the other expansions. Be sure to give it a try!
 * While playing the classic game, you may now find one of those new rare
   conditional comestibles in most runs!
 
