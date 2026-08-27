@@ -314,7 +314,7 @@ func (md *model) startNewGame(spe *Entity) {
 func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
 	md.menu.main.Update(msg)
 	resetChanges := func() {
-		if len(GameConfig.Mods) == NMods {
+		if len(GameConfig.Mods) == NMods && !ResetMods {
 			md.g.Mods = slices.Clone(GameConfig.Mods)
 		} else {
 			clear(md.g.Mods)
