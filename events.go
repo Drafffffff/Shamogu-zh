@@ -330,13 +330,13 @@ func (ev *EventWithStatus) onPlayer() bool {
 
 // WatchPlayerStatus triggers when the player begins a specific status
 type WatchPlayerStatus struct {
-	MatchAny bool // ignore EvStatus; allow any
-	EvStatus Status
+	MatchNegative bool // ignore EvStatus; allow any negative
+	EvStatus      Status
 }
 
 func (w WatchPlayerStatus) Desc() string {
-	if w.MatchAny {
-		return "you get any status"
+	if w.MatchNegative {
+		return "you get any @Onegative@N status"
 	}
 	if w.EvStatus == StatusFire {
 		return "you catch fire"
@@ -350,7 +350,7 @@ func (w WatchPlayerStatus) EventTypes() EventType {
 
 func (w WatchPlayerStatus) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	d, ok := e.(*EventWithStatus)
-	return ok && d.EvType == EventStatus && (w.MatchAny || d.EvStatus == w.EvStatus) && d.onPlayer()
+	return ok && d.EvType == EventStatus && (w.MatchNegative && d.EvStatus.Bad() || d.EvStatus == w.EvStatus) && d.onPlayer()
 }
 
 // WatchHits triggers when some actor hits a monster
@@ -910,7 +910,7 @@ func (g *Game) GenConditions() []*SpiritCond {
 		case 2:
 			cs[i] = Compl(RemCharges, CqDischargeAll, WatchEvent{Type: EventMonsDeath})
 		case 3:
-			cs[i] = Compl(RemCharges, CqDischarge, WatchPlayerStatus{MatchAny: true})
+			cs[i] = Compl(RemCharges, CqDischarge, WatchPlayerStatus{MatchNegative: true})
 		case 4:
 			cs[i] = Compl(RemCharges, CqDischarge, WatchHits{PlayerActs: true})
 		}
