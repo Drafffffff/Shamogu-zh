@@ -902,13 +902,17 @@ func (g *Game) GenConditions() []*SpiritCond {
 		if (sp[i].Advanced && j > 2) || (noRecharges && j != 0) {
 			continue // too hard
 		}
+		aqDischargeAll := CqDischargeAll
+		if sp[i].Advanced {
+			aqDischargeAll = CqDischarge
+		}
 		switch j {
 		case 0:
 			cs[i] = Compl(EmptyInventory, CqLeave, WatchEvent{Type: EventPickup})
 		case 1:
-			cs[i] = Compl(RemCharges, CqDischargeAll, &WatchMoveFar{PrevPos: InvalidPos})
+			cs[i] = Compl(RemCharges, aqDischargeAll, &WatchMoveFar{PrevPos: InvalidPos})
 		case 2:
-			cs[i] = Compl(RemCharges, CqDischargeAll, WatchEvent{Type: EventMonsDeath})
+			cs[i] = Compl(RemCharges, aqDischargeAll, WatchEvent{Type: EventMonsDeath})
 		case 3:
 			cs[i] = Compl(RemCharges, CqDischarge, WatchPlayerStatus{MatchNegative: true})
 		case 4:
