@@ -58,7 +58,7 @@ func (m Mod) String() string {
 func (m Mod) Desc() string {
 	switch m {
 	case ModCorruptedDungeon:
-		return "The orb’s influence has scattered twisted surprises through the dungeon. Some might even be good!\n\n@SRecommended for players that know the vanilla game and want more unpredictability and variability.@N"
+		return "The orb’s influence has scattered twisted surprises through the dungeon. Some might even be good!\n\n@SRecommended for players that know the vanilla game and want more variability and unpredictability.@N"
 	case ModAdvancedSpirits:
 		return "Enable extra advanced secondary spirits: Dazzling Zebra, Gardening Lion, Gawalt Monkey, Gluttonous Bear, Runic Chicken, Staring Owl, Stomping Elephant.\n\nAdvanced secondaries always have strong points but also serious and quirky drawbacks.\n\n@SRecommended for players that want more build variety.@N"
 	case ModTotemConditions:
