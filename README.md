@@ -86,3 +86,9 @@ command line options and use of the replay file. For example:
     shamogu -r _
 
 launches an auto-replay of your last game.
+
+Configuration
+-------------
+
+Mods and some options can be set in-game. The `vars.go` file contains extra
+compile-time options that may be tweaked before building the game.
