@@ -9,7 +9,6 @@ import (
 	"math/rand/v2"
 	"runtime"
 	"slices"
-	"strings"
 
 	"codeberg.org/anaseto/gruid"
 	"codeberg.org/anaseto/gruid/paths"
@@ -285,7 +284,7 @@ func (md *model) openSpiritSelectionMenu(m mode) {
 		}
 		advanced := ""
 		if i >= 5 {
-			advanced = strings.Repeat(" ", 24-len(si.Name)) + "@S(advanced)@N"
+			advanced = " @S(advanced)@N"
 		}
 		name := si.Name
 		if md.g.Mod(ModHealingCombat) && !VampiricHC && name == "Vampiric Bat" {
