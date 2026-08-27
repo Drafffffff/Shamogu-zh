@@ -54,9 +54,9 @@ UI, graphics, QoL:
 
 * The classic New Game menu has been merged with the advanced one. Now the menu
   simply shows all primary spirits and signals Crocodile and Bat are “advanced”
-  in the menu itself. The previous system was not worth the complexity and the
-  extra easy-to-miss config setting, and it was making things more confusing
-  even for new players in the end.
+  in the menu itself. The previous system was subtle and needed an extra
+  easy-to-miss config setting, so it could sometimes be more confusing for
+  players in the end.
 * The Mod Selection menu has now improved highlighting, so that it's harder to
   miss which mods are selected. The mod count in the New Game menu uses color
   now, too, so that it's easier to check. There is also now a new “Reset
@@ -64,6 +64,9 @@ UI, graphics, QoL:
 * Improvements in configuration menu: now current setting is shown greyed in
   the description, and toggling a setting does not immediately quit the menu
   anymore.
+* Configuration preferences affecting new games by providing changes to the
+  default experience and which weren't convenient as mods, like Gluttony
+  Rework, are now exposed through compile-time variables in `vars.go`.
 * The “game summary” action (shortcut `#`) now opens the pager with a
   simplified summary for in-game viewing, in addition to writing full
   statistics to a file (or “below” for the browser version).

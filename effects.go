@@ -943,7 +943,7 @@ func (eff EffectSnack) Name() string {
 
 func (eff EffectSnack) Desc(g *Game) string {
 	desc := "You teleport to the nearest comestible, if any, and eat it."
-	if g.Mod(ModGluttonyRework) {
+	if GluttonyRework {
 		return desc
 	}
 	return desc + " It doesn’t trigger @BGluttony@N."

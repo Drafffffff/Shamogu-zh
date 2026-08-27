@@ -11,8 +11,6 @@ const (
 	ModAdvancedSpirits             // dedicated slot for challenge secondary spirits
 	ModTotemConditions             // totems come with Curse/Until conditions
 
-	ModGluttonyRework // mod with choice-of-two gluttony rework
-
 	ModSmallInventory // mod limiting inventory to 3 comestible slots
 	ModNoRecharges    // mod without spirit recharges
 	ModHealingCombat  // combat-based healing system instead of comestible-based
@@ -26,7 +24,6 @@ const NMods = int(modCount)
 // Position of first mod in each mod section.
 const (
 	FirstExpansion = ModCorruptedDungeon
-	FirstSmallMod  = ModGluttonyRework
 	FirstChallenge = ModSmallInventory
 )
 
@@ -34,8 +31,6 @@ const (
 var GameMods = []Mod{
 	// Expansions
 	ModCorruptedDungeon, ModAdvancedSpirits, ModTotemConditions,
-	// Small Mods
-	ModGluttonyRework,
 	// Challenges
 	ModSmallInventory,
 	ModNoRecharges, ModHealingCombat,
@@ -49,8 +44,6 @@ func (m Mod) String() string {
 		return "Advanced Spirits"
 	case ModTotemConditions:
 		return "Totem Conditions"
-	case ModGluttonyRework:
-		return "Gluttony Rework"
 	case ModSmallInventory:
 		return "Small Inventory"
 	case ModNoRecharges:
@@ -70,8 +63,6 @@ func (m Mod) Desc() string {
 		return "Enable extra advanced secondary spirits: Dazzling Zebra, Gardening Lion, Gawalt Monkey, Gluttonous Bear, Runic Chicken, Staring Owl, Stomping Elephant.\n\nAdvanced secondaries always have strong points but also serious and quirky drawbacks.\n\n@SRecommended for players that want more build variety.@N"
 	case ModTotemConditions:
 		return "Read the fine print: each spirit will curse you to play by its rules or lose its benefits. You may also find a few comestibles that aren’t so easy to eat!\n\nThink ahead when choosing spirits; the run will have one fewer empty totem to expand your options.\n\n@SRecommended for players that want a fun condition-based challenge with tricky totem choices.@N"
-	case ModGluttonyRework:
-		return "Makes the Gluttonous Bear eat in pairs through a choice-of-two menu, without relying on a Gluttony status.\n\nThe Advanced Spirits mod should be enabled too for this mod to take effect.\n\n@SRecommended for players that don’t like the default Bear with a Gluttony status.@N"
 	case ModSmallInventory:
 		return "Inventory can only hold 3 comestibles. Choose them with care!"
 	case ModNoRecharges:
@@ -83,9 +74,11 @@ func (m Mod) Desc() string {
 	}
 }
 
-// HasVampirism reports whether the player has a vampirism ability.
-func (g *Game) HasVampirism() bool {
-	sp := g.Entity(0).Role.(*Spirit)
-	_, ok := sp.GetAbility().(EffectVampirism)
-	return ok
+// HasVampirism reports whether the given entity has a vampirism ability.
+func (e *Entity) HasVampirism() bool {
+	if sp, ok := e.Role.(*Spirit); ok {
+		_, ok := sp.GetAbility().(EffectVampirism)
+		return ok
+	}
+	return false
 }

@@ -99,7 +99,7 @@ func (md *model) init() gruid.Effect {
 		// Start a new game: go to spirit selection menu.
 		// Initialize mods before starting the game, because we need
 		// that information during the new game settings.
-		if len(GameConfig.Mods) == NMods {
+		if len(GameConfig.Mods) == NMods && !ResetMods {
 			g.Mods = slices.Clone(GameConfig.Mods)
 		} else {
 			g.Mods = make([]bool, NMods)
@@ -288,7 +288,7 @@ func (md *model) openSpiritSelectionMenu(m mode) {
 			advanced = strings.Repeat(" ", 24-len(si.Name)) + "@S(advanced)@N"
 		}
 		name := si.Name
-		if md.g.Mod(ModHealingCombat) && name == "Vampiric Bat" {
+		if md.g.Mod(ModHealingCombat) && !VampiricHC && name == "Vampiric Bat" {
 			name = "@RVampiric@N Bat"
 		}
 		entries = append(entries, ui.MenuEntry{

@@ -56,7 +56,7 @@ type Game struct {
 	Wizard   Wizard    // wizard mode (default: no)
 
 	instant bool       // whether the last action was instant-effect
-	snack   bool       // whether you're eating a snack (without ModGluttonyRework)
+	snack   bool       // whether you're eating a snack
 	win     bool       // whether we just won the game
 	confirm bool       // whether action was confirmed after warning
 	rand    *rand.Rand // random number generator

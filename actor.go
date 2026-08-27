@@ -936,7 +936,7 @@ func (g *Game) HandleActorTurn(i ID, ai *Actor) {
 
 // handleGluttony handles progression of the Gluttony status.
 func (g *Game) handleGluttony() {
-	if g.Mod(ModGluttonyRework) {
+	if GluttonyRework {
 		return
 	}
 	pa := g.PlayerActor()

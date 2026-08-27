@@ -252,7 +252,7 @@ var challengeSpirits = []spiritInfo{
 
 // spiritEntity generates a new spirit entity using the given data.
 func spiritEntity(mods []bool, si spiritInfo) *Entity {
-	if HasMod(mods, ModHealingCombat) {
+	if HasMod(mods, ModHealingCombat) || VampiricHC {
 		if _, ok := si.Ability[0].(EffectVampirism); ok {
 			si.MaxCharges[0]++
 			si.MaxCharges[1]++

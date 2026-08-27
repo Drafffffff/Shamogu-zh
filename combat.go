@@ -240,7 +240,7 @@ func (g *Game) monsterDeath(i, j ID, aj *Actor) {
 		aj.KnownDead = true
 	}
 	TotemEvents(g, &EventWithEntity{EvType: EventMonsDeath, EvEntity: ej})
-	if g.Mod(ModHealingCombat) && !g.HasVampirism() {
+	if g.Mod(ModHealingCombat) && !g.Entity(0).HasVampirism() {
 		// When Healing Combat is enabled and the player is not a bat,
 		// we have a chance of healing when killing monsters.
 		// The chance is higher at low HP (guaranteed at 3 HP or less).

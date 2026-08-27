@@ -673,7 +673,7 @@ func (a ActionInventory) Handle(md *model) (gruid.Effect, bool) {
 }
 
 // openInventory opens the inventory. The entry corresponding to the given ID
-// is marked as already selected and disabled (used by ModGluttonyRework).
+// is marked as already selected and disabled (used by GluttonyRework).
 func (md *model) openInventory(bound ID) (gruid.Effect, bool) {
 	entries := []ui.MenuEntry{}
 	r := 'a'
@@ -837,7 +837,7 @@ func (g *Game) useItem(id ID) bool {
 	return it.Use(g, id)
 }
 
-// ActionBindItem chooses the first comestible for ModGluttonyRework.
+// ActionBindItem chooses the first comestible for GluttonyRework.
 type ActionBindItem struct {
 	ID ID
 }
@@ -846,7 +846,7 @@ func (a ActionBindItem) Handle(md *model) (gruid.Effect, bool) {
 	return md.openInventory(a.ID)
 }
 
-// ActionUseTwoItems uses two comestibles for ModGluttonyRework.
+// ActionUseTwoItems uses two comestibles for GluttonyRework.
 type ActionUseTwoItems struct {
 	ID0 ID
 	ID1 ID
@@ -1915,7 +1915,7 @@ On the map, monster color may change depending on active status effects.  By def
 	pa := g.PlayerActor()
 	for i, desc := range statusDesc {
 		st := Status(i)
-		if st == StatusGluttony && g.Mod(ModGluttonyRework) {
+		if st == StatusGluttony && GluttonyRework {
 			continue
 		}
 		color := statusColor(st, 42)

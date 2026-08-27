@@ -266,7 +266,7 @@ func (c *Comestible) Use(g *Game, i ID) bool {
 }
 
 func (g *Game) handleGluttonyOnEating() {
-	if g.Mod(ModGluttonyRework) {
+	if GluttonyRework {
 		return
 	}
 	switch pa := g.PlayerActor(); {

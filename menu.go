@@ -12,7 +12,7 @@ import (
 type menu struct {
 	keys  *ui.Menu // key settings menu
 	main  *ui.Menu // typical main menu (game, settings, inventory)
-	bound ID       // pre-selected option for ModGluttonyRework
+	bound ID       // pre-selected option for GluttonyRework
 	mode  menuMode
 }
 
@@ -87,7 +87,7 @@ func (md *model) updateMainMenu(msg gruid.Msg) {
 				break
 			}
 			md.action = ActionUseItem{ID: id}
-			if !g.Mod(ModGluttonyRework) || !g.PlayerActor().DoesAny(Gluttony) {
+			if !GluttonyRework || !g.PlayerActor().DoesAny(Gluttony) {
 				break
 			}
 			if _, ok := e.Role.(*Comestible); ok {
@@ -100,7 +100,7 @@ func (md *model) updateMainMenu(msg gruid.Msg) {
 				}
 			}
 		case modeInventoryBound:
-			// Choosing second comestible (for mod ModGluttonyRework).
+			// Choosing second comestible (for GluttonyRework).
 			g := md.g
 			idx := md.menu.main.Active()
 			id := md.inventoryComestibleID(idx)
@@ -298,11 +298,16 @@ func (md *model) updateSpiritSelectionMenu(msg gruid.Msg) gruid.Effect {
 }
 
 func (md *model) startNewGame(spe *Entity) {
-	md.g.Init(spe)
-	md.g.ComputePlayerStats()
-	md.g.InitLevel()
+	g := md.g
+	if VampiricHC && spe.HasVampirism() {
+		// Implicitly set Healing Combat for Vampiric Bat players.
+		g.Mods[ModHealingCombat] = true
+	}
+	g.Init(spe)
+	g.ComputePlayerStats()
+	g.InitLevel()
 	md.updateStatus()
-	md.g.LogStyled("Press SPACE for menu and ? for help. Good luck!", logSpecial)
+	g.LogStyled("Press SPACE for menu and ? for help. Good luck!", logSpecial)
 	md.mode = modeNormal
 }
 
@@ -415,11 +420,6 @@ func (md *model) modSelectionMenu() {
 		case FirstExpansion:
 			entries = append(entries, ui.MenuEntry{
 				Text:     ui.Text("Expansions").WithStyle(hstyle),
-				Disabled: true,
-			})
-		case FirstSmallMod:
-			entries = append(entries, ui.MenuEntry{
-				Text:     ui.Text("Small Mods").WithStyle(hstyle),
 				Disabled: true,
 			})
 		case FirstChallenge:
