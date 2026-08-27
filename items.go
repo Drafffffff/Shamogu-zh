@@ -103,7 +103,7 @@ func (sp *Spirit) eitherDesc(g *Game, descUpgrade bool) string {
 		}
 		sb.WriteByte('\n')
 	}
-	fmt.Fprintf(&sb, "@CAbility@S(%s %d/%d charges)@C:@N %s",
+	fmt.Fprintf(&sb, "@CAbility @S(%s %d/%d charges)@C:@N %s",
 		sp.GetAbility().Name(), sp.Charges, sp.GetMaxCharges(), sp.GetAbility().Desc(g))
 	sb.WriteByte('\n')
 	fmt.Fprintf(&sb, "@CTraits:@N %s.", g.TraitDesc(Player, sp.BonusTraits[sp.Level]))
