@@ -90,5 +90,7 @@ launches an auto-replay of your last game.
 Configuration
 -------------
 
-Mods and some options can be set in-game. The `vars.go` file contains extra
-compile-time options that may be tweaked before building the game.
+The game tries to provide good enough defaults so that most players don't need
+to worry about configuring anything. Mod selection, keybindings and some common
+options can be configured in-game, while the `vars.go` file contains extra
+compile-time startup options that may be tweaked before building the game.
