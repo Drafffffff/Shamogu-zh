@@ -58,11 +58,11 @@ func (m Mod) String() string {
 func (m Mod) Desc() string {
 	switch m {
 	case ModCorruptedDungeon:
-		return "The orb’s influence has scattered twisted surprises through the dungeon. Some might even be good!\n\n@SRecommended for players that want more unpredictability and variability.@N"
+		return "The orb’s influence has scattered twisted surprises through the dungeon. Some might even be good!\n\n@SRecommended for players that know the vanilla game and want more unpredictability and variability.@N"
 	case ModAdvancedSpirits:
 		return "Enable extra advanced secondary spirits: Dazzling Zebra, Gardening Lion, Gawalt Monkey, Gluttonous Bear, Runic Chicken, Staring Owl, Stomping Elephant.\n\nAdvanced secondaries always have strong points but also serious and quirky drawbacks.\n\n@SRecommended for players that want more build variety.@N"
 	case ModTotemConditions:
-		return "Read the fine print: each spirit will curse you to play by its rules or lose its benefits. You may also find a few comestibles that aren’t so easy to eat!\n\nThink ahead when choosing spirits; the run will have one fewer empty totem to expand your options.\n\n@SRecommended for players that want a fun condition-based challenge with tricky totem choices.@N"
+		return "Read the fine print: each spirit will curse you to play by its rules or lose its benefits. You may also find a few comestibles that aren’t so easy to eat!\n\nThink ahead when choosing spirits; the run will have one fewer empty totem to expand your options.\n\n@SRecommended for players that want an intense condition-based challenge with tricky totem choices.@N"
 	case ModSmallInventory:
 		return "Inventory can only hold 3 comestibles. Choose them with care!"
 	case ModNoRecharges:
