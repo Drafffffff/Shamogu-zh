@@ -1842,7 +1842,7 @@ func (a ActionHelpMods) Handle(md *model) (gruid.Effect, bool) {
 func modExtraInfo(m Mod) string {
 	switch m {
 	case ModCorruptedDungeon:
-		return `The wandering or guarding behavior of monsters is hidden with Corrupted Dungeon. While most of the time the roles remain the same as in the classic game, you’ll occasionally have to guess based on actual behavior.
+		return `The wandering or guarding behavior of monsters is hidden with Corrupted Dungeon. While most of the time the roles remain the same as in the vanilla game, you’ll occasionally have to guess based on actual behavior.
 
 Various thematic levels of diverse rarity may appear. They can be quite surprising!
 
@@ -1989,6 +1989,6 @@ While the recommended way to discover the game is to progressively improve your 
 
 @YCHALLENGE TIPS@N
 
-If, on the contrary, you find Shamogu too easy, you’re encouraged to try the various expansion and challenge mods accessible after pressing TAB or SPACE in the classic new game menu!
+If, on the contrary, you find Shamogu too easy, you’re encouraged to try the various expansion and challenge mods accessible after pressing TAB or SPACE in the new game menu!
 `)
 }
