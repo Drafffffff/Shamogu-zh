@@ -1842,7 +1842,7 @@ func (a ActionHelpMods) Handle(md *model) (gruid.Effect, bool) {
 func modExtraInfo(m Mod) string {
 	switch m {
 	case ModCorruptedDungeon:
-		return `The wandering or guarding behavior of monsters is hidden with Corrupted Dungeon. While most of the time the roles remain the same as in the vanilla game, you’ll occasionally have to guess based on actual behavior.
+		return `The wandering or guarding behavior of monsters is hidden with Corrupted Dungeon. While most of the time the roles remain the same as in the base game, you’ll occasionally have to guess based on actual behavior.
 
 Various thematic levels of diverse rarity may appear. They can be quite surprising!
 
