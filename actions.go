@@ -1816,7 +1816,7 @@ func (a ActionHelpMods) Handle(md *model) (gruid.Effect, bool) {
 	title := "Mods (Help)"
 	n := md.g.modCount()
 	if n == 0 {
-		md.helpTopic(title, "You haven’t enabled any expansion or challenge mods. You’re playing the vanilla game.\n\nMods are enabled through the Mod Selection menu. You can access it from the New Game menu by pressing TAB or SPACE.")
+		md.helpTopic(title, "You haven’t enabled any expansion or challenge mods. You’re playing the base game.\n\nMods are enabled through the Mod Selection menu. You can access it from the New Game menu by pressing TAB or SPACE.")
 		return nil, false
 	}
 	var sb strings.Builder
