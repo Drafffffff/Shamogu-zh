@@ -336,7 +336,7 @@ type WatchPlayerStatus struct {
 
 func (w WatchPlayerStatus) Desc() string {
 	if w.MatchNegative {
-		return "you get any @Onegative@N status"
+		return "you get any negative status"
 	}
 	if w.EvStatus == StatusFire {
 		return "you catch fire"
