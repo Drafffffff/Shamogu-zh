@@ -422,9 +422,7 @@ func (p *Portal) Use(g *Game, i ID) bool {
 	}
 	g.StoryLog("Entered a magical portal!")
 	g.LogStyled("You enter the portal.", logSpecial)
-	TotemEvents(g, &EventHappened{EvType: EventPortal})
 	g.NextLevel()
-	TotemEvents(g, &EventHappened{EvType: EventNewLevel})
 	return false
 }
 
@@ -447,6 +445,7 @@ func (g *Game) useFakePortal() {
 
 // NextLevel proceeds to the next level (assuming we're not at the last one).
 func (g *Game) NextLevel() {
+	TotemEvents(g, &EventHappened{EvType: EventPortal})
 	// We return false because after generating a new level we don't want
 	// to end the turn. However, we still upgrade the turn counter, as it
 	// wouldn't be intuitive otherwise.
@@ -456,6 +455,7 @@ func (g *Game) NextLevel() {
 	g.InitLevel()
 	g.Logs.NextTick = g.Logs.Index
 	g.md.targ.CancelExamine()
+	TotemEvents(g, &EventHappened{EvType: EventNewLevel})
 }
 
 // CorruptionOrb represents the orb of corruption.
