@@ -407,6 +407,7 @@ func (g *Game) comestiblesProcGen() {
 	g.ProcInfo.NComestibles[7+g.IntN(2)]++
 	g.ProcInfo.NComestibles[1+g.IntN(8)]++
 	g.ProcInfo.NComestibles[1+g.IntN(8)]--
+	g.ProcInfo.RareComestible = 4 + g.IntN(6) // levels 4-9
 
 	if !g.Mod(ModTotemConditions) {
 		return
@@ -432,7 +433,6 @@ func (g *Game) comestiblesProcGen() {
 			g.ProcInfo.NCondCom[g.rand.IntN(MapLevels)]++
 		}
 	}
-	g.ProcInfo.RareComestible = 4 + g.IntN(6) // levels 4-9
 }
 
 func (g *Game) menhirsProcGen() {
