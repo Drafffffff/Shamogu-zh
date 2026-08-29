@@ -59,6 +59,7 @@ type Game struct {
 	snack   bool       // whether you're eating a snack
 	win     bool       // whether we just won the game
 	confirm bool       // whether action was confirmed after warning
+	npturn  bool       // non-player turn (after player's turn and before next one)
 	rand    *rand.Rand // random number generator
 	md      *model     // reference to the UI model
 }
@@ -99,6 +100,8 @@ func (g *Game) InitLevel() {
 // EndTurn processes everything that happens between the end of last player's
 // turn and the beginning of the next turn.
 func (g *Game) EndTurn() {
+	g.npturn = true
+	defer func() { g.npturn = false }()
 	clear(g.Map.Noise)
 	if g.endTurnEarly() {
 		return

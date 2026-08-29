@@ -175,9 +175,6 @@ func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKi
 			g.StoryLog("Resurrected by the Wizard!")
 			g.Wizard.Resurrections++
 		}
-		if aj.HP+dmg > HPCritical && aj.HP <= HPCritical {
-			g.WarningPrompt()
-		}
 		g.md.StopAuto()
 	case aj.IsDead():
 		g.monsterDeath(i, j, aj)

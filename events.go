@@ -717,12 +717,16 @@ func (g *Game) curseLiftedFog() {
 
 // spiritLeftShock makes poison in an X, dazes the player, and stops time
 func (g *Game) spiritLeftShock() {
-	g.PutStatus(PlayerID, g.PlayerActor(), StatusDaze, 2)
-	g.PutStatus(PlayerID, g.PlayerActor(), StatusTimeStop, 6)
+	n := 1
+	if g.npturn {
+		n = 0
+	}
+	g.PutStatusN(PlayerID, g.PlayerActor(), StatusTimeStop, DurationTimeStop, n)
 	g.curseClouds(CloudPoison, 1)
 	mp := &MapPath{passable: inMap}
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, MaxFOVRange)
 	g.md.FloodAnimation(nodes, ColorViolet)
+	g.WarningPrompt()
 }
 
 // CondDisabled prevents invoking the spirit while the condition is active

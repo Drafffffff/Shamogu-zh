@@ -123,11 +123,13 @@ func (md *model) update(msg gruid.Msg) gruid.Effect {
 			md.dump(md.g.WriteDump())
 		}
 	}
-	md.g.UpdateFirePos(PlayerID, md.g.PlayerActor())
+	pa := md.g.PlayerActor()
+	md.g.UpdateFirePos(PlayerID, pa)
 	TotemEvents(md.g, &EventHappened{EvType: EventPlayerTurn})
+	ohp := pa.HP
 	eff, done := md.action.Handle(md)
 	if done {
-		md.endTurn()
+		md.endTurn(ohp)
 		md.RefreshExamineInfo()
 	}
 	md.updateStatus()
@@ -385,8 +387,10 @@ func (md *model) updateStatusMouse(msg gruid.MsgMouse) {
 
 // endTurn finalizes player's turn and runs other events until next player
 // turn.
-func (md *model) endTurn() {
-	md.mode = modeNormal
+func (md *model) endTurn(ohp int) {
+	if md.mode != modeCritical {
+		md.mode = modeNormal
+	}
 	g := md.g
 	g.EndTurn()
 	pa := g.PlayerActor()
@@ -405,10 +409,11 @@ func (md *model) endTurn() {
 		md.death()
 		return
 	}
+	if hp <= HPCritical && ohp > HPCritical {
+		g.WarningPrompt()
+		g.LogStyled("*** CRITICAL HP WARNING ***", logConfirm)
+	}
 	if md.mode == modeCritical {
-		if hp <= HPCritical {
-			g.LogStyled("*** CRITICAL HP WARNING ***", logConfirm)
-		}
 		md.logConfirmContinue()
 	}
 	g.Logs.NextTick = g.Logs.Index
