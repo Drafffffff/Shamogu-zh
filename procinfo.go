@@ -380,7 +380,6 @@ func (g *Game) NextMenhirKind() menhirKind {
 // ensures that all comestibles appear at least once in a while.
 func (g *Game) comestibleProcGen() {
 	g.ProcInfo.Comestibles = g.genRandomIndices(len(g.GetComestibleData()))
-	g.ProcInfo.RareComestible = 4 + g.IntN(6) // levels 4-9
 }
 
 // NextComestibleKind returns the next comestible kind (index of
@@ -433,6 +432,7 @@ func (g *Game) comestiblesProcGen() {
 			g.ProcInfo.NCondCom[g.rand.IntN(MapLevels)]++
 		}
 	}
+	g.ProcInfo.RareComestible = 4 + g.IntN(6) // levels 4-9
 }
 
 func (g *Game) menhirsProcGen() {
