@@ -403,7 +403,6 @@ func (md *model) endTurn(ohp int) {
 	if pa.DoesAny(Gawalt) {
 		g.SenseItems(itemMenhir)
 	}
-	//g.TurnStats()
 	hp := pa.HP
 	if hp <= 0 {
 		md.death()

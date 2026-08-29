@@ -8,23 +8,24 @@ import (
 	"codeberg.org/anaseto/gruid/paths"
 )
 
-// Event represents an occurrence that might trigger a spirit condition
+// Event represents an occurrence that might trigger a spirit condition.
 type Event interface {
 	Type() EventType
 }
 
-// EventType categorizes condition events
+// EventType categorizes condition events.
 type EventType uint64
 
 func (t EventType) Any(of EventType) bool {
 	return t&of != 0
 }
 
+// CheckEvent reports whether any spirit is watching for that event.
 func (g *Game) CheckEvent(ev EventType) bool {
 	return ev.Any(g.EventFilter)
 }
 
-// UpdateEventFilter re-computes which event types affect current spirits
+// UpdateEventFilter re-computes which event types affect current spirits.
 func (g *Game) UpdateEventFilter() {
 	g.EventFilter = 0
 	g.WarnTypes = 0
@@ -36,7 +37,8 @@ func (g *Game) UpdateEventFilter() {
 	}
 }
 
-// WarnLeave checks whether a warning is needed to interact with a comestible or menhir
+// WarnLeave checks whether a warning is needed to interact with a comestible
+// or menhir.
 func (g *Game) WarnLeave(ev EventType) bool {
 	if g.confirm { // warning already issued
 		g.confirm = false
@@ -77,7 +79,7 @@ const (
 	EventWallBreak // wall broken
 )
 
-// WarnType classifies reasons to give comestibles a warning color in the menu
+// WarnType classifies reasons to give comestibles a warning color in the menu.
 type WarnType int
 
 func (t WarnType) Has(w WarnType) bool {
@@ -93,6 +95,7 @@ const (
 	WarnTeleport
 )
 
+// WarnTypes returns warning types for the given event watcher.
 func WarnTypes(ew EventWatcher) WarnType {
 	switch w := ew.(type) {
 	case WatchEither:
@@ -119,7 +122,7 @@ func WarnTypes(ew EventWatcher) WarnType {
 	return WarnType(0)
 }
 
-// WarnComestible checks whether a specific comestible needs a warning
+// WarnComestible checks whether a specific comestible needs a warning.
 func (g *Game) WarnComestible(c *Comestible) bool {
 	w := g.WarnTypes
 	if w == 0 {
@@ -162,14 +165,14 @@ func (g *Game) willHeal(c *Comestible) bool {
 	}
 }
 
-// EventWatcher
+// EventWatcher represents a watcher for specific event types.
 type EventWatcher interface {
-	EventTypes() EventType
-	CheckEvent(*Game, *Spirit, Event) bool
+	EventTypes() EventType                 // watched event types
+	CheckEvent(*Game, *Spirit, Event) bool // reports whether event matches
 	Desc() string
 }
 
-// EventHappened is used for an EventType with no extra information
+// EventHappened is used for an EventType with no extra information.
 type EventHappened struct {
 	EvType EventType
 }
@@ -178,6 +181,7 @@ func (ev *EventHappened) Type() EventType {
 	return ev.EvType
 }
 
+// WatchEvent triggers for the given event type.
 type WatchEvent struct {
 	Type EventType
 }
@@ -215,7 +219,7 @@ func (w WatchEvent) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	return e.Type().Any(w.Type)
 }
 
-// EventWithEntity carries the entity relevant to the event
+// EventWithEntity carries the entity relevant to the event.
 type EventWithEntity struct {
 	EvType   EventType
 	EvEntity *Entity
@@ -225,12 +229,13 @@ func (ev *EventWithEntity) Type() EventType {
 	return ev.EvType
 }
 
-// EntityMatcher filters entities
+// EntityMatcher filters entities.
 type EntityMatcher interface {
 	Match(*Entity) bool
 	Desc() string
 }
 
+// MatchEither matches either of two entities.
 type MatchEither struct {
 	A EntityMatcher
 	B EntityMatcher
@@ -244,6 +249,7 @@ func (m MatchEither) Match(e *Entity) bool {
 	return m.A.Match(e) || m.B.Match(e)
 }
 
+// MonsterByKind matches a specific kind of monster.
 type MonsterByKind struct {
 	Kind ActorKind
 }
@@ -254,7 +260,7 @@ func (m MonsterByKind) Match(e *Entity) bool {
 	return e.IsActor() && e.Actor().Is(m.Kind)
 }
 
-// AnyMonster makes a matcher for any of the given names
+// AnyMonster makes a matcher for any of the given names.
 func AnyMonster(mons ...ActorKind) EntityMatcher {
 	var ms EntityMatcher = MonsterByKind{Kind: mons[0]}
 	for _, m := range mons[1:] {
@@ -263,7 +269,7 @@ func AnyMonster(mons ...ActorKind) EntityMatcher {
 	return ms
 }
 
-// WatchMonsEvent triggers based on a specified event and monster type
+// WatchMonsEvent triggers based on a specified event and monster type.
 type WatchMonsEvent struct {
 	Mons   EntityMatcher
 	EvType EventType
@@ -289,7 +295,7 @@ func (w WatchMonsEvent) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	return ok && w.EvType == d.EvType && w.Mons.Match(d.EvEntity)
 }
 
-// WatchMonsStatus triggers when a monster begins a specific status
+// WatchMonsStatus triggers when a monster begins a specific status.
 type WatchMonsStatus struct {
 	EvStatus Status
 	Mons     EntityMatcher
@@ -312,7 +318,7 @@ func (w WatchMonsStatus) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	return ok && d.EvType == EventStatus && d.EvStatus == w.EvStatus && w.Mons.Match(d.EvEntity)
 }
 
-// EventWithStatus marks status changes with the entity and status
+// EventWithStatus marks status changes with the entity and status.
 type EventWithStatus struct {
 	EvType   EventType
 	EvEntity *Entity
@@ -328,7 +334,7 @@ func (ev *EventWithStatus) onPlayer() bool {
 	return e.IsActor() && e.Actor().Is(Player)
 }
 
-// WatchPlayerStatus triggers when the player begins a specific status
+// WatchPlayerStatus triggers when the player begins a specific status.
 type WatchPlayerStatus struct {
 	MatchNegative bool // ignore EvStatus; allow any negative
 	EvStatus      Status
@@ -353,7 +359,7 @@ func (w WatchPlayerStatus) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	return ok && d.EvType == EventStatus && (w.MatchNegative && d.EvStatus.Bad() || d.EvStatus == w.EvStatus) && d.onPlayer()
 }
 
-// WatchHits triggers when some actor hits a monster
+// WatchHits triggers when some actor hits a monster.
 type WatchHits struct {
 	PlayerActs bool // triggers on the player, versus a monster
 }
@@ -374,7 +380,7 @@ func (w WatchHits) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	return ok && !d.EvTarget.Is(Player) && w.PlayerActs == d.EvActor.Is(Player)
 }
 
-// EventAffects indicates one actor doing something to another
+// EventAffects indicates one actor doing something to another.
 type EventAffects struct {
 	EvType   EventType
 	EvActor  *Actor
@@ -385,7 +391,7 @@ func (ev *EventAffects) Type() EventType {
 	return ev.EvType
 }
 
-// WatchEither triggers when either component does
+// WatchEither triggers when either component does.
 type WatchEither struct {
 	A EventWatcher
 	B EventWatcher
@@ -408,7 +414,7 @@ func (w WatchEither) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	return w.A.CheckEvent(g, sp, e) || w.B.CheckEvent(g, sp, e)
 }
 
-// WatchTwoStatus triggers when the player gets a combination of statuses
+// WatchTwoStatus triggers when the player gets a combination of statuses.
 type WatchTwoStatus struct {
 	A Status
 	B Status
@@ -431,7 +437,7 @@ func (w WatchTwoStatus) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	return (d.EvStatus == w.A && s.Has(w.B)) || (d.EvStatus == w.B && s.Has(w.A))
 }
 
-// WatchPlayerDamage triggers when fire or poison hurts the player
+// WatchPlayerDamage triggers when fire or poison hurts the player.
 type WatchPlayerDamage struct {
 	EvStatus Status
 }
@@ -449,7 +455,8 @@ func (w WatchPlayerDamage) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	return ok && d.EvType == EventDamage && d.EvStatus == w.EvStatus
 }
 
-// WatchMoveFar triggers when the player moves more than 1 tile between turn starts
+// WatchMoveFar triggers when the player moves more than 1 tile between turn
+// starts.
 type WatchMoveFar struct {
 	PrevPos gruid.Point
 }
@@ -473,7 +480,7 @@ func (w *WatchMoveFar) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	return p != InvalidPos && paths.DistanceManhattan(p, n) > 1
 }
 
-// WatchReachLevel triggers when you reach a numbered level
+// WatchReachLevel triggers when you reach a numbered level.
 type WatchReachLevel struct {
 	Level int
 }
@@ -490,12 +497,15 @@ func (w WatchReachLevel) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	return g.Map.Level == w.Level
 }
 
-// WatchCompleteLevel triggers when a matched monster dies
+// WatchCompleteLevel triggers when a matched monster dies.
+// The CanComplete field tracks eligibility for success: respect of the
+// condition and of the "complete" aspect (for remaining charges case).
 type WatchCompleteLevel struct {
 	Test        CompleteType
 	CanComplete bool
 }
 
+// CompleteType represents different kinds of level completion feats.
 type CompleteType int
 
 const (
@@ -538,7 +548,7 @@ func (w *WatchCompleteLevel) CheckEvent(g *Game, sp *Spirit, e Event) bool {
 	return false
 }
 
-// UpgradePolicy describes how the condition applies when used as an upgrade
+// UpgradePolicy describes how the condition applies when used as an upgrade.
 type UpgradePolicy int
 
 const (
@@ -562,16 +572,18 @@ func (p UpgradePolicy) Desc() string {
 	}
 }
 
-// SpiritCond represents a condition imposed by a spirit
+// SpiritCond represents a condition imposed by a spirit.
 type SpiritCond struct {
 	Effect  CondEffect
 	Until   EventWatcher
 	Upgrade UpgradePolicy
 }
+
+// CondEffect represents the effect of a spirit curse.
 type CondEffect interface {
 	EventTypes() EventType
 	ApplyEvent(*Game, *Spirit, Event) Consequence
-	Enabled() SpiritPart
+	Enabled() SpiritPart // which parts are enabled or not
 	Desc() string
 }
 
@@ -581,21 +593,25 @@ func (c *SpiritCond) EventTypes() EventType {
 	}
 	return c.Effect.EventTypes() | c.Until.EventTypes()
 }
+
 func (c *SpiritCond) Desc() string {
 	var sb strings.Builder
 	fmt.Fprintf(&sb, "@RCurse:@N %s.\n", UpperFirst(c.Effect.Desc()))
 	fmt.Fprintf(&sb, "@YUntil:@N %s.", UpperFirst(c.Until.Desc()))
 	return sb.String()
 }
+
 func (c *SpiritCond) Enabled() SpiritPart {
 	if c == nil {
 		return HasAll
 	}
 	return c.Effect.Enabled()
 }
+
 func (c *SpiritCond) CanInvoke() bool {
 	return c.Enabled().Any(HasInvoke)
 }
+
 func (c *SpiritCond) ApplyEvent(g *Game, sp *Spirit, e Event) Consequence {
 	if c == nil {
 		return CqNone
@@ -606,7 +622,8 @@ func (c *SpiritCond) ApplyEvent(g *Game, sp *Spirit, e Event) Consequence {
 	return c.Effect.ApplyEvent(g, sp, e)
 }
 
-// leaveWatcher returns the EventWatcher that will make the spirit leave, or nil if none
+// leaveWatcher returns the EventWatcher that will make the spirit leave, or
+// nil if none.
 func (c *SpiritCond) leaveWatcher() EventWatcher {
 	if c != nil {
 		if p, ok := c.Effect.(CondPunish); ok && p.Do == CqLeave {
@@ -616,7 +633,7 @@ func (c *SpiritCond) leaveWatcher() EventWatcher {
 	return nil
 }
 
-// SpiritPart allows independently disabling part of a spirit
+// SpiritPart allows independently disabling part of a spirit.
 type SpiritPart int
 
 func (t SpiritPart) Any(of SpiritPart) bool {
@@ -632,7 +649,7 @@ const (
 	HasAll      = HasInvoke | HasPassives
 )
 
-// Consequence represents a result of a condition being met
+// Consequence represents a result of a condition being met.
 type Consequence int
 
 const (
@@ -697,7 +714,7 @@ func TotemEvents(g *Game, ev Event) {
 	}
 }
 
-// curseClouds makes clouds in an X shape around the player
+// curseClouds makes clouds in an X shape around the player.
 func (g *Game) curseClouds(k CloudKind, dur int) {
 	pp := g.PP()
 	for i := -1; i <= 1; i += 2 {
@@ -710,12 +727,12 @@ func (g *Game) curseClouds(k CloudKind, dur int) {
 	}
 }
 
-// curseLiftedFog creates fog in an X shape when a condition is fulfilled
+// curseLiftedFog creates fog in an X shape when a condition is fulfilled.
 func (g *Game) curseLiftedFog() {
 	g.curseClouds(CloudNormal, 3)
 }
 
-// spiritLeftShock makes poison in an X, dazes the player, and stops time
+// spiritLeftShock makes poison in an X, dazes the player, and stops time.
 func (g *Game) spiritLeftShock() {
 	n := 1
 	if g.npturn {
@@ -729,7 +746,7 @@ func (g *Game) spiritLeftShock() {
 	g.WarningPrompt()
 }
 
-// CondDisabled prevents invoking the spirit while the condition is active
+// CondDisabled prevents invoking the spirit while the condition is active.
 type CondDisabled struct {
 	Part SpiritPart
 }
@@ -765,7 +782,7 @@ func (cond CondDisabled) ApplyEvent(g *Game, sp *Spirit, e Event) Consequence {
 	return CqNone
 }
 
-// CondPunish applies a consequence whenever an event triggers
+// CondPunish applies a consequence whenever an event triggers.
 type CondPunish struct {
 	When EventWatcher
 	Do   Consequence
@@ -790,19 +807,19 @@ func (c CondPunish) ApplyEvent(g *Game, sp *Spirit, e Event) Consequence {
 	return CqNone
 }
 
-// OnEvent consequence based on event type
+// OnEvent consequence based on event type.
 func OnEvent(cq Consequence, ty EventType) CondEffect {
 	w := WatchEvent{Type: ty}
 	return CondPunish{When: w, Do: cq}
 }
 
-// OnStatus consequence when the player gets a particular status
+// OnStatus consequence when the player gets a particular status.
 func OnStatus(cq Consequence, st Status) CondEffect {
 	w := WatchPlayerStatus{EvStatus: st}
 	return CondPunish{When: w, Do: cq}
 }
 
-// OnDamage consequence when the player takes damage from a status
+// OnDamage consequence when the player takes damage from a status.
 func OnDamage(cq Consequence, st Status) CondEffect {
 	w := WatchPlayerDamage{EvStatus: st}
 	return CondPunish{When: w, Do: cq}
@@ -844,8 +861,8 @@ func Gets(st Status, mons ...ActorKind) EventWatcher {
 	return WatchMonsStatus{EvStatus: st, Mons: AnyMonster(mons...)}
 }
 
-// GenCondition randomly generates the sequence of conditions for a run
-// 8 are generated but any that correspond to empty totems will be ignored
+// GenCondition randomly generates the sequence of conditions for a run.
+// 8 are generated but any that correspond to empty totems will be ignored.
 func (g *Game) GenConditions() []*SpiritCond {
 	sp := g.ProcInfo.Spirits
 	cs := make([]*SpiritCond, 8)
@@ -952,7 +969,7 @@ func (g *Game) GenConditions() []*SpiritCond {
 	return cs
 }
 
-// Conditional comestibles, only usable if conditions are met
+// Conditional comestibles, only usable if conditions are met.
 type ConditionalComestible interface {
 	CanApply(*Game, ID) bool
 }
@@ -1257,7 +1274,7 @@ func (eff EffectTrickyChestnut) Apply(g *Game) bool {
 			tot = o
 		}
 	}
-	// Recharge spirits by default
+	// Recharge spirits by default.
 	g.LogStyled("Your spirits are recharged!", logSpecial)
 	if tot != nil { // turn totem to empty if present
 		g.Entity(g.TotemID()).P = InvalidPos
@@ -1297,6 +1314,8 @@ func (eff EffectTrickyChestnut) Desc(g *Game) string {
 	return "Eat if you are standing on a broken portal, to make it work again.\n" + recharges
 }
 
+// CantEatMsg returns a message suitable for when you try to eat a conditional
+// comestible when the necessary conditions aren't fulfilled.
 func CantEatMsg(ef Effect) string {
 	switch ef.(type) {
 	case EffectVanishingSnail, EffectWarpingBean:
@@ -1312,6 +1331,7 @@ func CantEatMsg(ef Effect) string {
 	}
 }
 
+// CondComs provides information about the various conditional comestibles.
 var CondComs = []itemInfo{
 	{"fortress oyster", EffectFortressOyster{}},
 	{"runethorn rose", EffectRunethornRose{}},
@@ -1322,6 +1342,8 @@ var CondComs = []itemInfo{
 	{"tricky chestnut", EffectTrickyChestnut{}},
 }
 
+// GetConditionalComestible returns info for a random conditional comestible
+// suitable for the given map level.
 func (g *Game) GetConditionalComestible(level int) itemInfo {
 	n := len(CondComs)
 	if level == 9 {

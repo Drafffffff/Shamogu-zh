@@ -222,9 +222,9 @@ func (g *Game) flavoursProcGen() {
 }
 
 func (g *Game) spiritProcGen() {
-	// Simpler case: only one empty slot and no special handling
-	// for advanced totems
 	if g.Mod(ModTotemConditions) {
+		// Simpler case: only one empty slot and no special handling
+		// for advanced totems.
 		ts := make([]spiritProcInfo, 7)
 		n := len(secondarySpirits)
 		if !g.Mod(ModAdvancedSpirits) {
@@ -242,11 +242,11 @@ func (g *Game) spiritProcGen() {
 				}
 			}
 		}
-		// Empty totem on a random level, and the last one
+		// Empty totem on a random level, and the last one.
 		ts = slices.Insert(ts, 1+g.IntN(len(ts)), spiritProcInfo{Idx: -1})
 		ts = append(ts, spiritProcInfo{Idx: -1})
 		g.ProcInfo.Spirits = ts
-		// Generate totem conditions
+		// Generate totem conditions.
 		g.ProcInfo.Conditions = g.GenConditions()
 		return
 	}
@@ -415,8 +415,8 @@ func (g *Game) comestiblesProcGen() {
 	g.ProcInfo.NCondCom = make([]int, MapLevels)
 	tot := 0
 	for i, n := range g.ProcInfo.NComestibles {
-		// Per-comestible probability is 1/14 to 1/6
-		// Generate in groups of size k to reduce variability
+		// Per-comestible probability is 1/14 to 1/6.
+		// Generate in groups of size k to reduce variability.
 		f := 14 - i
 		k := 3
 		for n > 0 {
