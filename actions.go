@@ -1864,11 +1864,9 @@ The Chicken not triggering traps is as simple as it sounds, but given how wander
 	case ModTotemConditions:
 		return `Be careful while choosing spirits: some totem curses may replace existing curses on upgrade or even apply a curse on any upgrade (including for primary spirit!). Watch closely the nature of punishment: often, difficult restrictions have softer punishments when you fail.
 
-Don’t be too afraid of losing a spirit or two: each run generates an extra non-empty totem, so there are now two extra more than necessary to complete your build.
+Don’t be too afraid of losing a spirit or two: each run generates an extra non-empty totem, so there are now two extra more than necessary to complete your build. Also, when a spirit leaves, time freezes for a few turns, giving you some respite to adjust.
 
-Curses that ask to “complete a full level” exclude the level in which you got the curse.
-
-The curse that says “you move by more than one tile in a turn” only cares about your final position after a full turn, so beware of frogs catching you from afar or butterflies blinking you away!
+Curses that ask to “complete a full level” exclude the level in which you got the curse. The curse that says “you move by more than one tile in a turn” only cares about your final position after a full turn, so beware of frogs catching you from afar or butterflies blinking you away!
 
 Conditional rare comestibles are more frequent later on.
 
