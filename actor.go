@@ -36,7 +36,7 @@ func NewActor(attack, defense, hp int, ak ActorKind, t Traits) *Actor {
 	return a
 }
 
-// DoesAny reports whether the player has all traits in t.
+// DoesAny reports whether the player has any trait in t.
 func (a *Actor) DoesAny(t Traits) bool {
 	return a.Traits.Any(t)
 }
