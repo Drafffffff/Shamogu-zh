@@ -29,11 +29,9 @@ func (g *Game) CheckEvent(ev EventType) bool {
 func (g *Game) UpdateEventFilter() {
 	g.EventFilter = 0
 	g.WarnTypes = 0
-	for _, e := range g.Entities[:NSpirits] {
-		if sp, ok := e.Role.(*Spirit); ok {
-			g.EventFilter |= sp.Condition.EventTypes()
-			g.WarnTypes |= WarnTypes(sp.Condition.leaveWatcher())
-		}
+	for _, sp := range g.PlayerSpirits() {
+		g.EventFilter |= sp.Condition.EventTypes()
+		g.WarnTypes |= WarnTypes(sp.Condition.leaveWatcher())
 	}
 }
 
@@ -47,13 +45,12 @@ func (g *Game) WarnLeave(ev EventType) bool {
 	if !g.CheckEvent(ev) {
 		return false
 	}
-	for _, e := range g.Entities[:NSpirits] {
-		if sp, ok := e.Role.(*Spirit); ok {
-			w := sp.Condition.leaveWatcher()
-			if w != nil && ev.Any(w.EventTypes()) {
-				g.LogfStyled("Are you sure? Your %s spirit will leave! [y/N]", logConfirm, e.Name)
-				return true
-			}
+	for i, sp := range g.PlayerSpirits() {
+		e := g.Entity(i)
+		w := sp.Condition.leaveWatcher()
+		if w != nil && ev.Any(w.EventTypes()) {
+			g.LogfStyled("Are you sure? Your %s spirit will leave! [y/N]", logConfirm, e.Name)
+			return true
 		}
 	}
 	return false
