@@ -499,6 +499,12 @@ func (md *model) drawTargInfo() {
 	}
 	formatBox(t, desc, fg)
 	for _, id := range info.entities {
+		if int(id) >= len(md.g.Entities) {
+			// Should not happen, but we keep this check in case
+			// examination info doesn't get updated correctly
+			// between levels.
+			continue
+		}
 		e := g.Entity(id)
 		if !info.sees && e.Noise && e.P == md.targ.p && !g.Wizard.Mode.Reveal() {
 			noise := "footsteps"

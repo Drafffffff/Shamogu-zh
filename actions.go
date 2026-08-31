@@ -1436,6 +1436,7 @@ func (a ActionWizardNextLevel) Handle(md *model) (gruid.Effect, bool) {
 		g.Log("You’re already at the last level. Starting again!")
 		*g = Game{rand: g.rand, Mods: g.Mods, md: md, Wizard: g.Wizard}
 		spe := spiritEntity(g.Mods, primarySpirits[g.IntN(len(primarySpirits))])
+		md.targ.CancelExamine()
 		md.startNewGame(spe)
 		return nil, false
 	}
