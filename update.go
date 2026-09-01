@@ -126,14 +126,27 @@ func (md *model) update(msg gruid.Msg) gruid.Effect {
 	pa := md.g.PlayerActor()
 	md.g.UpdateFirePos(PlayerID, pa)
 	TotemEvents(md.g, &EventHappened{EvType: EventPlayerTurn})
-	ohp := pa.HP
+	xhp := pa.expectedHP()
 	eff, done := md.action.Handle(md)
 	if done {
-		md.endTurn(ohp)
+		md.endTurn(xhp)
 		md.RefreshExamineInfo()
 	}
 	md.updateStatus()
 	return eff
+}
+
+// expectedHP returns the expectedHP HP at the end of the turn, assuming no
+// external interference or any healing actions.
+func (a *Actor) expectedHP() int {
+	hp := a.HP
+	if a.Statuses[StatusBerserk] == 1 {
+		hp = max(1, hp-a.HPBonus())
+	}
+	if a.Statuses[StatusLignification] == 1 {
+		hp = max(min(3, hp), hp-a.HPBonus())
+	}
+	return hp
 }
 
 func (md *model) more(msg gruid.Msg) bool {
@@ -386,8 +399,8 @@ func (md *model) updateStatusMouse(msg gruid.MsgMouse) {
 }
 
 // endTurn finalizes player's turn and runs other events until next player
-// turn.
-func (md *model) endTurn(ohp int) {
+// turn. The given argument contains the expected HP at the end of the turn.
+func (md *model) endTurn(xhp int) {
 	if md.mode != modeCritical {
 		md.mode = modeNormal
 	}
@@ -408,7 +421,9 @@ func (md *model) endTurn(ohp int) {
 		md.death()
 		return
 	}
-	if hp <= HPCritical && ohp > HPCritical {
+	if hp <= HPCritical && xhp > HPCritical {
+		// Warn only if HP went below critical point when it was
+		// expected to remain higher.
 		g.WarningPrompt()
 		g.LogStyled("*** CRITICAL HP WARNING ***", logConfirm)
 	}
