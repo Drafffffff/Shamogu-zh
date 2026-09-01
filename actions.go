@@ -1851,17 +1851,19 @@ Sometimes, map corruption events happen. In particular, lots of long-lasting fog
 	case ModAdvancedSpirits:
 		return `Some advanced secondary spirit traits are a bit tricky to use or understand.
 
-The Gawalt’s weakens by 1 damage any hits doing more than 2 base damage and two thirds of the hits doing 2 base damage. Accuracy is preserved.
-
 Zebra’s “dazzling” trait means that any attack directed at you will be redirected to any monster just on your other side. It hence encourages weird positioning tactics. Also, with Zebra, monsters notice you instantly, without losing a turn, so beware of sudden ranged attacks during exploration.
 
 The Lion’s roaring happens on first sight, but detecting a monster first beyond view with @BClarity@N will prevent the roaring. Fear duration is 4-5, with 4 being more likely a short distances, because monsters get over their Fear more quickly when the danger is close.
+
+The Gawalt weakens by 1 damage any hits doing more than 2 base damage and two thirds of the hits doing 2 base damage. Accuracy is preserved.
+
+The Bear ignores any special requirements for eating rare comestibles.
 
 When the Elephant is in a dead-end or the Gawalt is on a menhir tile, wandering monsters don’t notice you, but hunting monsters still see you.
 
 The Chicken not triggering traps is as simple as it sounds, but given how wandering monsters avoid traps, it has subtle stealth implications.
 
-@MNote.@N Unless combined with Totem Conditions, this mod makes regular spirits are rarer early on than advanced ones, to make it harder to skip those.`
+@MNote.@N Unless combined with Totem Conditions, this mod makes regular spirits rarer early on than advanced ones, to make it harder to skip those.`
 	case ModTotemConditions:
 		return `Be careful while choosing spirits: some totem curses may replace existing curses on upgrade or even apply a curse on any upgrade (including for primary spirit!). Watch closely the nature of punishment: often, difficult restrictions have softer punishments when you fail.
 
