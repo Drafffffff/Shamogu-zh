@@ -136,7 +136,7 @@ func (md *model) update(msg gruid.Msg) gruid.Effect {
 	return eff
 }
 
-// expectedHP returns the expectedHP HP at the end of the turn, assuming no
+// expectedHP returns the expected HP at the end of the turn, assuming no
 // external interference or any healing actions.
 func (a *Actor) expectedHP() int {
 	hp := a.HP
