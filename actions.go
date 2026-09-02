@@ -637,7 +637,7 @@ func equipItem(md *model, i ID) bool {
 			}
 		}
 		if entry.Disabled {
-			entry.Text = ui.Textf("  - %s", ej.Name)
+			entry.Text = ui.Textf("  - %s", ej.Name).WithStyle(gruid.Style{Fg: ColorForegroundSecondary})
 		} else {
 			entry.Text = ui.Textf("%c - %s", r, ej.Text())
 			entry.Keys = []gruid.Key{gruid.Key(r)}
@@ -687,7 +687,7 @@ func (md *model) openInventory(bound ID) (gruid.Effect, bool) {
 			entry.Text = ui.Textf("%c - %s", r, ei.TextWarn(md.g, -1)) // ID only matters if on the ground
 			entry.Keys = []gruid.Key{gruid.Key(r)}
 		} else {
-			entry.Text = ui.Textf("  - %s", ei.Name)
+			entry.Text = ui.Textf("  - %s", ei.Name).WithStyle(gruid.Style{Fg: ColorForegroundSecondary})
 			entry.Disabled = true
 		}
 		entries = append(entries, entry)
