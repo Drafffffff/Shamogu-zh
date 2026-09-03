@@ -69,6 +69,11 @@ func (a *Actor) ResistsMove() bool {
 	return a.Has(StatusLignification) || a.Is(WalkingTree)
 }
 
+// DoesChaosAttack reports whether the actor has a multi-effect chaotic attack.
+func (a *Actor) DoesChaosAttack() bool {
+	return !NoChaos && a.Is(ChaosMegabat)
+}
+
 // IsAlive reports whether the actor is still alive.
 func (a *Actor) IsAlive() bool {
 	return a.HP > 0
@@ -234,7 +239,10 @@ func (g *Game) TraitDesc(ak ActorKind, t Traits) string {
 	case DraggingAlligator:
 		desc = append(desc, "confusing bite")
 	case ChaosMegabat:
-		desc = append(desc, "chaos bite (random effect), cries upon death")
+		if !NoChaos {
+			desc = append(desc, "chaos bite (random effect), ")
+		}
+		desc = append(desc, "cries upon death")
 	}
 
 	// Extra traits.

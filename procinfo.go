@@ -145,7 +145,7 @@ func (g *Game) flavoursProcGen() {
 	}
 	gpi.GuardianEarly = 3 // 60% chance
 	switch n := g.IntN(10); {
-	case n == 0:
+	case n == 0 || NoChaos && n == 1:
 		gpi.GuardianEarly = 2 // 10% chance
 	case n >= 7:
 		// 30% chance of late chaos megabats.
@@ -407,7 +407,10 @@ func (g *Game) comestiblesProcGen() {
 	g.ProcInfo.NComestibles[7+g.IntN(2)]++
 	g.ProcInfo.NComestibles[1+g.IntN(8)]++
 	g.ProcInfo.NComestibles[1+g.IntN(8)]--
-	g.ProcInfo.RareComestible = 4 + g.IntN(6) // levels 4-9
+	g.ProcInfo.RareComestible = -1
+	if !NoChaos {
+		g.ProcInfo.RareComestible = 4 + g.IntN(6) // levels 4-9
+	}
 
 	if !g.Mod(ModTotemConditions) {
 		return

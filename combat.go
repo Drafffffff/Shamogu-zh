@@ -435,7 +435,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 		}
 	case ai.Is(DraggingAlligator):
 		_ = !g.ResistStatusRoll(j, StatusConfusion) && g.PutStatus(j, aj, StatusConfusion, 2)
-	case ai.Is(ChaosMegabat) && g.IntN(6-dmg) < 2:
+	case ai.DoesChaosAttack() && g.IntN(6-dmg) < 2:
 		g.inflictChaos(j, aj, g.PutStatus)
 		if ai.Has(StatusConfusion) {
 			if g.InFOV(ei.P) {
@@ -452,9 +452,9 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 		if !g.ResistStatusRoll(j, StatusBerserk) && g.PutStatus(j, aj, StatusBerserk, DurationBerserkHit) {
 			g.monsConfusionPenalty(i, ai)
 		}
-	case ai.Is(BlinkButterfly) || ai.Is(ChaosMegabat) && g.IntN(16) == 0:
+	case ai.Is(BlinkButterfly) || ai.DoesChaosAttack() && g.IntN(16) == 0:
 		g.blinkOther(i, j, ai, aj)
-	case ai.Is(WarpingWraith) || ai.Is(ChaosMegabat) && g.IntN(32) == 0:
+	case ai.Is(WarpingWraith) || ai.DoesChaosAttack() && g.IntN(32) == 0:
 		g.teleportOther(i, j, ai, aj)
 	}
 	// Extra defense effects.
