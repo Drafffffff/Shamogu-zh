@@ -1083,19 +1083,14 @@ func (g *Game) genMonsters(mg *MapGen) {
 				}
 				// Rare level with many imps and different
 				// possible behaviors.
-				switch g.IntN(4) {
-				case 0:
-					// Patrolling imp+imp+(butterfly|nadre) trio.
-					mk := g.randMonsKind([]ActorKind{BlinkButterfly, ExplodingNadre})
+				if g.IntN(2) == 0 {
+					// Patrolling imp+imp+(bat|butterfly|nadre|hound) trio.
+					mk := g.randMonsKind([]ActorKind{ChaosMegabat, ChaosMegabat,
+						BlinkButterfly, ExplodingNadre, BarkingHound})
 					for range (1 + nE + nM + nL) / 2 {
 						impPatrol(mk)
 					}
-				case 1:
-					// Patrolling imp+imp+bat trio.
-					for range (1 + nE + nM + nL) / 2 {
-						impPatrol(ChaosMegabat)
-					}
-				default:
+				} else {
 					// Wandering imps in great numbers.
 					for range nE*2 + nM*2 + nL*3 {
 						g.genMonster(NoisyImp)
