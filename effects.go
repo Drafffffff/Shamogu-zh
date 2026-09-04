@@ -88,11 +88,10 @@ func (g *Game) healMsg(amount int) string {
 // eatMsg returns an eating message with the given optional new hp info.
 func (g *Game) eatMsg(name string, hpstr string) {
 	g.Logf("You eat the %s.", name)
-	n := g.ComestibleCount() - 1
 	if hpstr != "" {
-		g.StoryLogf("Ate %s (HP: %s, comestibles: %d)", One(name), hpstr, n)
+		g.StoryLogf("Ate %s (HP: %s)", One(name), hpstr)
 	} else {
-		g.StoryLogf("Ate %s (comestibles: %d)", One(name), n)
+		g.StoryLogf("Ate %s", One(name))
 	}
 }
 
