@@ -10,11 +10,14 @@ New content:
   fewer empty totem to expand your options”.  The expansion provides lots of
   different challenging spirit curses, found on totems and imposing varied
   conditions on the player until fulfilled, as well as seven new rare
-  comestibles that can only be eaten when the right conditions are met. Like
-  with all mods, the new expansion is compatible with any mod combination, and
-  in particular with the other expansions. Be sure to give it a try!
-* While playing the classic game, you may now find one of those new rare
-  conditional comestibles in most runs!
+  comestibles that can only be eaten when the right conditions are met:
+  fortress oyster, runethorn rose, vanishing snail, tunneling acorn, warping
+  bean, seeing potato, tricky chestnut.  Like with all mods, the new expansion
+  is compatible with any mod combination, and in particular with the other
+  expansions. Be sure to give it a try!
+* While playing the base game, you may now find one or sometimes even two very
+  rare comestibles during a run! Those very rare comestibles include the new
+  conditional ones except chestnut, as well as the new fickle lotus.
 
 Reworked and improved content:
 

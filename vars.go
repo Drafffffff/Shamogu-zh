@@ -16,5 +16,5 @@ const ResetMods = false
 const VampiricHC = false
 
 // NoChaos changes chaos megabat to a screeching megabat with no chaos bite,
-// and removes the rare comestible.
+// and removes rare comestibles from base game.
 const NoChaos = false

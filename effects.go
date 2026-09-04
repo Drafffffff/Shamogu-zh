@@ -60,6 +60,7 @@ const (
 
 	DurationDig       = 5
 	DurationDisorient = 6
+	DurationGarDis    = 8
 	DurationFocus     = 3
 	DurationShadow    = 8
 	DurationGarden    = 7
@@ -337,6 +338,54 @@ func (eff EffectTeleportMushroom) Desc(g *Game) string {
 	}
 	return fmt.Sprintf("Teleports you away and makes you sense any totemic spirit. Leaves you either @Odazed@N or @Oimbalanced@N for %d or %d turns respectively.%s",
 		DurationDazeTeleport, DurationImbalanceTeleport, healMsg)
+}
+
+type EffectFickleLotus struct{}
+
+func (eff EffectFickleLotus) Apply(g *Game) bool {
+	pa := g.PlayerActor()
+	pp := g.PP()
+	g.eatMsg(lotusInfo.Name, "")
+	mp := &MappingPath{passable: g.Map.Passable}
+	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{pp}, MaxFOVRange)
+	if g.Map.Terrain.At(pp) == Foliage {
+		g.PutStatus1(PlayerID, pa, StatusDisorient, DurationGarDis)
+		for _, n := range nodes {
+			switch g.Map.Terrain.At(n.P) {
+			case Foliage:
+				g.Map.Terrain.Set(n.P, Floor)
+				if g.Map.KnownTerrain.At(n.P) == Foliage {
+					g.Map.KnownTerrain.Set(n.P, Floor)
+				}
+			case Wall:
+				g.Map.Terrain.Set(n.P, TranslucentWall)
+				if g.Map.KnownTerrain.At(n.P) == Wall {
+					g.Map.KnownTerrain.Set(n.P, TranslucentWall)
+				}
+			}
+		}
+		// Update FOV and player knowledge.
+		g.UpdateFOV()
+		g.UpdateKnowledge()
+	} else {
+		g.PutStatus1(PlayerID, pa, StatusGardener, DurationGarDis)
+		for _, n := range nodes {
+			switch g.Map.Terrain.At(n.P) {
+			case TranslucentWall:
+				g.Map.Terrain.Set(n.P, Wall)
+				if g.Map.KnownTerrain.At(n.P) == TranslucentWall {
+					g.Map.KnownTerrain.Set(n.P, Wall)
+				}
+			}
+		}
+		// Updating just FOV is enough, because it becomes smaller.
+		g.UpdateFOV()
+	}
+	return true
+}
+
+func (eff EffectFickleLotus) Desc(g *Game) string {
+	return fmt.Sprintf("If you are standing on foliage, gives @BDisorient@N for %d turns and increases visibility around, changing plain walls into translucent ones and foliage into floor.\nOtherwise, gives @BGardening@N for %d turns and changes instead translucent walls into plain ones.", DurationGarDis, DurationGarDis)
 }
 
 type EffectFocus struct{}

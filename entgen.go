@@ -547,6 +547,9 @@ func (g *Game) genItems(mg *MapGen) {
 		if g.IntN(2) == 0 {
 			// Field of comestibles of same kind.
 			cod := g.GetComestibleData()[comestibleIdx()]
+			if !NoChaos && g.IntN(len(ComestibleData)+1) == 0 {
+				cod = lotusInfo
+			}
 			for i := range nitems + 7 {
 				addComestible(i, cod)
 			}
@@ -584,16 +587,27 @@ func (g *Game) genItems(mg *MapGen) {
 		})
 	}
 	for i := range nitems {
-		if g.Mod(ModTotemConditions) && ccMap[i] {
+		switch {
+		case g.Mod(ModTotemConditions) && ccMap[i]:
 			addComestible(i, g.GetConditionalComestible(g.Map.Level))
-		} else if !g.Mod(ModTotemConditions) && g.Map.Level == g.ProcInfo.RareComestible {
-			// Once in (most) games, a rare condition-based
-			// comestible usually only found with
-			// ModTotemConditions (no chestnut, because kinda
-			// complicated).
-			addComestible(i, g.GetConditionalComestible(MapLevels))
-			g.ProcInfo.RareComestible = -1
-		} else {
+		case !NoChaos && g.Map.Level == g.ProcInfo.RareComestible:
+			// Rare comestible: once or sometimes twice per run (if
+			// first one appears in mid game).
+			if g.Mod(ModTotemConditions) && g.IntN(4) == 0 {
+				// Even with Totem Conditions, rarely generate
+				// a rare non-conditional comestible.
+				addComestible(i, lotusInfo)
+				g.ProcInfo.RareComestible = -1
+				break
+			}
+			addComestible(i, RareComestibles[g.IntN(len(RareComestibles))])
+			if g.Map.Level < 7 && g.IntN(3) > 0 {
+				// Chance of extra rare comestible in late game.
+				g.ProcInfo.RareComestible = 7 + g.IntN(3) // levels 7-9
+			} else {
+				g.ProcInfo.RareComestible = -1
+			}
+		default:
 			addComestible(i, g.GetComestibleData()[comestibleIdx()])
 		}
 	}
@@ -661,6 +675,14 @@ func (g *Game) genItems(mg *MapGen) {
 		}
 	}
 }
+
+// RareComestibles contains the list of rare comestibles: all the conditional
+// comestibles from Totem Conditions except tricky chestnut, as well as the
+// fickle lotus.
+var RareComestibles = append(slices.Clone(CondComs[:len(CondComs)-1]), lotusInfo)
+
+// lotusInfo holds item information for the rare lotus comestible.
+var lotusInfo = itemInfo{"fickle lotus", EffectFickleLotus{}}
 
 // randomFreeItemFloor returns a random passable position that is not occupied
 // by an item. The returned position has some bias toward walls and sets the
