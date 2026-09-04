@@ -384,7 +384,7 @@ func (eff EffectFickleLotus) Apply(g *Game) bool {
 }
 
 func (eff EffectFickleLotus) Desc(g *Game) string {
-	return fmt.Sprintf("If you are standing on foliage, gives @BDisorient@N for %d turns and increases visibility around, changing plain walls into translucent ones and foliage into floor.\nOtherwise, gives @BGardening@N for %d turns and changes instead translucent walls into plain ones.", DurationGarDis, DurationGarDis)
+	return fmt.Sprintf("If you are standing on foliage, gives @BDisorient@N for %d turns and increases visibility around, changing plain walls into translucent ones and foliage into floor.\nOtherwise, gives @BGardener@N for %d turns and changes instead translucent walls into plain ones.", DurationGarDis, DurationGarDis)
 }
 
 type EffectFocus struct{}
