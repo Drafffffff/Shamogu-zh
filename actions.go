@@ -1723,7 +1723,7 @@ In Shamogu, both the player and the monsters may use one of several attack patte
 
 @CDragging@N attacks are melee attacks that drag foes backwards, unbalancing them. They’re performed by dragging alligators and Spinning Crocodile players.
 
-@CSneak@N attacks are a two-phased attack pattern. When ranged, it works as a rampaging attack. In melee, a plain attack is followed by quick 2-tile retreat. Sneak attacks are performed by sneaky megabats and Vampiric Bat players.
+@CSneak@N attacks are a two-phased attack pattern. When ranged, it works as a rampaging attack. In melee, a plain attack is followed by quick 2-tile retreat. Sneak attacks are performed by megabats and Vampiric Bat players.
 
 @MNote:@N crocodile’s dragging and bat’s retreat don’t happen when @Opoisoned@N nor when they would move you onto dangerous visible fire, unless you’re already on @OFire@N or would be protected by @BFoggy-Skin@N. The boar’s pushing charge and wind fox’s recoil don’t have any safety rules, but because recoil is a form of involuntary movement, it is at least unaffected by poison. Melee pushing with @BDig@N is restricted by poison when it requires player movement, but unbalancing and piercing effects still happen when pushing a monster against a wall or another monster.
 
@@ -1764,7 +1764,7 @@ In Shamogu, stealth plays an important role. There are two main mechanisms that 
 
 Monsters can be @Owandering@N, @Oguarding@N or @Rhunting@N. Guarding monsters walk around some vault location, often protecting a totem or portal. Wandering monsters take longer trips, possibly to any place in the map but with some bias toward nearby interesting places. Hunting monsters usually travel to the last location they saw you at; when they lose track of you, they become wandering or guarding again and briefly search around the nearby area before going back to their usual behavior.
 
-When in view, wandering and guarding monsters normally spend a turn noticing the player and switching to hunting behavior. There are some exceptions to this rule. For example, Dazzling Zebra players are instantly noticeable. Also, when hungry rats smell you from afar or sneaky megabats hear you, they immediately start hunting you even if they’re still out of view. Moreover, any monster may perform by chance an ambushing charge from out-of-view, like behind some rubble, attacking and becoming hunting at once.
+When in view, wandering and guarding monsters normally spend a turn noticing the player and switching to hunting behavior. There are some exceptions to this rule. For example, Dazzling Zebra players are instantly noticeable. Also, when hungry rats smell you from afar or megabats hear you, they immediately start hunting you even if they’re still out of view. Moreover, any monster may perform by chance an ambushing charge from out-of-view, like behind some rubble, attacking and becoming hunting at once.
 
 @YNOISE@N
 
