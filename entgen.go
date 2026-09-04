@@ -898,6 +898,13 @@ const (
 	WindFox
 )
 
+func batMonsName() string {
+	if NoChaos {
+		return "screeching megabat"
+	}
+	return "chaos megabat"
+}
+
 // MonsData provides information about the various kinds of monsters.
 var MonsData = []monsterInfo{
 	// 		  {name, rune, attack, defense, hp, traits}
@@ -907,7 +914,7 @@ var MonsData = []monsterInfo{
 	BlazingGolem:      {"blazing golem", 'G', 2, 3, 4, MonsExplodingDeath | ImmunityFire | ImmunityPoison | ImmunityFear | ImmunityConfusion | MonsHeavyFootsteps | MonsNotable},
 	BlinkButterfly:    {"blinking butterfly", 'b', 2, 3, 2, ImmunityImbalance | ImmunityLignification | MonsWingFlap},
 	BurningPhoenix:    {"burning phoenix", 'P', 2, 1, 5, PatternRampage | BurningHits | ImmunityFire | ImmunityLignification | MonsWingFlap | MonsNotable},
-	ChaosMegabat:      {"chaos megabat", 'm', 2, 2, 2, PatternSneaky | GoodHearing | ImmunityLignification | MonsWingFlap | MonsNotable},
+	ChaosMegabat:      {batMonsName(), 'm', 2, 2, 2, PatternSneaky | GoodHearing | ImmunityLignification | MonsWingFlap | MonsNotable},
 	ConfusingEye:      {"confusing eye", 'e', 2, 0, 2, PatternRanged | MonsConfusion | ImmunityConfusion | MonsLightFootsteps},
 	CrazyDruid:        {"crazy druid", 'C', 3, 1, 4, PatternSwap | BurningHits | MonsBerserking | MonsNotable},
 	DraggingAlligator: {"dragging alligator", 'A', 3, 1, 4, PatternDragging | MonsScales | ResistanceFire | ResistanceFear | MonsNotable},
