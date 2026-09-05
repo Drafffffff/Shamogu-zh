@@ -412,7 +412,7 @@ func (g *Game) comestiblesProcGen() {
 	g.ProcInfo.NComestibles[1+g.IntN(8)]--
 	g.ProcInfo.RareComestible1 = -1
 	if !NoChaos {
-		if g.IntN(3) > 0 {
+		if g.IntN(3) > 0 && !g.Mod(ModTotemConditions) {
 			// Only 2/3 chance of rare comestible in mid game.
 			g.ProcInfo.RareComestible1 = 4 + g.IntN(3) // levels 4-6
 		}
