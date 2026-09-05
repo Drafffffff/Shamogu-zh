@@ -590,23 +590,21 @@ func (g *Game) genItems(mg *MapGen) {
 		switch {
 		case g.Mod(ModTotemConditions) && ccMap[i]:
 			addComestible(i, g.GetConditionalComestible(g.Map.Level))
-		case !NoChaos && g.Map.Level == g.ProcInfo.RareComestible:
-			// Rare comestible: once or sometimes twice per run (if
-			// first one appears in mid game).
+		case g.Map.Level == g.ProcInfo.RareComestible1 && !NoChaos:
+			// Mid-game rare comestible.
+			addComestible(i, RareComestibles[g.IntN(len(RareComestibles))])
+			g.ProcInfo.RareComestible1 = -1
+		case g.Map.Level == g.ProcInfo.RareComestible2 && !NoChaos:
+			// Late-game rare comestible.
 			if g.Mod(ModTotemConditions) && g.IntN(4) == 0 {
 				// Even with Totem Conditions, rarely generate
 				// a rare non-conditional comestible.
 				addComestible(i, lotusInfo)
-				g.ProcInfo.RareComestible = -1
+				g.ProcInfo.RareComestible2 = -1
 				break
 			}
 			addComestible(i, RareComestibles[g.IntN(len(RareComestibles))])
-			if g.Map.Level < 7 && g.IntN(3) > 0 {
-				// Chance of extra rare comestible in late game.
-				g.ProcInfo.RareComestible = 7 + g.IntN(3) // levels 7-9
-			} else {
-				g.ProcInfo.RareComestible = -1
-			}
+			g.ProcInfo.RareComestible2 = -1
 		default:
 			addComestible(i, g.GetComestibleData()[comestibleIdx()])
 		}

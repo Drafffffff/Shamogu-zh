@@ -38,7 +38,8 @@ type ProcInfo struct {
 	MenhirIdx        int              // current index in Menhirs
 	Comestibles      []int            // comestible-generation data
 	ComestibleIdx    int              // current index in Comestibles
-	RareComestible   int              // level with unique conditional comestible
+	RareComestible1  int              // mid level with rare comestible
+	RareComestible2  int              // late level with rare comestible
 	NComestibles     []int            // number of comestibles per level
 	NCondCom         []int            // number of conditional comestibles
 	NMenhirs         []int            // number of menhirs per level
@@ -210,13 +211,15 @@ func (g *Game) flavoursProcGen() {
 	// Disable very occasionally some events/flavours, for some
 	// extra unpredictability.
 	switch g.IntN(10) {
-	case 1:
+	case 0:
 		gpi.WanderingUnique1 = 0
-	case 2:
+	case 1:
 		gpi.WanderingUnique2 = 0
-	case 3:
+	}
+	switch g.IntN(10) {
+	case 0:
 		gpi.Earthquake = 0
-	case 4:
+	case 1:
 		gpi.TrapLevel = 0
 	}
 }
@@ -407,9 +410,13 @@ func (g *Game) comestiblesProcGen() {
 	g.ProcInfo.NComestibles[7+g.IntN(2)]++
 	g.ProcInfo.NComestibles[1+g.IntN(8)]++
 	g.ProcInfo.NComestibles[1+g.IntN(8)]--
-	g.ProcInfo.RareComestible = -1
+	g.ProcInfo.RareComestible1 = -1
 	if !NoChaos {
-		g.ProcInfo.RareComestible = 4 + g.IntN(6) // levels 4-9
+		if g.IntN(3) > 0 {
+			// Only 2/3 chance of rare comestible in mid game.
+			g.ProcInfo.RareComestible1 = 4 + g.IntN(3) // levels 4-6
+		}
+		g.ProcInfo.RareComestible2 = 7 + g.IntN(3) // levels 7-9
 	}
 
 	if !g.Mod(ModTotemConditions) {
