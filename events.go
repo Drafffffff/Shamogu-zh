@@ -1109,7 +1109,7 @@ func (eff EffectVanishingSnail) Apply(g *Game) bool {
 }
 
 func (eff EffectVanishingSnail) Desc(g *Game) string {
-	cond := "Eat only if at least 4 monsters are hunting you. "
+	cond := "Eat only if at least 4 monsters are hunting you, including any out of view ones. "
 	if g.PlayerActor().DoesAny(Gluttony) {
 		cond = ""
 	}
