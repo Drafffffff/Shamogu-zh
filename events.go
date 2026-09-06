@@ -1330,13 +1330,8 @@ func CantEatMsg(ef Effect) string {
 
 // CondComs provides information about the various conditional comestibles.
 var CondComs = []itemInfo{
-	{"fortress oyster", EffectFortressOyster{}},
-	{"runethorn rose", EffectRunethornRose{}},
-	{"vanishing snail", EffectVanishingSnail{}},
-	{"tunnelling acorn", EffectTunnellingAcorn{}},
-	{"warping bean", EffectWarpingBean{}},
-	{"seeing potato", EffectSeeingPotato{}},
-	{"tricky chestnut", EffectTrickyChestnut{}},
+	oysterInfo, roseInfo, snailInfo, acornInfo, beanInfo, potatoInfo,
+	chestnutInfo, // last
 }
 
 // GetConditionalComestible returns info for a random conditional comestible

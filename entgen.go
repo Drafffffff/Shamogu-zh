@@ -674,13 +674,24 @@ func (g *Game) genItems(mg *MapGen) {
 	}
 }
 
-// RareComestibles contains the list of rare comestibles: all the conditional
-// comestibles from Totem Conditions except tricky chestnut, as well as the
-// fickle lotus.
-var RareComestibles = append(slices.Clone(CondComs[:len(CondComs)-1]), lotusInfo)
+// RareComestibles contains the list of rare comestibles: most conditional
+// comestibles from Totem Conditions, excluding chestnut and oyster, as well as
+// the fickle lotus.
+var RareComestibles = []itemInfo{lotusInfo, roseInfo, snailInfo, acornInfo, beanInfo, potatoInfo}
 
-// lotusInfo holds item information for the rare lotus comestible.
-var lotusInfo = itemInfo{"fickle lotus", EffectFickleLotus{}}
+// These variables hold information about the various rare comestibles.
+var (
+	lotusInfo = itemInfo{"fickle lotus", EffectFickleLotus{}}
+
+	// Totem Conditions comestibles.
+	oysterInfo   = itemInfo{"fortress oyster", EffectFortressOyster{}}
+	roseInfo     = itemInfo{"runethorn rose", EffectRunethornRose{}}
+	snailInfo    = itemInfo{"vanishing snail", EffectVanishingSnail{}}
+	acornInfo    = itemInfo{"tunnelling acorn", EffectTunnellingAcorn{}}
+	beanInfo     = itemInfo{"warping bean", EffectWarpingBean{}}
+	potatoInfo   = itemInfo{"seeing potato", EffectSeeingPotato{}}
+	chestnutInfo = itemInfo{"tricky chestnut", EffectTrickyChestnut{}}
+)
 
 // randomFreeItemFloor returns a random passable position that is not occupied
 // by an item. The returned position has some bias toward walls and sets the

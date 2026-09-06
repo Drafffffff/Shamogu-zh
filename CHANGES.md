@@ -16,8 +16,8 @@ New content:
   is compatible with any mod combination, and in particular with the other
   expansions. Be sure to give it a try!
 * While playing the base game, you may now find one or sometimes even two very
-  rare comestibles during a run! Those very rare comestibles include the new
-  conditional ones except chestnut, as well as the new fickle lotus.
+  rare comestibles during a run! Those very rare comestibles include most new
+  conditional, excluding chestnut and oyster, as well as the new fickle lotus.
 
 Reworked and improved content:
 
