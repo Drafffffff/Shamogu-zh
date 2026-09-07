@@ -1,3 +1,6 @@
+// This file implements the curses from Totem Conditions, as well as
+// conditional comestible effects.
+
 package main
 
 import (
@@ -984,7 +987,7 @@ func (eff EffectFortressOyster) CanApply(g *Game, i ID) bool {
 func (eff EffectFortressOyster) Apply(g *Game) bool {
 	const d = 5 // common status duration
 	pa := g.PlayerActor()
-	g.eatMsg("fortress oyster", "")
+	g.eatMsg(FortressOyster.Name(), "")
 	g.RemoveStatus(PlayerID, pa, StatusClarity)
 	if pa.Has(StatusBerserk) {
 		pa.Statuses[StatusBerserk] = max(pa.Statuses[StatusBerserk], d+1)
@@ -1031,7 +1034,7 @@ func (eff EffectRunethornRose) CanApply(g *Game, i ID) bool {
 }
 
 func (eff EffectRunethornRose) Apply(g *Game) bool {
-	g.eatMsg("runethorn rose", "")
+	g.eatMsg(RunethornRose.Name(), "")
 	pp := g.PP()
 	var t MagicRune // type of rune
 	if r, ok := g.anyRuneAt(pp); ok {
@@ -1089,7 +1092,7 @@ func (eff EffectVanishingSnail) CanApply(g *Game, i ID) bool {
 }
 
 func (eff EffectVanishingSnail) Apply(g *Game) bool {
-	g.eatMsg("vanishing snail", "")
+	g.eatMsg(VanishingSnail.Name(), "")
 	for _, a := range g.Monsters() {
 		if a.Behavior.State == Hunting {
 			a.Behavior.State = Wandering
@@ -1125,7 +1128,7 @@ func (eff EffectTunnellingAcorn) CanApply(g *Game, i ID) bool {
 }
 
 func (eff EffectTunnellingAcorn) Apply(g *Game) bool {
-	g.eatMsg("tunnelling acorn", "")
+	g.eatMsg(TunnelingAcorn.Name(), "")
 	p := g.PP().Add(g.Dir)
 	for inMap(p) && !g.Map.Passable(p) {
 		g.disintegrateWall(p)
@@ -1157,7 +1160,7 @@ func (eff EffectWarpingBean) CanApply(g *Game, i ID) bool {
 
 func (eff EffectWarpingBean) Apply(g *Game) bool {
 	pa := g.PlayerActor()
-	g.eatMsg("warping bean", "")
+	g.eatMsg(WarpingBean.Name(), "")
 	for i := range pa.Statuses {
 		pa.Statuses[i] = 0
 	}
@@ -1257,7 +1260,7 @@ func (eff EffectTrickyChestnut) CanApply(g *Game, i ID) bool {
 }
 
 func (eff EffectTrickyChestnut) Apply(g *Game) bool {
-	g.eatMsg("tricky chestnut", "")
+	g.eatMsg(TrickyChestnut.Name(), "")
 	pp := g.PP()
 	var tot *Spirit
 	if i, it := g.ItemAt(pp); i >= 0 {
@@ -1326,20 +1329,4 @@ func CantEatMsg(ef Effect) string {
 	default:
 		panic("unexpected inedible comestible")
 	}
-}
-
-// CondComs provides information about the various conditional comestibles.
-var CondComs = []itemInfo{
-	oysterInfo, roseInfo, snailInfo, acornInfo, beanInfo, potatoInfo,
-	chestnutInfo, // last
-}
-
-// GetConditionalComestible returns info for a random conditional comestible
-// suitable for the given map level.
-func (g *Game) GetConditionalComestible(level int) itemInfo {
-	n := len(CondComs)
-	if level == 9 {
-		n-- // chestnuts are useless on the last level
-	}
-	return CondComs[g.IntN(n)]
 }

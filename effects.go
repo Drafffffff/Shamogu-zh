@@ -1,3 +1,5 @@
+// This file implements effects for comestibles, abilities, and menhirs.
+
 package main
 
 import (
@@ -122,7 +124,7 @@ func (eff EffectAmbrosiaBerries) Apply(g *Game) bool {
 	if g.Mod(ModHealingCombat) {
 		heal = HealAmbrosiaHC
 	}
-	g.eatMsg("ambrosia berries", newHPMsg(pa, heal))
+	g.eatMsg(AmbrosiaBerries.Name(), newHPMsg(pa, heal))
 	g.healPlayer(pa, heal)
 	if g.IntN(2) == 0 {
 		g.PutStatus1(PlayerID, pa, StatusConfusion, DurationConfusionAmbrosia)
@@ -146,7 +148,7 @@ type EffectBerserkingFlower struct{}
 func (eff EffectBerserkingFlower) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	d := DurationBerserk
-	g.eatMsg("berserking flower", "")
+	g.eatMsg(BerserkingFlower.Name(), "")
 	if pa.Has(StatusClarity) {
 		// Eating a berserking flower while clear-minded works but
 		// reduces the duration by half (rounding up).
@@ -175,7 +177,7 @@ type EffectLignificationFruit struct{}
 func (eff EffectLignificationFruit) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	d := DurationLignification
-	g.eatMsg("lignification fruit", "")
+	g.eatMsg(LignificationFruit.Name(), "")
 	if pa.Has(StatusFoggySkin) {
 		// Eating a lignification fruit while foggy works but reduces
 		// the duration by half (rounding up).
@@ -212,7 +214,7 @@ func (eff EffectClarityLeaves) Apply(g *Game) bool {
 		hpstr = newHPMsg(pa, HealClarityLeaves)
 	}
 	extraTurns := pa.Statuses[StatusClarity]
-	g.eatMsg("clarity leaves", hpstr)
+	g.eatMsg(ClarityLeaves.Name(), hpstr)
 	g.PutStatus1(PlayerID, pa, StatusClarity, DurationClarity+extraTurns)
 	if !g.Mod(ModHealingCombat) {
 		g.healPlayer(pa, HealClarityLeaves)
@@ -249,7 +251,7 @@ func (eff EffectFoggySkinOnion) Apply(g *Game) bool {
 		hpstr = newHPMsg(pa, HealFoggySkinOnion)
 	}
 	extraTurns := pa.Statuses[StatusFoggySkin]
-	g.eatMsg("foggy-skin onion", hpstr)
+	g.eatMsg(FoggySkinOnion.Name(), hpstr)
 	g.PutStatus1(PlayerID, pa, StatusFoggySkin, DurationFoggySkin+extraTurns)
 	if !g.Mod(ModHealingCombat) {
 		g.healPlayer(pa, HealFoggySkinOnion)
@@ -271,7 +273,7 @@ func (eff EffectFirebreathPepper) Apply(g *Game) bool {
 	if !g.Mod(ModHealingCombat) {
 		hpstr = newHPMsg(pa, HealFirebreathPepper)
 	}
-	g.eatMsg("firebreath pepper", hpstr)
+	g.eatMsg(FirebreathPepper.Name(), hpstr)
 	g.MakeNoise(pp, NoiseRoar)
 	if !g.Mod(ModHealingCombat) {
 		g.healPlayer(pa, HealFirebreathPepper)
@@ -310,7 +312,7 @@ type EffectTeleportMushroom struct{}
 func (eff EffectTeleportMushroom) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	j := g.TotemID()
-	g.eatMsg("teleport mushroom", "")
+	g.eatMsg(TeleportMushroom.Name(), "")
 	if !g.TeleportActor(PlayerID, pa, 1) {
 		g.Log("You resist teleport while lignified.")
 		if !g.Mod(ModHealingCombat) {
@@ -345,7 +347,7 @@ type EffectFickleLotus struct{}
 func (eff EffectFickleLotus) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	pp := g.PP()
-	g.eatMsg(lotusInfo.Name, "")
+	g.eatMsg(FickleLotus.Name(), "")
 	mp := &MappingPath{passable: g.Map.Passable}
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{pp}, MaxFOVRange)
 	if g.Map.Terrain.At(pp) == Foliage {
@@ -406,7 +408,7 @@ type EffectPolymorphFungus struct{}
 // }
 
 func (eff EffectPolymorphFungus) Apply(g *Game) bool {
-	g.eatMsg(fungusInfo.Name, "")
+	g.eatMsg(PolymorphFungus.Name(), "")
 	// Collect IDs from monsters in view.
 	var mids []ID
 	for i := range g.Monsters() {

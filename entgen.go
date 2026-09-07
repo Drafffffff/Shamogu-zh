@@ -1,3 +1,5 @@
+// This file implements entity generation during map initialization.
+
 package main
 
 import (
@@ -28,10 +30,10 @@ func (g *Game) debugBuild() {
 	// g.Entities[2] = spiritEntity(g.Mods, secondarySpirits[3])
 	// g.Entities[1] = spiritEntity(g.Mods, challengeSpirits[4])
 	// g.Entities[2] = spiritEntity(g.Mods, challengeSpirits[2])
-	// g.Entities[4] = comestibleEntity(ComestibleData[BerserkingFlower])
-	// g.Entities[5] = comestibleEntity(ComestibleData[ClarityLeaves])
-	// g.Entities[6] = comestibleEntity(ComestibleData[FirebreathPepper])
-	// g.Entities[7] = comestibleEntity(ComestibleData[FoggySkinOnion])
+	// g.Entities[4] = comestibleEntity(BerserkingFlower)
+	// g.Entities[5] = comestibleEntity(ClarityLeaves)
+	// g.Entities[6] = comestibleEntity(FirebreathPepper)
+	// g.Entities[7] = comestibleEntity(FoggySkinOnion)
 }
 
 func emptySlot() *Entity {
@@ -298,10 +300,30 @@ const (
 	FoggySkinOnion
 	LignificationFruit
 	TeleportMushroom
+
+	// Conditional rare comestibles.
+	FortressOyster
+	RunethornRose
+	SeeingPotato
+	TrickyChestnut
+	TunnelingAcorn
+	VanishingSnail
+	WarpingBean
+
+	// Miscellaneous rare comestibles.
+	FickleLotus
+	PolymorphFungus
 )
+
+// Name returns the name of the comestible.
+func (ck comestibleKind) Name() string { return ComestibleData[ck].Name }
+
+// Info returns the item information for the comestible.
+func (ck comestibleKind) Info() itemInfo { return ComestibleData[ck] }
 
 // ComestibleData provides information about the various kinds of comestibles.
 var ComestibleData = []itemInfo{
+	// Common comestibles.
 	AmbrosiaBerries:    {"ambrosia berries", EffectAmbrosiaBerries{}},
 	BerserkingFlower:   {"berserking flower", EffectBerserkingFlower{}},
 	ClarityLeaves:      {"clarity leaves", EffectClarityLeaves{}},
@@ -309,15 +331,52 @@ var ComestibleData = []itemInfo{
 	FoggySkinOnion:     {"foggy-skin onion", EffectFoggySkinOnion{}},
 	LignificationFruit: {"lignification fruit", EffectLignificationFruit{}},
 	TeleportMushroom:   {"teleport mushroom", EffectTeleportMushroom{}},
+
+	// Conditional rare comestibles.
+	FortressOyster: {"fortress oyster", EffectFortressOyster{}},
+	RunethornRose:  {"runethorn rose", EffectRunethornRose{}},
+	SeeingPotato:   {"seeing potato", EffectSeeingPotato{}},
+	TrickyChestnut: {"tricky chestnut", EffectTrickyChestnut{}},
+	TunnelingAcorn: {"tunnelling acorn", EffectTunnellingAcorn{}},
+	VanishingSnail: {"vanishing snail", EffectVanishingSnail{}},
+	WarpingBean:    {"warping bean", EffectWarpingBean{}},
+
+	// Miscellaneous rare comestibles.
+	FickleLotus:     {"fickle lotus", EffectFickleLotus{}},
+	PolymorphFungus: {"polymorph fungus", EffectPolymorphFungus{}},
 }
 
-// GetComestibleData returns the appropriate comestible data for current mod
-// selection.
-func (g *Game) GetComestibleData() []itemInfo { return ComestibleData }
+// CommonComestibles represents the most common comestibles.
+var CommonComestibles = []comestibleKind{
+	AmbrosiaBerries, BerserkingFlower, ClarityLeaves,
+	FirebreathPepper, FoggySkinOnion, LignificationFruit,
+	TeleportMushroom}
+
+// RareComestibles contains the list of rare comestibles.
+var RareComestibles = []comestibleKind{
+	FickleLotus, PolymorphFungus,
+	RunethornRose, VanishingSnail, TunnelingAcorn, WarpingBean}
+
+// CondComestibles provides information about the various conditional comestibles.
+var CondComestibles = []comestibleKind{
+	FortressOyster, RunethornRose, VanishingSnail, TunnelingAcorn, WarpingBean, SeeingPotato,
+	TrickyChestnut, // last
+}
+
+// GetConditionalComestible returns info for a random conditional comestible
+// suitable for the given map level.
+func (g *Game) GetConditionalComestible(level int) comestibleKind {
+	n := len(CondComestibles)
+	if level == 9 {
+		n-- // chestnuts are useless on the last level
+	}
+	return CondComestibles[g.IntN(n)]
+}
 
 // comestibleEntity generates a new comestible Entity entity using the given
 // data.
-func comestibleEntity(ci itemInfo) *Entity {
+func comestibleEntity(ck comestibleKind) *Entity {
+	ci := ck.Info()
 	return &Entity{
 		Name:   ci.Name,
 		Rune:   '%',
@@ -496,8 +555,8 @@ func (g *Game) genItems(mg *MapGen) {
 	}
 	// Comestibles.
 	nitems := g.ProcInfo.NComestibles[g.Map.Level-1]
-	addComestible := func(i int, cod itemInfo) {
-		co := comestibleEntity(cod)
+	addComestible := func(i int, ck comestibleKind) {
+		co := comestibleEntity(ck)
 		if i <= max(4, (nitems+1)/2) {
 			co.P = g.RandomPlace(mg, PlaceItem)
 		} else {
@@ -546,12 +605,12 @@ func (g *Game) genItems(mg *MapGen) {
 	if g.Mod(ModCorruptedDungeon) && mg.theme == ThemeNone && g.IntN(4*MapLevels) == 0 {
 		if g.IntN(2) == 0 {
 			// Field of comestibles of same kind.
-			cod := g.GetComestibleData()[comestibleIdx()]
+			ck := CommonComestibles[g.IntN(len(CommonComestibles))]
 			if !NoChaos && g.IntN(len(ComestibleData)+1) == 0 {
-				cod = lotusInfo
+				ck = FickleLotus
 			}
 			for i := range nitems + 7 {
-				addComestible(i, cod)
+				addComestible(i, ck)
 			}
 		} else if g.IntN(3) > 0 {
 			// Extra traps (of same kind) to compensate for lack of
@@ -599,14 +658,14 @@ func (g *Game) genItems(mg *MapGen) {
 			if g.Mod(ModTotemConditions) && g.IntN(4) == 0 {
 				// Even with Totem Conditions, rarely generate
 				// a rare non-conditional comestible.
-				addComestible(i, lotusInfo)
+				addComestible(i, FickleLotus)
 				g.ProcInfo.RareComestible2 = -1
 				break
 			}
 			addComestible(i, RareComestibles[g.IntN(len(RareComestibles))])
 			g.ProcInfo.RareComestible2 = -1
 		default:
-			addComestible(i, g.GetComestibleData()[comestibleIdx()])
+			addComestible(i, CommonComestibles[comestibleIdx()])
 		}
 	}
 	// Runic traps.
@@ -673,26 +732,6 @@ func (g *Game) genItems(mg *MapGen) {
 		}
 	}
 }
-
-// RareComestibles contains the list of rare comestibles: most conditional
-// comestibles from Totem Conditions, excluding chestnut and oyster, as well as
-// the fickle lotus.
-var RareComestibles = []itemInfo{lotusInfo, roseInfo, snailInfo, acornInfo, beanInfo, fungusInfo}
-
-// These variables hold information about the various rare comestibles.
-var (
-	lotusInfo  = itemInfo{"fickle lotus", EffectFickleLotus{}}
-	fungusInfo = itemInfo{"polymorph fungus", EffectPolymorphFungus{}}
-
-	// Totem Conditions comestibles.
-	oysterInfo   = itemInfo{"fortress oyster", EffectFortressOyster{}}
-	roseInfo     = itemInfo{"runethorn rose", EffectRunethornRose{}}
-	snailInfo    = itemInfo{"vanishing snail", EffectVanishingSnail{}}
-	acornInfo    = itemInfo{"tunnelling acorn", EffectTunnellingAcorn{}}
-	beanInfo     = itemInfo{"warping bean", EffectWarpingBean{}}
-	potatoInfo   = itemInfo{"seeing potato", EffectSeeingPotato{}}
-	chestnutInfo = itemInfo{"tricky chestnut", EffectTrickyChestnut{}}
-)
 
 // randomFreeItemFloor returns a random passable position that is not occupied
 // by an item. The returned position has some bias toward walls and sets the
