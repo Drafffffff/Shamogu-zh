@@ -68,6 +68,7 @@ const (
 	DurationSprint    = 6
 	DurationTimeStop  = 5
 	DurationVampirism = 2
+	DurationVampFung  = 3
 )
 
 // newHPMsg returns a message with new HP after healing an actor for the given
@@ -388,6 +389,74 @@ func (eff EffectFickleLotus) Desc(g *Game) string {
 }
 
 type EffectFocus struct{}
+
+type EffectPolymorphFungus struct{}
+
+// func (eff EffectPolymorphFungus) CanApply(g *Game) bool {
+//      // NOTE: idea for a hard-condition variant: only works if there are
+//      // exactly 2 monsters in view?
+// 	var n int
+// 	for i := range g.Monsters() {
+// 		ei := g.Entity(i)
+// 		if g.InFOV(ei.P) {
+// 			n++
+// 		}
+// 	}
+// 	return n == 2
+// }
+
+func (eff EffectPolymorphFungus) Apply(g *Game) bool {
+	g.eatMsg(fungusInfo.Name, "")
+	// Collect IDs from monsters in view.
+	var mids []ID
+	for i := range g.Monsters() {
+		if g.InFOV(g.Entity(i).P) {
+			mids = append(mids, i)
+		}
+	}
+	if len(mids) == 0 {
+		g.PutStatus1(PlayerID, g.PlayerActor(), StatusVampirism, DurationVampFung)
+		return true
+	}
+	mks := []ActorKind{LashingFrog, HungryRat}
+	if g.IntN(2) == 0 {
+		// For cases with only one monster in view: choose between frog
+		// or rat randomly.
+		mks[0], mks[1] = mks[1], mks[0]
+	}
+	p := g.rand.Perm(len(mids))[:min(len(mids), 2)]
+	for i, pi := range p {
+		ei := g.Entity(mids[pi])
+		ai := ei.Role.(*Actor)
+		e := monster(mks[i])
+		a := e.Role.(*Actor)
+		g.Logf("The %s becomes %s.", ei.Name, One(e.Name))
+		if ai.DoesAny(MonsNotable) {
+			g.StoryLogf("Polymorphed %s into %s", One(ei.Name), One(e.Name))
+		}
+		// Update name and rune only in entity.
+		ei.Name = e.Name
+		ei.Rune = e.Rune
+		// Update actor stats and traits, but keep behavior, statuses,
+		// and knowledge info.
+		ai.MaxHP = a.MaxHP
+		ai.HP = min(a.HP, ai.MaxHP)
+		ai.Defense = a.Defense
+		ai.Attack = a.Attack
+		ai.Kind = a.Kind
+		ai.Traits = a.Traits
+	}
+	return true
+}
+
+func (eff EffectPolymorphFungus) Desc(g *Game) string {
+	// // NOTE: a hard-condition variant would be:
+	// if g.PlayerActor().DoesAny(Gluttony) {
+	// 	return "Polymorphs up to two random monsters in view into a lashing frog and a berserk hungry rat."
+	// }
+	// return "Eat only if there are exactly two monsters in view. Polymorphs them into a lashing frog and a berserk hungry rat."
+	return fmt.Sprintf("Polymorphs up to two random monsters in view into a lashing frog and a berserk hungry rat. If no monsters are in view, gives @BVampirism@N for %d turns instead.", DurationVampFung)
+}
 
 func (eff EffectFocus) Apply(g *Game) bool {
 	pa := g.PlayerActor()

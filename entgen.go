@@ -677,11 +677,12 @@ func (g *Game) genItems(mg *MapGen) {
 // RareComestibles contains the list of rare comestibles: most conditional
 // comestibles from Totem Conditions, excluding chestnut and oyster, as well as
 // the fickle lotus.
-var RareComestibles = []itemInfo{lotusInfo, roseInfo, snailInfo, acornInfo, beanInfo, potatoInfo}
+var RareComestibles = []itemInfo{lotusInfo, roseInfo, snailInfo, acornInfo, beanInfo, fungusInfo}
 
 // These variables hold information about the various rare comestibles.
 var (
-	lotusInfo = itemInfo{"fickle lotus", EffectFickleLotus{}}
+	lotusInfo  = itemInfo{"fickle lotus", EffectFickleLotus{}}
+	fungusInfo = itemInfo{"polymorph fungus", EffectPolymorphFungus{}}
 
 	// Totem Conditions comestibles.
 	oysterInfo   = itemInfo{"fortress oyster", EffectFortressOyster{}}
