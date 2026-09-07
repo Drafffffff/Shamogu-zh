@@ -505,7 +505,7 @@ func (st Status) Details() string {
 	case StatusConfusion:
 		details = "Confused monsters will attack other monsters too when adjacent. Some monsters may even hurt or affect themselves when performing special actions like digging, spitting fire, barking, or pushing."
 	case StatusDisorient:
-		details = "Player-only effect obtainable with the Dazzling Zebra spirit or the fickle lotus."
+		details = "Player-only effect obtainable with the Dazzling Zebra spirit or by eating a fickle lotus."
 	case StatusFear:
 		details = "Monsters will flee when facing you. Ambushing charges against unseen foes can still happen. At the end of a turn, a cornered and afraid actor with no possible escape will become berserk. When lignified and afraid, getting hit makes you berserk, too."
 	case StatusFire:
@@ -515,7 +515,7 @@ func (st Status) Details() string {
 	case StatusFoggySkin:
 		details = "Player-only effect obtainable by eating a foggy-skin onion. May be removed by eating a lignification fruit for half the @BLignification@N duration."
 	case StatusGardener:
-		details = "Player-only effect obtainable with the Gardening Lion spirit or the fickle lotus."
+		details = "Player-only effect obtainable with the Gardening Lion spirit or by eating a fickle lotus."
 	case StatusGluttony:
 		details = "Player-only effect obtainable with the Gluttonous Bear spirit."
 	case StatusImbalance:
@@ -525,13 +525,13 @@ func (st Status) Details() string {
 	case StatusPoison:
 		details = "Watch out for confusion if any monsters survive poisoning!"
 	case StatusShadow:
-		details = "Note that hitting a wandering monster will make it hunt you as usual. Player-only effect obtainable with the Gawalt Monkey spirit or the vanishing snail."
+		details = "Note that hitting a wandering monster will make it hunt you as usual. Player-only effect obtainable with the Gawalt Monkey spirit or by eating a vanishing snail."
 	case StatusSprint:
 		details = "Disables normal attack. Player-only effect obtainable with the Sprinting Gazelle spirit."
 	case StatusTimeStop:
 		details = "Player-only effect obtainable with the Temporal Cat spirit."
 	case StatusVampirism:
-		details = "Player-only effect obtainable with the Vampiric Bat spirit or the polymorph fungus."
+		details = "Player-only effect obtainable with the Vampiric Bat spirit or by eating a polymorph fungus."
 	}
 	return details
 }
