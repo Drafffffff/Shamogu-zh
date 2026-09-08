@@ -62,7 +62,7 @@ const (
 
 	DurationDig       = 5
 	DurationDisorient = 6
-	DurationGarDis    = 8
+	DurationGarDis    = 10
 	DurationFocus     = 3
 	DurationShadow    = 8
 	DurationGarden    = 7
@@ -396,7 +396,8 @@ type EffectPolymorphFungus struct{}
 
 // func (eff EffectPolymorphFungus) CanApply(g *Game) bool {
 //      // NOTE: idea for a hard-condition variant: only works if there are
-//      // exactly 2 monsters in view?
+//      // exactly 2 monsters in view? Or if there are at least 2 monsters in
+//      // view? Or not more than 2 monsters in view?
 // 	var n int
 // 	for i := range g.Monsters() {
 // 		ei := g.Entity(i)
@@ -420,12 +421,7 @@ func (eff EffectPolymorphFungus) Apply(g *Game) bool {
 		g.PutStatus1(PlayerID, g.PlayerActor(), StatusVampirism, DurationVampFung)
 		return true
 	}
-	mks := []ActorKind{LashingFrog, HungryRat}
-	if g.IntN(2) == 0 {
-		// For cases with only one monster in view: choose between frog
-		// or rat randomly.
-		mks[0], mks[1] = mks[1], mks[0]
-	}
+	mks := []ActorKind{BlinkButterfly, ConfusingEye}
 	p := g.rand.Perm(len(mids))[:min(len(mids), 2)]
 	for i, pi := range p {
 		ei := g.Entity(mids[pi])
@@ -454,10 +450,10 @@ func (eff EffectPolymorphFungus) Apply(g *Game) bool {
 func (eff EffectPolymorphFungus) Desc(g *Game) string {
 	// // NOTE: a hard-condition variant would be:
 	// if g.PlayerActor().DoesAny(Gluttony) {
-	// 	return "Polymorphs up to two random monsters in view into a lashing frog and a berserk hungry rat."
+	// 	return "Polymorphs up to two random monsters in view into a blinking butterfly and a confusing eye."
 	// }
-	// return "Eat only if there are exactly two monsters in view. Polymorphs them into a lashing frog and a berserk hungry rat."
-	return fmt.Sprintf("Polymorphs up to two random monsters in view into a lashing frog and a berserk hungry rat. If no monsters are in view, gives @BVampirism@N for %d turns instead.", DurationVampFung)
+	// return "Eat only if there are exactly two monsters in view. Polymorphs them into a blinking butterfly and a confusing eye."
+	return fmt.Sprintf("Polymorphs a random monster in view into a blinking butterfly, and a second monster, if any, into a confusing eye. If no monsters are in view, gives @BVampirism@N for %d turns instead, preparing you for a vampiric ambush.", DurationVampFung)
 }
 
 func (eff EffectFocus) Apply(g *Game) bool {
