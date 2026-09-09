@@ -240,7 +240,7 @@ func (g *Game) TraitDesc(ak ActorKind, t Traits) string {
 		desc = append(desc, "confusing bite")
 	case ChaosMegabat:
 		if !NoChaos {
-			desc = append(desc, "chaos bite (random effect), ")
+			desc = append(desc, "chaos bite (random effect)")
 		}
 		desc = append(desc, "cries upon death")
 	}

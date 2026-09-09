@@ -21,9 +21,8 @@ const (
 )
 
 var (
-	DisableAnimations bool = false       // whether to disable animations
-	LogGame                = false       // write game logs to file
-	ColorMode              = ColorMode16 // default 16-color palette
+	LogGame   = false       // write game logs to file
+	ColorMode = ColorMode16 // default 16-color palette
 )
 
 // colorMode represents various color compatibility modes.

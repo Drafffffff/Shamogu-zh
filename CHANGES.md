@@ -71,7 +71,9 @@ UI, graphics, QoL:
   anymore.
 * Configuration preferences affecting new games by providing changes to the
   default experience and which weren't convenient as mods, like Gluttony
-  Rework, are now exposed through compile-time variables in `vars.go`.
+  Rework, are now exposed through compile-time variables in `vars.go`. Some of
+  them can also be modified from command-line options (in native versions of
+  the game). Disabling animations is now done through that way, too.
 * The “game summary” action (shortcut `#`) now opens the pager with a
   simplified summary for in-game viewing, in addition to writing full
   statistics to a file (or “below” for the browser version).
