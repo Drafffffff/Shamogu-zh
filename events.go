@@ -1159,13 +1159,17 @@ func (eff EffectWarpingBean) CanApply(g *Game, i ID) bool {
 }
 
 func (eff EffectWarpingBean) Apply(g *Game) bool {
+	if GluttonyRework {
+		// In case the bear teleported or warped first.
+		g.UpdateFOV()
+		g.UpdateKnowledge()
+	}
 	pa := g.PlayerActor()
 	g.eatMsg(WarpingBean.Name(), "")
 	for i := range pa.Statuses {
 		pa.Statuses[i] = 0
 	}
 	pa.HP = min(pa.HP, pa.GetMaxHP())
-	g.UpdateFOV() // in case the bear teleported or warped first
 	r := g.MaxFOVRange()
 	pp := g.PP()
 	var ps []gruid.Point

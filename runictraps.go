@@ -121,6 +121,10 @@ func (g *Game) TriggerTrap(i ID, ai *Actor) {
 	case rt.Rune == RuneBerserk && ai.Has(StatusBerserk):
 		// Do not trigger berserk traps while berserk.
 		return
+	case rt.Rune == RuneWarp && i == PlayerID:
+		// Update FOV before teleporting.
+		g.UpdateFOV()
+		g.UpdateKnowledge()
 	}
 	switch {
 	case i == PlayerID:

@@ -951,6 +951,11 @@ func (g *Game) handleGluttony() {
 		// itself anymore and eats a random comestible, or becomes
 		// confused if it cannot find one.
 		if id, co := g.randomComestible(); id >= 0 {
+			switch co.Effect.(type) {
+			case EffectTeleportMushroom, EffectWarpingBean:
+				g.UpdateFOV()
+				g.UpdateKnowledge()
+			}
 			g.LogStyled("You cannot hold your appetite any longer!", logStatusEnd)
 			co.Use(g, id)
 		} else {

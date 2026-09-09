@@ -310,6 +310,11 @@ func (eff EffectFirebreathPepper) Desc(g *Game) string {
 type EffectTeleportMushroom struct{}
 
 func (eff EffectTeleportMushroom) Apply(g *Game) bool {
+	if GluttonyRework {
+		// In case the bear teleported or warped first.
+		g.UpdateFOV()
+		g.UpdateKnowledge()
+	}
 	pa := g.PlayerActor()
 	j := g.TotemID()
 	g.eatMsg(TeleportMushroom.Name(), "")
