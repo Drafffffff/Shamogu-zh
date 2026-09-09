@@ -40,6 +40,7 @@ type ProcInfo struct {
 	ComestibleIdx    int              // current index in Comestibles
 	RareComestible1  int              // mid level with rare comestible
 	RareComestible2  int              // late level with rare comestible
+	WaitFungus       int              // how much we waited for fungus (Healing Combat)
 	NComestibles     []int            // number of comestibles per level
 	NCondCom         []int            // number of conditional comestibles
 	NMenhirs         []int            // number of menhirs per level

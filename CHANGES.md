@@ -15,10 +15,11 @@ New content:
   bean, seeing potato, tricky chestnut.  Like with all mods, the new expansion
   is compatible with any mod combination, and in particular with the other
   expansions. Be sure to give it a try!
-* While playing the base game, you may now find one or sometimes even two very
-  rare comestibles during a run! Those very rare comestibles include several of
-  the new conditional ones (acorn, bean, snail, rose), as well as new fickle
-  lotus and polymorph fungus comestibles with softer conditions.
+* While playing the base game, you may now find one or sometimes even two rare
+  comestibles during a run! Those rare comestibles include several of the new
+  conditional ones (acorn, bean, snail, rose), as well as the new rare fickle
+  lotus and polymorph fungus comestibles with softer conditions, which occur a
+  bit more often with Corrupted Dungeon and Healing Combat, respectively.
 
 Reworked and improved content:
 

@@ -357,6 +357,9 @@ var RareComestibles = []comestibleKind{
 	FickleLotus, PolymorphFungus,
 	RunethornRose, VanishingSnail, TunnelingAcorn, WarpingBean}
 
+// RareNCComestibles contains the list of rare non-conditional comestibles.
+var RareNCComestibles = []comestibleKind{FickleLotus, PolymorphFungus}
+
 // CondComestibles provides information about the various conditional comestibles.
 var CondComestibles = []comestibleKind{
 	FortressOyster, RunethornRose, VanishingSnail, TunnelingAcorn, WarpingBean, SeeingPotato,
@@ -606,8 +609,13 @@ func (g *Game) genItems(mg *MapGen) {
 		if g.IntN(2) == 0 {
 			// Field of comestibles of same kind.
 			ck := CommonComestibles[g.IntN(len(CommonComestibles))]
-			if !NoChaos && g.IntN(len(ComestibleData)+1) == 0 {
-				ck = FickleLotus
+			if !NoChaos && g.IntN(len(CommonComestibles)) == 0 {
+				ck = FickleLotus // Corrupted Dungeon's signature rare comestible
+				if g.IntN(3) == 0 {
+					// Rarely, put a random rare comestible
+					// instead.
+					ck = RareComestibles[g.IntN(len(RareComestibles))]
+				}
 			}
 			for i := range nitems + 7 {
 				addComestible(i, ck)
@@ -658,14 +666,34 @@ func (g *Game) genItems(mg *MapGen) {
 			if g.Mod(ModTotemConditions) && g.IntN(4) == 0 {
 				// Even with Totem Conditions, rarely generate
 				// a rare non-conditional comestible.
-				addComestible(i, FickleLotus)
+				addComestible(i, RareNCComestibles[g.IntN(len(RareNCComestibles))])
 				g.ProcInfo.RareComestible2 = -1
 				break
 			}
 			addComestible(i, RareComestibles[g.IntN(len(RareComestibles))])
 			g.ProcInfo.RareComestible2 = -1
 		default:
-			addComestible(i, CommonComestibles[comestibleIdx()])
+			ck := comestibleIdx()
+			switch {
+			case ck == AmbrosiaBerries && g.Mod(ModHealingCombat) && !NoChaos:
+				// Replace about a third of ambrosia berries
+				// with polymorph fungus when Healing Combat is
+				// enabled (a bit over 1 per game on average).
+				g.ProcInfo.WaitFungus++
+				if g.IntN(16) == 0 { // minor randomization
+					g.ProcInfo.WaitFungus++
+				}
+				if g.ProcInfo.WaitFungus >= 3 {
+					ck = PolymorphFungus
+					g.ProcInfo.WaitFungus = 0
+				}
+			case g.Mod(ModCorruptedDungeon) && !NoChaos && g.IntN(32) == 0:
+				// Small random chance of extra fickle lotus
+				// with Corrupted Dungeon (slightly more than 1
+				// per game).
+				ck = FickleLotus
+			}
+			addComestible(i, ck)
 		}
 	}
 	// Runic traps.
