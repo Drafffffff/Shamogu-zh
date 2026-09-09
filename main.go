@@ -226,6 +226,8 @@ func processOptions(s string) {
 			MonsData[ChaosMegabat].Name = GetMegabatName()
 		case "NoAnim":
 			NoAnim = !negate
+		default:
+			fmt.Fprintf(os.Stderr, "shamogu: unknown option: %v\n", opt)
 		}
 	}
 }
