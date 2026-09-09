@@ -9,7 +9,7 @@
 //     shamogu -O NoAnim
 //
 // Any extra options should be comma separated. Options can be preceded by an
-// exaclamation mark "!" to negate them (in case you set "true" as default
+// exclamation mark "!" to negate them (in case you set "true" as default
 // before building the game).
 
 package main

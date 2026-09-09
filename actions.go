@@ -868,7 +868,7 @@ func (md *model) updateEquipItemDesc(ei, ej *Entity) {
 	switch rj := ej.Role.(type) {
 	case *Spirit:
 		md.desc.Content = stt // empty (not drawn)
-		md.equipPager.SetBox(&ui.Box{Title: stt.WithTextf("%s (ugprade)", ej.Name)})
+		md.equipPager.SetBox(&ui.Box{Title: stt.WithTextf("%s (upgrade)", ej.Name)})
 		md.equipPager.SetLines(stt.WithText(rj.UpgradeDesc(g, ei)).Format(UIWidth/2 - 1 - 2).Lines())
 	case *Comestible:
 		md.desc.Box = &ui.Box{Title: stt.WithTextf("%s (replace)", ej.Name)}
