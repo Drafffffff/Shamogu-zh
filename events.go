@@ -1084,7 +1084,7 @@ type EffectVanishingSnail struct{}
 func (eff EffectVanishingSnail) CanApply(g *Game, i ID) bool {
 	count := 0
 	for _, a := range g.Monsters() {
-		if !a.IsDead() && a.Behavior.State == Hunting {
+		if a.Behavior.State == Hunting {
 			count++
 		}
 	}
