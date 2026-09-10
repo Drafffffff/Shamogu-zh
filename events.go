@@ -1119,15 +1119,15 @@ func (eff EffectVanishingSnail) Desc(g *Game) string {
 	return cond + "Makes all monsters stop hunting and blinks away any that are next to you. Gives @BShadow@N for 10 turns."
 }
 
-type EffectTunnellingAcorn struct{}
+type EffectTunnelingAcorn struct{}
 
-func (eff EffectTunnellingAcorn) CanApply(g *Game, i ID) bool {
+func (eff EffectTunnelingAcorn) CanApply(g *Game, i ID) bool {
 	pp := g.PP()
 	n := pp.Add(g.Dir)
 	return inMap(n) && !g.Map.Passable(n) && g.Map.AdjacentNonPassableCount(pp) >= 3
 }
 
-func (eff EffectTunnellingAcorn) Apply(g *Game) bool {
+func (eff EffectTunnelingAcorn) Apply(g *Game) bool {
 	g.eatMsg(TunnelingAcorn.Name(), "")
 	p := g.PP().Add(g.Dir)
 	for inMap(p) && !g.Map.Passable(p) {
@@ -1144,7 +1144,7 @@ func (g *Game) disintegrateWall(at gruid.Point) {
 	g.NormalCloudAt(at, 10+g.IntN(30))
 }
 
-func (eff EffectTunnellingAcorn) Desc(g *Game) string {
+func (eff EffectTunnelingAcorn) Desc(g *Game) string {
 	if g.PlayerActor().DoesAny(Gluttony) {
 		return "If you are facing a wall, makes you silently disintegrate all walls in front of you, until reaching a non-wall. Otherwise, does nothing."
 	}
@@ -1324,7 +1324,7 @@ func CantEatMsg(ef Effect) string {
 	switch ef.(type) {
 	case EffectVanishingSnail, EffectWarpingBean:
 		return "You can’t grab it!"
-	case EffectFortressOyster, EffectTunnellingAcorn, EffectTrickyChestnut:
+	case EffectFortressOyster, EffectTunnelingAcorn, EffectTrickyChestnut:
 		return "It won’t open!"
 	case EffectRunethornRose:
 		return "You can’t get past its thorns!"

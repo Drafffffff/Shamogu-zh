@@ -337,7 +337,7 @@ var ComestibleData = []itemInfo{
 	RunethornRose:  {"runethorn rose", EffectRunethornRose{}},
 	SeeingPotato:   {"seeing potato", EffectSeeingPotato{}},
 	TrickyChestnut: {"tricky chestnut", EffectTrickyChestnut{}},
-	TunnelingAcorn: {"tunnelling acorn", EffectTunnellingAcorn{}},
+	TunnelingAcorn: {"tunneling acorn", EffectTunnelingAcorn{}},
 	VanishingSnail: {"vanishing snail", EffectVanishingSnail{}},
 	WarpingBean:    {"warping bean", EffectWarpingBean{}},
 
