@@ -505,7 +505,7 @@ func (st Status) Details() string {
 	case StatusConfusion:
 		details = "Confused monsters will attack other monsters too when adjacent. Some monsters may even hurt or affect themselves when performing special actions like digging, spitting fire, barking, or pushing."
 	case StatusDisorient:
-		details = "Player-only effect obtainable with the Dazzling Zebra spirit or by eating a fickle lotus."
+		details = "Player-only effect obtainable with the Dazzling Zebra spirit or by eating a moonlight lotus."
 	case StatusFear:
 		details = "Monsters will flee when facing you. Ambushing charges against unseen foes can still happen. At the end of a turn, a cornered and afraid actor with no possible escape will become berserk. When lignified and afraid, getting hit makes you berserk, too."
 	case StatusFire:
@@ -515,7 +515,7 @@ func (st Status) Details() string {
 	case StatusFoggySkin:
 		details = "Player-only effect obtainable by eating a foggy-skin onion. May be removed by eating a lignification fruit for half the @BLignification@N duration."
 	case StatusGardener:
-		details = "Player-only effect obtainable with the Gardening Lion spirit or by eating a fickle lotus."
+		details = "Player-only effect obtainable with the Gardening Lion spirit or by eating a moonlight lotus."
 	case StatusGluttony:
 		details = "Player-only effect obtainable with the Gluttonous Bear spirit."
 	case StatusImbalance:

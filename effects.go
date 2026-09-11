@@ -347,12 +347,12 @@ func (eff EffectTeleportMushroom) Desc(g *Game) string {
 		DurationDazeTeleport, DurationImbalanceTeleport, healMsg)
 }
 
-type EffectFickleLotus struct{}
+type EffectMoonlightLotus struct{}
 
-func (eff EffectFickleLotus) Apply(g *Game) bool {
+func (eff EffectMoonlightLotus) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	pp := g.PP()
-	g.eatMsg(FickleLotus.Name(), "")
+	g.eatMsg(MoonlightLotus.Name(), "")
 	mp := &MappingPath{passable: g.Map.Passable}
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{pp}, MaxFOVRange)
 	if g.Map.Terrain.At(pp) == Foliage {
@@ -391,7 +391,7 @@ func (eff EffectFickleLotus) Apply(g *Game) bool {
 	return true
 }
 
-func (eff EffectFickleLotus) Desc(g *Game) string {
+func (eff EffectMoonlightLotus) Desc(g *Game) string {
 	return fmt.Sprintf("If you are standing on foliage, gives @BDisorient@N for %d turns and increases visibility around, changing plain walls into translucent ones and foliage into floor.\nOtherwise, gives @BGardener@N for %d turns and changes instead translucent walls into plain ones.", DurationGarDis, DurationGarDis)
 }
 

@@ -311,7 +311,7 @@ const (
 	WarpingBean
 
 	// Miscellaneous rare comestibles.
-	FickleLotus
+	MoonlightLotus
 	PolymorphFungus
 )
 
@@ -342,7 +342,7 @@ var ComestibleData = []itemInfo{
 	WarpingBean:    {"warping bean", EffectWarpingBean{}},
 
 	// Miscellaneous rare comestibles.
-	FickleLotus:     {"fickle lotus", EffectFickleLotus{}},
+	MoonlightLotus:  {"moonlight lotus", EffectMoonlightLotus{}},
 	PolymorphFungus: {"polymorph fungus", EffectPolymorphFungus{}},
 }
 
@@ -354,11 +354,11 @@ var CommonComestibles = []comestibleKind{
 
 // RareComestibles contains the list of rare comestibles.
 var RareComestibles = []comestibleKind{
-	FickleLotus, PolymorphFungus,
+	MoonlightLotus, PolymorphFungus,
 	RunethornRose, VanishingSnail, TunnelingAcorn, WarpingBean}
 
 // RareNCComestibles contains the list of rare non-conditional comestibles.
-var RareNCComestibles = []comestibleKind{FickleLotus, PolymorphFungus}
+var RareNCComestibles = []comestibleKind{MoonlightLotus, PolymorphFungus}
 
 // CondComestibles provides information about the various conditional comestibles.
 var CondComestibles = []comestibleKind{
@@ -610,7 +610,7 @@ func (g *Game) genItems(mg *MapGen) {
 			// Field of comestibles of same kind.
 			ck := CommonComestibles[g.IntN(len(CommonComestibles))]
 			if !NoChaos && g.IntN(len(CommonComestibles)) == 0 {
-				ck = FickleLotus // Corrupted Dungeon's signature rare comestible
+				ck = MoonlightLotus // Corrupted Dungeon's signature rare comestible
 				if g.IntN(3) == 0 {
 					// Rarely, put a random rare comestible
 					// instead.
@@ -688,10 +688,10 @@ func (g *Game) genItems(mg *MapGen) {
 					g.ProcInfo.WaitFungus = 0
 				}
 			case g.Mod(ModCorruptedDungeon) && !NoChaos && g.IntN(32) == 0:
-				// Small random chance of extra fickle lotus
+				// Small random chance of extra moonlight lotus
 				// with Corrupted Dungeon (slightly more than 1
 				// per game).
-				ck = FickleLotus
+				ck = MoonlightLotus
 			}
 			addComestible(i, ck)
 		}

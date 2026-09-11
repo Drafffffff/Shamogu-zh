@@ -17,7 +17,7 @@ func init() {
 	gob.Register(EffectFoggySkinOnion{})
 	gob.Register(EffectFirebreathPepper{})
 	gob.Register(EffectTeleportMushroom{})
-	gob.Register(EffectFickleLotus{})
+	gob.Register(EffectMoonlightLotus{})
 	gob.Register(EffectPolymorphFungus{})
 
 	// Primary Spirit Effects.
