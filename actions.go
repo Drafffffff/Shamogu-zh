@@ -1871,7 +1871,7 @@ Don’t be too afraid of losing a spirit or two: each run generates an extra non
 
 Curses that ask to “complete a full level” exclude the level in which you got the curse. The curse that says “you move by more than one tile in a turn” only cares about your final position after a full turn, so beware of frogs catching you from afar or butterflies blinking you away!
 
-Conditional rare comestibles are more frequent later on.
+@CConditional comestibles@N are special comestibles that can only be eaten under special circumstances. Some are specific to this mod (oyster, potato, chestnut) and some others have non-conditional variants in base game (acorn, bean, snail, rose). Conditional rare comestibles are more frequent than rare comestibles in base game, particularly later on.
 
 @MNote.@N When this mod is combined with Advanced Spirits, those aren’t more frequent than regular ones early on anymore. Instead, they sometimes get softer curses to help make them more appealing. Also, when No Recharges is on, some curses are disabled or adjusted for balance.`
 	default:

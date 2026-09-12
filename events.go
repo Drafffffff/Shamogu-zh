@@ -1012,7 +1012,7 @@ func (eff EffectFortressOyster) Apply(g *Game) bool {
 
 func (eff EffectFortressOyster) Desc(g *Game) string {
 	cond := "Eat only if you are next to at least 3 monsters. "
-	if g.PlayerActor().DoesAny(Gluttony) {
+	if !g.HasCondComestibles() {
 		cond = ""
 	}
 	return cond + "Gives @BBerserk@N, @BLignification@N, and @BVampirism@N for 5 turns. Removes incompatible statuses. Renews duration and temporary HP bonuses if applicable."
@@ -1073,8 +1073,8 @@ func (g *Game) validRunePlace(p gruid.Point) bool {
 }
 
 func (eff EffectRunethornRose) Desc(g *Game) string {
-	if g.PlayerActor().DoesAny(Gluttony) {
-		return "If you are standing on a runic trap, creates 8 runes of its type: up to two at each diagonal, or randomly around the map. Otherwise, the rune type is chosen randomly."
+	if !g.HasCondComestibles() {
+		return "Creates 8 runes of same type: up to two at each diagonal, or randomly around the map.\nThe rune type is chosen randomly unless you are standing on a trap, in which case its rune type will be used."
 	}
 	return "Eat only if you are standing on a runic trap. Creates 8 runes of its type: up to two at each diagonal, or randomly around the map."
 }
@@ -1113,7 +1113,7 @@ func (eff EffectVanishingSnail) Apply(g *Game) bool {
 
 func (eff EffectVanishingSnail) Desc(g *Game) string {
 	cond := "Eat only if at least 4 monsters are hunting you, including any out of view ones. "
-	if g.PlayerActor().DoesAny(Gluttony) {
+	if !g.HasCondComestibles() {
 		cond = ""
 	}
 	return cond + "Makes all monsters stop hunting and blinks away any that are next to you. Gives @BShadow@N for 10 turns."
@@ -1145,7 +1145,7 @@ func (g *Game) disintegrateWall(at gruid.Point) {
 }
 
 func (eff EffectTunnelingAcorn) Desc(g *Game) string {
-	if g.PlayerActor().DoesAny(Gluttony) {
+	if !g.HasCondComestibles() {
 		return "If you are facing a wall, makes you silently disintegrate all walls in front of you, until reaching a non-wall. Otherwise, does nothing."
 	}
 	return "Eat only if you are next to 3 walls, and facing one of them. Makes you silently disintegrate all walls in front of you, until reaching a non-wall."
@@ -1196,7 +1196,7 @@ func (eff EffectWarpingBean) Apply(g *Game) bool {
 
 func (eff EffectWarpingBean) Desc(g *Game) string {
 	cond := "Eat only if you are lignified, dazed, or poisoned. "
-	if g.PlayerActor().DoesAny(Gluttony) {
+	if !g.HasCondComestibles() {
 		cond = ""
 	}
 	return cond + "Removes all your statuses without the usual effects, then warps you to one of the furthest tiles in your view."
@@ -1243,7 +1243,7 @@ func (eff EffectSeeingPotato) Apply(g *Game) bool {
 
 func (eff EffectSeeingPotato) Desc(g *Game) string {
 	cond := "Eat only from the ground and not your inventory. "
-	if g.PlayerActor().DoesAny(Gluttony) {
+	if !g.HasCondComestibles() {
 		cond = ""
 	}
 	return cond + "Makes you sense nearby floor tiles and items (2× view range)."
@@ -1301,17 +1301,17 @@ func (eff EffectTrickyChestnut) Apply(g *Game) bool {
 }
 
 func (eff EffectTrickyChestnut) Desc(g *Game) string {
-	gluttony := g.PlayerActor().DoesAny(Gluttony)
+	nocond := !g.HasCondComestibles()
 	recharges := "Eat if you are standing on an inhabited totem, to empty the totem, and restore all your spirit charges."
 	if g.Mod(ModNoRecharges) {
 		recharges = "Eat if you are standing on an inhabited totem, to empty the totem, and restore two charges per spirit."
-		if gluttony {
+		if nocond {
 			recharges = "If you are standing on an inhabited totem, empties it, and restores two charges per spirit."
 		}
-	} else if gluttony {
+	} else if nocond {
 		recharges = "If you are standing on an inhabited totem, empties it, and restores all your spirit charges."
 	}
-	if gluttony {
+	if nocond {
 		return fmt.Sprintf("If you are standing on a broken portal, makes it work again.\n%s\nOtherwise, restores one charge per spirit.",
 			recharges)
 	}
@@ -1333,4 +1333,9 @@ func CantEatMsg(ef Effect) string {
 	default:
 		panic("unexpected inedible comestible")
 	}
+}
+
+// HasCondComestibles reports whether conditional comestibles are enabled.
+func (g *Game) HasCondComestibles() bool {
+	return g.Mod(ModTotemConditions) && !g.PlayerActor().DoesAny(Gluttony)
 }

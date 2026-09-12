@@ -128,12 +128,15 @@ func (e *Entity) TextWarn(g *Game, id ID) string {
 		if g == nil {
 			return e.Name
 		}
-		co, cond := r.Effect.(ConditionalComestible)
-		if cond && !g.PlayerActor().DoesAny(Gluttony) && !co.CanApply(g, id) {
-			return fmt.Sprintf("@S%s@N", e.Name)
-		} else if g.WarnComestible(r) {
-			// Comestible will cause a spirit to leave
-			return fmt.Sprintf("@M%s@N", e.Name)
+		if g.Mod(ModTotemConditions) {
+			co, cond := r.Effect.(ConditionalComestible)
+			if cond && !g.PlayerActor().DoesAny(Gluttony) && !co.CanApply(g, id) {
+				return fmt.Sprintf("@S%s@N", e.Name)
+			}
+			if g.WarnComestible(r) {
+				// Comestible will cause a spirit to leave
+				return fmt.Sprintf("@M%s@N", e.Name)
+			}
 		}
 		return e.Name
 	default:

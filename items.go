@@ -236,10 +236,12 @@ func (c *Comestible) ExamineDesc(g *Game) string {
 
 func (c *Comestible) Use(g *Game, i ID) bool {
 	ef := c.Effect
-	et, cond := ef.(ConditionalComestible)
-	if cond && !g.snack && !g.PlayerActor().DoesAny(Gluttony) && !et.CanApply(g, i) {
-		g.Log(CantEatMsg(ef))
-		return false
+	if g.Mod(ModTotemConditions) {
+		co, cond := ef.(ConditionalComestible)
+		if cond && !g.PlayerActor().DoesAny(Gluttony) && !co.CanApply(g, i) {
+			g.Log(CantEatMsg(ef))
+			return false
+		}
 	}
 	pp := g.PP()
 	done := ef.Apply(g)

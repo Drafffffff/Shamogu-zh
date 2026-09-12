@@ -16,9 +16,9 @@ New content:
   is compatible with any mod combination, and in particular with the other
   expansions. Be sure to give it a try!
 * While playing the base game, you may now find one or sometimes even two rare
-  comestibles during a run! Those rare comestibles include several of the new
-  conditional ones (acorn, bean, snail, rose), as well as the new rare
-  moonlight lotus and polymorph fungus comestibles with softer conditions,
+  comestibles during a run! Some of those are easier non-conditional variants
+  of Totem Condition ones (acorn, bean, snail, rose). There's as well the new
+  rare moonlight lotus and polymorph fungus comestibles with alternate effects,
   which occur a bit more often with Corrupted Dungeon and Healing Combat,
   respectively.
 
