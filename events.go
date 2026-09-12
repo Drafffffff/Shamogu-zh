@@ -1261,7 +1261,7 @@ func (eff EffectSeeingPotato) Desc(g *Game) string {
 	if !g.HasCondComestibles() {
 		cond = ""
 	}
-	return cond + "Makes you sense nearby floor tiles and items (2× view range)."
+	return cond + "Makes you sense nearby floor tiles and any entities on them (2× view range)."
 }
 
 type EffectTrickyChestnut struct{}
