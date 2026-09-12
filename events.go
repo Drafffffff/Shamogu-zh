@@ -741,7 +741,7 @@ func (g *Game) spiritLeftShock() {
 	g.PutStatusN(PlayerID, g.PlayerActor(), StatusTimeStop, DurationTimeStop, n)
 	g.curseClouds(CloudPoison, 1)
 	mp := &MapPath{passable: inMap}
-	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, MaxFOVRange)
+	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, g.MaxFOVRange())
 	g.md.FloodAnimation(nodes, ColorViolet)
 	g.WarningPrompt()
 }
@@ -1170,15 +1170,16 @@ func (eff EffectWarpingBean) Apply(g *Game) bool {
 		pa.Statuses[i] = 0
 	}
 	pa.HP = min(pa.HP, pa.GetMaxHP())
-	r := g.MaxFOVRange()
+	maxdist := g.MaxFOVRange()
 	pp := g.PP()
 	var ps []gruid.Point
 	dist := -1
 	for _, p := range g.Map.FOVPts {
-		if paths.DistanceManhattan(p, pp) > r || p == pp {
+		d := paths.DistanceManhattan(p, pp)
+		if d > maxdist || p == pp {
 			continue
 		}
-		if d, ok := g.Map.FOV.At(p); ok && d <= r && g.IsFree(p) {
+		if cost, ok := g.Map.FOV.At(p); ok && cost <= maxdist && g.IsFree(p) {
 			if d > dist {
 				dist = d
 				ps = []gruid.Point{p}

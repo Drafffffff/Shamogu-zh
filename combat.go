@@ -959,13 +959,14 @@ func (g *Game) BlinkPos(from gruid.Point) (gruid.Point, bool) {
 		// when in FOV.
 		return InvalidPos, false
 	}
+	maxdist := g.MaxFOVRange()
 	pp := g.PP()
 	ps := []gruid.Point{}
 	for _, p := range g.Map.FOVPts {
-		if paths.DistanceManhattan(p, pp) > MaxFOVRange || p == from {
+		if paths.DistanceManhattan(p, pp) > maxdist || p == from {
 			continue
 		}
-		if cost, ok := g.Map.FOV.At(p); ok && cost <= MaxFOVRange && g.IsFree(p) {
+		if cost, ok := g.Map.FOV.At(p); ok && cost <= maxdist && g.IsFree(p) {
 			ps = append(ps, p)
 		}
 	}
