@@ -360,16 +360,23 @@ func (eff EffectMoonlightLotus) Apply(g *Game) bool {
 	g.eatMsg(MoonlightLotus.Name(), hpstr)
 	mp := &MappingPath{passable: g.Map.Passable}
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{pp}, MaxFOVRange)
+	draw, cost := false, 1
 	if g.Map.Terrain.At(pp) == Foliage {
 		g.PutStatus1(PlayerID, pa, StatusDisorient, DurationGarDis)
 		for _, n := range nodes {
+			if n.Cost > cost && draw {
+				g.md.AnimationFrameFast()
+				draw, cost = false, n.Cost
+			}
 			switch g.Map.Terrain.At(n.P) {
 			case Foliage:
+				draw = true
 				g.Map.Terrain.Set(n.P, Floor)
 				if g.Map.KnownTerrain.At(n.P) == Foliage {
 					g.Map.KnownTerrain.Set(n.P, Floor)
 				}
 			case Wall:
+				draw = true
 				g.Map.Terrain.Set(n.P, TranslucentWall)
 				if g.Map.KnownTerrain.At(n.P) == Wall {
 					g.Map.KnownTerrain.Set(n.P, TranslucentWall)
@@ -382,8 +389,13 @@ func (eff EffectMoonlightLotus) Apply(g *Game) bool {
 	} else {
 		g.PutStatus1(PlayerID, pa, StatusGardener, DurationGarDis)
 		for _, n := range nodes {
+			if n.Cost > cost && draw {
+				g.md.AnimationFrameFast()
+				draw, cost = false, n.Cost
+			}
 			switch g.Map.Terrain.At(n.P) {
 			case TranslucentWall:
+				draw = true
 				g.Map.Terrain.Set(n.P, Wall)
 				if g.Map.KnownTerrain.At(n.P) == TranslucentWall {
 					g.Map.KnownTerrain.Set(n.P, Wall)
