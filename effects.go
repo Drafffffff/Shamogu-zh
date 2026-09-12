@@ -399,19 +399,16 @@ type EffectFocus struct{}
 
 type EffectPolymorphFungus struct{}
 
-// func (eff EffectPolymorphFungus) CanApply(g *Game) bool {
-//      // NOTE: idea for a hard-condition variant: only works if there are
-//      // exactly 2 monsters in view? Or if there are at least 2 monsters in
-//      // view? Or not more than 2 monsters in view?
-// 	var n int
-// 	for i := range g.Monsters() {
-// 		ei := g.Entity(i)
-// 		if g.InFOV(ei.P) {
-// 			n++
-// 		}
-// 	}
-// 	return n == 2
-// }
+func (eff EffectPolymorphFungus) CanApply(g *Game, i ID) bool {
+	var n int
+	for i := range g.Monsters() {
+		ei := g.Entity(i)
+		if g.InFOV(ei.P) {
+			n++
+		}
+	}
+	return n == 2
+}
 
 func (eff EffectPolymorphFungus) Apply(g *Game) bool {
 	g.eatMsg(PolymorphFungus.Name(), "")
@@ -453,11 +450,9 @@ func (eff EffectPolymorphFungus) Apply(g *Game) bool {
 }
 
 func (eff EffectPolymorphFungus) Desc(g *Game) string {
-	// // NOTE: a hard-condition variant would be:
-	// if g.PlayerActor().DoesAny(Gluttony) {
-	// 	return "Polymorphs up to two random monsters in view into a blinking butterfly and a confusing eye."
-	// }
-	// return "Eat only if there are exactly two monsters in view. Polymorphs them into a blinking butterfly and a confusing eye."
+	if g.HasCondComestibles() {
+		return "Eat only if there are exactly two monsters in view. Polymorphs them into a blinking butterfly and a confusing eye."
+	}
 	return fmt.Sprintf("Polymorphs a random monster in view into a blinking butterfly, and a second monster, if any, into a confusing eye. If no monsters are in view, gives @BVampirism@N for %d turns instead, preparing you for a vampiric ambush.", DurationVampFung)
 }
 

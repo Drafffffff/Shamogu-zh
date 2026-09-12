@@ -332,7 +332,7 @@ var ComestibleData = []itemInfo{
 	LignificationFruit: {"lignification fruit", EffectLignificationFruit{}},
 	TeleportMushroom:   {"teleport mushroom", EffectTeleportMushroom{}},
 
-	// Conditional rare comestibles.
+	// Rare comestibles with conditional variant.
 	FortressOyster: {"fortress oyster", EffectFortressOyster{}},
 	RunethornRose:  {"runethorn rose", EffectRunethornRose{}},
 	SeeingPotato:   {"seeing potato", EffectSeeingPotato{}},
@@ -341,9 +341,11 @@ var ComestibleData = []itemInfo{
 	VanishingSnail: {"vanishing snail", EffectVanishingSnail{}},
 	WarpingBean:    {"warping bean", EffectWarpingBean{}},
 
-	// Miscellaneous rare comestibles.
-	MoonlightLotus:  {"moonlight lotus", EffectMoonlightLotus{}},
+	// Rare comestibles with conditional and 2-effect variants.
 	PolymorphFungus: {"polymorph fungus", EffectPolymorphFungus{}},
+
+	// Miscellaneous rare comestibles without conditional variant.
+	MoonlightLotus: {"moonlight lotus", EffectMoonlightLotus{}},
 }
 
 // CommonComestibles represents the most common comestibles.
@@ -352,17 +354,20 @@ var CommonComestibles = []comestibleKind{
 	FirebreathPepper, FoggySkinOnion, LignificationFruit,
 	TeleportMushroom}
 
-// RareComestibles contains the list of rare comestibles.
+// RareComestibles contains the list of rare comestibles available in the base
+// game.
 var RareComestibles = []comestibleKind{
 	MoonlightLotus, PolymorphFungus,
 	RunethornRose, VanishingSnail, TunnelingAcorn, WarpingBean}
 
-// RareNCComestibles contains the list of rare non-conditional comestibles.
-var RareNCComestibles = []comestibleKind{MoonlightLotus, PolymorphFungus}
+// RareNCComestibles contains the list of rare comestibles that do not have a
+// non-conditional variant.
+var RareNCComestibles = []comestibleKind{MoonlightLotus}
 
-// CondComestibles provides information about the various conditional comestibles.
+// CondComestibles provides information about the various conditional
+// comestibles available in Totem Conditions.
 var CondComestibles = []comestibleKind{
-	FortressOyster, RunethornRose, VanishingSnail, TunnelingAcorn, WarpingBean, SeeingPotato,
+	FortressOyster, PolymorphFungus, RunethornRose, VanishingSnail, TunnelingAcorn, WarpingBean, SeeingPotato,
 	TrickyChestnut, // last
 }
 

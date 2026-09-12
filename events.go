@@ -1331,6 +1331,8 @@ func CantEatMsg(ef Effect) string {
 		return "You can’t get past its thorns!"
 	case EffectSeeingPotato:
 		return "It has to be planted in the ground!"
+	case EffectPolymorphFungus:
+		return "It can only be eaten with exactly two monsters in view!"
 	default:
 		panic("unexpected inedible comestible")
 	}
