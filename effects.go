@@ -434,6 +434,7 @@ func (eff EffectPolymorphFungus) Apply(g *Game) bool {
 	}
 	mks := []ActorKind{BlinkButterfly, ConfusingEye}
 	p := g.rand.Perm(len(mids))[:min(len(mids), 2)]
+	g.md.PolymorphAnimation(mids, p)
 	for i, pi := range p {
 		ei := g.Entity(mids[pi])
 		ai := ei.Role.(*Actor)
@@ -455,6 +456,7 @@ func (eff EffectPolymorphFungus) Apply(g *Game) bool {
 		ai.Kind = a.Kind
 		ai.Traits = a.Traits
 	}
+	g.md.PolymorphAnimation(mids, p)
 	return true
 }
 

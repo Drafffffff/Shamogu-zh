@@ -295,6 +295,19 @@ func (md *model) BadStatusAnimation() {
 	md.PlayerAnimation(ColorMagenta, AnimDurShortMedium)
 }
 
+// PolymorphAnimation animates monster-shapeshifting.
+func (md *model) PolymorphAnimation(mids []ID, p []int) {
+	if NoAnim {
+		return
+	}
+	md.startAnimSeq()
+	for _, pi := range p {
+		ei := md.g.Entity(mids[pi])
+		md.anims.DrawColor(ei.P, ColorViolet)
+	}
+	md.anims.Frame(AnimDurShortMedium)
+}
+
 // BarkAnimation animates noise (like barking) at the given point.
 func (md *model) BarkAnimation(p gruid.Point) {
 	if NoAnim {
