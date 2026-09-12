@@ -462,7 +462,7 @@ func (eff EffectPolymorphFungus) Desc(g *Game) string {
 	if g.HasCondComestibles() {
 		return "Eat only if there are exactly two monsters in view. Polymorphs them into a blinking butterfly and a confusing eye."
 	}
-	return fmt.Sprintf("Polymorphs a random monster in view into a blinking butterfly, and a second monster, if any, into a confusing eye. If no monsters are in view, gives @BVampirism@N for %d turns instead, preparing you for a vampiric ambush.", DurationVampFung)
+	return fmt.Sprintf("Polymorphs a random monster in view into a blinking butterfly, and a second monster, if any, into a confusing eye.\nIf no monsters are in view, gives @BVampirism@N for %d turns instead, preparing you for a vampiric ambush.", DurationVampFung)
 }
 
 func (eff EffectFocus) Apply(g *Game) bool {
