@@ -1130,6 +1130,10 @@ func (eff EffectTunnelingAcorn) CanApply(g *Game, i ID) bool {
 func (eff EffectTunnelingAcorn) Apply(g *Game) bool {
 	g.eatMsg(TunnelingAcorn.Name(), "")
 	p := g.PP().Add(g.Dir)
+	for g.Map.Passable(p) {
+		// Skip over floor tiles for non-conditional variant.
+		p = p.Add(g.Dir)
+	}
 	for inMap(p) && !g.Map.Passable(p) {
 		g.disintegrateWall(p)
 		p = p.Add(g.Dir)
@@ -1146,7 +1150,7 @@ func (g *Game) disintegrateWall(at gruid.Point) {
 
 func (eff EffectTunnelingAcorn) Desc(g *Game) string {
 	if !g.HasCondComestibles() {
-		return "If you are facing a wall, makes you silently disintegrate all walls in front of you, until reaching a non-wall. Otherwise, does nothing."
+		return "Makes you emit a beam that silently disintegrates any walls in front of you, until reaching a non-wall."
 	}
 	return "Eat only if you are next to 3 walls, and facing one of them. Makes you silently disintegrate all walls in front of you, until reaching a non-wall."
 }
