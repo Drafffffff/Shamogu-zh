@@ -58,11 +58,12 @@ const (
 	HealClarityLeaves     = 4
 	HealFirebreathPepper  = 2
 	HealFoggySkinOnion    = 3
+	HealMoonlightLotus    = 2
 	HealTeleportLignified = 2
 
 	DurationDig       = 5
 	DurationDisorient = 6
-	DurationGarDis    = 10
+	DurationGarDis    = 8
 	DurationFocus     = 3
 	DurationShadow    = 8
 	DurationGarden    = 7
@@ -352,7 +353,11 @@ type EffectMoonlightLotus struct{}
 func (eff EffectMoonlightLotus) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	pp := g.PP()
-	g.eatMsg(MoonlightLotus.Name(), "")
+	var hpstr string
+	if !g.Mod(ModHealingCombat) {
+		hpstr = newHPMsg(pa, HealMoonlightLotus)
+	}
+	g.eatMsg(MoonlightLotus.Name(), hpstr)
 	mp := &MappingPath{passable: g.Map.Passable}
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{pp}, MaxFOVRange)
 	if g.Map.Terrain.At(pp) == Foliage {
@@ -392,7 +397,11 @@ func (eff EffectMoonlightLotus) Apply(g *Game) bool {
 }
 
 func (eff EffectMoonlightLotus) Desc(g *Game) string {
-	return fmt.Sprintf("If you are standing on foliage, gives @BDisorient@N for %d turns and increases visibility around, changing plain walls into translucent ones and foliage into floor.\nOtherwise, gives @BGardener@N for %d turns and changes instead translucent walls into plain ones.", DurationGarDis, DurationGarDis)
+	var healmsg string
+	if !g.Mod(ModHealingCombat) {
+		healmsg = fmt.Sprintf("\nIn any case, restores %+d HP.", HealMoonlightLotus)
+	}
+	return fmt.Sprintf("If you are standing on foliage, gives @BDisorient@N for %d turns and increases visibility around, changing plain walls into translucent ones and foliage into floor.\nOtherwise, gives @BGardener@N for %d turns and changes instead translucent walls into plain ones.%s", DurationGarDis, DurationGarDis, healmsg)
 }
 
 type EffectFocus struct{}
