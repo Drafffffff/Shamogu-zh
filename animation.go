@@ -360,6 +360,31 @@ func (md *model) TeleportAnimation(i ID, from, to gruid.Point) {
 	md.anims.Frame(AnimDurMediumLong)
 }
 
+// BeamAnimation animates a tunneling beam from a given point and direction.
+func (md *model) BeamAnimation(from, to gruid.Point) {
+	if NoAnim {
+		return
+	}
+	md.startAnimSeq()
+	g := md.g
+	dir := toDir(to.Sub(from))
+	for range 4 {
+		p := from
+		for inMap(p) && p != to {
+			r := '*'
+			switch g.IntN(3) {
+			case 0:
+				r = '×'
+			case 1:
+				r = '+'
+			}
+			md.anims.DrawReverse(p, r, ColorForegroundEmph)
+			p = p.Add(dir)
+		}
+		md.anims.Frame(AnimDurShortMedium)
+	}
+}
+
 // FirebreathAnimation animates a firebreath attack from a given point and
 // direction.
 func (md *model) FirebreathAnimation(from, dir gruid.Point) {

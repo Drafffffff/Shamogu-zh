@@ -1130,13 +1130,22 @@ func (eff EffectTunnelingAcorn) CanApply(g *Game, i ID) bool {
 func (eff EffectTunnelingAcorn) Apply(g *Game) bool {
 	g.eatMsg(TunnelingAcorn.Name(), "")
 	p := g.PP().Add(g.Dir)
+	from := p
 	for g.Map.Passable(p) {
-		// Skip over floor tiles for non-conditional variant.
+		// Skip over floor tiles for non-conditional variant, and
+		// reveal terrain on the path.
 		p = p.Add(g.Dir)
+		g.SeeTerrain(p)
+		if i, _ := g.ItemAt(p); i >= 0 {
+			g.SenseEntity(i, "sense")
+		}
 	}
 	for inMap(p) && !g.Map.Passable(p) {
 		g.disintegrateWall(p)
 		p = p.Add(g.Dir)
+	}
+	if from != p {
+		g.md.BeamAnimation(from, p)
 	}
 	return true
 }
@@ -1145,12 +1154,13 @@ func (g *Game) disintegrateWall(at gruid.Point) {
 	g.Stats.Digs++
 	TotemEvents(g, &EventHappened{EvType: EventWallBreak})
 	g.Map.Terrain.Set(at, Floor)
+	g.Map.KnownTerrain.Set(at, Floor) // reveal tunnel
 	g.NormalCloudAt(at, 10+g.IntN(30))
 }
 
 func (eff EffectTunnelingAcorn) Desc(g *Game) string {
 	if !g.HasCondComestibles() {
-		return "Makes you emit a beam that silently disintegrates any walls in front of you, until reaching a non-wall."
+		return "Makes you emit a beam that silently disintegrates any walls in front of you, until reaching a non-wall. Reveals terrain on the path."
 	}
 	return "Eat only if you are next to 3 walls, and facing one of them. Makes you silently disintegrate all walls in front of you, until reaching a non-wall."
 }
