@@ -1317,14 +1317,14 @@ func (eff EffectTrickyChestnut) Apply(g *Game) bool {
 
 func (eff EffectTrickyChestnut) Desc(g *Game) string {
 	nocond := !g.HasCondComestibles()
-	recharges := "Eat if you are standing on an inhabited totem, to empty the totem, and restore all your spirit charges."
+	recharges := "Eat if you are standing on a full totem, to empty the totem, and restore all your spirit charges."
 	if g.Mod(ModNoRecharges) {
-		recharges = "Eat if you are standing on an inhabited totem, to empty the totem, and restore two charges per spirit."
+		recharges = "Eat if you are standing on a full totem, to empty the totem, and restore two charges per spirit."
 		if nocond {
-			recharges = "If you are standing on an inhabited totem, empties it, and restores two charges per spirit."
+			recharges = "If you are standing on a full totem, empties it, and restores two charges per spirit."
 		}
 	} else if nocond {
-		recharges = "If you are standing on an inhabited totem, empties it, and restores all your spirit charges."
+		recharges = "If you are standing on a full totem, empties it, and restores all your spirit charges."
 	}
 	if nocond {
 		return fmt.Sprintf("If you are standing on a broken portal, makes it work again.\n%s\nOtherwise, restores one charge per spirit.",
