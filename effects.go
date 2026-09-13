@@ -450,7 +450,8 @@ func (eff EffectPolymorphFungus) Apply(g *Game) bool {
 	for i, pi := range p {
 		ei := g.Entity(mids[pi])
 		ai := ei.Role.(*Actor)
-		e := monster(mks[i])
+		mki := mks[i]
+		e := monster(mki)
 		a := e.Role.(*Actor)
 		g.Logf("The %s becomes %s.", ei.Name, One(e.Name))
 		if ai.DoesAny(MonsNotable) {
@@ -467,6 +468,13 @@ func (eff EffectPolymorphFungus) Apply(g *Game) bool {
 		ai.Attack = a.Attack
 		ai.Kind = a.Kind
 		ai.Traits = a.Traits
+		switch mki {
+		case BlinkButterfly:
+			ai.Statuses[StatusLignification] = 0
+			ai.Statuses[StatusImbalance] = 0
+		case ConfusingEye:
+			ai.Statuses[StatusConfusion] = 0
+		}
 	}
 	g.md.PolymorphAnimation(mids, p)
 	return true
