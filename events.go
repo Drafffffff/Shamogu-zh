@@ -1093,9 +1093,13 @@ func (eff EffectVanishingSnail) CanApply(g *Game, i ID) bool {
 
 func (eff EffectVanishingSnail) Apply(g *Game) bool {
 	g.eatMsg(VanishingSnail.Name(), "")
-	for _, a := range g.Monsters() {
-		if a.Behavior.State == Hunting {
-			a.Behavior.State = Wandering
+	for i, ai := range g.Monsters() {
+		ei := g.Entity(i)
+		if ai.Behavior.State == Hunting {
+			// Make monster lose track of you and wander again to a
+			// nearby location, as if hit by a player with Shadow.
+			ai.Behavior.State = Wandering
+			ai.Behavior.Target = g.RandomPassableWithin(ei.P, MaxFOVRange)
 		}
 	}
 	pa := g.PlayerActor()
@@ -1107,7 +1111,7 @@ func (eff EffectVanishingSnail) Apply(g *Game) bool {
 			}
 		}
 	}
-	g.PutStatus1(PlayerID, pa, StatusShadow, 10)
+	g.PutStatus1(PlayerID, pa, StatusShadow, DurationShadow)
 	return true
 }
 
@@ -1116,7 +1120,9 @@ func (eff EffectVanishingSnail) Desc(g *Game) string {
 	if !g.HasCondComestibles() {
 		cond = ""
 	}
-	return cond + "Makes all monsters stop hunting and blinks away any that are next to you. Gives @BShadow@N for 10 turns."
+	return cond + fmt.Sprintf(
+		"Makes all monsters lose track of you and blinks away any that are next to you. Gives @BShadow@N for %d turns.",
+		DurationShadow)
 }
 
 type EffectTunnelingAcorn struct{}
