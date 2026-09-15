@@ -1074,9 +1074,9 @@ func (g *Game) validRunePlace(p gruid.Point) bool {
 
 func (eff EffectRunethornRose) Desc(g *Game) string {
 	if !g.HasCondComestibles() {
-		return "Creates 8 runes of same type: up to two at each diagonal, or randomly around the map.\nThe rune type is chosen randomly unless you are standing on a trap, in which case its rune type will be used."
+		return "Creates 8 runes of same type: up to two at each diagonal, or randomly around the map if there’s no room.\nThe rune type is chosen randomly unless you are standing on a trap, in which case its rune type will be used."
 	}
-	return "Eat only if you are standing on a runic trap. Creates 8 runes of its type: up to two at each diagonal, or randomly around the map."
+	return "Eat only if you are standing on a runic trap. Creates 8 runes of its type: up to two at each diagonal, or randomly around the map if there’s no room."
 }
 
 type EffectVanishingSnail struct{}
