@@ -401,6 +401,7 @@ func (g *Game) NextComestibleKind() comestibleKind {
 }
 
 func (g *Game) comestiblesProcGen() {
+	// Common comestibles.
 	g.ProcInfo.NComestibles = []int{
 		2, 2, 3, 3, 4,
 		4, 5, 5, 6,
@@ -411,15 +412,53 @@ func (g *Game) comestiblesProcGen() {
 	g.ProcInfo.NComestibles[7+g.IntN(2)]++
 	g.ProcInfo.NComestibles[1+g.IntN(8)]++
 	g.ProcInfo.NComestibles[1+g.IntN(8)]--
-	g.ProcInfo.RareComestible1 = -1
-	if !NoChaos {
-		if g.IntN(3) > 0 && !g.Mod(ModTotemConditions) {
-			// Only 2/3 chance of rare comestible in mid game.
-			g.ProcInfo.RareComestible1 = 4 + g.IntN(3) // levels 4-6
-		}
-		g.ProcInfo.RareComestible2 = 7 + g.IntN(3) // levels 7-9
-	}
 
+	// Rare comestibles.
+	g.rareComsProcGen()
+	g.condComsProcGen()
+}
+
+func (g *Game) rareComsProcGen() {
+	if NoChaos {
+		g.ProcInfo.RareComestible1 = -1
+		g.ProcInfo.RareComestible2 = -1
+		return
+	}
+	g.ProcInfo.RareComestible1 = 4 + g.IntN(3) // levels 4-6
+	g.ProcInfo.RareComestible2 = 7 + g.IntN(3) // levels 7-9
+	// Occasional minor variations for some unpredictability.
+	switch g.IntN(10) {
+	case 0:
+		g.ProcInfo.RareComestible1 = -1
+	case 1:
+		g.ProcInfo.RareComestible2 = -1
+	case 2:
+		if g.IntN(2) == 0 {
+			g.ProcInfo.RareComestible1 = 3
+		} else {
+			g.ProcInfo.RareComestible1 = 7
+		}
+	case 3:
+		if g.IntN(2) == 0 {
+			g.ProcInfo.RareComestible2 = 6
+		} else {
+			// Occasional bias toward 9 to compensate.
+			g.ProcInfo.RareComestible2 = min(g.ProcInfo.RareComestible2+1, MapLevels)
+		}
+	}
+	if g.Mod(ModTotemConditions) {
+		// With Totem Conditions, conditional comestibles are handled
+		// separately, so we skip the rare non-conditional lategame
+		// one, as there are already quite a few rare ones later on,
+		// but sometimes keep the midgame one.
+		g.ProcInfo.RareComestible2 = -1
+		if g.IntN(3) > 0 {
+			g.ProcInfo.RareComestible1 = -1
+		}
+	}
+}
+
+func (g *Game) condComsProcGen() {
 	if !g.Mod(ModTotemConditions) {
 		return
 	}
