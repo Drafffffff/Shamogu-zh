@@ -238,7 +238,12 @@ func (c *Comestible) Use(g *Game, i ID) bool {
 	ef := c.Effect
 	if g.Mod(ModTotemConditions) {
 		co, cond := ef.(ConditionalComestible)
-		if cond && !g.PlayerActor().DoesAny(Gluttony) && !co.CanApply(g, i) {
+		if cond && !g.snack && !g.PlayerActor().DoesAny(Gluttony) && !co.CanApply(g, i) {
+			// Unless the player is the Bear, forbid eating unless
+			// condition is met.
+			// NOTE: We have to check both snack and Gluttony above
+			// because some curses may disable the latter, but we
+			// want snack to still ignore requirements even then.
 			g.Log(CantEatMsg(ef))
 			return false
 		}
