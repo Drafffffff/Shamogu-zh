@@ -1042,20 +1042,21 @@ func (eff EffectRunethornRose) Apply(g *Game) bool {
 	} else {
 		t = MagicRune(g.IntN(NRunes))
 	}
+	size := g.Map.Terrain.Size()
 	for i := -1; i <= 1; i += 2 {
 		for j := -1; j <= 1; j += 2 {
 			q := pp
 			for range 2 {
 				q = q.Shift(i, j)
-				size := g.Map.Terrain.Size()
-				for !g.validRunePlace(q) || q == pp {
-					q = gruid.Point{g.rand.IntN(size.X), g.rand.IntN(size.Y)}
+				p := q
+				for !g.validRunePlace(p) || p == pp {
+					p = gruid.Point{g.rand.IntN(size.X), g.rand.IntN(size.Y)}
 				}
-				i, _ := g.genRunicTrapAt(t, q)
+				i, _ := g.genRunicTrapAt(t, p)
 				g.SenseEntity(i, "sense")
 				// Trigger the trap if there's already a
 				// monster on top of it.
-				if k, ak := g.ActorAt(q); k >= 0 {
+				if k, ak := g.ActorAt(p); k >= 0 {
 					g.TriggerTrap(k, ak)
 				}
 			}
