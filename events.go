@@ -1045,18 +1045,19 @@ func (eff EffectRunethornRose) Apply(g *Game) bool {
 	for i := -1; i <= 1; i += 2 {
 		for j := -1; j <= 1; j += 2 {
 			q := pp
-			cont := true
 			for range 2 {
 				q = q.Shift(i, j)
-				cont = cont && g.validRunePlace(q)
-				if !cont {
-					size := g.Map.Terrain.Size()
-					for !g.validRunePlace(q) {
-						q = gruid.Point{g.rand.IntN(size.X), g.rand.IntN(size.Y)}
-					}
+				size := g.Map.Terrain.Size()
+				for !g.validRunePlace(q) || q == pp {
+					q = gruid.Point{g.rand.IntN(size.X), g.rand.IntN(size.Y)}
 				}
 				i, _ := g.genRunicTrapAt(t, q)
 				g.SenseEntity(i, "sense")
+				// Trigger the trap if there's already a
+				// monster on top of it.
+				if k, ak := g.ActorAt(q); k >= 0 {
+					g.TriggerTrap(k, ak)
+				}
 			}
 		}
 	}
