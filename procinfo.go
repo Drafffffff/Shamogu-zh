@@ -40,9 +40,10 @@ type ProcInfo struct {
 	ComestibleIdx    int              // current index in Comestibles
 	RareComestible1  int              // mid level with rare comestible
 	RareComestible2  int              // late level with rare comestible
-	WaitFungus       int              // how much we waited for fungus (Healing Combat)
+	WaitFungus       int              // how much we wait for first fungus (Healing Combat)
 	NComestibles     []int            // number of comestibles per level
-	NCondCom         []int            // number of conditional comestibles
+	NComestiblesRare []int            // number of extra rare comestibles
+	SingleRareCom    comestibleKind   // single extra rare comestible kind (Corrupted Dungeon)
 	NMenhirs         []int            // number of menhirs per level
 	Runes            []int            // rune-generation data
 	RuneIdx          int              // current index in Runes
@@ -415,7 +416,18 @@ func (g *Game) comestiblesProcGen() {
 
 	// Rare comestibles.
 	g.rareComsProcGen()
-	g.condComsProcGen()
+	g.extraRareComsProcGen()
+
+	if len(g.ProcInfo.NComestiblesRare) > 0 {
+		// When extra rare comestibles are enabled, we skip the usual
+		// rare ones from late game, as there are already quite a few
+		// rare ones later on, but sometimes keep the midgame one with
+		// Totem Conditions (for a rare non-conditional one).
+		g.ProcInfo.RareComestible2 = -1
+		if !g.Mod(ModTotemConditions) || g.IntN(3) > 0 {
+			g.ProcInfo.RareComestible1 = -1
+		}
+	}
 }
 
 func (g *Game) rareComsProcGen() {
@@ -426,6 +438,7 @@ func (g *Game) rareComsProcGen() {
 	}
 	g.ProcInfo.RareComestible1 = 4 + g.IntN(3) // levels 4-6
 	g.ProcInfo.RareComestible2 = 7 + g.IntN(3) // levels 7-9
+	g.ProcInfo.WaitFungus = 1 + g.IntN(4)
 	// Occasional minor variations for some unpredictability.
 	switch g.IntN(10) {
 	case 0:
@@ -446,23 +459,24 @@ func (g *Game) rareComsProcGen() {
 			g.ProcInfo.RareComestible2 = min(g.ProcInfo.RareComestible2+1, MapLevels)
 		}
 	}
-	if g.Mod(ModTotemConditions) {
-		// With Totem Conditions, conditional comestibles are handled
-		// separately, so we skip the rare non-conditional lategame
-		// one, as there are already quite a few rare ones later on,
-		// but sometimes keep the midgame one.
-		g.ProcInfo.RareComestible2 = -1
-		if g.IntN(3) > 0 {
-			g.ProcInfo.RareComestible1 = -1
-		}
-	}
 }
 
-func (g *Game) condComsProcGen() {
-	if !g.Mod(ModTotemConditions) {
+func (g *Game) extraRareComsProcGen() {
+	corrupted := !NoChaos && g.Mod(ModCorruptedDungeon) && g.IntN(5) == 0
+	if !g.Mod(ModTotemConditions) && !corrupted {
 		return
 	}
-	g.ProcInfo.NCondCom = make([]int, MapLevels)
+	g.ProcInfo.NComestiblesRare = make([]int, MapLevels)
+	if corrupted && g.IntN(3) == 0 {
+		// Rarely, make all extra rare comestibles be of the same kind.
+		coms := g.GetExtraRareComestibles(MapLevels)
+		if g.Mod(ModTotemConditions) {
+			// Potato would be disappointing as single rare
+			// conditional comestible.
+			coms = coms[:len(coms)-1]
+		}
+		g.ProcInfo.SingleRareCom = coms[g.IntN(len(coms))]
+	}
 	tot := 0
 	for i, n := range g.ProcInfo.NComestibles {
 		// Per-comestible probability is 1/14 to 1/6.
@@ -472,7 +486,7 @@ func (g *Game) condComsProcGen() {
 		for n > 0 {
 			k = min(n, k)
 			if g.IntN(f) < k {
-				g.ProcInfo.NCondCom[i]++
+				g.ProcInfo.NComestiblesRare[i]++
 				tot++
 			}
 			n -= k
@@ -480,7 +494,7 @@ func (g *Game) condComsProcGen() {
 	}
 	if tot < 3 {
 		for range 2 {
-			g.ProcInfo.NCondCom[g.rand.IntN(MapLevels)]++
+			g.ProcInfo.NComestiblesRare[g.rand.IntN(MapLevels)]++
 		}
 	}
 }

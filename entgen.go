@@ -371,14 +371,17 @@ var CondComestibles = []comestibleKind{
 	TrickyChestnut, // last
 }
 
-// GetConditionalComestible returns info for a random conditional comestible
+// GetExtraRareComestibles returns info for the random extra rare comestibles
 // suitable for the given map level.
-func (g *Game) GetConditionalComestible(level int) comestibleKind {
+func (g *Game) GetExtraRareComestibles(level int) []comestibleKind {
+	if !g.Mod(ModTotemConditions) {
+		return RareComestibles
+	}
 	n := len(CondComestibles)
 	if level == 9 {
 		n-- // chestnuts are useless on the last level
 	}
-	return CondComestibles[g.IntN(n)]
+	return CondComestibles[:n]
 }
 
 // comestibleEntity generates a new comestible Entity entity using the given
@@ -647,28 +650,33 @@ func (g *Game) genItems(mg *MapGen) {
 	default:
 		nitems += 4
 	}
-	var ccMap []bool // where conditional comestibles go
-	if g.Mod(ModTotemConditions) {
-		k := g.ProcInfo.NCondCom[g.Map.Level-1]
-		ccMap = make([]bool, nitems)
+	var xrcMap []bool // where extra rare comestibles go
+	if len(g.ProcInfo.NComestiblesRare) > 0 {
+		k := g.ProcInfo.NComestiblesRare[g.Map.Level-1]
+		xrcMap = make([]bool, nitems)
 		for i := range nitems {
-			ccMap[i] = i < k
+			xrcMap[i] = i < k
 		}
 		g.rand.Shuffle(nitems, func(i, j int) {
-			ccMap[i], ccMap[j] = ccMap[j], ccMap[i]
+			xrcMap[i], xrcMap[j] = xrcMap[j], xrcMap[i]
 		})
 	}
 	for i := range nitems {
 		switch {
-		case g.Mod(ModTotemConditions) && ccMap[i]:
-			addComestible(i, g.GetConditionalComestible(g.Map.Level))
+		case len(xrcMap) > 0 && xrcMap[i]:
+			if g.ProcInfo.SingleRareCom > 0 {
+				addComestible(i, g.ProcInfo.SingleRareCom)
+			} else {
+				coms := g.GetExtraRareComestibles(g.Map.Level)
+				addComestible(i, coms[g.IntN(len(coms))])
+			}
 		case g.Map.Level == g.ProcInfo.RareComestible1 && !NoChaos:
 			// Mid-game rare comestible.
 			if g.Mod(ModTotemConditions) {
 				// With Totem Conditions, generate a rare
 				// midgame non-conditional comestible, as
 				// conditional ones are generated
-				// independently.
+				// independently as extra rare ones.
 				addComestible(i, RareNCComestibles[g.IntN(len(RareNCComestibles))])
 				g.ProcInfo.RareComestible1 = -1
 				break
@@ -683,16 +691,19 @@ func (g *Game) genItems(mg *MapGen) {
 			ck := comestibleIdx()
 			switch {
 			case ck == AmbrosiaBerries && g.Mod(ModHealingCombat) && !NoChaos:
-				// Replace about a third of ambrosia berries
-				// with polymorph fungus when Healing Combat is
-				// enabled (a bit over 1 per game on average).
-				g.ProcInfo.WaitFungus++
-				if g.IntN(16) == 0 { // minor randomization
-					g.ProcInfo.WaitFungus++
-				}
-				if g.ProcInfo.WaitFungus >= 3 {
+				// Replace a few ambrosia berries with
+				// polymorph fungus when Healing Combat is
+				// enabled (1-2 per game).
+				g.ProcInfo.WaitFungus--
+				switch {
+				case g.ProcInfo.WaitFungus == 0:
+					// First one.
 					ck = PolymorphFungus
-					g.ProcInfo.WaitFungus = 0
+				case g.ProcInfo.WaitFungus < 0 && g.IntN(4) == 0:
+					// Sometimes, extra replacement, but
+					// never more than 2.
+					ck = PolymorphFungus
+					g.ProcInfo.WaitFungus = MapLevels
 				}
 			case g.Mod(ModCorruptedDungeon) && !NoChaos && g.IntN(32) == 0:
 				// Small random chance of extra moonlight lotus
