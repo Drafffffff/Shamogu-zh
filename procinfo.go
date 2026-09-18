@@ -40,6 +40,7 @@ type ProcInfo struct {
 	ComestibleIdx    int              // current index in Comestibles
 	RareComestible1  int              // mid level with rare comestible
 	RareComestible2  int              // late level with rare comestible
+	ExtraLotus       int              // extra lotus (Corrupted Dungeon)
 	WaitFungus       int              // how much we wait for first fungus (Healing Combat)
 	NComestibles     []int            // number of comestibles per level
 	NComestiblesRare []int            // number of extra rare comestibles
@@ -438,7 +439,13 @@ func (g *Game) rareComsProcGen() {
 	}
 	g.ProcInfo.RareComestible1 = 4 + g.IntN(3) // levels 4-6
 	g.ProcInfo.RareComestible2 = 7 + g.IntN(3) // levels 7-9
-	g.ProcInfo.WaitFungus = 1 + g.IntN(4)
+	if g.Mod(ModCorruptedDungeon) && g.IntN(4) > 0 {
+		// Often, an extra lotus with Corrupted Dungeon.
+		g.ProcInfo.ExtraLotus = 2 + g.IntN(8)
+	}
+	if g.Mod(ModHealingCombat) {
+		g.ProcInfo.WaitFungus = 1 + g.IntN(4)
+	}
 	// Occasional minor variations for some unpredictability.
 	switch g.IntN(10) {
 	case 0:

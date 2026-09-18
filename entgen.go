@@ -567,6 +567,11 @@ func (g *Game) genItems(mg *MapGen) {
 	// Comestibles.
 	nitems := g.ProcInfo.NComestibles[g.Map.Level-1]
 	addComestible := func(i int, ck comestibleKind) {
+		// NOTE: first comestibles are always placed in vaults, which
+		// currently means that we typically place rare comestibles in
+		// vaults. Kinda distinctive in a way, to make them stand out a
+		// little more, but it might be nice to sometimes have them
+		// outside of vaults, too.
 		co := comestibleEntity(ck)
 		if i <= max(4, (nitems+1)/2) {
 			co.P = g.RandomPlace(mg, PlaceItem)
@@ -670,7 +675,7 @@ func (g *Game) genItems(mg *MapGen) {
 				coms := g.GetExtraRareComestibles(g.Map.Level)
 				addComestible(i, coms[g.IntN(len(coms))])
 			}
-		case g.Map.Level == g.ProcInfo.RareComestible1 && !NoChaos:
+		case g.Map.Level == g.ProcInfo.RareComestible1:
 			// Mid-game rare comestible.
 			if g.Mod(ModTotemConditions) {
 				// With Totem Conditions, generate a rare
@@ -683,14 +688,18 @@ func (g *Game) genItems(mg *MapGen) {
 			}
 			addComestible(i, RareComestibles[g.IntN(len(RareComestibles))])
 			g.ProcInfo.RareComestible1 = -1
-		case g.Map.Level == g.ProcInfo.RareComestible2 && !NoChaos:
+		case g.Map.Level == g.ProcInfo.RareComestible2:
 			// Late-game rare comestible.
 			addComestible(i, RareComestibles[g.IntN(len(RareComestibles))])
 			g.ProcInfo.RareComestible2 = -1
+		case g.Map.Level == g.ProcInfo.ExtraLotus && i == nitems-1:
+			// Rare extra lotus in Corrupted Dungeon (outside of
+			// vault, for a change).
+			addComestible(i, MoonlightLotus)
+			g.ProcInfo.ExtraLotus = -1
 		default:
 			ck := comestibleIdx()
-			switch {
-			case ck == AmbrosiaBerries && g.Mod(ModHealingCombat) && !NoChaos:
+			if ck == AmbrosiaBerries && g.Mod(ModHealingCombat) && !NoChaos {
 				// Replace a few ambrosia berries with
 				// polymorph fungus when Healing Combat is
 				// enabled (1-2 per game).
@@ -705,11 +714,6 @@ func (g *Game) genItems(mg *MapGen) {
 					ck = PolymorphFungus
 					g.ProcInfo.WaitFungus = MapLevels
 				}
-			case g.Mod(ModCorruptedDungeon) && !NoChaos && g.IntN(32) == 0:
-				// Small random chance of extra moonlight lotus
-				// with Corrupted Dungeon (slightly more than 1
-				// per game).
-				ck = MoonlightLotus
 			}
 			addComestible(i, ck)
 		}
