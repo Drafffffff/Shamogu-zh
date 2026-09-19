@@ -1204,26 +1204,16 @@ func (eff EffectWarpingBean) Apply(g *Game) bool {
 	if !g.Mod(ModHealingCombat) {
 		g.healPlayer(pa, HealFirebreathPepper)
 	}
-	maxdist := g.MaxFOVRange()
 	pp := g.PP()
-	var ps []gruid.Point
-	dist := -1
-	for _, p := range g.Map.FOVPts {
-		d := paths.DistanceManhattan(p, pp)
-		if d > maxdist || p == pp {
-			continue
-		}
-		if cost, ok := g.Map.FOV.At(p); ok && cost <= maxdist && g.IsFree(p) {
-			if d > dist {
-				dist = d
-				ps = []gruid.Point{p}
-			} else if d == dist {
-				ps = append(ps, p)
-			}
+	ps := g.BlinkPosSlice(pp)
+	to := pp
+	for range 6 {
+		p := ps[g.IntN(len(ps))]
+		if paths.DistanceManhattan(to, pp) < paths.DistanceManhattan(p, pp) {
+			to = p
 		}
 	}
-	if dist > 0 {
-		to := ps[g.IntN(len(ps))]
+	if to != pp {
 		g.MoveActor(PlayerID, pa, to, MovTeleport)
 	}
 	return true
@@ -1234,7 +1224,7 @@ func (eff EffectWarpingBean) Desc(g *Game) string {
 	if !g.HasCondComestibles() {
 		cond = ""
 	}
-	return fmt.Sprintf("%sRemoves all your statuses without the usual after-effects, then warps you to one of the furthest tiles in your view.%s",
+	return fmt.Sprintf("%sRemoves all your statuses without the usual after-effects, then warps you away in view but with greater chance to distant tiles.%s",
 		cond, g.healMsg(HealWarpingBean))
 }
 

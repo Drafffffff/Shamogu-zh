@@ -959,6 +959,16 @@ func (g *Game) BlinkPos(from gruid.Point) (gruid.Point, bool) {
 		// when in FOV.
 		return InvalidPos, false
 	}
+	ps := g.BlinkPosSlice(from)
+	if len(ps) == 0 {
+		return InvalidPos, false
+	}
+	return ps[g.IntN(len(ps))], true
+}
+
+// BlinkPosSlice returns a slice of positions suitable for blinking in FOV from
+// the given position.
+func (g *Game) BlinkPosSlice(from gruid.Point) []gruid.Point {
 	maxdist := g.MaxFOVRange()
 	pp := g.PP()
 	ps := []gruid.Point{}
@@ -970,10 +980,7 @@ func (g *Game) BlinkPos(from gruid.Point) (gruid.Point, bool) {
 			ps = append(ps, p)
 		}
 	}
-	if len(ps) == 0 {
-		return InvalidPos, false
-	}
-	return ps[g.IntN(len(ps))], true
+	return ps
 }
 
 // teleportOther implements wraith's teleporting hit effect.
