@@ -32,6 +32,7 @@ type ProcInfo struct {
 	MonsLateSwarm    int              // special “swarm” late level (8-9)
 	ThemedLevel      int              // special theme for rare late corrupted level (4-8)
 	TrapLevel        int              // special level with lots of traps (5-9)
+	ImpLevel         bool             // whether an imp level occured already (Corrupted Dungeon)
 	Spirits          []spiritProcInfo // spirit index for each dungeon level (-1 if no spirit)
 	Conditions       []*SpiritCond    // spirit condition for each dungeon level
 	Menhirs          []int            // menhir-generation data

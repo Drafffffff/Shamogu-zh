@@ -1192,61 +1192,7 @@ func (g *Game) genMonsters(mg *MapGen) {
 			nM--
 			nL++
 		}
-		if g.Map.Level >= 4 && g.Map.Level < MapLevels && g.IntN(5*4) == 0 {
-			switch g.IntN(4) {
-			case 0:
-				impPatrol := func(mk ActorKind) {
-					p := g.RandomWaypoint()
-					ps := append(g.patrolPointCandidates(p), p)
-					ps = ps[:min(len(ps), 2+g.IntN(2))]
-					g.genMonsterPatroller(mk, ps)
-					g.genMonsterPatroller(NoisyImp, ps)
-					g.genMonsterPatroller(NoisyImp, ps)
-				}
-				// Rare level with many imps and different
-				// possible behaviors.
-				if g.IntN(2) == 0 {
-					// Patrolling imp+imp+(bat|butterfly|nadre|hound) trio.
-					mk := g.randMonsKind([]ActorKind{ChaosMegabat, ChaosMegabat,
-						BlinkButterfly, ExplodingNadre, BarkingHound})
-					for range (1 + nE + nM + nL) / 2 {
-						impPatrol(mk)
-					}
-				} else {
-					// Wandering imps in great numbers.
-					for range nE*2 + nM*2 + nL*3 {
-						g.genMonster(NoisyImp)
-					}
-				}
-			case 1:
-				// Rare spooky level with no remaining
-				// wandering monsters with no drawback!
-			case 2:
-				// Rare level where all remaining monsters
-				// become patrolling pairs between random
-				// waypoints.
-				for range (1 + nE) / 2 {
-					g.placeRandomPatrollers(g.randMonsKind(monsEarly), g.RandomWaypoint(), 2)
-				}
-				for range nM / 2 {
-					g.placeRandomPatrollers(g.randMonsKind(monsMid), g.RandomWaypoint(), 2)
-				}
-				for range (1 + nL) / 2 {
-					g.placeRandomPatrollers(g.randMonsKind(monsLate), g.RandomWaypoint(), 2)
-				}
-			default:
-				// Rare level where all remaining monsters
-				// become guardians scattered around.
-				for range nE {
-					g.genMonsterGuardian(g.randMonsKind(monsEarly), g.RandomWaypoint())
-				}
-				for range nM {
-					g.genMonsterGuardian(g.randMonsKind(monsMid), g.RandomWaypoint())
-				}
-				for range nL {
-					g.genMonsterGuardian(g.randMonsKind(monsLate), g.RandomWaypoint())
-				}
-			}
+		if g.genCorruptedLevel(nE, nM, nL) {
 			nE, nM, nL = 0, 0, 0
 		} else {
 			// Occasionally spawn extra uniques or guardians
@@ -1444,6 +1390,74 @@ func (g *Game) genThemedMonsters(mg *MapGen, nE, nM, nL int) {
 			g.genMonster(WarpingWraith)
 		}
 	}
+}
+
+func (g *Game) genCorruptedLevel(nE, nM, nL int) bool {
+	if g.Map.Level < 4 || g.Map.Level >= MapLevels || g.IntN(5*4) != 0 {
+		return false
+	}
+	// Special corrupted non-thematic levels can appear in map levels 4-8.
+	// Unlike thematic levels, they can combine with previous features.
+	// Chance is about 1/4 per game, and each corruption has 1/16 chance.
+	switch g.IntN(4) {
+	case 0:
+		if g.ProcInfo.ImpLevel {
+			// Never two imp levels in a single run, as it's a very
+			// noticeable event.
+			return false
+		}
+		g.ProcInfo.ImpLevel = true
+		impPatrol := func(mk ActorKind) {
+			p := g.RandomWaypoint()
+			ps := append(g.patrolPointCandidates(p), p)
+			ps = ps[:min(len(ps), 2+g.IntN(2))]
+			g.genMonsterPatroller(mk, ps)
+			g.genMonsterPatroller(NoisyImp, ps)
+			g.genMonsterPatroller(NoisyImp, ps)
+		}
+		// Rare level with many imps and different possible behaviors.
+		if g.IntN(2) == 0 {
+			// Patrolling imp+imp+(bat|butterfly|nadre|hound) trio.
+			mk := g.randMonsKind([]ActorKind{ChaosMegabat, ChaosMegabat,
+				BlinkButterfly, ExplodingNadre, BarkingHound})
+			for range (1 + nE + nM + nL) / 2 {
+				impPatrol(mk)
+			}
+		} else {
+			// Wandering imps in great numbers.
+			for range nE*2 + nM*2 + nL*3 {
+				g.genMonster(NoisyImp)
+			}
+		}
+	case 1:
+		// Rare spooky level with no remaining wandering monsters with
+		// no drawback!
+	case 2:
+		// Rare level where all remaining monsters become patrolling
+		// pairs between random waypoints.
+		for range (1 + nE) / 2 {
+			g.placeRandomPatrollers(g.randMonsKind(monsEarly), g.RandomWaypoint(), 2)
+		}
+		for range nM / 2 {
+			g.placeRandomPatrollers(g.randMonsKind(monsMid), g.RandomWaypoint(), 2)
+		}
+		for range (1 + nL) / 2 {
+			g.placeRandomPatrollers(g.randMonsKind(monsLate), g.RandomWaypoint(), 2)
+		}
+	default:
+		// Rare level where all remaining monsters become guardians
+		// scattered around.
+		for range nE {
+			g.genMonsterGuardian(g.randMonsKind(monsEarly), g.RandomWaypoint())
+		}
+		for range nM {
+			g.genMonsterGuardian(g.randMonsKind(monsMid), g.RandomWaypoint())
+		}
+		for range nL {
+			g.genMonsterGuardian(g.randMonsKind(monsLate), g.RandomWaypoint())
+		}
+	}
+	return true
 }
 
 // RandomWaypoint returns a random non-player waypoint, or a random free
