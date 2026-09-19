@@ -1187,11 +1187,23 @@ func (eff EffectWarpingBean) Apply(g *Game) bool {
 		g.UpdateKnowledge()
 	}
 	pa := g.PlayerActor()
-	g.eatMsg(WarpingBean.Name(), "")
+	if pa.Has(StatusBerserk) {
+		pa.HP = max(1, pa.HP-pa.HPBonus())
+	}
+	if pa.Has(StatusLignification) {
+		pa.HP = max(min(3, pa.HP), pa.HP-pa.HPBonus())
+	}
 	for i := range pa.Statuses {
 		pa.Statuses[i] = 0
 	}
-	pa.HP = min(pa.HP, pa.GetMaxHP())
+	var hpstr string
+	if !g.Mod(ModHealingCombat) {
+		hpstr = newHPMsg(pa, HealWarpingBean)
+	}
+	g.eatMsg(WarpingBean.Name(), hpstr)
+	if !g.Mod(ModHealingCombat) {
+		g.healPlayer(pa, HealFirebreathPepper)
+	}
 	maxdist := g.MaxFOVRange()
 	pp := g.PP()
 	var ps []gruid.Point
@@ -1222,7 +1234,8 @@ func (eff EffectWarpingBean) Desc(g *Game) string {
 	if !g.HasCondComestibles() {
 		cond = ""
 	}
-	return cond + "Removes all your statuses without the usual effects, then warps you to one of the furthest tiles in your view."
+	return fmt.Sprintf("%sRemoves all your statuses without the usual after-effects, then warps you to one of the furthest tiles in your view.%s",
+		cond, g.healMsg(HealWarpingBean))
 }
 
 type EffectSeeingPotato struct{}

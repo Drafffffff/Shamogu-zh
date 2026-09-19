@@ -60,6 +60,7 @@ const (
 	HealFoggySkinOnion    = 3
 	HealMoonlightLotus    = 2
 	HealTeleportLignified = 2
+	HealWarpingBean       = 2
 
 	DurationDig       = 5
 	DurationDisorient = 6
