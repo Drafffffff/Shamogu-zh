@@ -301,18 +301,20 @@ const (
 	LignificationFruit
 	TeleportMushroom
 
-	// Conditional rare comestibles.
-	FortressOyster
+	// Rare comestibles (with conditional variant).
+	PolymorphFungus
 	RunethornRose
-	SeeingPotato
-	TrickyChestnut
 	TunnelingAcorn
 	VanishingSnail
 	WarpingBean
 
+	// Rare conditional comestibles (exclusive to Totem Conditions).
+	FortressOyster
+	SeeingPotato
+	TrickyChestnut
+
 	// Miscellaneous rare comestibles.
 	MoonlightLotus
-	PolymorphFungus
 )
 
 // Name returns the name of the comestible.
@@ -333,16 +335,16 @@ var ComestibleData = []itemInfo{
 	TeleportMushroom:   {"teleport mushroom", EffectTeleportMushroom{}},
 
 	// Rare comestibles with conditional variant.
+	PolymorphFungus: {"polymorph fungus", EffectPolymorphFungus{}},
+	RunethornRose:   {"runethorn rose", EffectRunethornRose{}},
+	TunnelingAcorn:  {"tunneling acorn", EffectTunnelingAcorn{}},
+	VanishingSnail:  {"vanishing snail", EffectVanishingSnail{}},
+	WarpingBean:     {"warping bean", EffectWarpingBean{}},
+
+	// Rare conditional comestibles (exclusive to Totem Conditions).
 	FortressOyster: {"fortress oyster", EffectFortressOyster{}},
-	RunethornRose:  {"runethorn rose", EffectRunethornRose{}},
 	SeeingPotato:   {"seeing potato", EffectSeeingPotato{}},
 	TrickyChestnut: {"tricky chestnut", EffectTrickyChestnut{}},
-	TunnelingAcorn: {"tunneling acorn", EffectTunnelingAcorn{}},
-	VanishingSnail: {"vanishing snail", EffectVanishingSnail{}},
-	WarpingBean:    {"warping bean", EffectWarpingBean{}},
-
-	// Rare comestibles with conditional and 2-effect variants.
-	PolymorphFungus: {"polymorph fungus", EffectPolymorphFungus{}},
 
 	// Miscellaneous rare comestibles without conditional variant.
 	MoonlightLotus: {"moonlight lotus", EffectMoonlightLotus{}},
@@ -357,8 +359,8 @@ var CommonComestibles = []comestibleKind{
 // RareComestibles contains the list of rare comestibles available in the base
 // game.
 var RareComestibles = []comestibleKind{
-	MoonlightLotus, PolymorphFungus,
-	RunethornRose, VanishingSnail, TunnelingAcorn, WarpingBean}
+	MoonlightLotus,
+	PolymorphFungus, RunethornRose, TunnelingAcorn, VanishingSnail, WarpingBean}
 
 // RareNCComestibles contains the list of rare comestibles that do not have a
 // non-conditional variant.
@@ -367,7 +369,8 @@ var RareNCComestibles = []comestibleKind{MoonlightLotus}
 // CondComestibles provides information about the various conditional
 // comestibles available in Totem Conditions.
 var CondComestibles = []comestibleKind{
-	FortressOyster, PolymorphFungus, RunethornRose, VanishingSnail, TunnelingAcorn, WarpingBean, SeeingPotato,
+	PolymorphFungus, RunethornRose, TunnelingAcorn, VanishingSnail, WarpingBean,
+	FortressOyster, SeeingPotato,
 	TrickyChestnut, // last
 }
 
