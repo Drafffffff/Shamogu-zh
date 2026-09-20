@@ -1,5 +1,8 @@
 # v? ?
 
+This release is a significant one, with a new challenge expansion, new rare
+comestibles, and various improvements to existing content.
+
 New content:
 
 * New expansion mod: **Totem Conditions** (contributed by @mlochbaum, see
@@ -9,18 +12,18 @@ New content:
   so easy to eat! Think ahead when choosing spirits; the run will have one
   fewer empty totem to expand your options”.  The expansion provides lots of
   different challenging spirit curses, found on totems and imposing varied
-  conditions on the player until fulfilled, as well as seven new rare
+  conditions on the player until fulfilled, as well as new rare
   comestibles that can only be eaten when the right conditions are met:
-  fortress oyster, runethorn rose, vanishing snail, tunneling acorn, warping
-  bean, seeing potato, tricky chestnut.  Like with all mods, the new expansion
-  is compatible with any mod combination, and in particular with the other
-  expansions. Be sure to give it a try!
-* While playing the base game, you may now find one or sometimes even two rare
-  comestibles during a run! Some of those are easier non-conditional variants
-  of Totem Condition ones (acorn, bean, snail, rose). There's as well the new
-  rare moonlight lotus and polymorph fungus comestibles with alternate effects,
-  which occur a bit more often with Corrupted Dungeon and Healing Combat,
-  respectively.
+  tunneling acorn, warping bean, polymorph fungus, runethorn rose, vanishing
+  snail, tricky chestnut, fortress oyster, seeing potato. Like with all mods,
+  the new expansion is compatible with any mod combination, and in particular
+  with the other expansions. Be sure to give it a try!
+* While playing the base game, you may now find one or two **rare comestibles**
+  during a run! (See design discussion in issue #24). Some of those are easier
+  non-conditional variants of Totem Condition ones (acorn, bean, fungus, rose,
+  snail). The new rare moonlight lotus and the polymorph fungus have alternate
+  effects depending on circumstances, and appear more frequently with Corrupted
+  Dungeon and Healing Combat enabled, respectively. 
 
 Reworked and improved content:
 
@@ -53,6 +56,8 @@ Corrupted dungeon improvements (see discussion in #11):
 * New rare variations of alternative guardians.
 * New variant of rare imp levels with patrolling trios with 2 imps and another
   frail mid-level monster, so that imp levels feel less the same.
+* New rare comestible corruptions: sometimes, more of them will appear than in
+  the base game.
 * Lower a bit frequency for various corruptions, in part to compensate for new
   ones.
 
@@ -74,7 +79,9 @@ UI, graphics, QoL:
   default experience and which weren't convenient as mods, like Gluttony
   Rework, are now exposed through compile-time variables in `vars.go`. Some of
   them can also be modified from command-line options (in native versions of
-  the game). Disabling animations is now done through that way, too.
+  the game). Disabling animations is now done through that way, too. And the
+  new NoChaos option disables megabat's chaos bite and rare comestibles for any
+  players who'd prefer a more minimalistic experience.
 * The “game summary” action (shortcut `#`) now opens the pager with a
   simplified summary for in-game viewing, in addition to writing full
   statistics to a file (or “below” for the browser version).
