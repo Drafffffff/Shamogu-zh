@@ -1,4 +1,5 @@
-// This file implements effects for comestibles, abilities, and menhirs.
+// This file implements effects for comestibles (except conditional ones),
+// abilities, and menhirs.
 
 package main
 
@@ -418,75 +419,6 @@ func (eff EffectMoonlightLotus) Desc(g *Game) string {
 }
 
 type EffectFocus struct{}
-
-type EffectPolymorphFungus struct{}
-
-func (eff EffectPolymorphFungus) CanApply(g *Game, i ID) bool {
-	var n int
-	for i := range g.Monsters() {
-		ei := g.Entity(i)
-		if g.InFOV(ei.P) {
-			n++
-		}
-	}
-	return n == 2
-}
-
-func (eff EffectPolymorphFungus) Apply(g *Game) bool {
-	g.eatMsg(PolymorphFungus.Name(), "")
-	// Collect IDs from monsters in view.
-	var mids []ID
-	for i := range g.Monsters() {
-		if g.InFOV(g.Entity(i).P) {
-			mids = append(mids, i)
-		}
-	}
-	if len(mids) == 0 {
-		g.PutStatus1(PlayerID, g.PlayerActor(), StatusVampirism, DurationVampFung)
-		return true
-	}
-	mks := []ActorKind{BlinkButterfly, ConfusingEye}
-	p := g.rand.Perm(len(mids))[:min(len(mids), 2)]
-	g.md.PolymorphAnimation(mids, p)
-	for i, pi := range p {
-		ei := g.Entity(mids[pi])
-		ai := ei.Role.(*Actor)
-		mki := mks[i]
-		e := monster(mki)
-		a := e.Role.(*Actor)
-		g.Logf("The %s becomes %s.", ei.Name, One(e.Name))
-		if ai.DoesAny(MonsNotable) {
-			g.StoryLogf("Polymorphed %s into %s", One(ei.Name), One(e.Name))
-		}
-		// Update name and rune only in entity.
-		ei.Name = e.Name
-		ei.Rune = e.Rune
-		// Update actor stats and traits, but keep behavior, statuses,
-		// and knowledge info.
-		ai.MaxHP = a.MaxHP
-		ai.HP = min(a.HP, ai.MaxHP)
-		ai.Defense = a.Defense
-		ai.Attack = a.Attack
-		ai.Kind = a.Kind
-		ai.Traits = a.Traits
-		switch mki {
-		case BlinkButterfly:
-			ai.Statuses[StatusLignification] = 0
-			ai.Statuses[StatusImbalance] = 0
-		case ConfusingEye:
-			ai.Statuses[StatusConfusion] = 0
-		}
-	}
-	g.md.PolymorphAnimation(mids, p)
-	return true
-}
-
-func (eff EffectPolymorphFungus) Desc(g *Game) string {
-	if g.HasCondComestibles() {
-		return "Eat only if there are exactly two monsters in view. Polymorphs them into a blinking butterfly and a confusing eye."
-	}
-	return fmt.Sprintf("Polymorphs a random monster in view into a blinking butterfly, and a second monster, if any, into a confusing eye.\nIf no monsters are in view, gives @BVampirism@N for %d turns instead, preparing you for a vampiric ambush.", DurationVampFung)
-}
 
 func (eff EffectFocus) Apply(g *Game) bool {
 	pa := g.PlayerActor()
