@@ -1224,7 +1224,7 @@ func (eff EffectWarpingBean) Desc(g *Game) string {
 	if !g.HasCondComestibles() {
 		cond = ""
 	}
-	return fmt.Sprintf("%sRemoves all your statuses without the usual after-effects, then warps you away in view but with greater chance to distant tiles.%s",
+	return fmt.Sprintf("%sRemoves all your statuses without the usual after-effects, then warps you away in view with greater chance to distant tiles.%s",
 		cond, g.healMsg(HealWarpingBean))
 }
 
