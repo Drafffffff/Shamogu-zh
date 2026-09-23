@@ -23,7 +23,7 @@ New content:
   non-conditional variants of Totem Condition ones (acorn, bean, fungus, rose,
   snail). The new rare moonlight lotus and the polymorph fungus have alternate
   effects depending on circumstances, and appear more frequently with Corrupted
-  Dungeon and Healing Combat enabled, respectively. 
+  Dungeon and Healing Combat enabled, respectively.
 
 Reworked and improved content:
 
@@ -43,10 +43,10 @@ Reworked and improved content:
 
 Corrupted dungeon improvements (see discussion in #11):
 
-* Monster nests now scale with map level and happen less
-  often early on, to make (very) rare cases that could feel a bit too unfair
-  even rarer (see #18).
-* Only 3/4 chance of relief comestible in warp, berserk and lignification thematic levels.
+* Monster nests now scale with map level and happen less often early on, to
+  make (very) rare cases that could feel a bit too unfair even rarer (see #18).
+* Only 3/4 chance of relief comestible in warp, berserk and lignification
+  thematic levels.
 * Rarely spawn lone golem or wasp guardian.
 * New rare spooky level with empty totem, runes and menhirs.
 * New rare footstep-themed level.
