@@ -1,4 +1,4 @@
-# v? ?
+# v1.6.0 2026-09-24
 
 This release is a significant one, with a new challenge expansion, new rare
 comestibles, and various improvements to existing content.
