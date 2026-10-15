@@ -47,7 +47,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 	j, aj := g.RangedTargetInDir(pl.P, dir)
 	if j >= 0 {
 		if g.PlayerFears(j, aj) {
-			g.Log("You’re afraid to go in that direction.")
+			g.Log("你害怕朝那个方向前进。")
 			return false
 		}
 		ej := g.Entity(j)
@@ -97,7 +97,7 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 			g.Dir = dir
 			return true
 		}
-		g.Log("You cannot move while lignified.")
+		g.Log("木化时无法移动。")
 		return false
 	}
 	if pa.HP == 1 && pa.Has(StatusPoison) {
@@ -105,19 +105,19 @@ func (g *Game) PlayerBump(dir gruid.Point) bool {
 			g.Dir = dir
 			return true
 		}
-		g.Log("You cannot move while poisoned and almost dead.")
+		g.Log("中毒且濒死时无法移动。")
 		return false
 	}
 	if !passto {
 		if !inMap(to) {
-			g.Log("You cannot walk out of the map.")
+			g.Log("无法走出地图边界。")
 			return false
 		}
 		switch {
 		case pa.Has(StatusDig):
 			g.digAt(to)
 		default:
-			g.Logf("You cannot walk into the %s.", TerrainName(tto))
+			g.Logf("无法走进%s。", TerrainName(tto))
 			return false
 		}
 	}
@@ -149,7 +149,7 @@ func (g *Game) PlayerFears(j ID, aj *Actor) bool {
 }
 
 func (g *Game) logDaze() {
-	g.Log("You’re dazed: you need to wait (ENTER) or eat.")
+	g.Log("你陷入眩晕：需要等待（回车键）或进食。")
 }
 
 // Sprint performs a sprinting bump-movement in the given direction.
@@ -157,12 +157,12 @@ func (g *Game) Sprint(dir gruid.Point) bool {
 	pl, pa := g.Player()
 	if j, aj := g.RangedTargetInDir(pl.P, dir); j >= 0 {
 		if g.PlayerFears(j, aj) {
-			g.Log("You’re afraid to go in that direction.")
+			g.Log("你害怕朝那个方向前进。")
 			return false
 		}
 	}
 	if pa.HP == 1 && pa.Has(StatusPoison) {
-		g.Log("You cannot sprint while poisoned and almost dead.")
+		g.Log("中毒且濒死时无法冲刺。")
 		return false
 	}
 	n := 2 // length of step
@@ -195,7 +195,7 @@ func (g *Game) Sprint(dir gruid.Point) bool {
 		}
 	}
 	if from == to {
-		g.Log("You cannot sprint in that direction.")
+		g.Log("无法朝那个方向冲刺。")
 		return false
 	}
 	g.Dir = dir
@@ -209,7 +209,7 @@ func (g *Game) Sprint(dir gruid.Point) bool {
 		}
 	}
 	if n > 1 && pa.Has(StatusImbalance) && g.IntN(3*DurationSprint/2) == 0 {
-		g.Log("You fall due to imbalance.")
+		g.Log("你因失衡而跌倒。")
 		g.PutStatus1(PlayerID, pa, StatusDaze, DurationDazeFall)
 	}
 	g.TriggerTrap(PlayerID, pa)
@@ -220,7 +220,7 @@ func (g *Game) Sprint(dir gruid.Point) bool {
 func (g *Game) WallThrough(dir, at gruid.Point) bool {
 	to := at.Add(dir)
 	if !g.IsFree(to) {
-		g.Log("There is no room behind the translucent wall.")
+		g.Log("半透明墙后没有空间。")
 		return false
 	}
 	g.BumpMoveActor(PlayerID, g.PlayerActor(), to)
@@ -233,21 +233,21 @@ func (g *Game) WallJump(dir gruid.Point) bool {
 	pl, pa := g.Player()
 	at := pl.P.Add(dir)
 	if !inMap(at) {
-		g.Log("You cannot walk out of the map.")
+		g.Log("无法走出地图边界。")
 		return false
 	}
 	over := pl.P.Sub(dir)
 	to := over.Sub(dir)
 	if !g.Map.Passable(over) {
-		g.Log("There’s no room for a wall jump.")
+		g.Log("没有足够空间进行蹬墙跳。")
 		return false
 	}
 	if !g.InFOV(to) {
-		g.Log("You cannot jump out of view.")
+		g.Log("无法跳出视野范围。")
 		return false
 	}
 	if !g.IsFree(to) {
-		g.Log("There’s no room for a wall jump.")
+		g.Log("没有足够空间进行蹬墙跳。")
 		return false
 	}
 	g.Dir = dir
@@ -260,7 +260,7 @@ func (g *Game) WallJump(dir gruid.Point) bool {
 		}
 	}
 	if pa.Has(StatusImbalance) && g.IntN(4) == 0 {
-		g.Log("You fall due to imbalance.")
+		g.Log("你因失衡而跌倒。")
 		g.PutStatus1(PlayerID, pa, StatusDaze, DurationDazeFall)
 	}
 	g.TriggerTrap(PlayerID, pa)

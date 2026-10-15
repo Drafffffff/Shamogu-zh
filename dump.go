@@ -20,7 +20,7 @@ type Stats struct {
 	Damage              int            // total damage you got
 	Deaths              map[string]int // monster deaths by name
 	DeathsPast          map[string]int // monster deaths by name (past levels)
-	Digs                int            // number of digs (destroyed walls)
+	Digs                int            // number of digs (面墙壁被摧毁s)
 	DigsPast            int            // number of digs (past levels)
 	EatenComestibles    int            // number of eaten comestibles
 	FireClouds          int            // number of spawn fire clouds
@@ -150,9 +150,9 @@ func (g *Game) getStatExcludeStr(markup bool) string {
 		return ""
 	}
 	if markup {
-		return " @S(excluding current level)@N"
+		return " @S（不含当前层）@N"
 	}
-	return " (excluding current level)"
+	return "（不含当前层）"
 }
 
 // showAllStats reports whether game statistics should show everything, including
@@ -170,27 +170,27 @@ func (g *Game) DumpEndSummary(markup bool) string {
 	} else {
 		version = Version
 	}
-	fmt.Fprintf(&sb, " ♣ Game Summary — Shamogu %s ♣\n\n", version)
+	fmt.Fprintf(&sb, " ♣ Shamogu 游戏总结 %s ♣\n\n", version)
 	if g.Wizard.Mode != WizardNone {
-		fmt.Fprintf(&sb, "ENABLED WIZARD MODE (%s",
-			CountNoun("resurrection", g.Wizard.Resurrections))
+		fmt.Fprintf(&sb, "已启用向导模式（复活 %s",
+			CountNoun("次", g.Wizard.Resurrections))
 		if g.Wizard.Extra {
-			sb.WriteString(" & EXTRA CHEATS")
+			sb.WriteString("，额外作弊选项")
 		}
-		sb.WriteString(").\n")
+		sb.WriteString("）。\n")
 	}
 	if !markup {
 		pa := g.PlayerActor()
 		if g.win {
-			fmt.Fprintf(&sb, "You destroyed the Orb of Corruption!\n")
+			fmt.Fprintf(&sb, "你摧毁了腐化之球！\n")
 		} else if pa.IsDead() {
-			fmt.Fprintf(&sb, "You died while exploring level %d of the dungeon.\n", g.Map.Level)
+			fmt.Fprintf(&sb, "你在探索地城第 %d 层时死亡。\n", g.Map.Level)
 		} else {
-			fmt.Fprintf(&sb, "You are exploring level %d of the dungeon.\n", g.Map.Level)
+			fmt.Fprintf(&sb, "你正在探索地城第 %d 层。\n", g.Map.Level)
 		}
-		fmt.Fprintf(&sb, "You spent %d turns in the dungeon.\n", g.Turn)
+		fmt.Fprintf(&sb, "你在地城中行动了 %d 回合。\n", g.Turn)
 	}
-	fmt.Fprintf(&sb, "Your adventure resulted in %s%s.\n", CountNoun("monster death", g.getStatNDeaths()), g.getStatExcludeStr(markup))
+	fmt.Fprintf(&sb, "此番冒险中共有 %s 怪物死亡%s。\n", CountNoun("只", g.getStatNDeaths()), g.getStatExcludeStr(markup))
 	g.dumpMods(&sb, markup)
 	g.dumpPlayer(&sb, markup)
 	return sb.String()
@@ -238,7 +238,7 @@ func (g *Game) dumpMods(sb *strings.Builder, markup bool) {
 	if g.modCount() == 0 {
 		return
 	}
-	sb.WriteString(section("Mods", markup))
+	sb.WriteString(section("模组", markup))
 	for i, b := range g.Mods {
 		if !b {
 			continue
@@ -250,7 +250,7 @@ func (g *Game) dumpMods(sb *strings.Builder, markup bool) {
 func (g *Game) dumpPlayer(sb *strings.Builder, markup bool) {
 	pa := g.PlayerActor()
 	if !markup {
-		fmt.Fprintf(sb, "\nHP:%d/%d A:%d D:%d",
+		fmt.Fprintf(sb, "\n生命:%d/%d 攻:%d 防:%d",
 			pa.HP, pa.GetMaxHP(), pa.GetAttack(), pa.GetDefense())
 		for i, turns := range pa.Statuses {
 			if turns <= 0 {
@@ -262,10 +262,10 @@ func (g *Game) dumpPlayer(sb *strings.Builder, markup bool) {
 		}
 		sb.WriteByte('\n')
 	}
-	sb.WriteString(section("Spirits", markup))
+	sb.WriteString(section("灵体", markup))
 	for i, sp := range g.PlayerSpirits() {
 		ei := g.Entity(i)
-		fmt.Fprintf(sb, "- %s (%s %d/%d, used %s)\n",
+		fmt.Fprintf(sb, "- %s（%s，充能 %d/%d，使用 %s）\n",
 			ei.Name, sp.GetAbility().Name(),
 			sp.Charges, sp.GetMaxCharges(),
 			times(sp.Uses))
@@ -273,7 +273,7 @@ func (g *Game) dumpPlayer(sb *strings.Builder, markup bool) {
 }
 
 func (g *Game) dumpComestibles(sb *strings.Builder, markup bool) {
-	sb.WriteString(section("Comestibles", markup))
+	sb.WriteString(section("食物", markup))
 	for i := range g.PlayerComestibles() {
 		ei := g.Entity(i)
 		fmt.Fprintf(sb, "- %s\n", ei.Name)
@@ -281,14 +281,14 @@ func (g *Game) dumpComestibles(sb *strings.Builder, markup bool) {
 }
 
 func (g *Game) dumpLastMessages(sb *strings.Builder, markup bool) {
-	sb.WriteString(section("Last messages", markup))
+	sb.WriteString(section("最近消息", markup))
 	for _, e := range g.Logs.Entries[max(0, len(g.Logs.Entries)-20):] {
 		fmt.Fprintf(sb, "%s\n", e.dumpString())
 	}
 }
 
 func (g *Game) dumpMap(sb *strings.Builder, markup bool) {
-	sb.WriteString(section("Map", markup))
+	sb.WriteString(section("地图", markup))
 	// Entities.
 	var ids CacheGrid[ID]
 	ids = ids.New()
@@ -349,9 +349,9 @@ func (g *Game) dumpMonsterDeaths(sb *strings.Builder, markup bool) {
 	}
 	var t string
 	if markup {
-		t = section(fmt.Sprintf("Monster deaths%s@C", g.getStatExcludeStr(markup)), markup)
+		t = section(fmt.Sprintf("怪物死亡%s@C", g.getStatExcludeStr(markup)), markup)
 	} else {
-		t = section(fmt.Sprintf("Monster deaths%s", g.getStatExcludeStr(markup)), markup)
+		t = section(fmt.Sprintf("怪物死亡%s", g.getStatExcludeStr(markup)), markup)
 	}
 	sb.WriteString(t)
 	deaths := g.getStatDeaths()
@@ -365,7 +365,7 @@ func (g *Game) dumpEatenComestibles(sb *strings.Builder, markup bool) {
 	if g.Stats.EatenComestibles == 0 {
 		return
 	}
-	sb.WriteString(section("Eaten comestibles", markup))
+	sb.WriteString(section("食用食物", markup))
 	comestibles := slices.Sorted(maps.Keys(g.Stats.Comestibles))
 	for _, co := range comestibles {
 		fmt.Fprintf(sb, "- %s: %d\n", co, g.Stats.Comestibles[co])
@@ -373,47 +373,45 @@ func (g *Game) dumpEatenComestibles(sb *strings.Builder, markup bool) {
 }
 
 func (g *Game) dumpStatistics(sb *strings.Builder, markup bool) {
-	sb.WriteString(section("Statistics", markup))
-	// NOTE: if the player dumps game statistics while playing, there are
-	// some minor information leaks (like number of destroyed walls or trap
-	// triggers including out of view ones you might not still be aware
-	// of). Avoiding those is not worth the effort.
+	sb.WriteString(section("统计", markup))
+	// 注意：游戏进行中查看统计时，可能泄露少量信息（例如被摧毁的墙壁数，
+	// 或包括视野外陷阱在内的触发次数）。为避免这些泄漏而增加复杂度并不值得。
 	timesPer100 := func(n int) string {
-		return fmt.Sprintf("%s (%.1f per 100 turns)",
+		return fmt.Sprintf("%s（每 100 回合 %.1f 次）",
 			times(n), float64(n)*100/float64(max(1, g.Turn)))
 	}
-	fmt.Fprintf(sb, "You used spirits %s, ate %s, activated %s.\n",
+	fmt.Fprintf(sb, "你使用灵体 %s，食用食物 %s，激活石碑 %s。\n",
 		times(g.Stats.SpiritUses),
-		CountNoun("comestible", g.Stats.EatenComestibles),
-		CountNoun("menhir", g.Stats.ActivatedMenhirs))
-	fmt.Fprintf(sb, "You triggered %s.\n", CountNoun("trap", g.Stats.PlayerTriggers))
-	fmt.Fprintf(sb, "You hit foes %s.\n", timesPer100(g.Stats.Hits))
-	fmt.Fprintf(sb, "You missed foes %s.\n", timesPer100(g.Stats.Misses))
-	fmt.Fprintf(sb, "You waited %s.\n", timesPer100(g.Stats.Waits))
-	fmt.Fprintf(sb, "You got hurt %s and endured %d damage.\n", times(g.Stats.Hurt), g.Stats.Damage)
-	fmt.Fprintf(sb, "You were lucky %s.\n", times(g.Stats.Lucky))
+		CountNoun("份", g.Stats.EatenComestibles),
+		CountNoun("次", g.Stats.ActivatedMenhirs))
+	fmt.Fprintf(sb, "你触发陷阱 %s。\n", CountNoun("次", g.Stats.PlayerTriggers))
+	fmt.Fprintf(sb, "你命中敌人 %s。\n", timesPer100(g.Stats.Hits))
+	fmt.Fprintf(sb, "你未命中敌人 %s。\n", timesPer100(g.Stats.Misses))
+	fmt.Fprintf(sb, "你等待了 %s。\n", timesPer100(g.Stats.Waits))
+	fmt.Fprintf(sb, "你受伤 %s，共承受 %d 点伤害。\n", times(g.Stats.Hurt), g.Stats.Damage)
+	fmt.Fprintf(sb, "你走运 %s。\n", times(g.Stats.Lucky))
 	if g.Stats.Cornered > 0 {
-		fmt.Fprintf(sb, "You felt cornered %s.\n", times(g.Stats.Cornered))
+		fmt.Fprintf(sb, "你陷入绝境 %s。\n", times(g.Stats.Cornered))
 	}
 	if g.Stats.WallJumps > 0 {
-		fmt.Fprintf(sb, "You jumped %s by propelling yourself against a wall.\n", times(g.Stats.WallJumps))
+		fmt.Fprintf(sb, "你借墙反弹跳跃 %s。\n", times(g.Stats.WallJumps))
 	}
 	if g.Stats.WallThroughs > 0 {
-		fmt.Fprintf(sb, "You passed %s through a translucent wall.\n", times(g.Stats.WallThroughs))
+		fmt.Fprintf(sb, "你穿过半透明墙 %s。\n", times(g.Stats.WallThroughs))
 	}
 	for i, n := range g.Stats.Statuses {
 		st := Status(i)
 		if n > 0 {
-			fmt.Fprintf(sb, "You were %s %s.\n", st, times(n))
+			fmt.Fprintf(sb, "你处于%s状态 %s。\n", st, times(n))
 		}
 	}
 	ses := g.getStatExcludeStr(markup)
-	fmt.Fprintf(sb, "There were %s and %s%s.\n",
-		CountNoun("fire cloud", g.getStatFireClouds()),
-		CountNoun("poison cloud", g.getStatPoisonClouds()),
+	fmt.Fprintf(sb, "你遭遇%s与%s%s。\n",
+		CountNoun("团火焰云雾", g.getStatFireClouds()),
+		CountNoun("团毒雾", g.getStatPoisonClouds()),
 		ses)
-	fmt.Fprintf(sb, "%s%s.\n", there("destroyed wall", g.Stats.Digs), ses)
-	fmt.Fprintf(sb, "%s triggered by monsters%s.\n", there("trap", g.getStatMonsterTriggers()), ses)
+	fmt.Fprintf(sb, "被摧毁的墙壁：%s%s。\n", CountNoun("面", g.Stats.Digs), ses)
+	fmt.Fprintf(sb, "怪物触发陷阱：%s%s。\n", CountNoun("次", g.getStatMonsterTriggers()), ses)
 	// Statistics per map level.
 	levels := g.Map.Level - 1
 	if g.win || g.PlayerActor().IsDead() {
@@ -424,7 +422,7 @@ func (g *Game) dumpStatistics(sb *strings.Builder, markup bool) {
 	}
 	sb.WriteByte('\n')
 	hfmt := "%-20s"
-	fmt.Fprintf(sb, hfmt, "Quantity/Level")
+	fmt.Fprintf(sb, hfmt, "项目/层数")
 	for i := range levels {
 		fmt.Fprintf(sb, " %4d", i+1)
 	}
@@ -436,21 +434,21 @@ func (g *Game) dumpStatistics(sb *strings.Builder, markup bool) {
 		}
 		sb.WriteByte('\n')
 	}
-	perLevel("Turns", g.Stats.MapTurns[:levels])
-	perLevel("Explored (%)", g.Stats.MapExplorePerc[:levels])
-	perLevel("Dead monsters (%)", g.Stats.MapDeathPerc[:levels])
-	perLevel("Endured damage", g.Stats.MapDamage[:levels])
-	perLevel("Eaten comestibles", g.Stats.MapEatenComestibles[:levels])
-	perLevel("Spirit uses", g.Stats.MapSpiritUses[:levels])
-	perLevel("Activated menhirs", g.Stats.MapActivatedMenhirs[:levels])
-	perLevel("Triggered traps", g.Stats.MapTriggeredTraps[:levels])
+	perLevel("回合数", g.Stats.MapTurns[:levels])
+	perLevel("探索度（%）", g.Stats.MapExplorePerc[:levels])
+	perLevel("死亡怪物（%）", g.Stats.MapDeathPerc[:levels])
+	perLevel("承受伤害", g.Stats.MapDamage[:levels])
+	perLevel("食用食物", g.Stats.MapEatenComestibles[:levels])
+	perLevel("使用灵体", g.Stats.MapSpiritUses[:levels])
+	perLevel("激活石碑", g.Stats.MapActivatedMenhirs[:levels])
+	perLevel("触发陷阱", g.Stats.MapTriggeredTraps[:levels])
 }
 
 func (g *Game) dumpCurseHistory(sb *strings.Builder, markup bool) {
 	if !g.Mod(ModTotemConditions) {
 		return
 	}
-	sb.WriteString(section("Curses", markup))
+	sb.WriteString(section("诅咒", markup))
 	for _, s := range g.Stats.CurseHistory {
 		stt := ui.Text(s).Format(76)
 		sb.WriteString(strings.ReplaceAll(stt.Text(), "\n", "\n  "))
@@ -459,13 +457,13 @@ func (g *Game) dumpCurseHistory(sb *strings.Builder, markup bool) {
 }
 
 func (g *Game) recordCurse(spname string, c *SpiritCond) {
-	s := fmt.Sprintf("- Curse on %s at level %d: %s.\nUntil: %s.",
+	s := fmt.Sprintf("- %s在第 %d 层受到诅咒：%s。\n持续条件：%s。",
 		spname, g.Map.Level, UpperFirst(c.Effect.Desc()), UpperFirst(c.Until.Desc()))
 	g.Stats.CurseHistory = append(g.Stats.CurseHistory, s)
 }
 
 func (g *Game) dumpTimeline(sb *strings.Builder, markup bool) {
-	sb.WriteString(section("Timeline", markup))
+	sb.WriteString(section("时间线", markup))
 	for _, s := range g.Logs.Story {
 		sb.WriteString(s)
 		sb.WriteByte('\n')
@@ -480,13 +478,6 @@ func section(s string, markup bool) string {
 
 }
 
-func there(s string, n int) string {
-	if n == 1 {
-		return "There was " + CountNoun(s, n)
-	}
-	return "There were " + CountNoun(s, n)
-}
-
 func times(n int) string {
-	return CountNoun("time", n)
+	return CountNoun("次", n)
 }

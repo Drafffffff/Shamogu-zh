@@ -38,7 +38,7 @@ func (md *model) updateActionDesc(a ActionDesc) {
 	l := md.desc
 	stt := ui.StyledText{}.WithMarkups(Markups)
 	l.Box = &ui.Box{Title: ui.Text(a.String())}
-	l.Content = stt.WithText(a.Desc(md)).Format(UIWidth/2 - 2)
+	l.Content = stt.WithText(a.Desc(md)).Format(descriptionPanelWidth() - 2)
 }
 
 // ActionNone does nothing.
@@ -60,12 +60,12 @@ func (a ActionWait) Handle(md *model) (gruid.Effect, bool) {
 func (g *Game) stopSprint() {
 	if pa := g.PlayerActor(); pa.Has(StatusSprint) {
 		pa.Statuses[StatusSprint] = 0
-		g.LogStyled("You stop sprinting.", logStatusEnd)
+		g.LogStyled("你停止冲刺。", logStatusEnd)
 	}
 }
 
 func (a ActionWait) String() string {
-	return "Wait a turn"
+	return "等待一回合"
 }
 
 // ActionBump moves the player to a given position and updates FOV information,
@@ -82,13 +82,13 @@ func (a ActionBump) String() string {
 	var text string
 	switch a.Delta {
 	case gruid.Point{-1, 0}:
-		text = "Move west"
+		text = "向西移动"
 	case gruid.Point{1, 0}:
-		text = "Move east"
+		text = "向东移动"
 	case gruid.Point{0, -1}:
-		text = "Move north"
+		text = "向北移动"
 	case gruid.Point{0, 1}:
-		text = "Move south"
+		text = "向南移动"
 	}
 	return text
 }
@@ -101,16 +101,16 @@ type ActionRun struct {
 func (a ActionRun) Handle(md *model) (gruid.Effect, bool) {
 	g := md.g
 	if g.DangerInFOV() {
-		g.Log("You cannot run: danger in view!")
+		g.Log("无法奔跑：视野中有危险！")
 		return nil, false
 	}
 	if pa := g.PlayerActor(); pa.Has(StatusPoison) {
-		g.Log("You cannot run while poisoned!")
+		g.Log("中毒时无法奔跑！")
 		return nil, false
 	}
 	p := g.PP().Add(a.Delta)
 	if !g.PlayerPassableNoTraps(p) {
-		g.Log("You cannot run in that direction.")
+		g.Log("无法朝那个方向奔跑。")
 		return nil, false
 	}
 	bump := ActionBump(a)
@@ -127,13 +127,13 @@ func (a ActionRun) String() string {
 	var text string
 	switch a.Delta {
 	case gruid.Point{-1, 0}:
-		text = "Run west"
+		text = "向西奔跑"
 	case gruid.Point{1, 0}:
-		text = "Run east"
+		text = "向东奔跑"
 	case gruid.Point{0, -1}:
-		text = "Run north"
+		text = "向北奔跑"
 	case gruid.Point{0, 1}:
-		text = "Run south"
+		text = "向南奔跑"
 	}
 	return text
 }
@@ -178,7 +178,7 @@ func (a ActionTravel) Handle(md *model) (gruid.Effect, bool) {
 }
 
 func (a ActionTravel) String() string {
-	return "Travel to target"
+	return "前往目标"
 }
 
 // ActionAutoExplore starts automatic exploration.
@@ -187,11 +187,11 @@ type ActionAutoExplore struct{}
 func (a ActionAutoExplore) Handle(md *model) (gruid.Effect, bool) {
 	g := md.g
 	if g.DangerInFOV() {
-		g.Log("You cannot auto-explore: danger in view!")
+		g.Log("无法自动探索：视野中有危险！")
 		return nil, false
 	}
 	if pa := g.PlayerActor(); pa.Has(StatusPoison) {
-		g.Log("You cannot auto-explore while poisoned!")
+		g.Log("中毒时无法自动探索！")
 		return nil, false
 	}
 	md.auto.aemRebuild = true
@@ -209,7 +209,7 @@ func (a ActionAutoExplore) Handle(md *model) (gruid.Effect, bool) {
 }
 
 func (a ActionAutoExplore) String() string {
-	return "Auto-explore"
+	return "自动探索"
 }
 
 // ActionCursorBump moves the cursor.
@@ -227,13 +227,13 @@ func (a ActionCursorBump) String() string {
 	var text string
 	switch a.Delta {
 	case gruid.Point{-1, 0}:
-		text = "Move cursor west"
+		text = "光标向西移动"
 	case gruid.Point{1, 0}:
-		text = "Move cursor east"
+		text = "光标向东移动"
 	case gruid.Point{0, -1}:
-		text = "Move cursor north"
+		text = "光标向北移动"
 	case gruid.Point{0, 1}:
-		text = "Move cursor south"
+		text = "光标向南移动"
 	}
 	return text
 }
@@ -265,13 +265,13 @@ func (a ActionCursorRun) String() string {
 	var text string
 	switch a.Delta {
 	case gruid.Point{-1, 0}:
-		text = "Move cursor fast west"
+		text = "光标快速向西移动"
 	case gruid.Point{1, 0}:
-		text = "Move cursor fast east"
+		text = "光标快速向东移动"
 	case gruid.Point{0, -1}:
-		text = "Move cursor fast north"
+		text = "光标快速向北移动"
 	case gruid.Point{0, 1}:
-		text = "Move cursor fast south"
+		text = "光标快速向南移动"
 	}
 	return text
 }
@@ -352,7 +352,7 @@ func (g *Game) getMonsterTargIDIndex(me []ID) int {
 }
 
 func (a ActionNextMonster) String() string {
-	return "Examine next monster"
+	return "查看下一个怪物"
 }
 
 // ActionPreviousMonster examines previous monster (sorted by distance to
@@ -389,7 +389,7 @@ func (a ActionPreviousMonster) Handle(md *model) (gruid.Effect, bool) {
 }
 
 func (a ActionPreviousMonster) String() string {
-	return "Examine previous monster"
+	return "查看上一个怪物"
 }
 
 // ActionNextItem examines next food item (sorted by distance to player).
@@ -423,7 +423,7 @@ func item2type(it Item) itemType {
 	case *RunicTrap:
 		return itemRune
 	default:
-		panic("unexpected item")
+		panic("意外的物品")
 	}
 }
 
@@ -486,19 +486,19 @@ func (g *Game) getItemTargIDIndex(items []ID, ty itemType) int {
 func (a ActionNextItem) String() string {
 	switch a.Type {
 	case itemComestible:
-		return "Examine next known comestible"
+		return "查看下一个已知食物"
 	case itemTotem:
-		return "Examine next known spirit"
+		return "查看下一个已知灵体"
 	case itemMenhir:
-		return "Examine next known menhir"
+		return "查看下一个已知石碑"
 	case itemPortal:
 		// Also works for the orb of corruption.
-		return "Examine next known portal"
+		return "查看下一个已知传送门"
 	case itemRune:
-		return "Examine next known runic trap"
+		return "查看下一个已知符文陷阱"
 	default:
 		// Should not happen.
-		return "Examine next known item"
+		return "查看下一个已知道具"
 	}
 }
 
@@ -532,7 +532,7 @@ func (a ActionExamineModeToggle) Handle(md *model) (gruid.Effect, bool) {
 }
 
 func (a ActionExamineModeToggle) String() string {
-	return "Examine (keyboard mode)"
+	return "查看（键盘模式）"
 }
 
 // ActionScroll represents a vertical scrolling action (usable for scrolling
@@ -558,9 +558,9 @@ func (a ActionScroll) Handle(md *model) (gruid.Effect, bool) {
 func (a ActionScroll) String() string {
 	switch a.Delta {
 	case gruid.Point{0, 1}:
-		return "Scroll description boxes up"
+		return "向上滚动说明框"
 	default:
-		return "Scroll description boxes down"
+		return "向下滚动说明框"
 	}
 }
 
@@ -590,12 +590,12 @@ func (a ActionInteract) Handle(md *model) (gruid.Effect, bool) {
 			return nil, it.Use(g, i)
 		}
 	}
-	g.Log("Nothing to interact with.")
+	g.Log("没有可互动的目标。")
 	return nil, false
 }
 
 func (a ActionInteract) String() string {
-	return "Interact (equip/activate)"
+	return "互动（装备/激活）"
 }
 
 func equipItem(md *model, i ID) bool {
@@ -649,11 +649,11 @@ func equipItem(md *model, i ID) bool {
 		// NOTE: At some point I considered providing another kind of
 		// benefit when all spirits were already upgraded, but I
 		// decided against it to not encourage perfectionism.
-		g.Log("No spirit upgrades or new slots available.")
+		g.Log("没有可升级的灵体，也没有空槽位。")
 		return false
 	}
 	altBgEntries(entries)
-	md.menu.main.SetBox(&ui.Box{Title: ui.Text("Inventory (equip)").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
+	md.menu.main.SetBox(&ui.Box{Title: ui.Text("物品栏（装备）").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
 	md.menu.main.SetEntries(entries)
 	md.mode = modeMenu
 	md.menu.mode = modeEquip
@@ -714,9 +714,9 @@ func (md *model) openInventory(bound ID) (gruid.Effect, bool) {
 	}
 	altBgEntries(entries)
 	if bound == -1 {
-		md.menu.main.SetBox(&ui.Box{Title: ui.Text("Inventory (use)").WithStyle(gruid.Style{Fg: ColorYellow})})
+		md.menu.main.SetBox(&ui.Box{Title: ui.Text("物品栏（使用）").WithStyle(gruid.Style{Fg: ColorYellow})})
 	} else {
-		md.menu.main.SetBox(&ui.Box{Title: ui.Text("Choose another comestible!").WithStyle(gruid.Style{Fg: ColorYellow})})
+		md.menu.main.SetBox(&ui.Box{Title: ui.Text("请选择其他食物！").WithStyle(gruid.Style{Fg: ColorYellow})})
 	}
 	md.menu.main.SetEntries(entries)
 	md.mode = modeMenu
@@ -753,22 +753,22 @@ func appendMenuHeader(entries []ui.MenuEntry, i ID) []ui.MenuEntry {
 	switch i {
 	case 0:
 		entries = append(entries, ui.MenuEntry{
-			Text:     ui.Text("Primary Spirit").WithStyle(hstyle),
+			Text:     ui.Text("主灵体").WithStyle(hstyle),
 			Disabled: true,
 		})
 	case 1:
 		entries = append(entries, ui.MenuEntry{
-			Text:     ui.Text("Secondary Spirits").WithStyle(hstyle),
+			Text:     ui.Text("副灵体").WithStyle(hstyle),
 			Disabled: true,
 		})
 	case NSpirits:
 		entries = append(entries, ui.MenuEntry{
-			Text:     ui.Text("Comestibles").WithStyle(hstyle),
+			Text:     ui.Text("食物").WithStyle(hstyle),
 			Disabled: true,
 		})
 	case NSpirits + NComestibles:
 		entries = append(entries, ui.MenuEntry{
-			Text:     ui.Text("Comestible on the floor").WithStyle(hstyle),
+			Text:     ui.Text("地上的食物").WithStyle(hstyle),
 			Disabled: true,
 		})
 	}
@@ -797,23 +797,23 @@ func (md *model) updateItemDesc(e *Entity) {
 	switch it := e.Role.(type) {
 	case *Spirit:
 		if it.Level == 1 {
-			l.Box.Title = ui.Textf("%s (upgraded)", e.Name)
+			l.Box.Title = ui.Textf("%s（已升级）", e.Name)
 		}
-		l.Content = stt.WithText(it.Desc(md.g)).Format(UIWidth/2 - 1 - 2)
+		l.Content = stt.WithText(it.Desc(md.g)).Format(descriptionPanelWidth() - 3)
 	case Item:
-		l.Content = stt.WithText(it.Desc(md.g)).Format(UIWidth/2 - 1 - 2)
+		l.Content = stt.WithText(it.Desc(md.g)).Format(descriptionPanelWidth() - 3)
 	default:
 		// Should not happen.
-		l.Content = stt.WithText(e.Name).Format(UIWidth/2 - 1 - 2)
+		l.Content = stt.WithText(e.Name).Format(descriptionPanelWidth() - 3)
 	}
 }
 
 func (a ActionInventory) String() string {
-	return "Open inventory"
+	return "打开物品栏"
 }
 
 func (a ActionInventory) Desc(_ *model) string {
-	return "Shows your spirits and comestibles. Selecting a spirit will use a charge, while selecting a comestible makes you eat it."
+	return "查看你的灵体和食物。选择灵体会消耗一次充能；选择食物则会将其吃掉。"
 }
 
 // ActionUseItem uses an item.
@@ -856,7 +856,7 @@ func (a ActionUseTwoItems) Handle(md *model) (gruid.Effect, bool) {
 	md.mode = modeNormal
 	ok := md.g.useItem(a.ID0) && md.g.useItem(a.ID1)
 	if !ok {
-		log.Print("BUG: did not eat both comestibles.")
+		log.Print("错误：未能同时吃下两份食物。")
 	}
 	return nil, ok
 }
@@ -868,23 +868,23 @@ func (md *model) updateEquipItemDesc(ei, ej *Entity) {
 	switch rj := ej.Role.(type) {
 	case *Spirit:
 		md.desc.Content = stt // empty (not drawn)
-		md.equipPager.SetBox(&ui.Box{Title: stt.WithTextf("%s (upgrade)", ej.Name)})
-		md.equipPager.SetLines(stt.WithText(rj.UpgradeDesc(g, ei)).Format(UIWidth/2 - 1 - 2).Lines())
+		md.equipPager.SetBox(&ui.Box{Title: stt.WithTextf("%s（升级）", ej.Name)})
+		md.equipPager.SetLines(stt.WithText(rj.UpgradeDesc(g, ei)).Format(descriptionPanelWidth() - 3).Lines())
 	case *Comestible:
-		md.desc.Box = &ui.Box{Title: stt.WithTextf("%s (replace)", ej.Name)}
-		md.desc.Content = stt.WithText(rj.Desc(g)).Format(UIWidth/2 - 1 - 2)
+		md.desc.Box = &ui.Box{Title: stt.WithTextf("%s（替换）", ej.Name)}
+		md.desc.Content = stt.WithText(rj.Desc(g)).Format(descriptionPanelWidth() - 3)
 		if ri, ok := ei.Role.(*Comestible); ok {
-			md.equipPager.SetBox(&ui.Box{Title: stt.WithTextf("%s (ground)", ei.Name)})
-			md.equipPager.SetLines(stt.WithText(ri.Desc(g)).Format(UIWidth/2 - 1 - 2).Lines())
+			md.equipPager.SetBox(&ui.Box{Title: stt.WithTextf("%s（地面）", ei.Name)})
+			md.equipPager.SetLines(stt.WithText(ri.Desc(g)).Format(descriptionPanelWidth() - 3).Lines())
 		}
 	default:
 		// Empty slot: should only happen with a spirit.
 		if ri, ok := ei.Role.(*Spirit); ok {
 			md.desc.Box = &ui.Box{Title: stt.WithText(ej.Name)}
-			s := "@MThe spirit on the ground can be equipped on this empty slot.@N"
-			md.desc.Content = stt.WithText(s).Format(UIWidth/2 - 1 - 2)
-			md.equipPager.SetBox(&ui.Box{Title: stt.WithTextf("%s (ground)", ei.Name)})
-			md.equipPager.SetLines(stt.WithText(ri.Desc(g)).Format(UIWidth/2 - 1 - 2).Lines())
+			s := "@M可将地上的灵体装备到此空槽位。@N"
+			md.desc.Content = stt.WithText(s).Format(descriptionPanelWidth() - 3)
+			md.equipPager.SetBox(&ui.Box{Title: stt.WithTextf("%s（地面）", ei.Name)})
+			md.equipPager.SetLines(stt.WithText(ri.Desc(g)).Format(descriptionPanelWidth() - 3).Lines())
 		}
 	}
 }
@@ -923,7 +923,7 @@ var menuKeys = []rune{'e', 'i', 'm', '?', '#', 'C', 'S', 'Q', '»'}
 
 func init() {
 	if len(menuActions) != len(menuKeys) {
-		panic("length mismatch between menuActions and menuKeys")
+		panic("菜单操作与按键数量不匹配")
 	}
 }
 
@@ -940,22 +940,22 @@ func (a ActionMenu) Handle(md *model) (gruid.Effect, bool) {
 		switch r {
 		case 'e':
 			entries = append(entries, ui.MenuEntry{
-				Text:     ui.Text("Gameplay Actions").WithStyle(hstyle),
+				Text:     ui.Text("游戏操作").WithStyle(hstyle),
 				Disabled: true,
 			})
 		case 'm':
 			entries = append(entries, ui.MenuEntry{
-				Text:     ui.Text("Gameplay Info").WithStyle(hstyle),
+				Text:     ui.Text("游戏信息").WithStyle(hstyle),
 				Disabled: true,
 			})
 		case 'C':
 			entries = append(entries, ui.MenuEntry{
-				Text:     ui.Text("Other Actions").WithStyle(hstyle),
+				Text:     ui.Text("其他操作").WithStyle(hstyle),
 				Disabled: true,
 			})
 		case '>':
 			entries = append(entries, ui.MenuEntry{
-				Text:     ui.Text("Wizard Actions").WithStyle(hstyle),
+				Text:     ui.Text("向导模式操作").WithStyle(hstyle),
 				Disabled: true,
 			})
 		}
@@ -975,7 +975,7 @@ func (a ActionMenu) Handle(md *model) (gruid.Effect, bool) {
 		}
 	}
 	altBgEntries(entries)
-	md.menu.main.SetBox(&ui.Box{Title: ui.Text("Menu").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
+	md.menu.main.SetBox(&ui.Box{Title: ui.Text("菜单").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
 	md.menu.main.SetEntries(entries)
 	md.menu.main.SetActiveInvokable(0)
 	md.updateMenuActionDesc(0)
@@ -985,7 +985,7 @@ func (a ActionMenu) Handle(md *model) (gruid.Effect, bool) {
 }
 
 func (a ActionMenu) String() string {
-	return "Menu"
+	return "菜单"
 }
 
 // ActionConfig opens settings menu.
@@ -1015,7 +1015,7 @@ func (md *model) openConfig(reset bool) {
 		})
 	}
 	altBgEntries(entries)
-	md.menu.main.SetBox(&ui.Box{Title: ui.Text("Config").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
+	md.menu.main.SetBox(&ui.Box{Title: ui.Text("设置").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
 	md.menu.main.SetEntries(entries)
 	if reset {
 		// Reset active entry.
@@ -1029,11 +1029,11 @@ func (md *model) openConfig(reset bool) {
 }
 
 func (a ActionConfig) String() string {
-	return "Configure settings"
+	return "设置选项"
 }
 
 func (a ActionConfig) Desc(_ *model) string {
-	return "Opens a configuration menu with various options."
+	return "打开设置菜单，调整多种选项。"
 }
 
 // ActionToggleDarkLight toggles dark/light mode.
@@ -1043,7 +1043,7 @@ func (a ActionToggleDarkLight) Handle(md *model) (gruid.Effect, bool) {
 	GameConfig.DarkColors = !GameConfig.DarkColors
 	err := SaveConfig()
 	if err != nil {
-		log.Printf("error saving config: %v", err)
+		log.Printf("保存设置失败：%v", err)
 	}
 	clearCache()
 	eff := gruid.Cmd(func() gruid.Msg { return gruid.MsgScreen{} })
@@ -1053,16 +1053,16 @@ func (a ActionToggleDarkLight) Handle(md *model) (gruid.Effect, bool) {
 
 func (a ActionToggleDarkLight) String() string {
 	if GameConfig.DarkColors {
-		return "Switch to light color theme"
+		return "切换为浅色主题"
 	}
-	return "Switch to dark color theme"
+	return "切换为深色主题"
 }
 
 func (a ActionToggleDarkLight) Desc(_ *model) string {
 	if GameConfig.DarkColors {
-		return "Toggling this option switches to a light color theme.\n\n@SCurrent setting: dark color theme.@N"
+		return "切换此选项即可改用浅色主题。\n\n@S当前设置：深色主题。@N"
 	}
-	return "Toggling this option switches to a dark color theme.\n\n@SCurrent setting: light color theme.@N"
+	return "切换此选项即可改用深色主题。\n\n@S当前设置：浅色主题。@N"
 }
 
 // ActionToggleExtraWarnings enables/disables extra warnings.
@@ -1072,7 +1072,7 @@ func (a ActionToggleExtraWarnings) Handle(md *model) (gruid.Effect, bool) {
 	GameConfig.WarningsExtra = !GameConfig.WarningsExtra
 	err := SaveConfig()
 	if err != nil {
-		log.Printf("error saving config: %v", err)
+		log.Printf("保存设置失败：%v", err)
 	}
 	clearCache()
 	eff := gruid.Cmd(func() gruid.Msg { return gruid.MsgScreen{} })
@@ -1082,19 +1082,19 @@ func (a ActionToggleExtraWarnings) Handle(md *model) (gruid.Effect, bool) {
 
 func (a ActionToggleExtraWarnings) String() string {
 	if GameConfig.WarningsExtra {
-		return "Disable extra warnings"
+		return "关闭额外警告"
 	}
-	return "Enable extra warnings"
+	return "开启额外警告"
 }
 
 func (a ActionToggleExtraWarnings) Desc(_ *model) string {
 	var verb, current string
 	if GameConfig.WarningsExtra {
-		verb, current = "disables", "enabled"
+		verb, current = "关闭", "已开启"
 	} else {
-		verb, current = "enables", "disabled"
+		verb, current = "开启", "已关闭"
 	}
-	return fmt.Sprintf("Toggling this option %s extra confirmation prompt warnings.\n\nThose are triggered when getting @OFire@N or @OPoison@N, but also when some specific statuses like @BBerserk@N or @BLignification@N only have one turn remaining.\n\n@SCurrent setting: %s.@N", verb, current)
+	return fmt.Sprintf("切换此选项可%s额外确认警告。\n\n受到@O火焰@N或@O中毒@N影响时会触发警告；某些状态（如@B狂暴@N或@B木化@N）只剩一回合时也会触发。\n\n@S当前设置：%s。@N", verb, current)
 }
 
 // ActionSetKeys opens the keymap settings.
@@ -1168,9 +1168,9 @@ func (a ActionSetKeys) Handle(md *model) (gruid.Effect, bool) {
 
 func (md *model) setKeyBindingsTitle() {
 	if md.UsesDefaultKeybindings() {
-		md.menu.keys.SetBox(&ui.Box{Title: ui.Text("Key Bindings (default)").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
+		md.menu.keys.SetBox(&ui.Box{Title: ui.Text("按键绑定（默认）").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
 	} else {
-		md.menu.keys.SetBox(&ui.Box{Title: ui.Text("Key Bindings (custom)").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
+		md.menu.keys.SetBox(&ui.Box{Title: ui.Text("按键绑定（自定义）").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
 	}
 }
 
@@ -1192,26 +1192,26 @@ func (md *model) keysForAction(a Action) string {
 	for i := range ks {
 		ki := string(keys[i])
 		if ki == " " {
-			ki = "SPACE"
+			ki = "空格键"
 		}
 		ks[i] = ki
 	}
 	slices.Sort(ks)
-	return strings.Join(ks, " or ")
+	return strings.Join(ks, " 或 ")
 }
 
 func (a ActionSetKeys) String() string {
-	return "View/Customize keybindings"
+	return "查看/自定义按键绑定"
 }
 
 func (a ActionSetKeys) Desc(md *model) string {
 	var s string
 	if md.UsesDefaultKeybindings() {
-		s = "\n\n@SCurrently: default keybindings.@N"
+		s = "\n\n@S当前使用默认按键绑定。@N"
 	} else {
-		s = "\n\n@SCurrently: custom keybindings.@N"
+		s = "\n\n@S当前使用自定义按键绑定。@N"
 	}
-	return fmt.Sprintf("Opens a menu that allows to view and customize keybindings.%s", s)
+	return fmt.Sprintf("打开菜单以查看和自定义按键绑定。%s", s)
 }
 
 // UsesDefaultKeybindings reports whether default keybindings are currently in
@@ -1231,20 +1231,20 @@ func (a ActionViewMessages) Handle(md *model) (gruid.Effect, bool) {
 	for _, e := range md.g.Logs.Entries[len(md.pager.lines):] {
 		md.pager.lines = append(md.pager.lines, md.pager.markup.WithText(e.MText))
 	}
-	md.pager.pg.SetLines(md.pager.lines)
+	md.pager.pg.SetLines(wrapPanelLines(md.pager.lines))
 	md.pager.pg.SetCursor(gruid.Point{0, len(md.pager.lines)})
-	md.pager.pg.SetBox(&ui.Box{Title: ui.Text("Messages").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
+	md.pager.pg.SetBox(&ui.Box{Title: ui.Text("消息").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
 	md.mode = modePager
 	md.pager.mode = modePagerNormal
 	return nil, false
 }
 
 func (a ActionViewMessages) String() string {
-	return "View messages"
+	return "查看消息"
 }
 
 func (a ActionViewMessages) Desc(_ *model) string {
-	return "Opens a pager with previous message logs. The pager supports page up/down, mouse scrolling, and other basic less-like keybindings."
+	return "打开分页查看器，浏览之前的消息记录。支持翻页、鼠标滚动及常见分页快捷键。"
 }
 
 // ActionDump writes a dump with game statistics.
@@ -1253,8 +1253,8 @@ type ActionDump struct{}
 func (a ActionDump) Handle(md *model) (gruid.Effect, bool) {
 	msg, err := md.g.WriteDump()
 	if err != nil {
-		log.Printf("error writing dump: %v", err)
-		md.g.LogStyled("Error writing statistics.", logError)
+		log.Printf("写入统计文件失败：%v", err)
+		md.g.LogStyled("写入统计信息失败。", logError)
 	} else {
 		md.g.Log(msg)
 	}
@@ -1262,21 +1262,21 @@ func (a ActionDump) Handle(md *model) (gruid.Effect, bool) {
 	md.pager.mode = modePagerNormal
 	dump := md.g.DumpInGame()
 	stts := ui.Text(strings.TrimRight(dump, "\n")).WithMarkups(Markups).Lines()
-	md.pager.pg.SetLines(stts)
+	md.pager.pg.SetLines(wrapPanelLines(stts))
 	md.pager.pg.SetCursor(gruid.Point{0, 0})
-	md.pager.pg.SetBox(&ui.Box{Title: ui.Text("Game Summary").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
+	md.pager.pg.SetBox(&ui.Box{Title: ui.Text("游戏总结").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
 	return nil, false
 }
 
 func (a ActionDump) String() string {
-	return "Game summary"
+	return "游戏总结"
 }
 
 func (a ActionDump) Desc(_ *model) string {
 	if runtime.GOOS == "js" {
-		return "Writes game statistics below. Also opens in-game pager with the summary."
+		return "将游戏统计信息写在下方，也会在游戏内分页查看器中打开总结。"
 	}
-	return "Writes game statistics to a dump.txt file in the game’s data directory. Also opens in-game pager with the summary."
+	return "将游戏统计信息写入数据目录中的 dump.txt 文件，也会在游戏内分页查看器中打开总结。"
 }
 
 // ActionSaveQuit asks for quitting the game after saving.
@@ -1284,7 +1284,7 @@ type ActionSaveQuit struct{}
 
 func (a ActionSaveQuit) Handle(md *model) (gruid.Effect, bool) {
 	if err := md.g.Save(); err != nil {
-		log.Printf("error saving game: %v", err)
+		log.Printf("保存游戏失败：%v", err)
 		return nil, false
 	}
 	md.mode = modeQuitting
@@ -1292,11 +1292,11 @@ func (a ActionSaveQuit) Handle(md *model) (gruid.Effect, bool) {
 }
 
 func (a ActionSaveQuit) String() string {
-	return "Save and Quit"
+	return "保存并退出"
 }
 
 func (a ActionSaveQuit) Desc(_ *model) string {
-	return "Saves current progress and quits the game. The next time you start the game, it will directly resume from here."
+	return "保存当前进度并退出游戏。下次启动时将直接从此处继续。"
 }
 
 // ActionQuit asks for quitting the game, without saving.
@@ -1304,16 +1304,16 @@ type ActionQuit struct{}
 
 func (a ActionQuit) Handle(md *model) (gruid.Effect, bool) {
 	md.mode = modeQuitConfirmation
-	md.g.LogStyled("Do you really want to quit without saving? [y/N]", logConfirm)
+	md.g.LogStyled("确定不保存并退出吗？[y/N]", logConfirm)
 	return nil, false
 }
 
 func (a ActionQuit) String() string {
-	return "Quit (without saving)"
+	return "退出（不保存）"
 }
 
 func (a ActionQuit) Desc(_ *model) string {
-	return "Deletes any saved progress for current playthrough and quits the game."
+	return "删除本轮游戏的所有存档并退出。"
 }
 
 // ActionQuitConfirm quits the game.
@@ -1327,12 +1327,12 @@ func (a ActionQuitConfirm) Handle(md *model) (gruid.Effect, bool) {
 		md.mode = modeQuitting
 		err := RemoveSaveFile()
 		if err != nil {
-			log.Printf("Error removing save file: %v", err)
+			log.Printf("删除存档文件失败：%v", err)
 		}
 		RemoveReplay()
 		return gruid.End(), false
 	case confirmFalse:
-		md.g.Log("Keep playing, then.")
+		md.g.Log("那就继续游戏吧。")
 		md.mode = modeNormal
 	}
 	return nil, false
@@ -1367,11 +1367,11 @@ type ActionWizard struct{}
 func (a ActionWizard) Handle(md *model) (gruid.Effect, bool) {
 	switch md.g.Wizard.Mode {
 	case WizardNone:
-		md.g.LogStyled("Do you really want to enter Wizard Mode? (non-permadeath mode) [y/N]", logConfirm)
+		md.g.LogStyled("确定进入向导模式吗？（非永久死亡模式）[y/N]", logConfirm)
 		md.mode = modeWizardConfirmation
 	case WizardNormal:
 		if !md.g.Wizard.Extra {
-			md.g.LogStyled("Do you really want extra cheats? (reveal map) [y/N]", logConfirm)
+			md.g.LogStyled("确定启用额外作弊功能吗？（显示地图）[y/N]", logConfirm)
 			md.mode = modeWizardConfirmation
 		} else {
 			md.g.Wizard.Mode = WizardReveal
@@ -1388,7 +1388,7 @@ func (a ActionWizard) Handle(md *model) (gruid.Effect, bool) {
 }
 
 func (a ActionWizard) String() string {
-	return "Enter Wizard Mode (irreversible)"
+	return "进入向导模式（不可逆）"
 }
 
 // ActionWizardConfirm enters wizard-mode.
@@ -1401,23 +1401,23 @@ func (a ActionWizardConfirm) Handle(md *model) (gruid.Effect, bool) {
 	case confirmTrue:
 		if md.g.Wizard.Mode == WizardNone {
 			md.g.Wizard.Mode = WizardNormal
-			md.g.LogStyled("Wizard Mode enabled.", logSpecial)
-			md.g.StoryLog("Entered Wizard Mode")
+			md.g.LogStyled("向导模式已启用。", logSpecial)
+			md.g.StoryLog("已进入向导模式")
 		} else {
 			md.g.Wizard.Extra = true
 			md.g.Wizard.Mode = WizardReveal
 			md.targ.CancelExamine()
-			md.g.LogStyled("Extra cheats enabled.", logSpecial)
-			md.g.StoryLog("Enabled extra Wizard Mode cheats!")
+			md.g.LogStyled("额外作弊功能已启用。", logSpecial)
+			md.g.StoryLog("已启用向导模式额外作弊功能！")
 		}
 		md.mode = modeNormal
 		return nil, false
 	case confirmFalse:
 		md.mode = modeNormal
 		if md.g.Wizard.Mode == WizardNone {
-			md.g.Log("Keep playing normally, then.")
+			md.g.Log("那就正常继续游戏吧。")
 		} else {
-			md.g.Log("Don’t reveal map, then.")
+			md.g.Log("那就不显示地图吧。")
 		}
 	}
 	return nil, false
@@ -1433,22 +1433,22 @@ func (a ActionWizardNextLevel) Handle(md *model) (gruid.Effect, bool) {
 		return nil, false
 	}
 	if g.Map.Level == MapLevels {
-		g.Log("You’re already at the last level. Starting again!")
+		g.Log("你已经到达最后一层，重新开始！")
 		*g = Game{rand: g.rand, Mods: g.Mods, md: md, Wizard: g.Wizard}
 		spe := spiritEntity(g.Mods, primarySpirits[g.IntN(len(primarySpirits))])
 		md.targ.CancelExamine()
 		md.startNewGame(spe)
 		return nil, false
 	}
-	md.g.StoryLog("Wizard Mode: used “go to next level” cheat")
-	g.LogStyled("You use the “go to next level” cheat.", logSpecial)
+	md.g.StoryLog("向导模式：使用“前往下一层”作弊功能")
+	g.LogStyled("你使用了“前往下一层”作弊功能。", logSpecial)
 	g.NextLevel()
 	md.mode = modeNormal
 	return nil, false
 }
 
 func (a ActionWizardNextLevel) String() string {
-	return "Go to next level"
+	return "前往下一层"
 }
 
 // actionAuto handles automatic movement of all kinds. It is triggered when
@@ -1523,7 +1523,7 @@ func (md *model) autoCmd() gruid.Effect {
 }
 
 func (a actionAuto) String() string {
-	return "action on msgAuto"
+	return "自动行动消息处理"
 }
 
 // KbTargetingMode reports whether the action is used in keyboard targeting mode.
@@ -1554,7 +1554,7 @@ var helpKeys = []rune{'?', 'c', 's', 'i', 'S', 'm', 't'}
 
 func init() {
 	if len(helpActions) != len(helpKeys) {
-		panic("length mismatch between helpActions and helpKeys")
+		panic("帮助操作与按键列表长度不匹配")
 	}
 }
 
@@ -1569,7 +1569,7 @@ func (a ActionHelp) Handle(md *model) (gruid.Effect, bool) {
 		})
 	}
 	altBgEntries(entries)
-	md.menu.main.SetBox(&ui.Box{Title: ui.Text("Help Menu").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
+	md.menu.main.SetBox(&ui.Box{Title: ui.Text("帮助菜单").WithStyle(gruid.Style{}.WithFg(ColorYellow))})
 	md.menu.main.SetEntries(entries)
 	md.menu.main.SetActiveInvokable(0)
 	md.updateMenuActionDesc(0)
@@ -1579,11 +1579,11 @@ func (a ActionHelp) Handle(md *model) (gruid.Effect, bool) {
 }
 
 func (a ActionHelp) String() string {
-	return "Help"
+	return "帮助"
 }
 
 func (a ActionHelp) Desc(_ *model) string {
-	return "Opens a menu leading to various help topics."
+	return "打开帮助菜单，查看各主题说明。"
 }
 
 // ActionHelpDefaultKeys enters a help menu.
@@ -1595,11 +1595,11 @@ func (a ActionHelpDefaultKeys) Handle(md *model) (gruid.Effect, bool) {
 }
 
 func (a ActionHelpDefaultKeys) String() string {
-	return "Keybindings (default values)"
+	return "按键绑定（默认）"
 }
 
 func (a ActionHelpDefaultKeys) Desc(_ *model) string {
-	return "Shows a short one-page summary with most default keybindings."
+	return "显示一页简明说明，列出大多数默认按键绑定。"
 }
 
 func (md *model) updateKeysDescription(title string, actions []string) {
@@ -1620,45 +1620,45 @@ func (md *model) updateKeysDescription(title string, actions []string) {
 		}
 		lines = append(lines, stt)
 	}
-	md.pager.pg.SetLines(lines)
+	md.pager.pg.SetLines(wrapPanelLines(lines))
 	md.pager.pg.SetCursor(gruid.Point{0, 0})
 }
 
 func (md *model) KeysHelp() {
-	runKeys := "shift+arrows or HJKL"
+	runKeys := "Shift+方向键或HJKL"
 	if runtime.GOOS == "js" {
 		runKeys = "HJKL"
 	}
 	entries := []string{
-		"Basic Game Actions", "",
-		"Move or Attack", "arrows or hjkl or mouse left",
-		"Wait a turn", "“.” or ENTER or mouse left on @",
-		"Interact (Equip/Activate/…)", "e",
-		"Use inventory item", "i",
-		"Toggle keyboard examine mode", "x",
-		"Open menu", "SPACE or mouse right",
-		"Close menu, inventory…", "SPACE or ESC or mouse left outside",
-		"Advanced Game Actions", "",
-		"View previous messages", "m",
-		"Scroll description boxes up/down", "u/d or page up/down or mouse scroll",
-		"Examine next portal/menhir/rune", "> & =",
-		"Examine next totem/comestible", "! %",
-		"Examine previous/next monster", "- +",
-		"Run (auto-move in direction)", runKeys,
-		"Travel (auto-move to destination)", "“.” or ENTER in keyboard examine mode",
-		"Autoexplore (use with caution)", "o",
-		"Other Common Actions", "",
-		"Save and Quit", "S",
-		"Quit (without saving)", "Q",
+		"基本操作", "",
+		"移动或攻击", "方向键、hjkl 或鼠标左键",
+		"等待一回合", "“.”、回车键，或在 @ 上单击鼠标左键",
+		"互动（装备/激活/…）", "e",
+		"使用物品栏道具", "i",
+		"切换键盘查看模式", "x",
+		"打开菜单", "空格键或鼠标右键",
+		"关闭菜单、物品栏…", "空格键、ESC 或在窗口外单击鼠标左键",
+		"进阶操作", "",
+		"查看之前的消息", "m",
+		"上下滚动说明框", "u/d、PageUp/PageDown 或鼠标滚轮",
+		"查看下一个传送门/石碑/符文", "> & =",
+		"查看下一个图腾/食物", "! %",
+		"查看上一个/下一个怪物", "- +",
+		"奔跑（沿指定方向自动移动）", runKeys,
+		"旅行（自动前往目标地点）", "键盘查看模式下按“.”或回车键",
+		"自动探索（请谨慎使用）", "o",
+		"其他常用操作", "",
+		"保存并退出", "S",
+		"退出（不保存）", "Q",
 	}
-	md.updateKeysDescription("Keybindings (default values)", entries)
+	md.updateKeysDescription("按键绑定（默认）", entries)
 }
 
 // helpTopic opens the pager with the given title and text content.
 func (md *model) helpTopic(title, content string) {
-	text := ui.Text(content).WithMarkups(Markups).Format(78)
+	text := ui.Text(content).WithMarkups(Markups).Format(TextPanelWidth - 2)
 	stts := text.Lines()
-	md.pager.pg.SetLines(stts)
+	md.pager.pg.SetLines(wrapPanelLines(stts))
 	md.pager.pg.SetCursor(gruid.Point{0, 0})
 	md.mode = modePager
 	md.pager.mode = modePagerNormal
@@ -1669,73 +1669,73 @@ func (md *model) helpTopic(title, content string) {
 type ActionHelpCombat struct{}
 
 func (a ActionHelpCombat) Handle(md *model) (gruid.Effect, bool) {
-	md.helpTopic("Combat (Help)", combatHelpText())
+	md.helpTopic("战斗（帮助）", combatHelpText())
 	return nil, false
 }
 
 func (a ActionHelpCombat) String() string {
-	return "Combat"
+	return "战斗"
 }
 
 func (a ActionHelpCombat) Desc(_ *model) string {
-	return "Explains how various combat-related features work, including attack patterns and on-hit effects."
+	return "介绍战斗机制，包括攻击模式和命中效果。"
 }
 
 func combatHelpText() string {
 	return strings.TrimSpace(`
-@YTURN-BASED SYSTEM@N
+@Y回合制系统@N
 
-Shamogu is a turn-based game. Each actor acts once per turn: the player acts first, then the monsters do. Monsters act one after another in a non-predictable order, but except during some animations, you’ll only see the final state and often feel they acted all at once.
+Shamogu 是一款回合制游戏。每个行动者每回合行动一次：玩家先行动，然后是怪物。怪物行动顺序无法预测；除动画期间外，你通常只会看到最终状态，感觉它们像是同时行动。
 
-@YCOMBAT DAMAGE@N
+@Y战斗伤害@N
 
-Combat damage is affected by attack (A) and defense (D). Maximum damage is the minimum of attack A and 3. Higher values of A increase chances of higher damage when attacking, while higher values of D decrease that chance when defending. Zero damage represents a miss.
+战斗伤害受攻击力（A）和防御力（D）影响。最大伤害为攻击力 A 与 3 中的较小值。攻击力越高，攻击时造成较高伤害的概率越大；防御力越高，防御时受到较高伤害的概率越低。伤害为 0 表示未命中。
 
-Players under the @BFocus@N status effect and four-headed hydras perform four damage-rolls per attack, doing four times as much damage.
+处于@B专注@N状态的玩家和四头九头蛇每次攻击都会进行四次伤害判定，造成四倍伤害。
 
-Special effects like @BBerserk@N or @BDig@N may then increase effective total attack damage by one, bypassing defense and any maximum damage caps.
+@B狂暴@N或@B掘地@N等特殊效果可使有效总攻击伤害再增加 1，并无视防御及伤害上限。
 
-Combat damage is applied to an actor’s HP. Zero HP means death. There is no passive HP regeneration, so monsters never recover lost HP. The player can recover HP by eating some comestibles or by going through a portal.
+战斗伤害会扣除行动者的生命值（HP）。生命值归零即死亡。生命值不会自动恢复，因此怪物不会恢复已损失的生命。玩家可以通过食用食物或穿过传送门恢复生命。
 
-@YCURRENT DIRECTION@N
+@Y当前方向@N
 
-In the status bar, an arrow shows you the direction of your last movement or attack. That direction is used in various contexts by some effects and abilities, like when eating firebreath pepper, sprinting or jumping. The current direction is a player-specific feature.
+状态栏中的箭头表示你上次移动或攻击的方向。某些效果和能力会使用此方向，例如食用吐火椒、冲刺或跳跃。当前方向是玩家专属的机制。
 
-@YATTACK PATTERNS@N
+@Y攻击模式@N
 
-In Shamogu, both the player and the monsters may use one of several attack patterns.
+Shamogu 中的玩家和怪物都可能使用多种攻击模式。
 
-@CPlain@N attacks are the simplest kind of attack performed by some monsters. Such monsters attack when they are adjacent to you or when they perform a @Mfrontal charge@N from an adjacent position.
+@C普通@N攻击是部分怪物使用的基础攻击。它们会攻击相邻目标，也可能从相邻位置发起@M正面冲锋@N。
 
-@CFour-directional@N attacks affect all four adjacent foes. When charging, it affects foes adjacent to the new position. That means walking laterally does not save you from the charge of an adjacent monster with four-directional attacks! When fighting more than one foe at once, Four-Headed Hydra players’ attack attribute is increased by the number of foes.
+@C四向@N攻击会影响四个相邻方向上的敌人。冲锋时，则会攻击新位置周围的敌人。因此，横向移动无法躲开相邻四向攻击怪物的冲锋！同时对付多个敌人时，四头九头蛇玩家的攻击属性会随敌人数增加。
 
-@CRampaging@N attacks allow to charge from as far as you can see. When charging, there is a bonus of 1 to attack, except against lignified foes that resist forced movement.
+@C狂奔@N攻击可从视野范围内任意距离发起冲锋。冲锋攻击力 +1，但木化敌人抵抗强制移动。
 
-@CPushing@N attacks push foes one tile away, unbalancing them. When there’s another foe just behind, you perform an extra attack on them instead. Rampaging boars, as well as Rampaging Boar spirit players, perform pushing when charging from beyond a 2-tile range, and distances beyond a 4-tile range result in double @OImbalance@N duration. Earth dragons and players with @BDig@N may push with melee attacks, too.
+@C推撞@N攻击会将敌人推开一格并使其失衡。若敌人身后还有其他敌人，则会改为额外攻击后者。狂奔野猪及其灵体从两格以外冲锋时会推撞；距离超过四格时，@O失衡@N持续时间加倍。地龙和使用@B掘地@N的玩家也可通过近战推撞。
 
-@CRanged@N attacks are performed without moving from as far as you can see.
+@C远程@N攻击无需移动即可攻击视野范围内的目标。
 
-@CCatching@N attacks are ranged attacks that catch foes @Mon successful hits@N and move them next to you, unbalancing them. When catching a foe from afar, there is a bonus of 1 to attack. Catching from beyond a 4-tile range results in double @OImbalance@N duration.
+@C抓取@N攻击属于远程攻击，@M成功命中@N时会抓住敌人并将其拉到身边，使其失衡。从远处抓取时攻击力 +1；距离超过四格时，@O失衡@N持续时间加倍。
 
-@CRecoil@N is an extra attack effect for wind fox monsters, as well as Wind Fox spirit players. After an attack from within a 4-tile range, they may move backwards one tile when ranged, or two cells with extra wind noise when in melee.
+@C后撤@N是风狐怪物及其灵体的额外攻击效果。从四格内发起攻击后，远程攻击可能使其后退一格；近战攻击则可能后退两格并制造更大的风声。
 
-@CSpace-distorting@N attacks are ranged attacks that @Mswap positions@N on successful hits, but result in normal movement on misses. Any foes adjacent to the landing hit position are blinked away. Note that such attacks reverse your current direction. They also swap any clouds, but not the terrain.
+@C空间扭曲@N攻击属于远程攻击，@M命中时会交换双方位置@N，未命中时则正常移动。落点相邻的敌人会被闪烁传送走。此类攻击会反转你的当前方向，也会交换云雾位置，但不会改变地形。
 
-@CDragging@N attacks are melee attacks that drag foes backwards, unbalancing them. They’re performed by dragging alligators and Spinning Crocodile players.
+@C拖拽@N攻击属于近战攻击，会将敌人向后拖动并使其失衡。拖拽鳄鱼和旋转鳄鱼玩家会使用此攻击。
 
-@CSneak@N attacks are a two-phased attack pattern. When ranged, it works as a rampaging attack. In melee, a plain attack is followed by quick 2-tile retreat. Sneak attacks are performed by megabats and Vampiric Bat players.
+@C潜袭@N由两个阶段组成。远程时相当于狂奔攻击；近战时则先普通攻击，再迅速后退两格。巨蝠和吸血蝙蝠玩家会使用潜袭攻击。
 
-@MNote:@N crocodile’s dragging and bat’s retreat don’t happen when @Opoisoned@N nor when they would move you onto dangerous visible fire, unless you’re already on @OFire@N or would be protected by @BFoggy-Skin@N. The boar’s pushing charge and wind fox’s recoil don’t have any safety rules, but because recoil is a form of involuntary movement, it is at least unaffected by poison. Melee pushing with @BDig@N is restricted by poison when it requires player movement, but unbalancing and piercing effects still happen when pushing a monster against a wall or another monster.
+@M注意：@N鳄鱼的拖拽和蝙蝠的后退不会在你@O中毒@N或它们会把你移入可见危险火焰时触发；若你已经身处@O火焰@N中，或受@B雾肤@N保护，则不受此限制。野猪的推撞冲锋和风狐的后撤没有安全限制，不过后撤属于非自愿移动，不受中毒影响。使用@B掘地@N进行近战推撞时，若需要移动玩家则受中毒限制；但若将怪物撞上墙壁或其他怪物，失衡和穿刺效果仍会触发。
 
-@YON-HIT EFFECTS@N
+@Y命中效果@N
 
-Various monsters have attacks that may inflict status effects after a successful hit on the player.
+多种怪物的攻击命中玩家后可能施加状态效果。
 
-In some cases, the effect is guaranteed on hit, like when a fire llama spits at the player from afar, or when a blinking butterfly makes you blink.
+有些效果命中后必定触发，例如火焰羊驼从远处喷火，或闪烁蝴蝶使你闪烁传送。
 
-When the description says “may”, it means there is only a chance of inflicting the status on hit. In most cases, the chance scales simply with damage, with higher damage corresponding to higher chances. As a special case, phoenixes’ burning chance is reduced by imbalance, too, due to the difficulty of rebalancing with their large wings. Also, the dazing effect of cat’s space-distorting attacks scales with distance instead: lower chance and longer duration at long distances.
+说明中的“可能”表示命中后有一定概率施加状态。多数情况下，概率随伤害增加。凤凰的点燃概率还会受失衡影响，因为它们的大翅膀难以重新平衡。猫的空间扭曲攻击造成眩晕的概率则随距离变化：距离越远，概率越低、持续时间越长。
 
-The duration of detrimental statuses can be refreshed by further hits, but not that of positive ones like @BBerserk@N or @BLignification@N. Besides, further on-hit applications on the player are only half as likely until after the expiration turn, thanks to the benevolent intervention of your spirit ancestors. That player-specific protection is extended for an extra turn for @ODaze@N, @OFire@N and @OImbalance@N.
+后续命中可刷新负面状态的持续时间，但不能刷新@B狂暴@N或@B木化@N等正面状态。感谢灵体祖先的庇佑，玩家受到的后续命中状态施加概率会减半，直到状态结束后的回合；对@O眩晕@N、@O火焰@N和@O失衡@N，此保护还会额外延长一回合。
 `)
 }
 
@@ -1743,40 +1743,39 @@ The duration of detrimental statuses can be refreshed by further hits, but not t
 type ActionHelpStealth struct{}
 
 func (a ActionHelpStealth) Handle(md *model) (gruid.Effect, bool) {
-	md.helpTopic("Stealth (Help)", stealthHelpText())
+	md.helpTopic("潜行（帮助）", stealthHelpText())
 	return nil, false
 }
 
 func (a ActionHelpStealth) String() string {
-	return "Stealth"
+	return "潜行"
 }
 
 func (a ActionHelpStealth) Desc(_ *model) string {
-	return "Explains how various stealth-related features work, including monster mindstate and noise."
+	return "介绍潜行机制，包括怪物心智状态与噪音。"
 }
 
 func stealthHelpText() string {
 	return strings.TrimSpace(`
+Shamogu 中，潜行十分重要。怪物行为主要受两种机制影响：是否进入视野，以及噪音。
 
-In Shamogu, stealth plays an important role. There are two main mechanisms that determine monster behavior changes: presence in the field of view and noise.
+@Y怪物心智状态@N
 
-@YMONSTER MINDSTATE@N
+怪物可能处于@O游荡@N、@O守卫@N或@R追猎@N状态。守卫怪物会在某个地城区域附近巡逻，通常守护着图腾或传送门。游荡怪物会走得更远，可能前往地图上的任意位置，但倾向于附近有趣的地点。追猎怪物通常会前往最后一次看见你的地点；失去你的踪迹后，它们会转为游荡或守卫，并短暂搜寻附近区域，之后恢复原有行为。
 
-Monsters can be @Owandering@N, @Oguarding@N or @Rhunting@N. Guarding monsters walk around some vault location, often protecting a totem or portal. Wandering monsters take longer trips, possibly to any place in the map but with some bias toward nearby interesting places. Hunting monsters usually travel to the last location they saw you at; when they lose track of you, they become wandering or guarding again and briefly search around the nearby area before going back to their usual behavior.
+进入视野时，游荡和守卫怪物通常会花一回合注意到玩家并转为追猎状态，但也有例外。例如，炫目斑马玩家会立刻被察觉。饥饿鼠从远处闻到你，或巨蝠听到你时，也会立即开始追猎，即使它们仍在视野之外。此外，怪物有时会从视野外发起伏击冲锋，例如从碎石后冲出，攻击后立即开始追猎。
 
-When in view, wandering and guarding monsters normally spend a turn noticing the player and switching to hunting behavior. There are some exceptions to this rule. For example, Dazzling Zebra players are instantly noticeable. Also, when hungry rats smell you from afar or megabats hear you, they immediately start hunting you even if they’re still out of view. Moreover, any monster may perform by chance an ambushing charge from out-of-view, like behind some rubble, attacking and becoming hunting at once.
+@Y噪音@N
 
-@YNOISE@N
+战斗及某些其他行动会产生噪音，游戏日志会用拟声词表示。部分噪音只能传到几格外，另一些最远可传至视野范围的两倍。噪音可能只是轻轻的“砰！”，也可能是响亮的“咆哮！”或“咔！”、麻烦的“轰隆！”，甚至更令人警觉的“叮铃！”。怪物会前往调查噪音来源。
 
-Combat and some other actions produce noise, as shown with onomatopoeias in the game logs. Some noises can be heard from a few tiles away only, while others may reach farther, up to two times the view range in the worst case. Possible noises include a gentle “Smash!”, a more serious “ROAR!” or “CRACK!”, a problematic “POP-BOOM!”, or an even more alarming “RING-RING!”. Beware that monsters will investigate the source of those noises.
+Shamogu 还会用视觉符号显示视野外怪物发出的声音：@R脚步声@N、@O轻微脚步声@N、@G窸窣声@N、@C拍翼声@N和@M沉重的脚步声@N。怪物听不见你的脚步声，或者至少它们不在意这么轻微的声音！
 
-Shamogu also shows visually the sound made by monsters out of view: @Rfootsteps@N, @Olight footsteps@N, @Gcreep noise@N, @Cflapping of wings@N, and @Mheavy footsteps@N. Note that monsters cannot hear your footsteps or, at the very least, they don’t care about such small noises!
+拥有“听觉敏锐”特性的玩家和怪物能听到更远处的声音。拥有“听觉迟钝”特性的玩家听不清@G窸窣声@N和@C拍翼声@N，但仍能正常听见其他声音。
 
-Players and monsters with the “good hearing” trait may hear sounds farther than usual. Players with “bad hearing” cannot hear @Gcreep noises@N nor @Cflapping of wings@N well, but they hear others sounds normally.
+@Y时限@N
 
-@YCLOCK@N
-
-When you spend more than a thousand turns on a given map, the dungeon core will detect your location and will make monsters hunt you on their next trip. A new pair of hunting blazing golems will be sent, too. Beware of playing too slowly!
+在同一层停留超过一千回合后，地城核心会发现你的位置，并让怪物在下次行动时追猎你；还会派来一对新的烈焰魔像。别磨蹭太久！
 `)
 }
 
@@ -1784,29 +1783,29 @@ When you spend more than a thousand turns on a given map, the dungeon core will 
 type ActionHelpItems struct{}
 
 func (a ActionHelpItems) Handle(md *model) (gruid.Effect, bool) {
-	md.helpTopic("Items (Help)", itemHelpText())
+	md.helpTopic("物品（帮助）", itemHelpText())
 	return nil, false
 }
 
 func (a ActionHelpItems) String() string {
-	return "Items"
+	return "物品"
 }
 
 func (a ActionHelpItems) Desc(_ *model) string {
-	return "Gives an overview about the various kinds of items found in the game."
+	return "概述游戏中的各类物品。"
 }
 
 func itemHelpText() string {
 	return strings.TrimSpace(`
-@CComestibles@N are found in every level. When the player is over them, pressing the @MInteract Key@N(e) allows to pick them. When your inventory is full, you’ll have to select a comestible to leave on the ground. Opening the @MInventory@N(i) allows to eat an equipped comestible or any comestible on the ground.
+@C食物@N每层都会出现。站在食物上时，按@M互动键@N（e）即可拾取。物品栏已满时，你需要选择一份食物留在地上。打开@M物品栏@N（i）即可吃掉已装备的食物或地上的任意食物。
 
-@CTotems@N are found once per level. By pressing the @MInteract Key@N(e), their spirit may either be chosen as a new secondary spirit or used to upgrade one of your existing spirits. Opening the @MInventory@N(i) allows then to use your chosen spirits. Beware that monsters that see you choosing a spirit will go berserk!
+@C图腾@N每层出现一次。按@M互动键@N（e）可以选择其中的灵体作为新的副灵体，或用于升级现有灵体。之后打开@M物品栏@N（i）即可使用已选灵体。注意：看见你选择灵体的怪物会陷入狂暴！
 
-@CMenhirs@N are found in every level. Pressing the @MInteract Key@N(e) will activate them.
+@C石碑@N每层都会出现。按@M互动键@N（e）即可激活。
 
-@CPortals@N are found once per level. Pressing the @MInteract Key@N(e) will make you reach the next map level. When doing so, spirit charges and HP are restored. Occasionally, you’ll come across an extra malfunctioning portal whose activation will frighten nearby monsters.
+@C传送门@N每层出现一次。按@M互动键@N（e）即可前往下一层，并补满灵体充能和生命值。偶尔还会遇到额外的故障传送门，激活后会吓跑附近的怪物。
 
-@CRunes@N are static traps found in every level. They are triggered when the player or a monster steps on them. Wandering monsters avoid them, but hunting ones do not.
+@C符文@N是每层都会出现的固定陷阱。玩家或怪物踩上去时会触发。游荡中的怪物会避开符文，追猎中的怪物则不会。
 `)
 }
 
@@ -1814,17 +1813,17 @@ func itemHelpText() string {
 type ActionHelpMods struct{}
 
 func (a ActionHelpMods) Handle(md *model) (gruid.Effect, bool) {
-	title := "Mods (Help)"
+	title := "模组（帮助）"
 	n := md.g.modCount()
 	if n == 0 {
-		md.helpTopic(title, "You haven’t enabled any expansion or challenge mods. You’re playing the base game.\n\nMods are enabled through the Mod Selection menu. You can access it from the New Game menu by pressing TAB or SPACE.")
+		md.helpTopic(title, "你尚未启用任何扩展或挑战模组，当前游玩的是基础游戏。\n\n可在模组选项菜单启用模组；在新游戏菜单按 TAB 或空格键即可打开该菜单。")
 		return nil, false
 	}
 	var sb strings.Builder
 	if n == 1 {
-		sb.WriteString("You have enabled the mod below.")
+		sb.WriteString("你已启用以下模组：")
 	} else {
-		fmt.Fprintf(&sb, "You have enabled the %d mods below.", n)
+		fmt.Fprintf(&sb, "你已启用以下 %d 个模组：", n)
 	}
 	for _, m := range GameMods {
 		if !md.g.Mod(m) {
@@ -1832,7 +1831,7 @@ func (a ActionHelpMods) Handle(md *model) (gruid.Effect, bool) {
 		}
 		fmt.Fprintf(&sb, "\n\n@Y%s@N\n\n%s", m.String(), m.Desc())
 		if s := modExtraInfo(m); s != "" {
-			sb.WriteString("\n\n@CExtra Info@N\n\n")
+			sb.WriteString("\n\n@C补充说明@N\n\n")
 			sb.WriteString(s)
 		}
 	}
@@ -1843,75 +1842,75 @@ func (a ActionHelpMods) Handle(md *model) (gruid.Effect, bool) {
 func modExtraInfo(m Mod) string {
 	switch m {
 	case ModCorruptedDungeon:
-		return `The wandering or guarding behavior of monsters is hidden with Corrupted Dungeon. While most of the time the roles remain the same as in the base game, you’ll occasionally have to guess based on actual behavior.
+		return `启用“腐化地城”后，怪物的游荡或守卫行为会被隐藏。大多数时候，它们的职责与基础游戏相同，但你偶尔需要根据实际行动猜测其行为。
 
-Various thematic levels of diverse rarity may appear. They can be quite surprising!
+游戏中可能出现多种主题楼层，出现概率各不相同，内容也可能相当出人意料！
 
-Sometimes, map corruption events happen. In particular, lots of long-lasting fog may spawn at once in the whole level. Beware however that this event is accompanied by a reduction in foliage and rubble around the map, so the temporarily reduced visibility progressively switches to an increased visibility.`
+有时会发生地图腐化事件。尤其要注意，整层可能同时生成大量持续较久的雾气。不过，事件也会减少地图上的植物和瓦砾，因此视野会先暂时缩小，随后逐步扩大。`
 	case ModAdvancedSpirits:
-		return `Some advanced secondary spirit traits are a bit tricky to use or understand.
+		return `部分高级副灵体特性较难理解或运用。
 
-Zebra’s “dazzling” trait means that any attack directed at you will be redirected to any monster just on your other side. It hence encourages weird positioning tactics. Also, with Zebra, monsters notice you instantly, without losing a turn, so beware of sudden ranged attacks during exploration.
+斑马的“炫目”特性会把指向你的攻击转移给你另一侧紧邻的怪物，因此需要采用特别的站位策略。此外，斑马会让怪物立刻发现你，不会让怪物损失一个回合；探索时要小心突然遭到远程攻击。
 
-The Lion’s roaring happens on first sight, but detecting a monster first beyond view with @BClarity@N will prevent the roaring. Fear duration is 4-5, with 4 being more likely a short distances, because monsters get over their Fear more quickly when the danger is close.
+狮子会在初次看见怪物时咆哮，但若你先在视野外通过@B清明@N感知到怪物，就能避免咆哮。恐惧持续 4 至 5 回合，距离较近时更可能持续 4 回合，因为危险越近，怪物越快克服恐惧。
 
-The Gawalt weakens by 1 damage any hits doing more than 2 base damage and two thirds of the hits doing 2 base damage. Accuracy is preserved.
+獾会使基础伤害超过 2 的攻击伤害降低 1 点，也会使造成 2 点基础伤害的攻击中约三分之二降低 1 点伤害，但不会影响命中率。
 
-The Bear ignores any special requirements for eating rare comestibles.
+熊会忽略食用稀有食物的特殊要求。
 
-When the Elephant is in a dead-end or the Gawalt is on a menhir tile, wandering monsters don’t notice you, but hunting monsters still see you.
+大象处于死路，或獾站在石碑格上时，游荡怪物不会注意到你，但追猎中的怪物仍能看见你。
 
-The Chicken not triggering traps is as simple as it sounds, but given how wandering monsters avoid traps, it has subtle stealth implications.
+鸡不会触发陷阱，规则看似简单；但由于游荡怪物会避开陷阱，这也会带来一些微妙的潜行影响。
 
-@MNote.@N Unless combined with Totem Conditions, this mod makes regular spirits rarer early on than advanced ones, to make it harder to skip those.`
+@M注意：@N若未与“图腾条件”同时启用，此模组会让普通灵体在游戏前期比高级灵体更稀有，使你更难跳过高级灵体。`
 	case ModTotemConditions:
-		return `Be careful while choosing spirits: some totem curses may replace existing curses on upgrade or even apply a curse on any upgrade (including for primary spirit!). Watch closely the nature of punishment: often, difficult restrictions have softer punishments when you fail.
+		return `选择灵体时请多加留意：升级时，某些图腾诅咒可能替换已有诅咒；甚至任何升级都可能施加诅咒（包括主灵体升级）！仔细观察惩罚的性质：限制越困难，失败时的惩罚往往越轻。
 
-Don’t be too afraid of losing a spirit or two: each run generates an extra non-empty totem, so there are now two extra more than necessary to complete your build. Also, when a spirit leaves, time freezes for a few turns, giving you some respite to adjust.
+不必太担心失去一两个灵体：每局都会额外生成一个非空图腾，因此多出的图腾比完成构筑所需数量多两个。此外，灵体离开时，时间会冻结数回合，让你有喘息和调整的机会。
 
-Curses that ask to “complete a full level” exclude the level in which you got the curse. The curse that says “you move by more than one tile in a turn” only cares about your final position after a full turn, so beware of frogs catching you from afar or butterflies blinking you away!
+要求“完成整层”的诅咒不包括你获得诅咒所在的楼层。“一回合移动超过一格”的诅咒只检查整回合结束后的最终位置，因此要小心青蛙从远处追上你，或蝴蝶将你闪现带走！
 
-@CConditional comestibles@N are special comestibles that can only be eaten under specific circumstances. Some are specific to this mod (oyster, potato, chestnut) and some others have non-conditional variants in base game (acorn, bean, fungus, rose, snail). Conditional comestibles are more frequent than rare comestibles in base game, particularly later on.
+@C条件食物@N是只能在特定情况下食用的特殊食物。有些是此模组独有的（牡蛎、土豆、栗子），另一些在基础游戏中也有普通版本（橡子、豆子、菌类、玫瑰、蜗牛）。条件食物比基础游戏中的稀有食物更常见，尤其在游戏后期。
 
-@MNote.@N When this mod is combined with Advanced Spirits, those aren’t more frequent than regular ones early on anymore. Instead, they sometimes get softer curses to help make them more appealing. Also, when No Recharges is on, some curses are disabled or adjusted for balance.`
+@M注意：@N与“高级灵体”同时启用时，条件食物在游戏前期不再比普通食物更常见，而是有时会带来较轻的诅咒，使其更有吸引力。此外，启用“无充能”时，部分诅咒会被禁用或调整以维持平衡。`
 	default:
 		return ""
 	}
 }
 
 func (a ActionHelpMods) String() string {
-	return "Mods"
+	return "模组"
 }
 
 func (a ActionHelpMods) Desc(_ *model) string {
-	return "Lists enabled mods along with their descriptions."
+	return "列出已启用的模组及其说明。"
 }
 
 // ActionHelpStatuses opens the log message viewer.
 type ActionHelpStatuses struct{}
 
 func (a ActionHelpStatuses) Handle(md *model) (gruid.Effect, bool) {
-	md.helpTopic("Statuses (Help)", statusesHelpText(md.g))
+	md.helpTopic("状态（帮助）", statusesHelpText(md.g))
 	return nil, false
 }
 
 func (a ActionHelpStatuses) String() string {
-	return "Statuses"
+	return "状态"
 }
 
 func (a ActionHelpStatuses) Desc(_ *model) string {
-	return "Explains in detail how the various status effects work, as well as the color conventions."
+	return "详细说明各种状态效果及颜色标记的含义。"
 }
 
 func statusesHelpText(g *Game) string {
 	var sb strings.Builder
-	sb.WriteString(`@YCOLORS@N
+	sb.WriteString(`@Y颜色说明@N
 
-In the status bar and descriptions, positive status effects are shown as @BBlue@N and negative ones are @OOrange@N. They last for a certain number of turns, shown between parens. Statuses end at the end of your turn, before monsters act, so you have to sometimes be careful before expiration. On the last turn, good statuses show as @CCyan@N if they are normally relevant during your turn and the monsters’, @VViolet@N if they have an effect on your turn only, and @SGrey@N if they don’t have an effect during your turn.
+状态栏和说明中，正面状态以@B蓝色@N显示，负面状态以@O橙色@N显示。状态会持续若干回合，回合数标在括号中。状态在你的回合结束、怪物行动之前到期，因此有时需要留意状态即将结束。持续的最后一回合中，若正面状态在你和怪物行动时均有效，则显示为@C青色@N；若只在你的回合生效，则显示为@V紫色@N；若在你的回合不生效，则显示为@S灰色@N。
 
-On the map, monster color may change depending on active status effects.  By default, status-free wandering monsters are @OOrange@N and hunting monsters are @RRed@N. @MMagenta@N indicates a positive status. @YYellow@N indicates both positive and negative statuses. @GGreen@N indicates a negative status. @CCyan@N indicates two or more negative statuses.`)
+地图上怪物的颜色可能随其当前状态改变。默认情况下，无状态的游荡怪物为@O橙色@N，正在追猎的怪物为@R红色@N。@M洋红色@N表示正面状态；@Y黄色@N表示同时具有正面和负面状态；@G绿色@N表示负面状态；@C青色@N表示具有两种或更多负面状态。`)
 	sb.WriteString("\n\n")
-	sb.WriteString(`@YSTATUSES@N`)
+	sb.WriteString(`@Y状态列表@N`)
 	sb.WriteString("\n\n")
 	pa := g.PlayerActor()
 	for i, desc := range statusDesc {
@@ -1920,7 +1919,7 @@ On the map, monster color may change depending on active status effects.  By def
 			continue
 		}
 		color := statusColor(st, 42)
-		fmt.Fprintf(&sb, "@%c%s@N (@%c%s@N). ", color, st.Name(), color, g.StatusAbbr(pa, st))
+		fmt.Fprintf(&sb, "@%c%s@N（@%c%s@N）。", color, st.Name(), color, g.StatusAbbr(pa, st))
 		sb.WriteString(desc)
 		details := st.Details()
 		if details != "" {
@@ -1936,60 +1935,60 @@ On the map, monster color may change depending on active status effects.  By def
 type ActionHelpTips struct{}
 
 func (a ActionHelpTips) Handle(md *model) (gruid.Effect, bool) {
-	md.helpTopic("Tips (Help)", tipsHelpText())
+	md.helpTopic("提示（帮助）", tipsHelpText())
 	return nil, false
 }
 
 func (a ActionHelpTips) String() string {
-	return "Tips"
+	return "提示"
 }
 
 func (a ActionHelpTips) Desc(_ *model) string {
-	return "Provides various tips for new players."
+	return "为新玩家提供一些实用提示。"
 }
 
 func tipsHelpText() string {
 	return strings.TrimSpace(`
-@YGENERAL TIPS@N
+@Y一般提示@N
 
-Shamogu is a @Mturn-based@N game: take your time when in perilous situations!
+Shamogu 是一款@M回合制@N游戏：遇到危险时不必慌张，可以从容思考！
 
-Always check your inventory to see if some spirit ability or comestible can help in your situation. The sooner is often the better!
+经常检查物品栏，看看灵体能力或食物能否帮你应对当前局面。通常越早使用越好！
 
-Wasting spirit charges and comestibles is bad, but dying without using them is worse!
+浪费灵体充能和食物固然可惜，但带着它们死去更糟！
 
-Most items and abilities have several effects and can be used for several purposes. For example, barking or freezing time may be useful both when attacking and fleeing, but freezing time can also help wait for some problematic status effect to end.
+多数物品和能力都有多种效果与用途。例如，吠叫或冻结时间既可用于攻击，也可用于逃跑；冻结时间还可以拖到棘手状态结束。
 
-@YCOMBAT TIPS@N
+@Y战斗提示@N
 
-Try to always get the @Mfirst hit@N against monsters. In particular, avoid moving yourself in front of ranged or rampaging monsters. Zigzag if necessary. Don’t forget that even plain melee monsters can charge frontally from one tile away!
+尽量先于怪物出手，争取@M先攻@N。尤其要避免走到远程或狂暴怪物的正前方，必要时可以曲折移动。别忘了，即使普通近战怪物也能从一格外正面冲锋！
 
-Try to learn the characteristics of each kind of monster. You can examine monsters to see their attack, defense and special traits.
+熟悉各类怪物的特点。检查怪物可以查看其攻击、防御和特殊特性。
 
-Remember that monsters with N attack can only hit for the minimum of N and 3 damage at most, except for burning phoenixes and ranged fire llamas that may burn you, and four-headed hydras that perform four damage-rolls per attack.
+攻击值为 N 的怪物，单次最多造成 N 与 3 中较小的伤害；燃烧凤凰和远程喷火羊驼可能使你着火，四头九头蛇每次攻击则会进行四次伤害判定。
 
-Some ranged monsters, like fire llamas or lashing frogs, are more dangerous ranged than in melee. You may sometimes want to force melee even if you’re ranged too!
+有些远程怪物，例如喷火羊驼或抽打青蛙，远程攻击比近战更危险。即使你也有远程攻击，有时仍应设法贴近它们！
 
-Various monsters have special attacks. For example, acid mounds ignore defense, and venomous vipers may poison you.
+许多怪物拥有特殊攻击。例如酸液丘会无视防御，毒蛇可能使你中毒。
 
-@YSTEALTH TIPS@N
+@Y潜行提示@N
 
-Killing all the monsters does not provide any benefit. So, once you have enough food items and don’t need more totems or already found one, you can skip exploring the rest of the map and go through a portal to the next level. Also, missing a totem or two is acceptable.
+杀光所有怪物并无额外好处。食物充足、不再需要图腾，或已经找到图腾后，可以不探索地图剩余部分，直接通过传送门前往下一层。漏掉一两个图腾也没关系。
 
-Monsters usually give up quickly their search once they don’t see you: use foliage and rubble to lose them. Beware of rats that hunt you by smell, though.
+怪物看不见你后通常很快就会放弃搜索；利用植物和瓦砾摆脱追踪。不过要小心会凭气味追猎你的老鼠。
 
-Watch out for @Mfootstep noise@N: while going through dense foliage, it can be very helpful to avoid unwanted encounters.
+留意@M脚步声@N：穿过茂密植物时，控制脚步声有助于避免不必要的遭遇。
 
-@YCONFIGURATION TIPS@N
+@Y配置提示@N
 
-If you often get surprised by @OFire@N or @OPoison@N and get hurt by mistake, you may want to enable extra warnings in the configuration options. Those warnings also stop you when @BBerserk@N or @BLignification@N is about to expire.
+如果你常被@O火焰@N或@O毒素@N打个措手不及，可以在配置中启用额外警告。状态@B狂暴@N或@B木化@N即将结束时，这些警告也会提醒你。
 
-@YWIZARD MODE@N
+@Y向导模式@N
 
-While the recommended way to discover the game is to progressively improve your skills by analyzing and enjoying your previous deaths, frustrated casual players should consider enabling @MWizard Mode@N(W) before giving up. Without further enabling extra cheats, it works as a kind of “adventure mode” that simply resurrects you each time you die. Resurrections are recorded in the game’s timeline, so you can check later how many lives you spent and try to do better next time until you can win in the default permadeath mode.
+建议通过复盘并享受每次失败，逐步提升技巧来认识游戏。如果你因此感到沮丧，可以在放弃前尝试启用@M向导模式@N（W）。无需开启其他作弊功能，它就像一种“冒险模式”，每次死亡都会让你复活。复活记录在游戏时间线中，你可以查看消耗了几条命，并继续尝试，直到能在默认的永久死亡模式中获胜。
 
-@YCHALLENGE TIPS@N
+@Y挑战提示@N
 
-If, on the contrary, you find Shamogu too easy, you’re encouraged to try the various expansion and challenge mods accessible after pressing TAB or SPACE in the new game menu!
+如果你觉得 Shamogu 太简单，可以在新游戏菜单按 TAB 或空格键，试试各种扩展和挑战模组！
 `)
 }

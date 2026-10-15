@@ -89,7 +89,7 @@ func (g *Game) SeeEntities() {
 // position of the given entity.
 func (g *Game) SeeEntity(i ID, ei *Entity) {
 	if g.InFOV(ei.P) {
-		g.SenseEntity(i, "see")
+		g.SenseEntity(i, "看见")
 	} else if g.InFOV(ei.KnownP) {
 		ei.KnownP = InvalidPos
 	}
@@ -111,9 +111,9 @@ func (g *Game) SenseEntity(i ID, verb string) {
 			if !ri.IsAlive() {
 				break
 			}
-			g.Logf("You %s %s.", verb, One(ei.Name))
+			g.Logf("你%s了%s。", verb, One(ei.Name))
 			if ri.DoesAny(MonsNotable) {
-				g.StoryLogf("Saw %s (distance: %d)", One(ei.Name), g.ppDist(ei.P))
+				g.StoryLogf("发现%s（距离：%d）", One(ei.Name), g.ppDist(ei.P))
 			}
 			if !g.InFOV(ei.P) {
 				break
@@ -121,7 +121,7 @@ func (g *Game) SenseEntity(i ID, verb string) {
 			pa := g.PlayerActor()
 			switch {
 			case pa.DoesAny(Elephanty) && ri.Is(HungryRat):
-				g.Logf("You trumpet at the %s", ei.Name)
+				g.Logf("你对%s吹响号角", ei.Name)
 				g.MakeNoise(g.PP(), NoiseTrumpet)
 			case pa.DoesAny(ScaryRoar):
 				// Scary roar at foe on first sight.
@@ -129,7 +129,7 @@ func (g *Game) SenseEntity(i ID, verb string) {
 				// the monster through Clarity. May
 				// happen several times in a turn if
 				// you see several monsters at once.
-				g.Logf("You roar at the %s", ei.Name)
+				g.Logf("你朝%s发出咆哮", ei.Name)
 				pp := g.PP()
 				g.md.RoarAnimation(pp)
 				g.MakeNoise(pp, NoiseRoar)
@@ -145,29 +145,29 @@ func (g *Game) SenseEntity(i ID, verb string) {
 				g.PutStatus(i, ri, StatusFear, d)
 			}
 		case *Comestible:
-			g.LogfStyled("You %s %s.", logNotable, verb, One(ei.Name))
-			g.StoryLogf("Spotted %s (distance: %d)", One(ei.Name), g.ppDist(ei.P))
+			g.LogfStyled("你%s了%s。", logNotable, verb, One(ei.Name))
+			g.StoryLogf("发现%s（距离：%d）", One(ei.Name), g.ppDist(ei.P))
 		case *Spirit:
-			g.LogfStyled("You %s %s totem.", logNotable, verb, One(ei.Name))
-			g.StoryLogf("Spotted %s totem (distance: %d)", One(ei.Name), g.ppDist(ei.P))
+			g.LogfStyled("你%s了%s图腾。", logNotable, verb, One(ei.Name))
+			g.StoryLogf("发现%s图腾（距离：%d）", One(ei.Name), g.ppDist(ei.P))
 			g.cackleAt(ei.P)
 		case *EmptyTotem:
-			g.LogStyled("You see an empty totem.", logNotable)
-			g.StoryLogf("Spotted an empty totem (distance: %d)", g.ppDist(ei.P))
+			g.LogStyled("你看见一个空图腾。", logNotable)
+			g.StoryLogf("发现空图腾（距离：%d）", g.ppDist(ei.P))
 		case *CorruptionOrb:
-			g.LogfStyled("You %s the Orb of Corruption!", logNotable, verb)
-			g.StoryLogf("Found the Orb of Corruption (distance: %d)", g.ppDist(ei.P))
+			g.LogfStyled("你%s了腐化魔法球！", logNotable, verb)
+			g.StoryLogf("发现腐化魔法球（距离：%d）", g.ppDist(ei.P))
 			g.cackleAt(ei.P)
 		case *RunicTrap:
-			g.LogfStyled("You %s %s.", logNotable, verb, One(ei.Name))
-			g.StoryLogf("Spotted %s (distance: %d)", One(ei.Name), g.ppDist(ei.P))
+			g.LogfStyled("你%s了%s。", logNotable, verb, One(ei.Name))
+			g.StoryLogf("发现%s（距离：%d）", One(ei.Name), g.ppDist(ei.P))
 		case *Portal:
-			g.LogfStyled("You %s %s.", logNotable, verb, One(ei.Name))
-			g.StoryLogf("Discovered %s (distance: %d)", One(ei.Name), g.ppDist(ei.P))
+			g.LogfStyled("你%s了%s。", logNotable, verb, One(ei.Name))
+			g.StoryLogf("发现%s（距离：%d）", One(ei.Name), g.ppDist(ei.P))
 			g.cackleAt(ei.P)
 		default:
-			g.LogfStyled("You %s %s.", logNotable, verb, One(ei.Name))
-			g.StoryLogf("Discovered %s (distance: %d)", One(ei.Name), g.ppDist(ei.P))
+			g.LogfStyled("你%s了%s。", logNotable, verb, One(ei.Name))
+			g.StoryLogf("发现%s（距离：%d）", One(ei.Name), g.ppDist(ei.P))
 		}
 	}
 	ei.KnownP = ei.P
@@ -203,7 +203,7 @@ func (g *Game) senseMonsters() {
 			continue
 		}
 		if SensingRange(pp, ei.P) {
-			g.SenseEntity(i, "sense")
+			g.SenseEntity(i, "感知到")
 			g.SensePassable(ei.P)
 		}
 	}

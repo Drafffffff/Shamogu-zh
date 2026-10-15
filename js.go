@@ -84,8 +84,8 @@ func newMainMenu() *mainMenu {
 	md.menu = ui.NewMenu(ui.MenuConfig{
 		Grid: gruid.NewGrid(UIWidth/2, 3),
 		Entries: []ui.MenuEntry{
-			{Text: ui.Text("- (P)lay"), Keys: []gruid.Key{"p", "P"}},
-			{Text: ui.Text("- (R)eplay"), Keys: []gruid.Key{"r", "R"}},
+			{Text: ui.Text("- (P)开始游戏"), Keys: []gruid.Key{"p", "P"}},
+			{Text: ui.Text("- (R)回放"), Keys: []gruid.Key{"r", "R"}},
 		},
 		Style: style,
 	})
@@ -119,7 +119,7 @@ func (md *mainMenu) Update(msg gruid.Msg) gruid.Effect {
 
 func (md *mainMenu) Draw() gruid.Grid {
 	md.gd.Fill(gruid.Cell{Rune: ' '})
-	ui.Textf("Shamanic Mountain Guardian - Shamogu %s", Version).WithStyle(gruid.Style{}.WithFg(ColorMagenta)).
+	ui.Textf("萨满山灵守护者 · Shamogu %s", Version).WithStyle(gruid.Style{}.WithFg(ColorMagenta)).
 		Draw(md.gd.Slice(gruid.NewRange(-25+UIWidth/2, 5, UIWidth, UIHeight)))
 	gd := md.gd.Slice(gruid.NewRange(-17+UIWidth/2, 7, UIWidth, UIHeight))
 	drawGamePicture(gd)
@@ -147,7 +147,7 @@ func RunGame() error {
 		} else {
 			rl, err := GetItem(replock)
 			if err != nil {
-				log.Printf("replock: %v", err)
+				log.Printf("回放锁错误：%v", err)
 			}
 			if rl != nil {
 				// save ongoing game replay
@@ -158,14 +158,14 @@ func RunGame() error {
 	rl, err := GetItem(replock)
 	if rl == nil {
 		if err != nil {
-			log.Printf("replock: %v", err)
+			log.Printf("回放锁错误：%v", err)
 		}
 		// new game: remove old replay
 		RemoveReplay()
 	}
 	replay, err := GetItem(repit)
 	if err != nil {
-		log.Printf("get replay: %v", err)
+		log.Printf("读取回放失败：%v", err)
 	} else if replay != nil {
 		repw.Write(replay)
 	}
@@ -182,16 +182,16 @@ func RunGame() error {
 func RunReplay() error {
 	replay, err := GetItem(repit)
 	if err != nil {
-		return fmt.Errorf("replay loading: %v", err)
+		return fmt.Errorf("载入回放失败：%v", err)
 	}
 	if replay == nil {
-		return errors.New("no replay found")
+		return errors.New("没有找到回放")
 	}
 	repr := &bytes.Buffer{}
 	repr.Write(replay)
 	fd, err := gruid.NewFrameDecoder(repr)
 	if err != nil {
-		return fmt.Errorf("frame decoder: %v", err)
+		return fmt.Errorf("帧解码器错误：%v", err)
 	}
 	gd := gruid.NewGrid(UIWidth, UIHeight)
 	rep := ui.NewReplay(ui.ReplayConfig{
@@ -217,7 +217,7 @@ func DataDir() (string, error) {
 func GetItem(item string) ([]byte, error) {
 	storage := js.Global().Get("localStorage")
 	if storage.Type() != js.TypeObject {
-		return nil, errors.New("localStorage not found")
+		return nil, errors.New("未找到浏览器本地存储")
 	}
 	save := storage.Call("getItem", item)
 	if save.Type() != js.TypeString {
@@ -236,7 +236,7 @@ func GetItem(item string) ([]byte, error) {
 func SetItem(item string, value []byte) error {
 	storage := js.Global().Get("localStorage")
 	if storage.Type() != js.TypeObject {
-		return errors.New("localStorage not found")
+		return errors.New("未找到浏览器本地存储")
 	}
 	s := base64.StdEncoding.EncodeToString(value)
 	storage.Call("setItem", item, s)
@@ -247,7 +247,7 @@ func SetItem(item string, value []byte) error {
 func RemoveItem(item string) {
 	storage := js.Global().Get("localStorage")
 	if storage.Type() != js.TypeObject {
-		log.Print("localStorage not found")
+		log.Print("未找到浏览器本地存储")
 	}
 	storage.Call("removeItem", item)
 }
@@ -318,12 +318,12 @@ func LoadConfig() (bool, error) {
 	}
 	c, err := DecodeConfigSave(s)
 	if err != nil {
-		log.Printf("ignoring incompatible old config: %v", err)
+		log.Printf("忽略不兼容的旧设置：%v", err)
 		RemoveItem(shamoguconfig)
 		return false, nil
 	}
 	if c.VersionNumber != GameConfig.VersionNumber {
-		log.Print("ignoring incompatible old config")
+		log.Print("忽略不兼容的旧设置")
 		RemoveItem(shamoguconfig)
 		return false, nil
 	}
@@ -336,7 +336,7 @@ func LoadConfig() (bool, error) {
 func (g *Game) WriteDump() (string, error) {
 	pre := js.Global().Get("document").Call("getElementById", "dump")
 	pre.Set("innerHTML", g.Dump())
-	return "Full game statistics written below.", nil
+	return "完整游戏统计信息已写在下方。", nil
 }
 
 // subSig is define here for build compatibility purposes, it is not used for

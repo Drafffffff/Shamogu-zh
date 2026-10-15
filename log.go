@@ -130,11 +130,11 @@ func (g *Game) Debug(format string, a ...any) {
 }
 
 func (g *Game) StoryLog(s string) {
-	g.Logs.Story = append(g.Logs.Story, fmt.Sprintf("Level %d|Turn %5d| %s", g.Map.Level, g.Turn, s))
+	g.Logs.Story = append(g.Logs.Story, fmt.Sprintf("层%d|回合 %5d| %s", g.Map.Level, g.Turn, s))
 }
 
 func (g *Game) StoryLogf(format string, a ...any) {
-	g.Logs.Story = append(g.Logs.Story, fmt.Sprintf("Level %d|Turn %5d| %s", g.Map.Level, g.Turn, fmt.Sprintf(format, a...)))
+	g.Logs.Story = append(g.Logs.Story, fmt.Sprintf("层%d|回合 %5d| %s", g.Map.Level, g.Turn, fmt.Sprintf(format, a...)))
 }
 
 // LogEntry adds a new log entry to the game logs.

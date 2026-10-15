@@ -1,0 +1,42 @@
+{
+  "grid": {
+    "size": [
+      920,
+      430
+    ],
+    "source": "Official v1.6.0 tiles; local composition",
+    "license": "CC-BY-4.0 (official itch.io asset license); attribution: anaseto (Yon)"
+  },
+  "poster": {
+    "size": [
+      600,
+      900
+    ],
+    "source": "Official v1.6.0 tiles; local composition",
+    "license": "CC-BY-4.0 (official itch.io asset license); attribution: anaseto (Yon)"
+  },
+  "hero": {
+    "size": [
+      3840,
+      1240
+    ],
+    "source": "Official v1.6.0 tiles; local composition",
+    "license": "CC-BY-4.0 (official itch.io asset license); attribution: anaseto (Yon)"
+  },
+  "logo": {
+    "size": [
+      1600,
+      480
+    ],
+    "source": "Official v1.6.0 tiles; local composition",
+    "license": "CC-BY-4.0 (official itch.io asset license); attribution: anaseto (Yon)"
+  },
+  "icon": {
+    "size": [
+      512,
+      512
+    ],
+    "source": "Official v1.6.0 tiles; local composition",
+    "license": "CC-BY-4.0 (official itch.io asset license); attribution: anaseto (Yon)"
+  }
+}

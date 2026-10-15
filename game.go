@@ -164,16 +164,16 @@ func (g *Game) HandleTurnCount() {
 	}
 	switch nmt {
 	case 950:
-		g.LogStyled("You feel a presence searching for intruders.", logSpecial)
+		g.LogStyled("你感到有某种存在正在搜寻入侵者。", logSpecial)
 		if g.Map.Portal != InvalidPos {
-			g.LogStyled("You need to hurry to the portal!", logSpecial)
+			g.LogStyled("你必须赶快前往传送门！", logSpecial)
 		} else {
-			g.LogStyled("You need to hurry!", logSpecial)
+			g.LogStyled("你必须加快脚步！", logSpecial)
 		}
 		g.WarningPrompt()
 	case 1000:
-		g.LogStyled("You’ve been found by the dungeon core!", logSpecial)
-		g.StoryLog("Found by the dungeon core!")
+		g.LogStyled("你被地城核心发现了！", logSpecial)
+		g.StoryLog("被地城核心发现！")
 		g.WarningPrompt()
 		g.genMonster(BlazingGolem)
 		g.genMonster(BlazingGolem)
@@ -246,13 +246,13 @@ func (g *Game) handleCorruptionEvent(nmt int) {
 	if log {
 		switch g.IntN(4) {
 		case 0:
-			g.Log("Uh.")
+			g.Log("呃。")
 		case 1:
-			g.Log("Um.")
+			g.Log("嗯。")
 		case 2:
-			g.Log("Oh.")
+			g.Log("哦。")
 		default:
-			g.Log("Eh.")
+			g.Log("咦。")
 		}
 	}
 	g.UpdateFOV()
@@ -360,43 +360,43 @@ func (g *Game) ComputeNoise() {
 		nheard++
 	}
 	if nheard == 1 {
-		g.Logf("You hear %s.", monsterNoiseString(a))
+		g.Logf("你听见%s。", monsterNoiseString(a))
 	} else if nheard > 1 {
-		g.Logf("You hear %d monsters.", nheard)
+		g.Logf("你听见%d只怪物。", nheard)
 	}
 }
 
 func monsterNoiseString(ai *Actor) string {
 	switch {
 	case ai.DoesAny(MonsSilent):
-		return "an imperceptible air movement"
+		return "几乎察觉不到的气流"
 	case ai.DoesAny(MonsHeavyFootsteps):
-		return "heavy footsteps"
+		return "沉重的脚步声"
 	case ai.DoesAny(MonsWingFlap):
-		return "the flapping of wings"
+		return "拍翼声"
 	case ai.DoesAny(MonsCreep):
-		return "a creep noise"
+		return "窸窣声"
 	case ai.DoesAny(MonsLightFootsteps):
-		return "light footsteps"
+		return "轻微的脚步声"
 	default:
-		return "footsteps"
+		return "脚步声"
 	}
 }
 
 func monsterNoiseStringStyled(ai *Actor) string {
 	switch {
 	case ai.DoesAny(MonsSilent):
-		return "an @Yimperceptible air movement@N"
+		return "@Y几乎察觉不到的气流@N"
 	case ai.DoesAny(MonsHeavyFootsteps):
-		return "@Mheavy footsteps@N"
+		return "@M沉重的脚步声@N"
 	case ai.DoesAny(MonsWingFlap):
-		return "the @Cflapping of wings@N"
+		return "@C拍翼声@N"
 	case ai.DoesAny(MonsCreep):
-		return "a @Gcreep noise@N"
+		return "@G窸窣声@N"
 	case ai.DoesAny(MonsLightFootsteps):
-		return "@Olight footsteps@N"
+		return "@O轻微的脚步声@N"
 	default:
-		return "@Rfootsteps@N"
+		return "@R脚步声@N"
 	}
 }
 
@@ -437,7 +437,7 @@ func (g *Game) MakeNoise(at gruid.Point, nt NoiseType) {
 			g.Map.Noise[at] = nt
 		}
 		if nt == NoiseExplosion {
-			g.StoryLogf("Explosion (distance: %d)", paths.DistanceManhattan(at, pp))
+			g.StoryLogf("爆炸声（距离：%d）", paths.DistanceManhattan(at, pp))
 		}
 		g.LogStyled(nt.Msg(), logNotable)
 	}
@@ -490,39 +490,39 @@ func (nt NoiseType) Noise() int {
 func (nt NoiseType) Msg() string {
 	switch nt {
 	case NoiseBark:
-		return "WOOF!"
+		return "汪！"
 	case NoiseCombat:
 		// Lowercase for combat, because noise is not as strong.
-		return "Smash!"
+		return "砰！"
 	case NoiseChomp:
-		return "Chomp!"
+		return "咔嚓！"
 	case NoiseCackle:
-		return "KO-KO-KO!"
+		return "咯咯咯！"
 	case NoiseCry:
-		return "SCREECH!"
+		return "尖啸！"
 	case NoiseDig:
-		return "CRACK!"
+		return "咔！"
 	case NoiseExplosion:
-		return "POP-BOOM!"
+		return "轰隆！"
 	case NoiseFakePortal:
-		return "THRUM!"
+		return "嗡！"
 	case NoiseLightning:
-		return "PANG!"
+		return "铿！"
 	case NoiseEarthMenhir:
-		return "RING-RING!"
+		return "叮铃！"
 	case NoiseMusic:
-		return "Noisy Imp belts “♫ larilon, larila ♫ ♪”."
+		return "吵闹小鬼高唱“♫ 啦哩隆，啦哩啦 ♫ ♪”。"
 	case NoiseRoar:
-		return "ROAR!"
+		return "吼！"
 	case NoiseStomp:
-		return "STOMP!"
+		return "咚！"
 	case NoiseTrumpet:
-		return "TARARA!"
+		return "哒啦！"
 	case NoiseWind:
-		return "WHIZ!"
+		return "嗖！"
 	default:
 		// should not happen.
-		return "NOISE!"
+		return "噪音！"
 	}
 }
 
@@ -544,7 +544,7 @@ func (g *Game) SmellFood() {
 			// NOTE: using path-distance would leak information
 			// about walls (if the player goes through the tedious
 			// task of doing some math).
-			g.SenseEntity(i, "smell")
+			g.SenseEntity(i, "嗅到")
 		}
 	}
 }
@@ -564,7 +564,7 @@ func (g *Game) SenseItems(ty itemType) {
 			// NOTE: using path-distance would leak information
 			// about walls (if the player goes through the tedious
 			// task of doing some math).
-			g.SenseEntity(i, "sense")
+			g.SenseEntity(i, "感知到")
 		}
 	}
 }

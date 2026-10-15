@@ -296,7 +296,7 @@ func (mg *MapGen) digBlock(gd rl.Grid, block []gruid.Point) []gruid.Point {
 			block = block[:0]
 		}
 		if count > maxIterations {
-			panic("infinite loop")
+			panic("地图生成陷入无限循环")
 		}
 		block = append(block, p)
 		if passableNeighbor(gd, p) {
@@ -326,7 +326,7 @@ func (mg *MapGen) randomWallCell(gd rl.Grid) gruid.Point {
 			return p
 		}
 	}
-	panic("no random wall found")
+		panic("找不到随机墙壁")
 }
 
 func (mg *MapGen) randomNeighbor(p gruid.Point) gruid.Point {
@@ -428,7 +428,7 @@ func (mg *MapGen) genVaults(templates []string, n int, pl Placement) (ps []gruid
 			mg.vaults = append(mg.vaults, vi)
 			ps = append(ps, p)
 		} else {
-			log.Printf("mapgen: found no space for vault")
+			log.Printf("地图生成：找不到可放置地城区域的空间")
 			ok = false
 		}
 	}
@@ -454,7 +454,7 @@ func (mg *MapGen) newVault(tpl string, pl Placement) *vault {
 	v := &vault{p: p, vault: &rl.Vault{}}
 	err := v.vault.Parse(tpl)
 	if err != nil {
-		log.Printf("mapgen: bad vault:%v", err)
+		log.Printf("地图生成：地城区域无效：%v", err)
 		return nil
 	}
 	v.w = v.vault.Size().X
@@ -490,7 +490,7 @@ func (mg *MapGen) newVault(tpl string, pl Placement) *vault {
 	}
 	mg.DigVault(v)
 	if v.w == 0 || v.h == 0 {
-		log.Printf("mapgen: bad vault size: %v", v.vault.Size())
+		log.Printf("地图生成：地城区域尺寸无效：%v", v.vault.Size())
 	}
 	return v
 }
@@ -581,7 +581,7 @@ func (mg *MapGen) connectAllVaults() {
 		nearest := mg.nearestConnectedVault(i)
 		ok := mg.connectVaultPair(nearest, vi, false)
 		if !ok {
-			panic("connect rooms")
+			panic("无法连接房间")
 		}
 	}
 	extraTunnels := 4
@@ -626,7 +626,7 @@ func (mg *MapGen) connectVaultPair(v1, v2 *vault, extra bool) bool {
 	path := mg.PR.AstarPath(tp, e1pos, e2pos)
 	if len(path) == 0 {
 		// Should not happen.
-		log.Print("mapgen: no path connecting vaults")
+		log.Print("地图生成：找不到连接地城区域的路径")
 		return false
 	}
 	// log.Printf("path length: %d", len(path))

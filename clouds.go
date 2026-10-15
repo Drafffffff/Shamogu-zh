@@ -26,13 +26,13 @@ const (
 func (ck CloudKind) String() string {
 	switch ck {
 	case CloudNormal:
-		return "cloud"
+		return "云雾"
 	case CloudFire:
-		return "fire"
+		return "火焰"
 	case CloudPoison:
-		return "poison"
+		return "毒雾"
 	default:
-		return "cloud"
+		return "云雾"
 	}
 }
 
@@ -63,14 +63,14 @@ func (ck CloudKind) ColorRune() rune {
 func (ck CloudKind) Desc() string {
 	switch ck {
 	case CloudNormal:
-		return "The steam, dust or smoke cloud obstructs vision."
+		return "蒸汽、尘土或烟雾会遮挡视线。"
 	case CloudFire:
-		return "The fire cloud is difficult to see through. It burns foliage and creatures."
+		return "火焰云雾会遮挡视线，并灼烧植物和生物。"
 	case CloudPoison:
-		return "The poisonous cloud is difficult to see through. It poisons creatures."
+		return "毒雾会遮挡视线，并使生物中毒。"
 	default:
 		// should not happen.
-		return "No description."
+		return "暂无说明。"
 	}
 }
 

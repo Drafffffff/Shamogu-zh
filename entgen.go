@@ -13,7 +13,7 @@ import (
 // InitPlayer initializes the player entity for the rest of the game.
 func (g *Game) InitPlayer(spe *Entity) {
 	g.Entities[PlayerID] = &Entity{
-		Name: "You",
+		Name: "你",
 		Rune: '@',
 		Role: NewActor(2, 1, 9, Player, NoTraits),
 	}
@@ -37,7 +37,7 @@ func (g *Game) debugBuild() {
 }
 
 func emptySlot() *Entity {
-	return &Entity{Name: "(empty slot)", P: InvalidPos, Seen: true}
+	return &Entity{Name: "（空槽位）", P: InvalidPos, Seen: true}
 }
 
 // GenEntities generates the entities for a new level, placing them on the map.
@@ -68,7 +68,7 @@ func (g *Game) genPlayerOnNewLevel(mg *MapGen) {
 		return cmp.Compare(vaultDistance(pv, vi), vaultDistance(pv, vj))
 	})
 	if p.P == InvalidPos {
-		panic("invalid player position")
+		panic("玩家位置无效")
 	}
 	p.KnownP = p.P
 	g.Map.ActorCache.SetU(p.P, PlayerID)
@@ -110,42 +110,42 @@ type spiritInfo struct {
 // primarySpirits represents the various kinds of primary spirits.
 var primarySpirits = []spiritInfo{
 	{
-		Name:        "Four-Headed Hydra",
+		Name:        "四头九头蛇",
 		MaxCharges:  [2]int{2, 3},
 		Ability:     [2]Ability{EffectFocus{}, EffectFocus{}},
 		BonusHP:     [2]int{0, 3},
 		BonusTraits: [2]Traits{PatternFourDirs, PatternFourDirs}},
 	{
-		Name:        "Rampaging Boar",
+		Name:        "狂奔野猪",
 		MaxCharges:  [2]int{2, 3},
 		Ability:     [2]Ability{EffectDig{}, EffectDig{}},
 		BonusAttack: [2]int{0, 1},
 		BonusTraits: [2]Traits{PatternRampage | PushingCharge, PatternRampage | PushingCharge}},
 	{
-		Name:         "Jumping Frog",
+		Name:         "跳跃蛙",
 		MaxCharges:   [2]int{3, 4},
 		Ability:      [2]Ability{EffectJump{}, EffectJump{}},
 		BonusDefense: [2]int{0, 1},
 		BonusTraits:  [2]Traits{PatternCatch, PatternCatch}},
 	{
-		Name:        "Wind Fox",
+		Name:        "风狐",
 		MaxCharges:  [2]int{2, 4},
 		Ability:     [2]Ability{EffectPushingGale{}, EffectPushingGale{}},
 		BonusTraits: [2]Traits{PatternRangedRecoil, PatternRangedRecoil}},
 	{
-		Name:        "Temporal Cat",
+		Name:        "时序猫",
 		MaxCharges:  [2]int{1, 2},
 		Ability:     [2]Ability{EffectTimeStop{}, EffectTimeStop{}},
 		BonusTraits: [2]Traits{PatternSwapDaze, PatternSwapDaze}},
 	{
-		Name:         "Spinning Crocodile",
+		Name:         "旋转鳄鱼",
 		MaxCharges:   [2]int{3, 4},
 		Ability:      [2]Ability{EffectTailSlap{}, EffectTailSlap{}},
 		BonusAttack:  [2]int{1, 1},
 		BonusDefense: [2]int{0, 1},
 		BonusTraits:  [2]Traits{PatternDragging, PatternDragging}},
 	{
-		Name:        "Vampiric Bat",
+		Name:        "吸血蝙蝠",
 		MaxCharges:  [2]int{1, 2},
 		Ability:     [2]Ability{EffectVampirism{DurationVampirism}, EffectVampirism{DurationVampirism}},
 		BonusTraits: [2]Traits{PatternSneaky, PatternSneaky}},
@@ -155,43 +155,43 @@ var primarySpirits = []spiritInfo{
 // that can be found.
 var secondarySpirits = []spiritInfo{
 	{
-		Name:        "Thunder Porcupine",
+		Name:        "雷豪猪",
 		MaxCharges:  [2]int{2, 3},
 		Ability:     [2]Ability{EffectLightning{}, EffectLightning{}},
 		BonusAttack: [2]int{1, 1},
 		BonusTraits: [2]Traits{DazingSpines, DazingSpines | ResistanceDaze}},
 	{
-		Name:        "Barking Hound",
+		Name:        "吠叫猎犬",
 		MaxCharges:  [2]int{2, 4},
 		Ability:     [2]Ability{EffectBark{}, EffectBark{}},
 		BonusAttack: [2]int{1, 1},
 		BonusTraits: [2]Traits{GoodHearing, GoodHearing | ResistanceFear}},
 	{
-		Name:        "Stinking Skunk",
+		Name:        "臭鼬",
 		MaxCharges:  [2]int{2, 3},
 		Ability:     [2]Ability{EffectNoxiousSmell{}, EffectNoxiousSmell{}},
 		BonusAttack: [2]int{1, 1},
 		BonusTraits: [2]Traits{GoodSmell, GoodSmell | ResistanceConfusion}},
 	{
-		Name:         "Walking Tree",
+		Name:         "行走树",
 		MaxCharges:   [2]int{2, 3},
 		Ability:      [2]Ability{EffectLignify{}, EffectLignify{}},
 		BonusDefense: [2]int{2, 2},
 		BonusTraits:  [2]Traits{VulnerabilityFire, VulnerabilityFire | WoodyLegs}},
 	{
-		Name:         "Venomous Viper",
+		Name:         "毒蛇",
 		MaxCharges:   [2]int{2, 3},
 		Ability:      [2]Ability{EffectPoisonCloud{}, EffectPoisonCloud{}},
 		BonusDefense: [2]int{1, 1},
 		BonusTraits:  [2]Traits{VenomousMelee, VenomousMelee | ResistancePoison}},
 	{
-		Name:         "Sprinting Gazelle",
+		Name:         "疾驰瞪羚",
 		MaxCharges:   [2]int{2, 3},
 		Ability:      [2]Ability{EffectSprint{}, EffectSprint{}},
 		BonusDefense: [2]int{1, 1},
 		BonusTraits:  [2]Traits{TrailingCloud, TrailingCloud | ResistanceImbalance}},
 	{
-		Name:        "Fire Salamander",
+		Name:        "火蜥蜴",
 		MaxCharges:  [2]int{2, 3},
 		Ability:     [2]Ability{EffectFireRetreat{}, EffectFireRetreat{}},
 		BonusAttack: [2]int{1, 1},
@@ -202,27 +202,27 @@ var secondarySpirits = []spiritInfo{
 // that can be found.
 var challengeSpirits = []spiritInfo{
 	{
-		Name:        "Gawalt Monkey",
+		Name:        "加瓦尔特猴",
 		MaxCharges:  [2]int{1, 4},
 		Ability:     [2]Ability{EffectShadows{}, EffectShadows{}},
 		BonusTraits: [2]Traits{Gawalt, Gawalt},
 		Advanced:    true},
 	{
-		Name:        "Gluttonous Bear",
+		Name:        "贪食熊",
 		MaxCharges:  [2]int{1, 3},
 		Ability:     [2]Ability{EffectSnack{}, EffectSnack{}},
 		BonusHP:     [2]int{3, 3},
 		BonusTraits: [2]Traits{Gluttony, Gluttony},
 		Advanced:    true},
 	{
-		Name:        "Gardening Lion",
+		Name:        "园艺狮",
 		MaxCharges:  [2]int{1, 3},
 		Ability:     [2]Ability{EffectGarden{}, EffectGarden{}},
 		BonusAttack: [2]int{1, 1},
 		BonusTraits: [2]Traits{ScaryRoar, ScaryRoar},
 		Advanced:    true},
 	{
-		Name:         "Stomping Elephant",
+		Name:         "重踏象",
 		MaxCharges:   [2]int{1, 3},
 		Ability:      [2]Ability{EffectStomp{}, EffectStomp{}},
 		BonusAttack:  [2]int{1, 1},
@@ -230,21 +230,21 @@ var challengeSpirits = []spiritInfo{
 		BonusTraits:  [2]Traits{Elephanty, Elephanty},
 		Advanced:     true},
 	{
-		Name:        "Staring Owl",
+		Name:        "凝视猫头鹰",
 		MaxCharges:  [2]int{1, 3},
 		Ability:     [2]Ability{EffectDeathStare{}, EffectDeathStare{}},
 		BonusAttack: [2]int{1, 1},
 		BonusTraits: [2]Traits{NocturnalFlying, NocturnalFlying},
 		Advanced:    true},
 	{
-		Name:         "Runic Chicken",
+		Name:         "符文鸡",
 		MaxCharges:   [2]int{2, 5},
 		Ability:      [2]Ability{EffectLayRune{}, EffectLayRune{}},
 		BonusDefense: [2]int{1, 1},
 		BonusTraits:  [2]Traits{RunicChicken, RunicChicken},
 		Advanced:     true},
 	{
-		Name:         "Dazzling Zebra",
+		Name:         "炫目斑马",
 		MaxCharges:   [2]int{1, 3},
 		Ability:      [2]Ability{EffectDisorient{}, EffectDisorient{}},
 		BonusDefense: [2]int{1, 1},
@@ -280,7 +280,7 @@ func spiritEntity(mods []bool, si spiritInfo) *Entity {
 
 // genEmptyTotemAt generates a new empty totem entity at the given point.
 func (g *Game) genEmptyTotemAt(p gruid.Point) ID {
-	return g.AddEntity(&Entity{Name: "empty totem", Rune: '!', P: p, Role: &EmptyTotem{}})
+	return g.AddEntity(&Entity{Name: "空图腾", Rune: '!', P: p, Role: &EmptyTotem{}})
 }
 
 // itemInfo gathers information for item generation.
@@ -326,28 +326,28 @@ func (ck comestibleKind) Info() itemInfo { return ComestibleData[ck] }
 // ComestibleData provides information about the various kinds of comestibles.
 var ComestibleData = []itemInfo{
 	// Common comestibles.
-	AmbrosiaBerries:    {"ambrosia berries", EffectAmbrosiaBerries{}},
-	BerserkingFlower:   {"berserking flower", EffectBerserkingFlower{}},
-	ClarityLeaves:      {"clarity leaves", EffectClarityLeaves{}},
-	FirebreathPepper:   {"firebreath pepper", EffectFirebreathPepper{}},
-	FoggySkinOnion:     {"foggy-skin onion", EffectFoggySkinOnion{}},
-	LignificationFruit: {"lignification fruit", EffectLignificationFruit{}},
-	TeleportMushroom:   {"teleport mushroom", EffectTeleportMushroom{}},
+	AmbrosiaBerries:    {"仙馔莓", EffectAmbrosiaBerries{}},
+	BerserkingFlower:   {"狂暴花", EffectBerserkingFlower{}},
+	ClarityLeaves:      {"明晰叶", EffectClarityLeaves{}},
+	FirebreathPepper:   {"吐火椒", EffectFirebreathPepper{}},
+	FoggySkinOnion:     {"雾肤洋葱", EffectFoggySkinOnion{}},
+	LignificationFruit: {"木化果", EffectLignificationFruit{}},
+	TeleportMushroom:   {"传送蘑菇", EffectTeleportMushroom{}},
 
 	// Rare comestibles with conditional variant.
-	PolymorphFungus: {"polymorph fungus", EffectPolymorphFungus{}},
-	RunethornRose:   {"runethorn rose", EffectRunethornRose{}},
-	TunnelingAcorn:  {"tunneling acorn", EffectTunnelingAcorn{}},
-	VanishingSnail:  {"vanishing snail", EffectVanishingSnail{}},
-	WarpingBean:     {"warping bean", EffectWarpingBean{}},
+	PolymorphFungus: {"变形菌", EffectPolymorphFungus{}},
+	RunethornRose:   {"符文刺玫瑰", EffectRunethornRose{}},
+	TunnelingAcorn:  {"掘地橡果", EffectTunnelingAcorn{}},
+	VanishingSnail:  {"隐匿蜗牛", EffectVanishingSnail{}},
+	WarpingBean:     {"扭曲豆", EffectWarpingBean{}},
 
 	// Rare conditional comestibles (exclusive to Totem Conditions).
-	FortressOyster: {"fortress oyster", EffectFortressOyster{}},
-	SeeingPotato:   {"seeing potato", EffectSeeingPotato{}},
-	TrickyChestnut: {"tricky chestnut", EffectTrickyChestnut{}},
+	FortressOyster: {"堡垒牡蛎", EffectFortressOyster{}},
+	SeeingPotato:   {"洞察土豆", EffectSeeingPotato{}},
+	TrickyChestnut: {"诡计栗子", EffectTrickyChestnut{}},
 
 	// Miscellaneous rare comestibles without conditional variant.
-	MoonlightLotus: {"moonlight lotus", EffectMoonlightLotus{}},
+	MoonlightLotus: {"月光莲", EffectMoonlightLotus{}},
 }
 
 // CommonComestibles represents the most common comestibles.
@@ -410,10 +410,10 @@ const (
 
 // MenhirData provides information about the various kinds of menhirs.
 var MenhirData = []itemInfo{
-	MenhirEarth:   {"earth menhir", EffectEarthMenhir{}},
-	MenhirFire:    {"fire menhir", EffectFireMenhir{}},
-	MenhirPoison:  {"poison menhir", EffectPoisonMenhir{}},
-	MenhirWarping: {"warping menhir", EffectWarpingMenhir{}},
+	MenhirEarth:   {"大地石碑", EffectEarthMenhir{}},
+	MenhirFire:    {"火焰石碑", EffectFireMenhir{}},
+	MenhirPoison:  {"毒雾石碑", EffectPoisonMenhir{}},
+	MenhirWarping: {"扭曲石碑", EffectWarpingMenhir{}},
 }
 
 // menhirEntity generates a new menhir Entity entity using the given data.
@@ -436,7 +436,7 @@ func (g *Game) genItems(mg *MapGen) {
 	if g.Map.Level < MapLevels {
 		var i int
 		addPortal := func(fake bool) {
-			portal := &Entity{Name: "magic portal", Rune: '>', Role: &Portal{Fake: fake}}
+			portal := &Entity{Name: "魔法传送门", Rune: '>', Role: &Portal{Fake: fake}}
 			i, portal.P = g.RandomVaultsPlaceWithFunc(mg, npvaults[len(npvaults)/3:], PlaceStatic, g.IntNBiasedUp)
 			portalIdxs = append(portalIdxs, i+1)
 			if !fake {
@@ -459,7 +459,7 @@ func (g *Game) genItems(mg *MapGen) {
 		}
 	} else {
 		var i int
-		orb := &Entity{Name: "Orb of Corruption", Rune: '☼', Role: &CorruptionOrb{}}
+		orb := &Entity{Name: "腐化魔法球", Rune: '☼', Role: &CorruptionOrb{}}
 		i, orb.P = g.RandomVaultsPlaceWithFunc(mg, npvaults[len(npvaults)/2:], PlaceStatic, g.IntNBiasedUp)
 		g.Map.Orb = orb.P
 		portalIdxs = append(portalIdxs, i+1)
@@ -1025,43 +1025,43 @@ const (
 // GetMegabatName returns the name of a megabat with current options.
 func GetMegabatName() string {
 	if NoChaos {
-		return "screeching megabat"
+		return "尖啸巨蝠"
 	}
-	return "chaos megabat"
+	return "混沌巨蝠"
 }
 
 // MonsData provides information about the various kinds of monsters.
 var MonsData = []monsterInfo{
 	// 		  {name, rune, attack, defense, hp, traits}
-	AcidMound:         {"acid mound", 'a', 2, 0, 5, MonsIgnoreDefense | ImmunityImbalance | MonsCreep},
-	BarkingHound:      {"barking hound", 'h', 3, 0, 4, GoodHearing | ImmunityFear},
-	BerserkingSpider:  {"berserking spider", 's', 2, 1, 3, MonsBerserking | MonsSilent},
-	BlazingGolem:      {"blazing golem", 'G', 2, 3, 4, MonsExplodingDeath | ImmunityFire | ImmunityPoison | ImmunityFear | ImmunityConfusion | MonsHeavyFootsteps | MonsNotable},
-	BlinkButterfly:    {"blinking butterfly", 'b', 2, 3, 2, ImmunityImbalance | ImmunityLignification | MonsWingFlap},
-	BurningPhoenix:    {"burning phoenix", 'P', 2, 1, 5, PatternRampage | BurningHits | ImmunityFire | ImmunityLignification | MonsWingFlap | MonsNotable},
+	AcidMound:         {"酸液团", 'a', 2, 0, 5, MonsIgnoreDefense | ImmunityImbalance | MonsCreep},
+	BarkingHound:      {"吠叫猎犬", 'h', 3, 0, 4, GoodHearing | ImmunityFear},
+	BerserkingSpider:  {"狂暴蜘蛛", 's', 2, 1, 3, MonsBerserking | MonsSilent},
+	BlazingGolem:      {"烈焰魔像", 'G', 2, 3, 4, MonsExplodingDeath | ImmunityFire | ImmunityPoison | ImmunityFear | ImmunityConfusion | MonsHeavyFootsteps | MonsNotable},
+	BlinkButterfly:    {"闪烁蝴蝶", 'b', 2, 3, 2, ImmunityImbalance | ImmunityLignification | MonsWingFlap},
+	BurningPhoenix:    {"燃烧凤凰", 'P', 2, 1, 5, PatternRampage | BurningHits | ImmunityFire | ImmunityLignification | MonsWingFlap | MonsNotable},
 	ChaosMegabat:      {GetMegabatName(), 'm', 2, 2, 2, PatternSneaky | GoodHearing | ImmunityLignification | MonsWingFlap | MonsNotable},
-	ConfusingEye:      {"confusing eye", 'e', 2, 0, 2, PatternRanged | MonsConfusion | ImmunityConfusion | MonsLightFootsteps},
-	CrazyDruid:        {"crazy druid", 'C', 3, 1, 4, PatternSwap | BurningHits | MonsBerserking | MonsNotable},
-	DraggingAlligator: {"dragging alligator", 'A', 3, 1, 4, PatternDragging | MonsScales | ResistanceFire | ResistanceFear | MonsNotable},
-	EarthDragon:       {"earth dragon", 'D', 4, 2, 5, MonsDig | ImmunityFear | MonsScales | MonsHeavyFootsteps | MonsNotable},
-	ExplodingNadre:    {"exploding nadre", 'n', 2, 3, 1, MonsExplodingDeath | MonsScales},
-	FearsomeLich:      {"fearsome lich", 'L', 2, 2, 5, PatternRanged | MonsFear | MonsIgnoreDefense | ImmunityPoison | ImmunityConfusion | MonsNotable},
-	FireLlama:         {"fire llama", 'l', 2, 0, 4, PatternRanged},
-	FourHeadedHydra:   {"four-headed hydra", 'H', 2, 0, 6, PatternFourDirs | MonsScales | MonsHeavyFootsteps | MonsNotable},
-	HungryRat:         {"hungry rat", 'r', 2, 0, 3, MonsLightFootsteps},
-	NoisyImp:          {"noisy imp", 'I', 2, 2, 4, MonsLightFootsteps | MonsNotable},
-	MadOctopode:       {"mad octopode", 'O', 3, 2, 5, PatternCatch | ImmunityImbalance | VenomousMelee | MonsCreep | MonsNotable},
-	LashingFrog:       {"lashing frog", 'F', 2, 1, 4, PatternCatch},
-	RampagingBoar:     {"rampaging boar", 'B', 3, 0, 4, PatternRampage | PushingCharge | MonsDig},
-	TemporalCat:       {"temporal cat", 'c', 2, 0, 4, PatternSwapDaze | MonsLightFootsteps},
-	ThunderPorcupine:  {"thunder porcupine", 'p', 2, 0, 3, DazingSpines | ImmunityDaze | MonsLightFootsteps},
-	TotemWasp:         {"totem wasp", 'w', 2, 1, 2, PatternRampage | VenomousMelee | ImmunityLignification | MonsWingFlap | MonsNotable},
-	UndeadKnight:      {"undead knight", 'K', 3, 3, 4, PatternFourDirs | MonsFear | ImmunityPoison | ImmunityDaze | MonsNotable},
-	VenomousViper:     {"venomous viper", 'v', 2, 1, 4, VenomousMelee | ImmunityPoison | MonsScales | MonsCreep},
-	WalkingMushroom:   {"walking mushroom", 'M', 2, 1, 5, MonsConfusion | ImmunityConfusion | ImmunityLignification | VulnerabilityFire | MonsNotable},
-	WalkingTree:       {"walking tree", 'T', 2, 2, 5, ImmunityImbalance | ImmunityPoison | ImmunityLignification | VulnerabilityFire | MonsHeavyFootsteps | MonsNotable},
-	WarpingWraith:     {"warping wraith", 'W', 2, 3, 3, ImmunityPoison | ImmunityLignification | MonsSilent},
-	WindFox:           {"wind fox", 'f', 2, 0, 4, PatternRangedRecoil | MonsLightFootsteps},
+	ConfusingEye:      {"惑心之眼", 'e', 2, 0, 2, PatternRanged | MonsConfusion | ImmunityConfusion | MonsLightFootsteps},
+	CrazyDruid:        {"疯狂德鲁伊", 'C', 3, 1, 4, PatternSwap | BurningHits | MonsBerserking | MonsNotable},
+	DraggingAlligator: {"拖拽鳄鱼", 'A', 3, 1, 4, PatternDragging | MonsScales | ResistanceFire | ResistanceFear | MonsNotable},
+	EarthDragon:       {"地龙", 'D', 4, 2, 5, MonsDig | ImmunityFear | MonsScales | MonsHeavyFootsteps | MonsNotable},
+	ExplodingNadre:    {"爆炸纳德", 'n', 2, 3, 1, MonsExplodingDeath | MonsScales},
+	FearsomeLich:      {"可怖巫妖", 'L', 2, 2, 5, PatternRanged | MonsFear | MonsIgnoreDefense | ImmunityPoison | ImmunityConfusion | MonsNotable},
+	FireLlama:         {"火焰羊驼", 'l', 2, 0, 4, PatternRanged},
+	FourHeadedHydra:   {"四头九头蛇", 'H', 2, 0, 6, PatternFourDirs | MonsScales | MonsHeavyFootsteps | MonsNotable},
+	HungryRat:         {"饥饿鼠", 'r', 2, 0, 3, MonsLightFootsteps},
+	NoisyImp:          {"喧闹小鬼", 'I', 2, 2, 4, MonsLightFootsteps | MonsNotable},
+	MadOctopode:       {"疯狂章鱼人", 'O', 3, 2, 5, PatternCatch | ImmunityImbalance | VenomousMelee | MonsCreep | MonsNotable},
+	LashingFrog:       {"鞭击蛙", 'F', 2, 1, 4, PatternCatch},
+	RampagingBoar:     {"狂奔野猪", 'B', 3, 0, 4, PatternRampage | PushingCharge | MonsDig},
+	TemporalCat:       {"时序猫", 'c', 2, 0, 4, PatternSwapDaze | MonsLightFootsteps},
+	ThunderPorcupine:  {"雷豪猪", 'p', 2, 0, 3, DazingSpines | ImmunityDaze | MonsLightFootsteps},
+	TotemWasp:         {"图腾蜂", 'w', 2, 1, 2, PatternRampage | VenomousMelee | ImmunityLignification | MonsWingFlap | MonsNotable},
+	UndeadKnight:      {"亡灵骑士", 'K', 3, 3, 4, PatternFourDirs | MonsFear | ImmunityPoison | ImmunityDaze | MonsNotable},
+	VenomousViper:     {"毒蛇", 'v', 2, 1, 4, VenomousMelee | ImmunityPoison | MonsScales | MonsCreep},
+	WalkingMushroom:   {"行走蘑菇", 'M', 2, 1, 5, MonsConfusion | ImmunityConfusion | ImmunityLignification | VulnerabilityFire | MonsNotable},
+	WalkingTree:       {"行走树", 'T', 2, 2, 5, ImmunityImbalance | ImmunityPoison | ImmunityLignification | VulnerabilityFire | MonsHeavyFootsteps | MonsNotable},
+	WarpingWraith:     {"扭曲幽灵", 'W', 2, 3, 3, ImmunityPoison | ImmunityLignification | MonsSilent},
+	WindFox:           {"风狐", 'f', 2, 0, 4, PatternRangedRecoil | MonsLightFootsteps},
 }
 
 // monsEarly represents early level monsters.

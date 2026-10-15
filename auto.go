@@ -141,26 +141,26 @@ func (md *model) UpdateAutoExplore() (next gruid.Point, ok bool) {
 	if md.auto.aemRebuild {
 		sources := md.autoExploreSources()
 		if len(sources) == 0 {
-			g.Log("You finished exploring.")
+			g.Log("你已完成探索。")
 			return next, false
 		}
 		md.buildAutoExploreMap(sources)
 	}
 	if g.DangerInProximity() {
 		if md.auto.mode == noAuto {
-			g.Log("You cannot auto-explore while danger is nearby.")
+			g.Log("附近有危险，无法自动探索。")
 		}
 		return next, false
 	}
 	ap := &MapPath{passable: g.PlayerPassableNoTrapsFunc()}
 	pp := g.PP()
 	if md.auto.PRauto.BreadthFirstMapAt(pp) > unreachable {
-		g.Log("You cannot reach some places.")
+		g.Log("有些地点无法到达。")
 		return next, false
 	}
 	neighbors := ap.Neighbors(pp)
 	if len(neighbors) == 0 {
-		g.Log("You cannot reach some places.")
+		g.Log("有些地点无法到达。")
 		return next, false
 	}
 	next = neighbors[0]
@@ -173,7 +173,7 @@ func (md *model) UpdateAutoExplore() (next gruid.Point, ok bool) {
 		}
 	}
 	if ncost >= md.auto.PRauto.BreadthFirstMapAt(pp) {
-		g.Log("You cannot reach some places.")
+		g.Log("有些地点无法到达。")
 		return next, false
 	}
 	return next, true

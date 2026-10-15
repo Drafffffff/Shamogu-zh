@@ -51,7 +51,7 @@ func (g *Game) WarnLeave(ev EventType) bool {
 		e := g.Entity(i)
 		w := sp.Condition.leaveWatcher()
 		if w != nil && ev.Any(w.EventTypes()) {
-			g.LogfStyled("Are you sure? Your %s spirit will leave! [y/N]", logConfirm, e.Name)
+			g.LogfStyled("确定吗？你的%s灵体将会离去！[y/N]", logConfirm, e.Name)
 			return true
 		}
 	}
@@ -188,25 +188,25 @@ type WatchEvent struct {
 func (w WatchEvent) Desc() string {
 	switch w.Type {
 	case EventMenhir:
-		return "you activate a menhir"
+		return "你激活石碑"
 	case EventNewLevel:
-		return "you reach the next level"
+		return "你抵达下一层"
 	case EventPickup:
-		return "you pick up a comestible"
+		return "你拾取食物"
 	case EventFakePortal:
-		return "a portal you use malfunctions"
+		return "你使用的传送门发生故障"
 	case EventHeal:
-		return "a comestible heals your HP"
+		return "食物恢复了你的生命值"
 	case EventTeleport:
-		return "you teleport"
+		return "你被传送"
 	case EventDamage:
-		return "you are hurt by fire or poison"
+		return "你受到火焰或毒素伤害"
 	case EventMonsDeath:
-		return "a monster dies"
+		return "一只怪物死亡"
 	case EventWallBreak:
-		return "a wall breaks"
+		return "一面墙壁被打破"
 	default:
-		return "(unknown)" // includes some generic events that shouldn't be used
+		return "（未知事件）" // includes some generic events that shouldn't be used
 	}
 }
 
@@ -241,7 +241,7 @@ type MatchEither struct {
 }
 
 func (m MatchEither) Desc() string {
-	return fmt.Sprintf("%s or %s", m.A.Desc(), m.B.Desc())
+	return fmt.Sprintf("%s或%s", m.A.Desc(), m.B.Desc())
 }
 
 func (m MatchEither) Match(e *Entity) bool {
@@ -277,11 +277,11 @@ type WatchMonsEvent struct {
 func (w WatchMonsEvent) Desc() string {
 	switch w.EvType {
 	case EventMonsDeath:
-		return fmt.Sprintf("a %s dies", w.Mons.Desc())
+		return fmt.Sprintf("%s死亡", w.Mons.Desc())
 	case EventMonsSeen:
-		return fmt.Sprintf("you see a %s", w.Mons.Desc())
+		return fmt.Sprintf("你看见%s", w.Mons.Desc())
 	default:
-		panic("unexpected complete-level condition")
+		panic("意外的整层完成条件")
 	}
 }
 
@@ -303,9 +303,9 @@ type WatchMonsStatus struct {
 func (w WatchMonsStatus) Desc() string {
 	d := w.Mons.Desc()
 	if w.EvStatus == StatusFire {
-		return fmt.Sprintf("a %s catches fire", d)
+		return fmt.Sprintf("%s着火", d)
 	}
-	return fmt.Sprintf("a %s becomes %s", d, w.EvStatus)
+	return fmt.Sprintf("%s变为%s", d, w.EvStatus)
 }
 
 func (w WatchMonsStatus) EventTypes() EventType {
@@ -341,12 +341,12 @@ type WatchPlayerStatus struct {
 
 func (w WatchPlayerStatus) Desc() string {
 	if w.MatchNegative {
-		return "you get any negative status"
+		return "你获得任意负面状态"
 	}
 	if w.EvStatus == StatusFire {
-		return "you catch fire"
+		return "你着火"
 	}
-	return fmt.Sprintf("you become %s", w.EvStatus)
+	return fmt.Sprintf("你变为%s", w.EvStatus)
 }
 
 func (w WatchPlayerStatus) EventTypes() EventType {
@@ -365,9 +365,9 @@ type WatchHits struct {
 
 func (w WatchHits) Desc() string {
 	if w.PlayerActs {
-		return "you hit a monster"
+		return "你击中怪物"
 	}
-	return "a monster hits another"
+	return "一只怪物击中另一只怪物"
 }
 
 func (w WatchHits) EventTypes() EventType {
@@ -399,10 +399,10 @@ type WatchEither struct {
 func (w WatchEither) Desc() string {
 	if aw, ok := w.A.(WatchPlayerStatus); ok && aw.EvStatus != StatusFire {
 		if bw, ok := w.B.(WatchPlayerStatus); ok {
-			return fmt.Sprintf("you become %s or %s", aw.EvStatus, bw.EvStatus)
+			return fmt.Sprintf("你变为%s或%s", aw.EvStatus, bw.EvStatus)
 		}
 	}
-	return fmt.Sprintf("%s or %s", w.A.Desc(), w.B.Desc())
+	return fmt.Sprintf("%s，或%s", w.A.Desc(), w.B.Desc())
 }
 
 func (w WatchEither) EventTypes() EventType {
@@ -420,7 +420,7 @@ type WatchTwoStatus struct {
 }
 
 func (w WatchTwoStatus) Desc() string {
-	return fmt.Sprintf("you become %s and %s", w.A, w.B)
+	return fmt.Sprintf("你同时变为%s和%s", w.A, w.B)
 }
 
 func (w WatchTwoStatus) EventTypes() EventType {
@@ -442,7 +442,7 @@ type WatchPlayerDamage struct {
 }
 
 func (w WatchPlayerDamage) Desc() string {
-	return fmt.Sprintf("you are hurt by %s", w.EvStatus.Name())
+	return fmt.Sprintf("你受到%s伤害", w.EvStatus.Name())
 }
 
 func (w WatchPlayerDamage) EventTypes() EventType {
@@ -461,7 +461,7 @@ type WatchMoveFar struct {
 }
 
 func (w *WatchMoveFar) Desc() string {
-	return "you move by more than one tile in a turn"
+	return "你在一个回合内移动超过一格"
 }
 
 func (w *WatchMoveFar) EventTypes() EventType {
@@ -485,7 +485,7 @@ type WatchReachLevel struct {
 }
 
 func (w WatchReachLevel) Desc() string {
-	return fmt.Sprintf("you reach level %d", w.Level)
+	return fmt.Sprintf("你抵达第 %d 层", w.Level)
 }
 
 func (w WatchReachLevel) EventTypes() EventType {
@@ -515,11 +515,11 @@ const (
 func (w *WatchCompleteLevel) Desc() string {
 	switch w.Test {
 	case RemCharges:
-		return "you complete a full level with some charges remaining"
+		return "你完成一整层时仍保有灵体充能"
 	case EmptyInventory:
-		return "you enter a portal with no comestibles in your inventory"
+		return "你物品栏中没有食物时进入传送门"
 	default:
-		panic("unexpected complete-level condition")
+		panic("意外的整层完成条件")
 	}
 }
 
@@ -563,9 +563,9 @@ func (p UpgradePolicy) Applies(existing bool) bool {
 func (p UpgradePolicy) Desc() string {
 	switch p {
 	case UpgradeContinues:
-		return "(Including when upgrading an unfulfilled spirit:)"
+		return "（升级尚未完成条件的灵体时也适用：）"
 	case UpgradeReplaces:
-		return "(Including on any upgrade:)"
+		return "（任何灵体升级时都适用：）"
 	default:
 		return ""
 	}
@@ -595,8 +595,8 @@ func (c *SpiritCond) EventTypes() EventType {
 
 func (c *SpiritCond) Desc() string {
 	var sb strings.Builder
-	fmt.Fprintf(&sb, "@RCurse:@N %s.\n", UpperFirst(c.Effect.Desc()))
-	fmt.Fprintf(&sb, "@YUntil:@N %s.", UpperFirst(c.Until.Desc()))
+	fmt.Fprintf(&sb, "@R诅咒：@N %s。\n", UpperFirst(c.Effect.Desc()))
+	fmt.Fprintf(&sb, "@Y解除条件：@N %s。", UpperFirst(c.Until.Desc()))
 	return sb.String()
 }
 
@@ -664,13 +664,13 @@ const nCq = 1 + int(CqDischarge)
 func descCq(c Consequence) string {
 	switch c {
 	case CqLeave:
-		return "leaves"
+		return "离去"
 	case CqDischargeAll:
-		return "loses all ability charges"
+		return "失去所有能力充能"
 	case CqDischarge:
-		return "loses an ability charge"
+		return "失去一点能力充能"
 	default:
-		panic("unexpected condition consequence")
+		panic("意外的条件惩罚")
 	}
 }
 
@@ -684,29 +684,29 @@ func TotemEvents(g *Game, ev Event) {
 		ei := g.Entity(i)
 		switch sp.Condition.ApplyEvent(g, sp, ev) {
 		case CqEndCondition:
-			g.Logf("Your %s spirit has been fulfilled!", ei.Name)
-			g.StoryLogf("Fulfilled the %s spirit", ei.Name)
+			g.Logf("你的%s灵体已完成条件！", ei.Name)
+			g.StoryLogf("完成%s灵体的条件", ei.Name)
 			g.curseLiftedFog()
 			sp.Condition = nil
 			g.ComputePlayerStats()
 		case CqLeave:
-			g.Logf("The %s spirit has left you!", ei.Name)
-			g.StoryLogf("Lost the %s spirit", ei.Name)
+			g.Logf("%s灵体离你而去！", ei.Name)
+			g.StoryLogf("失去%s灵体", ei.Name)
 			g.spiritLeftShock()
 			g.Entities[i] = emptySlot()
 			g.ComputePlayerStats()
 		case CqDischargeAll:
 			if sp.Charges > 0 {
 				name := sp.GetAbility().Name()
-				g.Logf("You lose all “%s” charges!", name)
-				g.StoryLogf("Lost all “%s” charges", name)
+				g.Logf("你失去了“%s”的所有充能！", name)
+				g.StoryLogf("失去“%s”的所有充能", name)
 				sp.Charges = 0
 			}
 		case CqDischarge:
 			if sp.Charges > 0 {
 				name := sp.GetAbility().Name()
-				g.Logf("You lose one “%s” charge!", name)
-				g.StoryLogf("Lost one “%s” charge (remaining %d/%d)", name, sp.Charges-1, sp.GetMaxCharges())
+				g.Logf("你失去了一点“%s”充能！", name)
+				g.StoryLogf("失去一点“%s”充能（剩余 %d/%d）", name, sp.Charges-1, sp.GetMaxCharges())
 				sp.Charges--
 			}
 		}
@@ -757,19 +757,19 @@ func (cond CondDisabled) EventTypes() EventType {
 func (cond CondDisabled) Desc() string {
 	switch cond.Part {
 	case HasInvoke:
-		return "This spirit cannot be invoked"
+		return "无法召唤此灵体"
 	case HasStats:
-		return "This spirit doesn’t affect your Stats"
+		return "此灵体不影响属性"
 	case HasInvStats:
-		return "This spirit can’t be invoked and doesn’t affect your Stats"
+		return "无法召唤此灵体，也不影响属性"
 	case HasTraits:
-		return "This spirit’s Traits don’t apply" // unused
+		return "此灵体的特性不生效" // unused
 	case HasAll:
-		return "This spirit has no effect" // unused
+		return "此灵体没有效果" // unused
 	case HasPassives:
-		return "This spirit can be invoked but has no other effects"
+		return "可以召唤此灵体，但没有其他效果"
 	default:
-		panic("unexpected disabled spirit part combination")
+		panic("意外的灵体禁用部分组合")
 	}
 }
 
@@ -792,7 +792,7 @@ func (c CondPunish) EventTypes() EventType {
 }
 
 func (c CondPunish) Desc() string {
-	return fmt.Sprintf("This spirit %s if %s", descCq(c.Do), c.When.Desc())
+	return fmt.Sprintf("当%s时，此灵体会%s", c.When.Desc(), descCq(c.Do))
 }
 
 func (c CondPunish) Enabled() SpiritPart {

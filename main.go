@@ -22,21 +22,25 @@ import (
 )
 
 func main() {
-	optReplay := flag.String("r", "", "path to replay file (_ means default location)")
-	optGameLogs := flag.Bool("l", false, "write game logs to log file")
-	optVersion := flag.Bool("version", false, "print build info")
-	optOptions := flag.String("O", "", "options (see 'vars.go' file for instructions)")
+	optReplay := flag.String("r", "", "回放文件路径（_ 表示默认位置）")
+	optGameLogs := flag.Bool("l", false, "将游戏日志写入文件")
+	optVersion := flag.Bool("version", false, "显示构建信息")
+	optOptions := flag.String("O", "", "选项（说明见 vars.go 文件）")
 	opt16colors, opt256colors, optTrueColor := new(bool), new(bool), new(bool)
 	optFullscreen := new(bool)
 	optWidthScale, optHeightScale := new(float64), new(float64)
 	if Tiles {
-		optFullscreen = flag.Bool("F", false, "fullscreen")
-		optWidthScale = flag.Float64("w", 1.0, "window width scale factor (default: 1.0, examples: 0.75, 1.25)")
-		optHeightScale = flag.Float64("h", 1.0, "window height scale factor (default: 1.0, examples: 0.75, 1.25)")
+		optFullscreen = flag.Bool("F", false, "全屏")
+		optWidthScale = flag.Float64("w", 1.0, "窗口宽度缩放比例（默认：1.0，示例：0.75、1.25）")
+		optHeightScale = flag.Float64("h", 1.0, "窗口高度缩放比例（默认：1.0，示例：0.75、1.25）")
 	} else {
-		opt16colors = flag.Bool("s", false, "use standard 16-color palette (default on most systems)")
-		opt256colors = flag.Bool("x", false, "use xterm 256-color palette (solarized approximation)")
-		optTrueColor = flag.Bool("t", false, "use true color selenized palette (not supported by all terminals)")
+		opt16colors = flag.Bool("s", false, "使用标准 16 色调色板（多数系统默认）")
+		opt256colors = flag.Bool("x", false, "使用 xterm 256 色调色板（近似 Solarized 配色）")
+		optTrueColor = flag.Bool("t", false, "使用真彩色 Selenized 调色板（并非所有终端都支持）")
+	}
+	flag.Usage = func() {
+		fmt.Fprintln(flag.CommandLine.Output(), "用法：shamogu [选项]\n\n可用选项：")
+		flag.PrintDefaults()
 	}
 	flag.Parse()
 
@@ -82,20 +86,20 @@ func RunGame(gamelogs bool) {
 	defer func() {
 		if repw != nil {
 			if err := repw.Close(); err != nil {
-				log.Printf("closing replay file: %v", err)
+				log.Printf("关闭回放文件失败：%v", err)
 			}
 		}
 		if md.gameEnded && dir != "" {
 			if err := RemoveSaveFile(); err != nil {
-				log.Printf("removing save file: %v", err)
+				log.Printf("删除存档文件失败：%v", err)
 			}
 			_, err := os.Stat(filepath.Join(dir, "replay.part"))
 			if err != nil {
-				log.Printf("no replay file: %v", err)
+				log.Printf("未找到回放文件：%v", err)
 				return
 			}
 			if err := os.Rename(filepath.Join(dir, "replay.part"), filepath.Join(dir, "replay")); err != nil {
-				log.Printf("writing replay file: %v", err)
+				log.Printf("写入回放文件失败：%v", err)
 			}
 		}
 	}()
@@ -104,7 +108,7 @@ func RunGame(gamelogs bool) {
 		if err == nil {
 			repw = replay
 		} else {
-			log.Printf("writing to replay file: %v", err)
+			log.Printf("写入回放数据失败：%v", err)
 		}
 	} else {
 		log.Print(err)
@@ -141,7 +145,7 @@ func RunReplay(file string) {
 	}
 	replay, err := os.Open(file)
 	if err != nil {
-		log.Fatalf("loading replay file: %v", err)
+		log.Fatalf("载入回放文件失败：%v", err)
 	}
 	defer replay.Close()
 	fd, err := gruid.NewFrameDecoder(replay)
@@ -152,7 +156,7 @@ func RunReplay(file string) {
 		var errb64 error
 		fd, errb64 = gruid.NewFrameDecoder(b64replay)
 		if errb64 != nil {
-			log.Fatalf("frame decoder: %v", err)
+			log.Fatalf("帧解码器错误：%v", err)
 		}
 	}
 	gd := gruid.NewGrid(UIWidth, UIHeight)
@@ -227,7 +231,7 @@ func processOptions(s string) {
 		case "NoAnim":
 			NoAnim = !negate
 		default:
-			fmt.Fprintf(os.Stderr, "shamogu: unknown option: %v\n", opt)
+			fmt.Fprintf(os.Stderr, "shamogu：未知选项：%v\n", opt)
 		}
 	}
 }

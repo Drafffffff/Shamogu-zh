@@ -3,18 +3,18 @@
 <head>
 <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="initial-scale=1">
-<title>Play Shamogu in the Browser</title>
+<title>在浏览器中游玩 Shamogu</title>
 <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
 <script src="wasm_exec.js"></script>
 <div id="gamediv">
 <canvas id="gamecanvas">
-Game Screen
+游戏画面
 </canvas>
 </div>
 <div style="display:none">
-<img id="loading" src="loading-screen.png" alt="Game Loading Screen">
+<img id="loading" src="loading-screen.png" alt="游戏加载画面">
 </div>
 <script>
 function hasLocalStorage() {
@@ -30,13 +30,13 @@ function hasLocalStorage() {
 function saveReplay() {
 	if (!hasLocalStorage()) {
 		var t = document.getElementById("shamoguinfo");
-		t.innerHTML = 'Feature not available in your browser.';
+		t.innerHTML = '你的浏览器不支持此功能。';
 		return
 	}
 	var data = localStorage.getItem('shamogureplay');
 	if (!data) {
 		var t = document.getElementById("shamoguinfo");
-		t.innerHTML = 'No replay available.';
+		t.innerHTML = '没有可用的回放。';
 		return
 	}
 	var a = document.createElement('a');
@@ -69,19 +69,18 @@ function loadReplay(files) {
 </script>
 <div>
 <span class="centered">
-Load replay: <input type="file" value="Load replay" onchange="loadReplay(this.files)"> -
-<input type="button" value="Save replay" onclick="saveReplay()">
+载入回放：<input type="file" value="载入回放" onchange="loadReplay(this.files)"> -
+<input type="button" value="保存回放" onclick="saveReplay()">
 <em id="shamoguinfo"></em>
-<small>Keys: press ? for help</small>
-<button id="goFS">Go Fullscreen</button>
-<button id="clearcfgsave">Clear config/saves</button>
+<small>按 ? 查看按键帮助</small>
+<button id="goFS">全屏</button>
+<button id="clearcfgsave">清除设置与存档</button>
 </span>
 </div>
 <details>
-<summary>Game Summary and Statistics</summary>
+<summary>游戏总结与统计</summary>
 <pre id="dump">
-This will be filled with statistics at the end of the game, or when you press
-“#” in the game.
+游戏结束后，或在游戏中按“#”键时，此处会显示统计信息。
 </pre>
 </details>
 <script>

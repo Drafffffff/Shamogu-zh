@@ -1,0 +1,6 @@
+{
+  "upstream_tag": "v1.6.0",
+  "upstream_commit": "0c1e2d4a4e50ff4cc10cd922b4e82004b9659e5a",
+  "official_embedded_images": 175,
+  "preserved": true
+}

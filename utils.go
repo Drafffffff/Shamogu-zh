@@ -34,33 +34,19 @@ func abs(i int) int {
 	return i
 }
 
-// One adds "a" or "an" to a string.
-func One(s string) (text string) {
-	if len(s) > 0 {
-		if s[len(s)-1] == 's' {
-			return s
-		}
-		switch s[0] {
-		case 'a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U':
-			text = "an " + s
-		default:
-			text = "a " + s
-		}
-	}
-	return text
+// One returns a noun without adding an English article.
+func One(s string) string {
+	return s
 }
 
-// CountNoun adds a counter and an "s" depending on quantity n.
+// CountNoun prefixes a quantity to a noun without English plural inflection.
 func CountNoun(s string, n int) string {
 	return fmt.Sprintf("%d %s", n, Countable(s, n))
 }
 
-// Countable adds an "s" depending on quantity n.
+// Countable returns the noun unchanged; Chinese nouns do not take an English plural suffix.
 func Countable(s string, n int) string {
-	if len(s) == 0 || s[len(s)-1] == 's' || n == 1 {
-		return s
-	}
-	return s + "s"
+	return s
 }
 
 // Neighbors returns an iterator over cardinal neighbors of the given position.

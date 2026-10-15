@@ -14,12 +14,12 @@ var driver gruid.Driver
 func initDriver(fullscreen bool, sx, sy float64) {
 	icon, err := base64pngToRGBA(TileImgs["favicon"])
 	if err != nil {
-		log.Printf("decoding window icon: %v", err)
+		log.Printf("解码窗口图标失败：%v", err)
 	}
 	dr := sdl.NewDriver(sdl.Config{
 		TileManager: &monochromeTileManager{},
 		Fullscreen:  fullscreen,
-		WindowTitle: "Shamogu",
+		WindowTitle: "萨满山灵守护者 · Shamogu",
 		WindowIcon:  icon,
 	})
 	if sx != 1 || sy != 1 {

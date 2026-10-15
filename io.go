@@ -26,7 +26,7 @@ func DataDir() (string, error) {
 	if err != nil {
 		err = os.MkdirAll(dataDir, 0755)
 		if err != nil {
-			return "", fmt.Errorf("building data directory: %v", err)
+			return "", fmt.Errorf("创建数据目录时出错：%v", err)
 		}
 	}
 	return dataDir, nil
@@ -77,7 +77,7 @@ func RemoveSaveFile() error {
 // RemoveReplay removes the replay file if it exists.
 func RemoveReplay() {
 	if err := RemoveDataFile("replay.part"); err != nil {
-		log.Printf("removing replay: %v", err)
+		log.Printf("删除回放文件时出错：%v", err)
 	}
 }
 
@@ -102,9 +102,9 @@ func (g *Game) Load() (bool, error) {
 		return false, err
 	}
 	if lg.Version != Version {
-		log.Print("ignoring incompatible old save")
+		log.Print("忽略不兼容的旧存档")
 		if err := RemoveDataFile("save"); err != nil {
-			log.Printf("removing old save: %v", err)
+			log.Printf("删除旧存档时出错：%v", err)
 		}
 		return false, nil
 	}
@@ -139,16 +139,16 @@ func LoadConfig() (bool, error) {
 	}
 	c, err := DecodeConfigSave(data)
 	if err != nil {
-		log.Printf("ignoring incompatible old config: %v", err)
+		log.Printf("忽略不兼容的旧配置：%v", err)
 		if err := RemoveDataFile("config"); err != nil {
-			log.Printf("removing old config: %v", err)
+			log.Printf("删除旧配置时出错：%v", err)
 		}
 		return false, nil
 	}
 	if c.VersionNumber != GameConfig.VersionNumber {
-		log.Print("ignoring incompatible old config")
+		log.Print("忽略不兼容的旧配置")
 		if err := RemoveDataFile("config"); err != nil {
-			log.Printf("removing old config: %v", err)
+			log.Printf("删除旧配置时出错：%v", err)
 		}
 		return false, nil
 	}
@@ -186,7 +186,7 @@ func (g *Game) WriteDump() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("Full game statistics at %s.", dumpPath()), nil
+	return fmt.Sprintf("完整游戏统计已保存至 %s。", dumpPath()), nil
 }
 
 // dumpPath returns an anonymized path to the dump.txt file.

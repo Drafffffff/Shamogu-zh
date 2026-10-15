@@ -67,7 +67,7 @@ func (sp *Spirit) Desc(g *Game) string {
 func (sp *Spirit) eitherDesc(g *Game, descUpgrade bool) string {
 	var sb strings.Builder
 	if descUpgrade {
-		sb.WriteString("@CTotemic spirit.@N\n")
+		sb.WriteString("@C图腾灵体。@N\n")
 	}
 	if cond := sp.Condition; cond != nil {
 		if descUpgrade {
@@ -82,16 +82,16 @@ func (sp *Spirit) eitherDesc(g *Game, descUpgrade bool) string {
 	}
 	bonuses := []string{}
 	if attack := sp.BonusAttack[sp.Level]; attack > 0 {
-		bonuses = append(bonuses, fmt.Sprintf("%+d Attack", attack))
+		bonuses = append(bonuses, fmt.Sprintf("攻击 %+d", attack))
 	}
 	if defense := sp.BonusDefense[sp.Level]; defense > 0 {
-		bonuses = append(bonuses, fmt.Sprintf("%+d Defense", defense))
+		bonuses = append(bonuses, fmt.Sprintf("防御 %+d", defense))
 	}
 	if hp := sp.BonusHP[sp.Level]; hp > 0 {
-		bonuses = append(bonuses, fmt.Sprintf("%+d HP", hp))
+		bonuses = append(bonuses, fmt.Sprintf("生命 %+d", hp))
 	}
 	if len(bonuses) > 0 {
-		sb.WriteString("@CStats:@N")
+		sb.WriteString("@C属性：@N")
 		for i, bonus := range bonuses {
 			sb.WriteByte(' ')
 			sb.WriteString(bonus)
@@ -103,37 +103,37 @@ func (sp *Spirit) eitherDesc(g *Game, descUpgrade bool) string {
 		}
 		sb.WriteByte('\n')
 	}
-	fmt.Fprintf(&sb, "@CAbility @S(%s %d/%d charges)@C:@N %s",
+	fmt.Fprintf(&sb, "@C能力 @S（%s，充能 %d/%d）@C：@N %s",
 		sp.GetAbility().Name(), sp.Charges, sp.GetMaxCharges(), sp.GetAbility().Desc(g))
 	sb.WriteByte('\n')
-	fmt.Fprintf(&sb, "@CTraits:@N %s.", g.TraitDesc(Player, sp.BonusTraits[sp.Level]))
+	fmt.Fprintf(&sb, "@C特性：@N %s。", g.TraitDesc(Player, sp.BonusTraits[sp.Level]))
 	return sb.String()
 }
 
 func (sp *Spirit) UpgradeDesc(g *Game, enew *Entity) string {
 	desc := sp.Desc(g)
 	var sb strings.Builder
-	sb.WriteString("@MThe spirit essence can be used to upgrade this spirit.@N\n")
+	sb.WriteString("@M可使用灵体精华升级此灵体。@N\n")
 	hasCond := sp.Condition != nil
 	if cond := enew.Role.(*Spirit).Condition; cond != nil && cond.Upgrade.Applies(hasCond) {
 		if hasCond {
-			sb.WriteString("@RReplacing@N ")
+			sb.WriteString("@R替换@N ")
 		}
 		sb.WriteString(cond.Desc())
 		sb.WriteByte('\n')
 	}
 	bonuses := []string{}
 	if attack := sp.BonusAttack[1] - sp.BonusAttack[0]; attack > 0 {
-		bonuses = append(bonuses, fmt.Sprintf("%+d Attack", attack))
+		bonuses = append(bonuses, fmt.Sprintf("攻击 %+d", attack))
 	}
 	if defense := sp.BonusDefense[1] - sp.BonusDefense[0]; defense > 0 {
-		bonuses = append(bonuses, fmt.Sprintf("%+d Defense", defense))
+		bonuses = append(bonuses, fmt.Sprintf("防御 %+d", defense))
 	}
 	if hp := sp.BonusHP[1] - sp.BonusHP[0]; hp > 0 {
-		bonuses = append(bonuses, fmt.Sprintf("%+d HP", hp))
+		bonuses = append(bonuses, fmt.Sprintf("生命 %+d", hp))
 	}
 	if len(bonuses) > 0 {
-		sb.WriteString("@BStats:@N")
+		sb.WriteString("@B属性：@N")
 		for i, bonus := range bonuses {
 			sb.WriteByte(' ')
 			sb.WriteString(bonus)
@@ -145,31 +145,31 @@ func (sp *Spirit) UpgradeDesc(g *Game, enew *Entity) string {
 		}
 		sb.WriteByte('\n')
 	}
-	fmt.Fprintf(&sb, "@BCharges:@N %+d", sp.MaxCharges[1]-sp.MaxCharges[0])
+	fmt.Fprintf(&sb, "@B充能：@N %+d", sp.MaxCharges[1]-sp.MaxCharges[0])
 	if sp.BonusTraits[1] != sp.BonusTraits[0] {
 		sb.WriteByte('\n')
-		fmt.Fprintf(&sb, "@BNew traits:@N %s.", g.TraitDesc(Player, sp.BonusTraits[1]&^sp.BonusTraits[0]))
+		fmt.Fprintf(&sb, "@B新特性：@N %s。", g.TraitDesc(Player, sp.BonusTraits[1]&^sp.BonusTraits[0]))
 	}
 	return desc + "\n\n" + sb.String()
 }
 
 func (sp *Spirit) Use(g *Game, i ID) bool {
 	if !sp.Condition.CanInvoke() {
-		g.Log("This spirit cannot yet be invoked!")
+		g.Log("暂时无法召唤此灵体！")
 		return false
 	}
 	if sp.Charges == 0 {
-		g.Log("No charges remaining.")
+		g.Log("没有剩余充能。")
 		return false
 	}
 	pa := g.PlayerActor()
 	if pa.Has(StatusDaze) && !pa.DoesAny(ResistanceDaze) {
-		g.Log("You cannot invoke a spirit while dazed.")
+		g.Log("眩晕时无法召唤灵体。")
 		return false
 	}
 	confused := pa.Has(StatusConfusion)
 	if confused && pa.HP <= 2 {
-		g.Log("You cannot invoke a spirit while confused and almost dead (HP < 3).")
+		g.Log("混乱且濒死（生命值 < 3）时无法召唤灵体。")
 		return false
 	}
 	ohp := pa.HP
@@ -183,14 +183,14 @@ func (sp *Spirit) Use(g *Game, i ID) bool {
 	g.Stats.MapSpiritUses[g.Map.Level-1]++
 	name := sp.GetAbility().Name()
 	if confused {
-		g.LogfStyled("Invoking the spirit while confused hurts you (%d dmg).", logHurtPlayer, ConfusionDamage)
+		g.LogfStyled("混乱时召唤灵体会使你受到 %d 点伤害。", logHurtPlayer, ConfusionDamage)
 		g.InflictDamage(PlayerID, pa, ConfusionDamage, AttackOther)
-		g.StoryLogf("Used the “%s” ability while confused (HP: %d/%d, charges: %d/%d)",
+		g.StoryLogf("在迷向时使用“%s”能力（生命值：%d/%d，充能：%d/%d）",
 			name, pa.HP, pa.GetMaxHP(), sp.Charges, sp.GetMaxCharges())
 	} else if hp := pa.HP; hp == ohp {
-		g.StoryLogf("Used the “%s” ability (charges: %d/%d)", name, sp.Charges, sp.GetMaxCharges())
+		g.StoryLogf("使用“%s”能力（充能：%d/%d）", name, sp.Charges, sp.GetMaxCharges())
 	} else {
-		g.StoryLogf("Used the “%s” ability (HP: %d/%d, charges: %d/%d)", name, hp, pa.GetMaxHP(), sp.Charges, sp.GetMaxCharges())
+		g.StoryLogf("使用“%s”能力（生命值：%d/%d，充能：%d/%d）", name, hp, pa.GetMaxHP(), sp.Charges, sp.GetMaxCharges())
 	}
 	return true
 }
@@ -213,11 +213,11 @@ const ConfusionDamage = 1
 type EmptyTotem struct{}
 
 func (sp *EmptyTotem) Desc(_ *Game) string {
-	return "The totem does not have a spirit or it already left."
+	return "图腾中没有灵体，或灵体已经离开。"
 }
 
 func (sp *EmptyTotem) Use(g *Game, i ID) bool {
-	g.Log("You cannot equip a spirit from an empty totem.")
+	g.Log("无法从空图腾中装备灵体。")
 	return false
 }
 
@@ -231,7 +231,7 @@ func (c *Comestible) Desc(g *Game) string {
 }
 
 func (c *Comestible) ExamineDesc(g *Game) string {
-	return fmt.Sprintf("@CComestible.@N\n%s", c.Effect.Desc(g))
+	return fmt.Sprintf("@C食物。@N\n%s", c.Effect.Desc(g))
 }
 
 func (c *Comestible) Use(g *Game, i ID) bool {
@@ -252,7 +252,7 @@ func (c *Comestible) Use(g *Game, i ID) bool {
 	done := ef.Apply(g)
 	if !done {
 		// Should never happen with comestibles.
-		log.Printf("BUG: did not eat the %s.", g.Entity(i).Name)
+		log.Printf("错误：未能吃下%s。", g.Entity(i).Name)
 		return false
 	}
 	g.Stats.Comestibles[g.Entity(i).Name]++
@@ -279,7 +279,7 @@ func (g *Game) handleGluttonyOnEating() {
 	switch pa := g.PlayerActor(); {
 	case pa.Has(StatusGluttony):
 		pa.Statuses[StatusGluttony] = 0
-		g.LogStyled("You feel full.", logStatusEnd)
+		g.LogStyled("你感到饱了。", logStatusEnd)
 	case pa.DoesAny(Gluttony) && !g.snack:
 		g.PutStatus1(PlayerID, pa, StatusGluttony, DurationGluttony)
 	}
@@ -291,7 +291,7 @@ func (g *Game) EquipItemAt(i ID) bool {
 	j, it := g.ItemAt(g.PP())
 	if j <= 0 {
 		// should not happen
-		g.LogStyled("Cannot equip item (BUG).", logError)
+		g.LogStyled("无法装备此物品（错误）。", logError)
 		return false
 	}
 	ej := g.Entity(j)
@@ -303,7 +303,7 @@ func (g *Game) EquipItemAt(i ID) bool {
 		if spi, ok := ei.Role.(*Spirit); ok {
 			if spi.Level >= 1 {
 				// Should not happen.
-				g.Log("Spirit cannot be upgraded anymore.")
+				g.Log("灵体已无法继续升级。")
 				return false
 			}
 			spi.Level++
@@ -312,15 +312,15 @@ func (g *Game) EquipItemAt(i ID) bool {
 				g.recordCurse(ei.Name, itc)
 				spi.Condition = itc
 			}
-			g.Logf("You upgrade your %s spirit.", ei.Name)
-			g.StoryLogf("Upgraded your %s spirit", ei.Name)
+			g.Logf("你升级了%s灵体。", ei.Name)
+			g.StoryLogf("已升级%s灵体", ei.Name)
 		} else {
 			if itc != nil {
 				g.recordCurse(ej.Name, itc)
 			}
 			g.Entities[i], g.Entities[j] = g.Entities[j], g.Entities[i]
-			g.Logf("You choose the %s spirit.", ej.Name)
-			g.StoryLogf("Chose the %s spirit", ej.Name)
+			g.Logf("你选择了%s灵体。", ej.Name)
+			g.StoryLogf("已选择%s灵体", ej.Name)
 		}
 		g.ComputePlayerStats()
 		if hpmaxDelta := pa.MaxHP - ohpmax; hpmaxDelta > 0 {
@@ -333,19 +333,19 @@ func (g *Game) EquipItemAt(i ID) bool {
 		return true
 	case *Comestible:
 		if ei.IsItem() {
-			g.Logf("You pick the %s (replacing %s).", ej.Name, ei.Name)
-			g.StoryLogf("Picked %s (replacing %s)", One(ej.Name), ei.Name)
+			g.Logf("你拾起%s（替换%s）。", ej.Name, ei.Name)
+			g.StoryLogf("已拾起%s（替换%s）", One(ej.Name), ei.Name)
 			ei.P = ej.P
 		} else {
-			g.Logf("You pick the %s.", ej.Name)
-			g.StoryLogf("Picked %s (comestibles: %d)", One(ej.Name), g.ComestibleCount()+1)
+			g.Logf("你拾起%s。", ej.Name)
+			g.StoryLogf("已拾起%s（食物：%d）", One(ej.Name), g.ComestibleCount()+1)
 		}
 		ej.P = InvalidPos
 		g.Entities[i], g.Entities[j] = g.Entities[j], g.Entities[i]
 		TotemEvents(g, &EventHappened{EvType: EventPickup})
 		return true
 	default:
-		panic("unexpected item type")
+		panic("意外的物品类型")
 	}
 }
 
@@ -363,7 +363,7 @@ func (g *Game) totemPickupBerserk() {
 		}
 	}
 	if berserk {
-		g.LogStyled("Picking a spirit makes monsters in view berserk!", logSpecial)
+		g.LogStyled("拾取灵体会使视野中的怪物陷入狂暴！", logSpecial)
 	}
 }
 
@@ -375,14 +375,14 @@ type Menhir struct {
 
 func (m *Menhir) Desc(g *Game) string {
 	if !m.Used {
-		return fmt.Sprintf("@CActivable@N.\n%s", m.Effect.Desc(g))
+		return fmt.Sprintf("@C可激活。@N\n%s", m.Effect.Desc(g))
 	}
 	return m.Effect.Desc(g)
 }
 
 func (m *Menhir) Use(g *Game, i ID) bool {
 	if m.Used {
-		g.Log("The menhir is already inert.")
+		g.Log("石碑已经失去能量。")
 		return false
 	}
 	if g.WarnLeave(EventMenhir) {
@@ -393,7 +393,7 @@ func (m *Menhir) Use(g *Game, i ID) bool {
 	if !done {
 		return false
 	}
-	g.StoryLogf("Activated %s", One(g.Entity(i).Name))
+	g.StoryLogf("已激活%s", One(g.Entity(i).Name))
 	m.Used = true
 	TotemEvents(g, &EventHappened{EvType: EventMenhir})
 	g.Stats.ActivatedMenhirs++
@@ -409,14 +409,14 @@ type Portal struct {
 
 func (p *Portal) Desc(_ *Game) string {
 	if p.Used {
-		return "Malfunctioning magical portal that doesn’t lead anywhere, despite looking normal."
+		return "外表正常的魔法传送门发生了故障，无法通往任何地方。"
 	}
-	return fmt.Sprintf("@CActivable@N.\n%s", "A magical portal leading to the next level. Replenishes spirit charges and HP.")
+	return fmt.Sprintf("@C可激活。@N\n%s", "通往下一层的魔法传送门。可补满灵体充能和生命值。")
 }
 
 func (p *Portal) Use(g *Game, i ID) bool {
 	if p.Used {
-		g.Log("This portal is malfunctional and cannot be triggered anymore.")
+		g.Log("传送门已发生故障，无法再次触发。")
 		return false
 	}
 	if p.Fake {
@@ -425,22 +425,22 @@ func (p *Portal) Use(g *Game, i ID) bool {
 		return true
 	}
 	if err := g.Save(); err != nil {
-		log.Printf("error saving game before new level: %v", err)
+		log.Printf("进入新一层前保存游戏失败：%v", err)
 	}
-	g.StoryLog("Entered a magical portal!")
-	g.LogStyled("You enter the portal.", logSpecial)
+	g.StoryLog("进入了魔法传送门！")
+	g.LogStyled("你进入传送门。", logSpecial)
 	g.NextLevel()
 	return false
 }
 
 func (g *Game) useFakePortal() {
-	g.LogStyled("You try to activate the magic portal…", logSpecial)
-	g.StoryLog("Triggered a malfunctioning portal")
+	g.LogStyled("你尝试激活魔法传送门……", logSpecial)
+	g.StoryLog("触发了故障传送门")
 	const maxdist = MaxFOVRange + 3
 	mp := &MapPath{passable: g.Map.Passable}
 	g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, maxdist)
 	g.MakeNoise(g.PP(), NoiseFakePortal)
-	g.LogStyled("An eerie sound came out, but nothing happened!", logSpecial)
+	g.LogStyled("传来一阵诡异的声音，但什么也没有发生！", logSpecial)
 	TotemEvents(g, &EventHappened{EvType: EventFakePortal})
 	for i, ai := range g.Monsters() {
 		ei := g.Entity(i)
@@ -474,19 +474,19 @@ func (o *CorruptionOrb) Desc(_ *Game) string {
 	if o.Broken {
 		// Should not happen in practice for now, unless we add extra
 		// content after destroying the orb.
-		return "The source of beast corruption that you destroyed."
+		return "你摧毁的野兽腐化源头。"
 	}
-	return fmt.Sprintf("@CActivable@N.\n%s", "The source of beast corruption that you need to destroy. Beware that the Orb may sometimes actively drive you further away when you teleport.")
+	return fmt.Sprintf("@C可激活。@N\n%s", "你需要摧毁的野兽腐化源头。注意，传送时魔法球有时会主动把你传送得更远。")
 }
 
 func (o *CorruptionOrb) Use(g *Game, i ID) bool {
 	o.Broken = true
 	if g.Wizard.Mode == WizardNone {
-		g.LogStyled("You destroy the Orb of Corruption… You win!", logSpecial)
+		g.LogStyled("你摧毁了腐化之球……胜利！", logSpecial)
 	} else {
-		g.LogStyled("You destroy the Orb of Corruption… **WIZARD**!", logSpecial)
+		g.LogStyled("你摧毁了腐化之球……**向导模式**！", logSpecial)
 	}
-	g.StoryLog("Destroyed the Orb of Corruption!")
+	g.StoryLog("摧毁了腐化魔法球！")
 	g.md.OrbDestructionAnimation()
 	g.LevelStats()
 	g.md.logConfirmContinue()

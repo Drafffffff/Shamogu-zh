@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+export LANG=zh_CN.UTF-8
+export SDL_RENDER_SCALE_QUALITY=0
+export SDL_VIDEO_X11_WMCLASS=shamogu-zh
+export SDL_ENABLE_SCREEN_KEYBOARD=0
+export SDL_ENABLE_STEAM_SCREEN_KEYBOARD=0
+exec "$HERE/shamogu-zh" -F "$@"

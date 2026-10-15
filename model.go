@@ -58,28 +58,31 @@ const (
 	modeQuitConfirmation               // waiting for no-save quit confirmation
 	modeQuitting                       // wait until end message
 	modeUseConfirmation                // menhir or comestible pickup warning
+	modeIntro
 )
 
 // model describes the gruid.Model of the game.
 type model struct {
-	action         Action     // action to handle
-	anims          Animations // animations
-	auto           *auto      // auto-travel mode info
-	desc           *ui.Label  // description label (for monsters, terrain)
-	equipPager     *ui.Pager  // description pager for equipping item
-	gameEnded      bool       // whether the game ended
-	drawGroundDesc bool       // whether to draw extra equipping desc
-	g              *Game      // game state
-	gd             gruid.Grid // drawing grid
-	keysNormal     map[gruid.Key]Action
-	keysTarget     map[gruid.Key]Action
-	log            *ui.Label // game's last log messages
-	menu           *menu     // menus (Menu, Settings, Inventory, Keymaps)
-	menuActions    []Action  // invokable actions in last game/help/config menu
-	mode           mode      // main mode
-	pager          *pager    // pager (logs and the like)
-	status         *gameStatus
-	targ           *targeting
+	action             Action     // action to handle
+	anims              Animations // animations
+	auto               *auto      // auto-travel mode info
+	desc               *ui.Label  // description label (for monsters, terrain)
+	equipPager         *ui.Pager  // description pager for equipping item
+	gameEnded          bool       // whether the game ended
+	textDescription    *ui.Pager
+	textDescriptionKey string
+	drawGroundDesc     bool       // whether to draw extra equipping desc
+	g                  *Game      // game state
+	gd                 gruid.Grid // drawing grid
+	keysNormal         map[gruid.Key]Action
+	keysTarget         map[gruid.Key]Action
+	log                *ui.Label // game's last log messages
+	menu               *menu     // menus (Menu, Settings, Inventory, Keymaps)
+	menuActions        []Action  // invokable actions in last game/help/config menu
+	mode               mode      // main mode
+	pager              *pager    // pager (logs and the like)
+	status             *gameStatus
+	targ               *targeting
 }
 
 func (md *model) init() gruid.Effect {
@@ -103,9 +106,12 @@ func (md *model) init() gruid.Effect {
 			g.Mods = make([]bool, NMods)
 		}
 		md.openSpiritSelectionMenu(modeNewGame)
+		if LargeTextPanels {
+			md.mode = modeIntro
+		}
 	}
 	if err != nil {
-		log.Printf("Error: %v", err)
+		log.Printf("错误：%v", err)
 	}
 	md.targ.CancelExamine()
 	md.InitAnimations()
@@ -129,12 +135,12 @@ func (md *model) initWidgets() {
 	md.desc = ui.NewLabel(ui.StyledText{}.WithMarkups(Markups))
 	md.desc.AdjustWidth = false
 	md.equipPager = ui.NewPager(ui.PagerConfig{
-		Grid: gruid.NewGrid(UIWidth/2, UIHeight-1),
+		Grid: gruid.NewGrid(menuPanelWidth(), menuPanelHeight()),
 		Box:  &ui.Box{},
 	})
 	md.pager = &pager{}
 	md.pager.pg = ui.NewPager(ui.PagerConfig{
-		Grid: gruid.NewGrid(UIWidth, UIHeight-1),
+		Grid: gruid.NewGrid(TextPanelWidth, textPanelHeight()),
 		Box:  &ui.Box{},
 		Keys: ui.PagerKeys{Quit: []gruid.Key{gruid.KeySpace, "x", "X", gruid.KeyEscape}},
 	})
@@ -150,13 +156,13 @@ func (md *model) initWidgets() {
 	})
 	md.menu = &menu{}
 	md.menu.main = ui.NewMenu(ui.MenuConfig{
-		Grid:  gruid.NewGrid(UIWidth/2, UIHeight-1),
+		Grid:  gruid.NewGrid(menuPanelWidth(), menuPanelHeight()),
 		Box:   &ui.Box{},
 		Style: style,
 		Keys:  ui.MenuKeys{Quit: []gruid.Key{gruid.KeySpace, "x", "X", gruid.KeyEscape}},
 	})
 	md.menu.keys = ui.NewMenu(ui.MenuConfig{
-		Grid:  gruid.NewGrid(UIWidth, UIHeight-1),
+		Grid:  gruid.NewGrid(TextPanelWidth, textPanelHeight()),
 		Box:   &ui.Box{},
 		Style: style,
 		Keys:  ui.MenuKeys{Quit: []gruid.Key{gruid.KeySpace, "x", "X", gruid.KeyEscape}},
@@ -256,10 +262,10 @@ func (md *model) applyKeyConfig() {
 func InitConfig() error {
 	_, err := LoadConfig()
 	if err != nil {
-		err = fmt.Errorf("error loading config: %v", err)
+		err = fmt.Errorf("读取配置时出错：%v", err)
 		saverr := SaveConfig()
 		if saverr != nil {
-			log.Printf("error resetting badly loaded config: %v", err)
+			log.Printf("重置损坏配置时出错：%v", err)
 		}
 		return err
 	}
@@ -271,23 +277,24 @@ var spiritKeys = []rune{'H', 'B', 'F', 'f', 'c', 'C', 'b'}
 func (md *model) openSpiritSelectionMenu(m mode) {
 	hstyle := gruid.Style{Fg: ColorCyan}
 	entries := []ui.MenuEntry{}
-	title := "New Game"
+	title := "新游戏"
 	for i, si := range primarySpirits {
 		r := spiritKeys[i]
 		switch r {
 		case 'H':
 			entries = append(entries, ui.MenuEntry{
-				Text:     ui.Text("Primary Spirit Selection").WithStyle(hstyle),
+				Text:     ui.Text("主灵体选择").WithStyle(hstyle),
 				Disabled: true,
 			})
 		}
 		advanced := ""
 		if i >= 5 {
-			advanced = " @S(advanced)@N"
+			advanced = " @S（高级）@N"
 		}
 		name := si.Name
-		if md.g.Mod(ModHealingCombat) && !VampiricHC && name == "Vampiric Bat" {
-			name = "@RVampiric@N Bat"
+		_, isVampiric := si.Ability[0].(EffectVampirism)
+		if md.g.Mod(ModHealingCombat) && !VampiricHC && isVampiric {
+			name = "@R吸血@N蝙蝠"
 		}
 		entries = append(entries, ui.MenuEntry{
 			Text: ui.Textf("%c - %s%s", r, name, advanced).WithMarkups(Markups),

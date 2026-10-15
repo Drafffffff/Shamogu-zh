@@ -20,7 +20,7 @@ func (md *model) Update(msg gruid.Msg) gruid.Effect {
 		if md.mode != modeQuitting {
 			// Save game before quitting.
 			if err := md.g.Save(); err != nil {
-				log.Printf("saving before quitting: %v", err)
+				log.Printf("退出前保存时出错：%v", err)
 			}
 		}
 		md.mode = modeQuitting
@@ -70,6 +70,11 @@ func (md *model) update(msg gruid.Msg) gruid.Effect {
 	md.action = ActionNone{}
 	md.g.instant = false
 	switch md.mode {
+	case modeIntro:
+		if md.interrupt(msg) {
+			md.openSpiritSelectionMenu(modeNewGame)
+		}
+		return nil
 	case modeLoadGame:
 		switch msg := msg.(type) {
 		case gruid.MsgKeyDown:
@@ -90,7 +95,7 @@ func (md *model) update(msg gruid.Msg) gruid.Effect {
 	case modeCritical:
 		if md.more(msg) {
 			md.mode = modeNormal
-			md.g.Log("Ok. Be careful, then.")
+			md.g.Log("好了，小心行事。")
 		}
 	case modePager:
 		return md.updatePager(msg)
@@ -106,7 +111,7 @@ func (md *model) update(msg gruid.Msg) gruid.Effect {
 			md.g.confirm = true
 			md.action = ActionInteract{}
 		case confirmFalse:
-			md.g.Log("Don’t touch it, then.")
+			md.g.Log("那就别碰它了。")
 			md.mode = modeNormal
 		}
 	case modeQuitConfirmation:
@@ -332,32 +337,32 @@ func (md *model) updateStatusMouse(msg gruid.MsgMouse) {
 		md.status.focus = false
 		switch {
 		case i == statusLevel:
-			md.status.desc.Box = &ui.Box{Title: ui.Text("Level")}
-			md.status.desc.SetText("Current map level.")
+			md.status.desc.Box = &ui.Box{Title: ui.Text("层数")}
+			md.status.desc.SetText("当前地图层数。")
 			md.status.focus = true
 		case i == statusTurns:
-			md.status.desc.Box = &ui.Box{Title: ui.Text("Turns")}
-			md.status.desc.SetText("Number of elapsed turns since the start.")
+			md.status.desc.Box = &ui.Box{Title: ui.Text("回合")}
+			md.status.desc.SetText("游戏开始后经过的回合数。")
 			md.status.focus = true
 		case i == statusMenu:
-			md.status.desc.Box = &ui.Box{Title: ui.Text("Menu")}
-			md.status.desc.SetText("Click to open menu or press either the Space or M key.")
+			md.status.desc.Box = &ui.Box{Title: ui.Text("菜单")}
+			md.status.desc.SetText("点击打开菜单，或按空格键、M 键。")
 			md.status.focus = true
 		case i == statusDirection:
-			md.status.desc.Box = &ui.Box{Title: ui.Text("Direction")}
-			md.status.desc.SetText("The direction of the last attack or movement.")
+			md.status.desc.Box = &ui.Box{Title: ui.Text("方向")}
+			md.status.desc.SetText("上次攻击或移动的方向。")
 			md.status.focus = true
 		case i == statusHP:
-			md.status.desc.Box = &ui.Box{Title: ui.Text("Health")}
-			md.status.desc.SetText("Your hit points.")
+			md.status.desc.Box = &ui.Box{Title: ui.Text("生命")}
+			md.status.desc.SetText("你的生命值。")
 			md.status.focus = true
 		case i == statusAttack:
-			md.status.desc.Box = &ui.Box{Title: ui.Text("Attack")}
-			md.status.desc.SetText("Your attack attribute.")
+			md.status.desc.Box = &ui.Box{Title: ui.Text("攻击")}
+			md.status.desc.SetText("你的攻击属性。")
 			md.status.focus = true
 		case i == statusDefense:
-			md.status.desc.Box = &ui.Box{Title: ui.Text("Defense")}
-			md.status.desc.SetText("Your defense attribute.")
+			md.status.desc.Box = &ui.Box{Title: ui.Text("防御")}
+			md.status.desc.SetText("你的防御属性。")
 			md.status.focus = true
 		case i >= statusIndex:
 			i := md.status.menu.Active() - int(statusIndex)
@@ -376,16 +381,16 @@ func (md *model) updateStatusMouse(msg gruid.MsgMouse) {
 			}
 			if st < 0 {
 				if !pa.IsDead() && !md.g.win {
-					md.status.desc.Box = &ui.Box{Title: ui.Text("Player’s Tile")}
-					md.status.desc.SetText("The tile where the player is.")
+					md.status.desc.Box = &ui.Box{Title: ui.Text("所在格")}
+					md.status.desc.SetText("玩家所在的位置。")
 					md.status.focus = true
 				}
 				break
 			}
 			turns := pa.Statuses[st]
 			title := ui.StyledText{}.WithMarkups(Markups).
-				WithTextf("@%c%s@N (for %s)",
-					statusColor(st, turns), st.Name(), CountNoun("turn", turns))
+				WithTextf("@%c%s@N（剩余 %s）",
+				statusColor(st, turns), st.Name(), CountNoun("回合", turns))
 			md.status.desc.Box = &ui.Box{Title: title}
 			desc := st.Desc()
 			if details := st.Details(); details != "" {
@@ -425,7 +430,7 @@ func (md *model) endTurn(xhp int) {
 		// Warn only if HP went below critical point when it was
 		// expected to remain higher.
 		g.WarningPrompt()
-		g.LogStyled("*** CRITICAL HP WARNING ***", logConfirm)
+			g.LogStyled("*** 生命值危急 ***", logConfirm)
 	}
 	if md.mode == modeCritical {
 		md.logConfirmContinue()
@@ -435,15 +440,15 @@ func (md *model) endTurn(xhp int) {
 
 func (md *model) death() {
 	g := md.g
-	g.StoryLog("Died")
-	g.LogStyled("You die…", logSpecial)
+	g.StoryLog("死亡")
+	g.LogStyled("你死了……", logSpecial)
 	g.LevelStats()
 	md.logConfirmContinue()
 	md.mode = modeEnd
 }
 
 func (md *model) logConfirmContinue() {
-	md.g.LogStyled("[SPACE/ESC to continue]", logConfirm)
+	md.g.LogStyled("[空格键/ESC 继续]", logConfirm)
 	md.targ.CancelExamine()
 }
 
@@ -456,13 +461,13 @@ func (md *model) dump(msg string, err error) {
 	}
 	var details string
 	if err != nil {
-		log.Printf("error writing dump: %v", err)
-		details = "Error writing statistics."
+		log.Printf("写入统计记录时出错：%v", err)
+		details = "统计记录写入失败。"
 	} else {
 		details = msg
 	}
 	stts = append(stts, ui.Text(details))
-	md.pager.pg.SetBox(&ui.Box{Title: ui.Text("Game Summary").WithStyle(gruid.Style{Fg: ColorYellow})})
+	md.pager.pg.SetBox(&ui.Box{Title: ui.Text("游戏总结").WithStyle(gruid.Style{Fg: ColorYellow})})
 	md.pager.pg.SetLines(stts)
 	md.pager.pg.SetCursor(gruid.Point{0, 0})
 }

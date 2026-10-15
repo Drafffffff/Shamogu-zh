@@ -1,0 +1,99 @@
+{
+  "release": "1.6.0-zh.1",
+  "upstream_tag": "v1.6.0",
+  "upstream_commit": "0c1e2d4a4e50ff4cc10cd922b4e82004b9659e5a",
+  "binary_sha256": "e3fe73eadb99314746bb27c9c67a521077c5ee112594556fc59fbc94c05aa64e",
+  "archive_sha256": "c4fa426e46e77df6263c9e675d342572380e6044bbed9edfc06961558b04064d",
+  "target_screen": [
+    3840,
+    2160
+  ],
+  "map_grid": [
+    80,
+    24
+  ],
+  "map_tile": [
+    48,
+    90
+  ],
+  "large_text_grid": [
+    48,
+    24
+  ],
+  "large_text_tile": [
+    80,
+    90
+  ],
+  "translation": {
+    "changed_strings": 1121,
+    "unchanged_classified_candidates": 249,
+    "format_mismatches": 0,
+    "cjk_glyphs_verified": 1072,
+    "dynamic_descriptions_tested": 664,
+    "exhaustive_random_state_coverage": false
+  },
+  "tests": {
+    "local_go": true,
+    "local_sdl_render": true,
+    "go_vet": true,
+    "vendor_grid_and_replay": true,
+    "wasm_build": true,
+    "linux_amd64_tests_under_emulation": true,
+    "steam_installer_temporary_profile": true,
+    "original_175_embedded_images_preserved": true
+  },
+  "artwork": {
+    "grid": {
+      "size": [
+        920,
+        430
+      ],
+      "source": "Official v1.6.0 tiles; local composition",
+      "license": "CC-BY-4.0 (official itch.io asset license); attribution: anaseto (Yon)"
+    },
+    "poster": {
+      "size": [
+        600,
+        900
+      ],
+      "source": "Official v1.6.0 tiles; local composition",
+      "license": "CC-BY-4.0 (official itch.io asset license); attribution: anaseto (Yon)"
+    },
+    "hero": {
+      "size": [
+        3840,
+        1240
+      ],
+      "source": "Official v1.6.0 tiles; local composition",
+      "license": "CC-BY-4.0 (official itch.io asset license); attribution: anaseto (Yon)"
+    },
+    "logo": {
+      "size": [
+        1600,
+        480
+      ],
+      "source": "Official v1.6.0 tiles; local composition",
+      "license": "CC-BY-4.0 (official itch.io asset license); attribution: anaseto (Yon)"
+    },
+    "icon": {
+      "size": [
+        512,
+        512
+      ],
+      "source": "Official v1.6.0 tiles; local composition",
+      "license": "CC-BY-4.0 (official itch.io asset license); attribution: anaseto (Yon)"
+    }
+  },
+  "installation": {
+    "installed": false,
+    "status": "pending_device_connection",
+    "host": "bazzite.local",
+    "known_ip": "192.168.50.20",
+    "connection_errors": [
+      "hostname resolution failed",
+      "known IP SSH timed out"
+    ],
+    "physical_display_verified": false,
+    "steam_keyboard_suppression_verified_on_device": false
+  }
+}

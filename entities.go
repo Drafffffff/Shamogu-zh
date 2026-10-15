@@ -215,9 +215,9 @@ func (g *Game) MoveActor(i ID, ai *Actor, to gruid.Point, movk movementKind) boo
 		if i, it := g.ItemAt(to); i >= 0 {
 			ei := g.Entity(i)
 			if _, ok := it.(*Spirit); ok {
-				g.Logf("You step over the %s totem.", ei.Name)
+				g.Logf("你跨过了%s图腾。", ei.Name)
 			} else {
-				g.Logf("You step over the %s.", ei.Name)
+				g.Logf("你跨过了%s。", ei.Name)
 			}
 		}
 	default:

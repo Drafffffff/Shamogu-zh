@@ -1,0 +1,7 @@
+FROM --platform=linux/arm64 golang:1.25-bookworm
+RUN dpkg --add-architecture amd64 \
+ && apt-get update \
+ && apt-get install -y --no-install-recommends gcc-x86-64-linux-gnu libsdl2-dev:amd64 \
+ && rm -rf /var/lib/apt/lists/*
+ENV GOOS=linux GOARCH=amd64 CGO_ENABLED=1 CC=x86_64-linux-gnu-gcc PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
+WORKDIR /src

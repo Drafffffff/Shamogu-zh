@@ -1,0 +1,24 @@
+shamogu	v1.6.0
+go	go1.25.14
+path	codeberg.org/anaseto/shamogu
+mod	codeberg.org/anaseto/shamogu	v1.6.0+dirty
+dep	codeberg.org/anaseto/gruid	v0.27.0
+dep	codeberg.org/anaseto/gruid-sdl	v0.10.1
+dep	golang.org/x/image	v0.34.0
+dep	golang.org/x/text	v0.32.0
+build	-buildmode=exe
+build	-compiler=gc
+build	-tags=sdl
+build	DefaultGODEBUG=containermaxprocs=0,decoratemappings=0,tlssha1=1,updatemaxprocs=0,x509sha256skid=0
+build	CGO_ENABLED=1
+build	CGO_CFLAGS=
+build	CGO_CPPFLAGS=
+build	CGO_CXXFLAGS=
+build	CGO_LDFLAGS=
+build	GOARCH=amd64
+build	GOOS=linux
+build	GOAMD64=v1
+build	vcs=git
+build	vcs.revision=0c1e2d4a4e50ff4cc10cd922b4e82004b9659e5a
+build	vcs.time=2026-09-24T07:50:50Z
+build	vcs.modified=true

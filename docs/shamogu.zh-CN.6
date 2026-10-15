@@ -1,0 +1,123 @@
+.\" Copyright (c) 2018 Yon <anaseto@bardinflor.perso.aquilenet.fr>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.Dd January 25, 2026
+.Dt SHAMOGU 6
+.Os
+.Sh 名称
+.Nm shamogu
+.Nd 适合短暂游玩的 Roguelike 游戏
+.Sh 概要
+.Nm
+.Op Fl F
+.Op Fl l
+.Op Fl s
+.Op Fl t
+.Op Fl x
+.Op Fl O Ar options
+.Op Fl h Ar scale
+.Op Fl w Ar scale
+.Op Fl r Ar file
+.Op Fl version
+.Sh 描述
+Shamogu 是一款适合短暂游玩的 Roguelike 游戏，强调战术移动，以及
+谨慎选择召唤图腾灵体和食用食物的时机。视野与噪音构成的潜行机制
+也十分重要。
+.Pp
+“山中万物正在遭受腐化。野兽逐渐失去理智，变得富有攻击性。
+这些异变始于一座地城传送门突然出现在山顶之后。
+作为山之守护者，你决定深入地城，找出并摧毁腐化的源头……愿好运与你同在！”
+.Pp
+可用选项如下：
+.Bl -tag -width Ds
+.It Fl F
+以全屏模式启动游戏（仅 SDL2 版本）。
+.It Fl O Ar options
+以逗号分隔的编译期变量选项列表；选项定义于
+.Pa vars.go
+文件中。
+感叹号
+.Cm \&!
+表示禁用该选项。
+设置选项后，本局游戏将暂时采用该值，而不使用默认值。
+.Pp
+.Bl
+.It
+选项
+.Cm NoAnim
+禁用动画。
+.It
+选项
+.Cm NoChaos
+将混沌巨蝠替换为不会混沌撕咬的尖啸巨蝠，并移除游戏中的稀有食物；
+启用“图腾条件”时，条件食物不受影响。
+.El
+.It Fl l
+将游戏日志写入日志文件。
+.It Fl r Ar file
+观看回放文件
+.Ar file
+而不启动普通游戏。
+若
+.Ar file
+为
+.Sq _ ,
+将使用上一局游戏的回放。
+可用按键如下：
+.Cm +
+和
+.Cm -
+用于调整速度；方向键用于前进或后退一帧；
+空格键
+和
+.Cm p
+用于暂停或继续回放；
+.Cm Q
+用于退出程序。
+.It Fl s
+使用 16 色简易调色板（仅终端版）。
+.It Fl t
+使用 Selenized 真彩色调色板（仅终端版）。
+.It Fl x
+使用 xterm 256 色调色板（近似 Solarized 配色，仅终端版）。
+.It Fl h Ar scale
+使用指定的窗口高度缩放比例（仅 SDL2 版本）。默认值为
+.Cm 1.0 .
+整数效果较佳。
+.It Fl w Ar scale
+使用指定的窗口宽度缩放比例（仅 SDL2 版本）。默认值为
+.Cm 1.0 .
+整数效果较佳。
+.It Fl version
+显示构建信息。
+.El
+.Sh 文件
+.Bl -tag -width Ds -compact
+.It Pa "$XDG_DATA_HOME/shamogu/dump.txt"
+上一局游戏的角色与统计信息。
+.It Pa "$XDG_DATA_HOME/shamogu/config"
+配置（二进制文件）。
+.It Pa "$XDG_DATA_HOME/shamogu/logs.txt"
+游戏日志。
+.It Pa "$XDG_DATA_HOME/shamogu/replay"
+上一局已结束游戏的回放（二进制文件）。
+.It Pa "$XDG_DATA_HOME/shamogu/replay.part"
+当前游戏的回放（二进制文件）。
+.It Pa "$XDG_DATA_HOME/shamogu/save"
+最近保存的游戏（二进制文件）。
+.El
+.Pp
+若
+.Pa "$XDG_DATA_HOME"
+未定义，则默认使用
+.Pa ~/.local/share .

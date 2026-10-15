@@ -102,7 +102,7 @@ func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKi
 			ohp := ai.HP
 			g.AdjustHP(i, ai, dmg)
 			if i == PlayerID && ai.HP > ohp {
-				g.StoryLogf("You drained vitality from %s (HP: %d/%d)", One(ej.Name), ai.HP, ai.GetMaxHP())
+				g.StoryLogf("你从%s身上汲取了生命力（生命值：%d/%d）", One(ej.Name), ai.HP, ai.GetMaxHP())
 			}
 		}
 		if ai.DoesAny(PatternSwap|PatternSwapDaze) || ai.Has(StatusShadow) || aj.Has(StatusShadow) || g.IntN(dmg) == 0 {
@@ -118,48 +118,48 @@ func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKi
 		break
 	case ap == AttackGale:
 		if aj.IsDead() {
-			g.LogfStyled("The gale kills the %s (%d dmg).", logHurtMons, ej.Name, dmg)
+			g.LogfStyled("强风杀死了%s（%d 点伤害）。", logHurtMons, ej.Name, dmg)
 		} else {
-			g.LogfStyled("The gale hurts the %s (%d dmg).", logHurtMons, ej.Name, dmg)
+			g.LogfStyled("强风击伤了%s（%d 点伤害）。", logHurtMons, ej.Name, dmg)
 		}
 	case ap == AttackLightning:
 		if aj.IsDead() {
-			g.LogfStyled("The lightning kills the %s (%d dmg).", logHurtMons, ej.Name, dmg)
+			g.LogfStyled("闪电杀死了%s（%d 点伤害）。", logHurtMons, ej.Name, dmg)
 		} else {
-			g.LogfStyled("The lightning hurts the %s (%d dmg).", logHurtMons, ej.Name, dmg)
+			g.LogfStyled("闪电击伤了%s（%d 点伤害）。", logHurtMons, ej.Name, dmg)
 		}
 	case ap == AttackFire:
 		if j == PlayerID {
-			g.LogfStyled("The fire burns you (%d dmg).", logHurtPlayer, FireDamage)
-			g.StoryLogf("Burnt by fire (HP: %d/%d)", aj.HP, aj.GetMaxHP())
+			g.LogfStyled("火焰灼伤了你（%d 点伤害）。", logHurtPlayer, FireDamage)
+			g.StoryLogf("被火焰灼伤（生命值：%d/%d）", aj.HP, aj.GetMaxHP())
 			TotemEvents(g, &EventWithStatus{EvType: EventDamage, EvStatus: StatusFire, EvEntity: ej})
 			break
 		}
 		if aj.IsDead() {
-			g.LogfStyled("The fire kills the %s.", logHurtMons, ej.Name)
+			g.LogfStyled("火焰杀死了%s。", logHurtMons, ej.Name)
 		}
 	case ap == AttackFireCatch:
 		if j == PlayerID {
-			g.LogfStyled("Catching fire burns you (%d dmg).", logHurtPlayer, FireDamage)
-			g.StoryLogf("Caught fire (HP: %d/%d)", aj.HP, aj.GetMaxHP())
+			g.LogfStyled("着火使你受到 %d 点伤害。", logHurtPlayer, FireDamage)
+			g.StoryLogf("着火了（生命值：%d/%d）", aj.HP, aj.GetMaxHP())
 			TotemEvents(g, &EventWithStatus{EvType: EventDamage, EvStatus: StatusFire, EvEntity: ej})
 			break
 		}
 		if aj.IsDead() {
-			g.LogfStyled("Catching fire kills the %s.", logHurtMons, ej.Name)
+			g.LogfStyled("火焰烧死了%s。", logHurtMons, ej.Name)
 		}
 	case ap == AttackPoison:
 		if j == PlayerID {
-			g.LogfStyled("Moving while poisoned hurts you (%d dmg).", logHurtPlayer, dmg)
-			g.StoryLogf("Moved while poisoned (HP: %d/%d)", aj.HP, aj.GetMaxHP())
+			g.LogfStyled("中毒时移动使你受到 %d 点伤害。", logHurtPlayer, dmg)
+			g.StoryLogf("中毒时移动（生命值：%d/%d）", aj.HP, aj.GetMaxHP())
 			TotemEvents(g, &EventWithStatus{EvType: EventDamage, EvStatus: StatusPoison, EvEntity: ej})
 			break
 		}
 		if aj.IsDead() {
-			g.LogfStyled("The %s dies from poison.", logHurtMons, ej.Name)
+			g.LogfStyled("%s死于中毒。", logHurtMons, ej.Name)
 		}
 	case j != PlayerID && aj.IsDead() && !aj.DoesAny(MonsExplodingDeath):
-		g.Logf("The %s dies.", ej.Name)
+		g.Logf("%s死亡。", ej.Name)
 	}
 	// Extra effects (gathering stats & monster death/explosion).
 	switch {
@@ -170,9 +170,9 @@ func (g *Game) InflictDamageGeneric(i, j ID, ai, aj *Actor, dmg int, ap AttackKi
 		g.md.WoundedAnimation()
 		if g.Wizard.Mode != WizardNone && aj.IsDead() {
 			aj.HP = aj.GetMaxHP()
-			g.LogStyled("*** Wizard mode resurrects you! ***", logSpecial)
+			g.LogStyled("*** 向导模式使你复活！***", logSpecial)
 			g.WarningPrompt()
-			g.StoryLog("Resurrected by the Wizard!")
+			g.StoryLog("已由向导复活！")
 			g.Wizard.Resurrections++
 		}
 		g.md.StopAuto()
@@ -189,27 +189,27 @@ func (g *Game) logBumpDamage(i, j ID, _, aj *Actor, dmg int, ap AttackKind) {
 		switch {
 		case aj.IsDead():
 			if ap == AttackCharge {
-				g.LogfStyled("Your charge kills the %v (%d dmg).", logHurtMons, ej.Name, dmg)
+				g.LogfStyled("你的冲锋杀死了%v（%d 点伤害）。", logHurtMons, ej.Name, dmg)
 			} else {
-				g.LogfStyled("You kill the %v (%d dmg).", logHurtMons, ej.Name, dmg)
+				g.LogfStyled("你杀死了%v（%d 点伤害）。", logHurtMons, ej.Name, dmg)
 			}
 			g.Stats.Hits++
 		default:
 			if ap == AttackCharge {
-				g.LogfStyled("You charge the %v (%d dmg).", logHurtMons, g.Entity(j).Name, dmg)
+				g.LogfStyled("你冲锋撞击%v（%d 点伤害）。", logHurtMons, g.Entity(j).Name, dmg)
 			} else {
-				g.LogfStyled("You hit the %v (%d dmg).", logHurtMons, g.Entity(j).Name, dmg)
+				g.LogfStyled("你击中%v（%d 点伤害）。", logHurtMons, g.Entity(j).Name, dmg)
 			}
 			g.Stats.Hits++
 		}
 	case j == PlayerID:
-		hpstr := fmt.Sprintf("HP: %d/%d", aj.HP, aj.GetMaxHP())
+		hpstr := fmt.Sprintf("生命值：%d/%d", aj.HP, aj.GetMaxHP())
 		if ap == AttackCharge {
-			g.LogfStyled("The %s charges you (%d dmg).", logHurtPlayer, ei.Name, dmg)
-			g.StoryLogf("Charged at by %s for %d dmg (%s)", ei.Name, dmg, hpstr)
+			g.LogfStyled("%s冲锋撞向你（%d 点伤害）。", logHurtPlayer, ei.Name, dmg)
+			g.StoryLogf("遭%s冲锋，受到 %d 点伤害（%s）", ei.Name, dmg, hpstr)
 		} else {
-			g.LogfStyled("The %v hits you (%d dmg).", logHurtPlayer, ei.Name, dmg)
-			g.StoryLogf("Hit by %s for %d dmg (%s)", ei.Name, dmg, hpstr)
+			g.LogfStyled("%v击中你（%d 点伤害）。", logHurtPlayer, ei.Name, dmg)
+			g.StoryLogf("遭%s攻击，受到 %d 点伤害（%s）", ei.Name, dmg, hpstr)
 		}
 	default:
 		if !g.InFOV(ej.P) {
@@ -217,9 +217,9 @@ func (g *Game) logBumpDamage(i, j ID, _, aj *Actor, dmg int, ap AttackKind) {
 		}
 		switch {
 		case aj.IsDead():
-			g.LogfStyled("The %s kills the %s (%d dmg).", logHurtMons, ei.Name, ej.Name, dmg)
+			g.LogfStyled("%s杀死了%s（%d 点伤害）。", logHurtMons, ei.Name, ej.Name, dmg)
 		default:
-			g.LogfStyled("The %s hits the %s (%d dmg).", logHurtMons, ei.Name, ej.Name, dmg)
+			g.LogfStyled("%s击中%s（%d 点伤害）。", logHurtMons, ei.Name, ej.Name, dmg)
 		}
 	}
 }
@@ -250,12 +250,12 @@ func (g *Game) monsterDeath(i, j ID, aj *Actor) {
 	switch {
 	case aj.Is(ChaosMegabat):
 		if g.InFOV(ej.P) {
-			g.Logf("The %s cries upon death.", ej.Name)
+			g.Logf("%s临死时发出叫声。", ej.Name)
 		}
 		g.MakeNoise(ej.P, NoiseCry)
 	case aj.DoesAny(MonsExplodingDeath):
 		if g.InFOV(ej.P) {
-			g.Logf("The %s explodes.", ej.Name)
+			g.Logf("%s爆炸了。", ej.Name)
 		}
 		g.ExplosionAt(i, ej.P)
 	}
@@ -383,7 +383,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 	case ai.DoesAny(PatternRangedRecoil) && ap != AttackCharge && ai.CanMove():
 		if g.recoil(i, j, ai, dist) && i != PlayerID &&
 			ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusImbalance, 1+dmg) && g.InFOV(ei.P) {
-			g.Logf("The confused %s lost balance due to recoil!", ei.Name)
+			g.Logf("混乱的%s因后坐力而失去平衡！", ei.Name)
 		}
 	case ai.DoesAny(PatternDragging) && ai.CanMove() && !aj.ResistsMove() && ap == AttackDrag && !ai.Has(StatusPoison) && aj.IsAlive():
 		g.drag(i, j, ai, aj)
@@ -397,7 +397,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 		if !g.ResistStatusRoll(j, StatusPoison) && g.PutStatus(j, aj, StatusPoison, DurationPoisonBite) &&
 			i != PlayerID && ai.Has(StatusConfusion) && ai.IsAlive() {
 			if g.InFOV(ei.P) {
-				g.LogfStyled("The confused %s bites itself too!", logHurtMons, ei.Name)
+				g.LogfStyled("混乱的%s也咬伤了自己！", logHurtMons, ei.Name)
 			}
 			g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
 		}
@@ -420,13 +420,13 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 				g.FireCloudAt(p)
 			}
 			if ai.Has(StatusConfusion) && i != PlayerID && g.PutStatus(i, ai, StatusFire, DurationFire) {
-				g.Logf("The confused %s burned itself too!", ei.Name)
+				g.Logf("混乱的%s也烧伤了自己！", ei.Name)
 			}
 		}
 	case ai.DoesAll(MonsFear) && g.IntN(5-dmg) < 2:
 		if !g.ResistStatusRoll(j, StatusFear) && g.PutStatus(j, aj, StatusFear, DurationFearUndead) {
 			if ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusFear, DurationFearUndead) && g.InFOV(ei.P) {
-				g.Logf("The confused %s frightened itself too!", ei.Name)
+				g.Logf("混乱的%s也吓到了自己！", ei.Name)
 			}
 		}
 	case ai.DoesAny(MonsConfusion) && g.IntN(6-dmg) < 2:
@@ -439,7 +439,7 @@ func (g *Game) BumpAttackActor(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonu
 		g.inflictChaos(j, aj, g.PutStatus)
 		if ai.Has(StatusConfusion) {
 			if g.InFOV(ei.P) {
-				g.LogfStyled("The confused %s bites itself too!", logHurtMons, ei.Name)
+				g.LogfStyled("混乱的%s也咬伤了自己！", logHurtMons, ei.Name)
 			}
 			g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
 			g.inflictChaos(i, ai, g.PutStatus1)
@@ -627,16 +627,16 @@ func (g *Game) logBumpMiss(i, j ID, ap AttackKind) {
 	switch {
 	case i == PlayerID:
 		if ap == AttackCharge {
-			g.Logf("Your charge misses the %v.", ej.Name)
+			g.Logf("你的冲锋没有击中%v。", ej.Name)
 		} else {
-			g.Logf("You miss the %v.", ej.Name)
+			g.Logf("你没有击中%v。", ej.Name)
 		}
 		g.Stats.Misses++
 	case j == PlayerID:
 		if ap == AttackCharge {
-			g.Logf("The %s’s charge misses you.", ei.Name)
+			g.Logf("%s的冲锋没有命中你。", ei.Name)
 		} else {
-			g.Logf("The %v misses you.", ei.Name)
+			g.Logf("%v没有击中你。", ei.Name)
 		}
 	}
 	// NOTE: we don't log misses between monsters, as that's not very
@@ -646,7 +646,7 @@ func (g *Game) logBumpMiss(i, j ID, ap AttackKind) {
 func (g *Game) monsConfusionPenalty(i ID, ai *Actor) {
 	if ai.Has(StatusConfusion) && ai.IsAlive() {
 		if g.InFOV(g.Entity(i).P) {
-			g.LogfStyled("The confused %s hurts itself too!", logHurtMons, g.Entity(i).Name)
+			g.LogfStyled("混乱的%s也伤到了自己！", logHurtMons, g.Entity(i).Name)
 		}
 		g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
 	}
@@ -697,7 +697,7 @@ func (g *Game) push(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonus int) {
 	d := 2 + 2*(dist/5) // imbalance duration (2 for dist 2-4, 4 for dist 5-8)
 	if g.PutStatus(j, aj, StatusImbalance, d) && i != PlayerID &&
 		ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusImbalance, d) && g.InFOV(ei.P) {
-		g.Logf("The confused %s lost balance while pushing too!", ei.Name)
+		g.Logf("混乱的%s推撞时也失去了平衡！", ei.Name)
 	}
 	if ak != nil {
 		// There's another actor behind: extra piercing attack (without
@@ -712,10 +712,10 @@ func (g *Game) push(i, j ID, ai, aj *Actor, ap AttackKind, dist, bonus int) {
 	case aj.IsAlive():
 		// Push.
 		if j != PlayerID && (i == PlayerID || g.InFOV(pj)) {
-			g.Logf("The %v is pushed away.", ej.Name)
+			g.Logf("%v被推开了。", ej.Name)
 		} else {
-			g.Log("You’re pushed away.")
-			g.StoryLogf("Pushed away by %s", ei.Name)
+			g.Log("你被推开了。")
+			g.StoryLogf("被%s推开", ei.Name)
 		}
 		g.MoveActor(j, aj, npj, MovPlain)
 	}
@@ -747,7 +747,7 @@ func (g *Game) catch(i, j ID, ai, aj *Actor, dist int) {
 	d := 2 + 2*(dist/5) // imbalance duration (2 for dist 2-4, 4 for dist 5-8)
 	if g.PutStatus(j, aj, StatusImbalance, d) && i != PlayerID &&
 		ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusImbalance, d) {
-		g.Logf("The confused %s lost balance too!", ei.Name)
+		g.Logf("混乱的%s也失去了平衡！", ei.Name)
 	}
 }
 
@@ -761,7 +761,7 @@ func (g *Game) swapSpaceDistortion(i, j ID, ai, aj *Actor, dazed bool, dist int)
 		duration := 2 + dist/3
 		if !g.ResistStatusRoll(j, StatusDaze) && g.PutStatus(j, aj, StatusDaze, duration) && i != PlayerID &&
 			ai.Has(StatusConfusion) && g.PutStatus1(i, ai, StatusDaze, duration) && g.InFOV(pj) {
-			g.LogfStyled("The confused %s dazed itself too!",
+			g.LogfStyled("混乱的%s也把自己弄晕了！",
 				logHurtMons, g.Entity(i).Name)
 		}
 	}
@@ -770,9 +770,9 @@ func (g *Game) swapSpaceDistortion(i, j ID, ai, aj *Actor, dazed bool, dist int)
 			ek := g.Entity(k)
 			if to, ok := g.BlinkPos(ek.P); ok {
 				if k == PlayerID {
-					g.Log("The space distortion blinks you away.")
+					g.Log("空间扭曲将你闪烁传送走。")
 				} else {
-					g.Logf("The space distortion blinks the %s away.", ek.Name)
+					g.Logf("空间扭曲将%s闪烁传送走。", ek.Name)
 				}
 				g.MoveActor(k, ak, to, MovTeleport)
 			}
@@ -936,13 +936,13 @@ func (g *Game) blinkOther(i, j ID, ai, aj *Actor) {
 	g.MoveActor(j, aj, to, MovTeleport)
 	ei := g.Entity(i)
 	if j == PlayerID {
-		g.Logf("The %s’s attack made you blink away.", ei.Name)
-		g.StoryLogf("Blinked away by %s", ei.Name)
+		g.Logf("%s的攻击使你闪现离开。", ei.Name)
+		g.StoryLogf("被%s闪烁传送走", ei.Name)
 	}
 	if ai.Has(StatusConfusion) && !ai.ResistsMove() {
 		if to, ok := g.BlinkPos(ei.P); ok {
 			g.MoveActor(i, ai, to, MovTeleport)
-			g.LogfStyled("The confused %s hurt and blinked itself too!", logHurtMons, ei.Name)
+			g.LogfStyled("混乱的%s也伤到了自己并闪烁传送走了！", logHurtMons, ei.Name)
 			g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
 		}
 	}
@@ -990,9 +990,9 @@ func (g *Game) teleportOther(i, j ID, ai, aj *Actor) {
 	}
 	ei, ej := g.Entity(i), g.Entity(j)
 	if j == PlayerID {
-		g.Logf("The %s teleports you away!", ei.Name)
+		g.Logf("%s将你传送走了！", ei.Name)
 	} else if g.InFOV(ei.P) && g.InFOV(ej.P) {
-		g.Logf("The confused %s teleports the %s away!", ei.Name, ej.Name)
+		g.Logf("混乱的%s将%s传送走了！", ei.Name, ej.Name)
 	}
 	g.TeleportActor(j, aj, 0)
 	if ai.Has(StatusConfusion) && ai.IsAlive() {

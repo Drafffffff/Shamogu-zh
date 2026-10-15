@@ -31,18 +31,18 @@ const NRunes = 1 + int(RuneWarp)
 func (mr MagicRune) String() string {
 	switch mr {
 	case RuneBerserk:
-		return "berserk rune"
+		return "狂暴符文"
 	case RuneFire:
-		return "fire rune"
+		return "火焰符文"
 	case RuneLignification:
-		return "lignification rune"
+		return "木化符文"
 	case RunePoison:
-		return "poison rune"
+		return "毒素符文"
 	case RuneWarp:
-		return "warp rune"
+		return "传送符文"
 	default:
 		// Should not happen.
-		return "unknown rune"
+		return "未知符文"
 	}
 }
 
@@ -71,29 +71,29 @@ func (rt *RunicTrap) Color() gruid.Color {
 // Desc returns the description of the runic trap.
 func (rt *RunicTrap) Desc(_ *Game) string {
 	if rt.KnownUsed {
-		return "The rune has already been triggered."
+		return "符文已经触发过了。"
 	}
 	switch rt.Rune {
 	case RuneBerserk:
-		return fmt.Sprintf("Applies @BBerserk@N status for %d turns when stepped on, unless already berserk.", DurationBerserkTrap)
+		return fmt.Sprintf("踩上时获得 @B狂暴@N 状态，持续 %d 回合；若已处于狂暴状态则不会触发。", DurationBerserkTrap)
 	case RuneFire:
-		return fmt.Sprintf("Inflicts @OConfusion@N for %d turns and spawns a fire cloud lasting 6-12 turns when stepped on.",
+		return fmt.Sprintf("踩上时陷入 @O迷向@N，持续 %d 回合，并生成持续 6 至 12 回合的火焰云雾。",
 			DurationConfusionFireTrap)
 	case RuneLignification:
-		return fmt.Sprintf("Applies @BLignification@N status for %d turns when stepped on, unless already lignified.", DurationLignificationTrap)
+		return fmt.Sprintf("踩上时获得 @B木化@N 状态，持续 %d 回合；若已处于木化状态则不会触发。", DurationLignificationTrap)
 	case RunePoison:
-		return "Spawns a poison cloud lasting 7-11 turns when stepped on."
+		return "踩上时生成持续 7 至 11 回合的毒雾。"
 	case RuneWarp:
-		return "Teleports away any actor that steps on it."
+		return "将踩上去的生物传送走。"
 	default:
 		// Should not happen.
-		return "Unknown effect."
+		return "未知效果。"
 	}
 }
 
 // RunicTraps are items but they cannot be used like other items.
 func (rt *RunicTrap) Use(g *Game, id ID) bool {
-	g.Log("You cannot interact with a trap.")
+	g.Log("你无法与陷阱互动。")
 	return false
 }
 
@@ -128,15 +128,15 @@ func (g *Game) TriggerTrap(i ID, ai *Actor) {
 	}
 	switch {
 	case i == PlayerID:
-		g.LogfStyled("You trigger the %s.", logSpecial, rt.Rune.String())
-		g.StoryLogf("Triggered %s", One(rt.Rune.String()))
+		g.LogfStyled("你触发了%s。", logSpecial, rt.Rune.String())
+		g.StoryLogf("触发了%s", One(rt.Rune.String()))
 		g.Stats.PlayerTriggers++
 		rt.KnownUsed = true
 	case g.InFOV(pi):
-		g.LogfStyled("The %s triggers the %s.", logSpecial, ei.Name, rt.Rune.String())
+		g.LogfStyled("%s触发了%s。", logSpecial, ei.Name, rt.Rune.String())
 		rt.KnownUsed = true
 	case SensingRange(pi, g.PP()) && g.PlayerActor().DoesAny(RunicChicken):
-		g.LogfStyled("The %s triggers.", logSpecial, rt.Rune.String())
+		g.LogfStyled("%s触发了。", logSpecial, rt.Rune.String())
 		rt.KnownUsed = true
 	}
 	if i != PlayerID {

@@ -1,0 +1,8 @@
+*.swp
+*~
+*.wasm
+*.prof
+*.tar.gz
+*.out
+*.test
+cov.sh

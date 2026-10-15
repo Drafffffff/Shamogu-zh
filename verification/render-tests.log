@@ -1,0 +1,35 @@
+=== RUN   TestGame
+--- PASS: TestGame (2.41s)
+=== RUN   TestChineseClosingPunctuationWrap
+--- PASS: TestChineseClosingPunctuationWrap (0.00s)
+=== RUN   TestChineseDynamicNouns
+--- PASS: TestChineseDynamicNouns (0.00s)
+=== RUN   TestChineseFontCoverage
+    zh_render_test.go:53: verified 1072 CJK glyphs
+--- PASS: TestChineseFontCoverage (0.02s)
+=== RUN   TestChineseRenderScreens
+--- PASS: TestChineseRenderScreens (1.41s)
+=== RUN   TestPixelGlyphsAreCrisp
+--- PASS: TestPixelGlyphsAreCrisp (0.00s)
+=== RUN   TestMixedScriptInkAlignment
+    zh_render_test.go:155: 汉 ink=(2,19)-(46,63), H ink=(9,15)-(39,63)
+    zh_render_test.go:155: 中 ink=(2,19)-(46,63), H ink=(9,15)-(39,63)
+    zh_render_test.go:155: 化 ink=(2,19)-(46,63), H ink=(9,15)-(39,63)
+    zh_render_test.go:155: 鹞 ink=(2,19)-(46,63), H ink=(9,15)-(39,63)
+    zh_render_test.go:155: 牦 ink=(2,19)-(46,63), H ink=(9,15)-(39,63)
+    zh_render_test.go:155: 汉 ink=(7,8)-(73,74), H ink=(20,10)-(60,74)
+    zh_render_test.go:155: 中 ink=(7,8)-(73,74), H ink=(20,10)-(60,74)
+    zh_render_test.go:155: 化 ink=(7,8)-(73,74), H ink=(20,10)-(60,74)
+    zh_render_test.go:155: 鹞 ink=(7,8)-(73,74), H ink=(20,10)-(60,74)
+    zh_render_test.go:155: 牦 ink=(7,8)-(73,74), H ink=(20,10)-(60,74)
+--- PASS: TestMixedScriptInkAlignment (0.00s)
+=== RUN   TestContinuousBoxBorders
+--- PASS: TestContinuousBoxBorders (0.00s)
+=== RUN   TestLargePanelDescriptionScrollsWithoutClipping
+--- PASS: TestLargePanelDescriptionScrollsWithoutClipping (0.00s)
+=== RUN   TestDynamicItemDescriptionsAcrossMods
+    zh_render_test.go:265: checked 664 dynamic descriptions
+--- PASS: TestDynamicItemDescriptionsAcrossMods (0.00s)
+PASS
+ok  	codeberg.org/anaseto/shamogu	3.874s
+?   	codeberg.org/anaseto/shamogu/tools	[no test files]

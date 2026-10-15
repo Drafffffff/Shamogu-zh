@@ -1,0 +1,6 @@
+=== RUN   TestChineseDynamicNouns
+--- PASS: TestChineseDynamicNouns (0.00s)
+=== RUN   TestLargePanelDescriptionScrollsWithoutClipping
+--- PASS: TestLargePanelDescriptionScrollsWithoutClipping (0.00s)
+PASS
+ok  	codeberg.org/anaseto/shamogu	0.016s

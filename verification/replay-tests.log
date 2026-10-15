@@ -1,0 +1,4 @@
+=== RUN   TestReplayVariableGridForwardAndBackward
+--- PASS: TestReplayVariableGridForwardAndBackward (0.00s)
+PASS
+ok  	codeberg.org/anaseto/gruid/ui	0.007s

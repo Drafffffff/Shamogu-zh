@@ -1,0 +1,34 @@
+=== RUN   TestGame
+--- PASS: TestGame (15.02s)
+=== RUN   TestChineseClosingPunctuationWrap
+--- PASS: TestChineseClosingPunctuationWrap (0.00s)
+=== RUN   TestChineseDynamicNouns
+--- PASS: TestChineseDynamicNouns (0.00s)
+=== RUN   TestChineseFontCoverage
+    zh_render_test.go:53: verified 1072 CJK glyphs
+--- PASS: TestChineseFontCoverage (0.21s)
+=== RUN   TestChineseRenderScreens
+    zh_render_test.go:58: set SHAMOGU_SCREENSHOTS to export screens
+--- SKIP: TestChineseRenderScreens (0.00s)
+=== RUN   TestPixelGlyphsAreCrisp
+--- PASS: TestPixelGlyphsAreCrisp (0.01s)
+=== RUN   TestMixedScriptInkAlignment
+    zh_render_test.go:155: 汉 ink=(2,19)-(46,63), H ink=(9,15)-(39,63)
+    zh_render_test.go:155: 中 ink=(2,19)-(46,63), H ink=(9,15)-(39,63)
+    zh_render_test.go:155: 化 ink=(2,19)-(46,63), H ink=(9,15)-(39,63)
+    zh_render_test.go:155: 鹞 ink=(2,19)-(46,63), H ink=(9,15)-(39,63)
+    zh_render_test.go:155: 牦 ink=(2,19)-(46,63), H ink=(9,15)-(39,63)
+    zh_render_test.go:155: 汉 ink=(7,8)-(73,74), H ink=(20,10)-(60,74)
+    zh_render_test.go:155: 中 ink=(7,8)-(73,74), H ink=(20,10)-(60,74)
+    zh_render_test.go:155: 化 ink=(7,8)-(73,74), H ink=(20,10)-(60,74)
+    zh_render_test.go:155: 鹞 ink=(7,8)-(73,74), H ink=(20,10)-(60,74)
+    zh_render_test.go:155: 牦 ink=(7,8)-(73,74), H ink=(20,10)-(60,74)
+--- PASS: TestMixedScriptInkAlignment (0.02s)
+=== RUN   TestContinuousBoxBorders
+--- PASS: TestContinuousBoxBorders (0.00s)
+=== RUN   TestLargePanelDescriptionScrollsWithoutClipping
+--- PASS: TestLargePanelDescriptionScrollsWithoutClipping (0.02s)
+=== RUN   TestDynamicItemDescriptionsAcrossMods
+    zh_render_test.go:265: checked 664 dynamic descriptions
+--- PASS: TestDynamicItemDescriptionsAcrossMods (0.03s)
+PASS

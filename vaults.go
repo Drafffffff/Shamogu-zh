@@ -32,16 +32,16 @@ func splitVaults(s string) []string {
 	for _, v := range vaults {
 		// We ensure all vaults contains essential places.
 		if !strings.ContainsRune(v, 'W') {
-			log.Fatalf("No W in vault:\n%s", v)
+			log.Fatalf("地城区域中缺少 W：\n%s", v)
 		}
 		if !strings.ContainsRune(v, '>') {
-			log.Fatalf("No > in vault:\n%s", v)
+			log.Fatalf("地城区域中缺少 >：\n%s", v)
 		}
 		if !strings.ContainsRune(v, '!') {
-			log.Fatalf("No ! in vault:\n%s", v)
+			log.Fatalf("地城区域中缺少 !：\n%s", v)
 		}
 		if !strings.ContainsAny(v, "+-") {
-			log.Fatalf("No + nor - in vault:\n%s", v)
+			log.Fatalf("地城区域中缺少 + 和 -：\n%s", v)
 		}
 	}
 	return vaults
@@ -150,7 +150,7 @@ func (mg *MapGen) DigVault(v *vault) {
 			}
 		case '?':
 		default:
-			log.Printf("mapgen: invalid terrain: %c for room w:%d h:%d pos:%+v\n%s", c, v.w, v.h, v.p, v.vault.Content())
+			log.Printf("地图生成：房间中出现无效地形符号 %c（宽:%d 高:%d 坐标:%+v）\n%s", c, v.w, v.h, v.p, v.vault.Content())
 		}
 		switch c {
 		case 'W':
@@ -216,7 +216,7 @@ func (g *Game) RandomVaultsPlaceWithFunc(mg *MapGen, vs []*vault, kind placeKind
 	for {
 		count++
 		if count > maxIterations {
-			log.Println("no suitable place in vault")
+			log.Println("地城区域中找不到合适的位置")
 			return 0, g.randomFreeItemFloor(mg)
 		}
 		i := rf(len(vs))

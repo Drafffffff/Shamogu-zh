@@ -23,19 +23,19 @@ const (
 func TerrainName(t rl.Cell) string {
 	switch t {
 	case Wall:
-		return "wall"
+		return "墙壁"
 	case Floor:
-		return "floor"
+		return "地面"
 	case Foliage:
-		return "foliage"
+		return "植被"
 	case Rubble:
-		return "rubble"
+		return "碎石"
 	case TranslucentWall:
-		return "translucent wall"
+		return "半透明墙"
 	case UnknownPassable:
-		return "passable terrain"
+		return "可通行地形"
 	default:
-		return "unknown terrain"
+		return "未知地形"
 	}
 }
 
@@ -43,19 +43,19 @@ func TerrainName(t rl.Cell) string {
 func TerrainDesc(t rl.Cell) string {
 	switch t {
 	case Wall:
-		return "An obstructing pile of rocks that blocks vision."
+		return "阻挡视线的岩石堆。"
 	case Floor:
-		return "Passable plain ground."
+		return "可通行的普通地面。"
 	case Foliage:
-		return "Dense foliage that is difficult to see through. Flammable."
+		return "难以看穿的茂密植被，可燃。"
 	case Rubble:
-		return "A collection of rocks broken into smaller ones. Passable, but blocks vision."
+		return "由碎石组成的地形。可以通行，但会阻挡视线。"
 	case TranslucentWall:
-		return "An obstructing pile of translucent rocks. Contains poison gas."
+		return "阻挡通行的半透明岩石堆，含有毒气。"
 	case UnknownPassable:
-		return "Passable terrain of unknown nature."
+		return "性质未知的可通行地形。"
 	default:
-		return "Terrain of unknown nature."
+		return "性质未知的地形。"
 	}
 }
 

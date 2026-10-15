@@ -1,0 +1,15 @@
+{
+  "source": "Fusion Pixel 12px monospaced zh-Hans",
+  "upstream": "https://github.com/TakWolf/fusion-pixel-font",
+  "license": "SIL OFL 1.1",
+  "pixel_size": 12,
+  "render_size": 48,
+  "pixel_scale": 4,
+  "glyph_count": 36982,
+  "local_source": "Preserved font from DCSS project",
+  "pixel_fallback_characters": [
+    "\u7266",
+    "\u9e5e"
+  ],
+  "fallback_method": "Noto Sans SC rasterised at 12px into square contours"
+}

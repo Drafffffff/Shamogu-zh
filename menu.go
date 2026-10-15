@@ -32,6 +32,9 @@ const (
 )
 
 func (md *model) updateMenu(msg gruid.Msg) {
+	if md.scrollTextDescription(msg) {
+		return
+	}
 	switch md.menu.mode {
 	case modeKeysView:
 		md.updateKeysMenu(msg)
@@ -95,7 +98,7 @@ func (md *model) updateMainMenu(msg gruid.Msg) {
 					md.action = ActionBindItem{id}
 				} else {
 					md.mode = modeNormal
-					md.g.Log("You don’t have a second comestible!")
+					md.g.Log("你没有第二份食物！")
 					md.action = ActionNone{}
 				}
 			}
@@ -116,7 +119,7 @@ func (md *model) updateMainMenu(msg gruid.Msg) {
 			if i < 0 {
 				// Should not happen.
 				md.mode = modeNormal
-				md.g.LogStyled("No item on the ground (BUG)", logError)
+				md.g.LogStyled("地上没有道具（错误）", logError)
 				md.action = ActionNone{}
 				break
 			}
@@ -232,8 +235,8 @@ func (md *model) resetKeys() {
 	GameConfig.ExamineModeKeys = md.keysTarget
 	err := SaveConfig()
 	if err != nil {
-		log.Printf("error saving config: %v", err)
-		md.g.LogStyled("Error resetting config changes.", logError)
+		log.Printf("保存设置失败：%v", err)
+		md.g.LogStyled("重置设置失败。", logError)
 	}
 }
 
@@ -257,7 +260,7 @@ func (md *model) updateKeysChange(msg gruid.Msg) {
 		GameConfig.ExamineModeKeys = md.keysTarget
 		err := SaveConfig()
 		if err != nil {
-			log.Printf("error saving config: %v", err)
+			log.Printf("保存设置失败：%v", err)
 		}
 		md.setKeyBindingsTitle()
 		md.action = ActionSetKeys{}
@@ -265,8 +268,15 @@ func (md *model) updateKeysChange(msg gruid.Msg) {
 }
 
 func (md *model) updateSpiritSelectionMenu(msg gruid.Msg) gruid.Effect {
+	if md.scrollTextDescription(msg) {
+		return nil
+	}
 	if msgmouse, ok := msg.(gruid.MsgMouse); ok {
-		msgmouse.P.Y -= spiritSelectionMargin
+		if LargeTextPanels {
+			msgmouse.P.Y -= 2
+		} else {
+			msgmouse.P.Y -= spiritSelectionMargin
+		}
 		msg = msgmouse
 	}
 	if msgkey, ok := msg.(gruid.MsgKeyDown); ok && (msgkey.Key == gruid.KeyTab || msgkey.Key == gruid.KeySpace) {
@@ -307,11 +317,14 @@ func (md *model) startNewGame(spe *Entity) {
 	g.ComputePlayerStats()
 	g.InitLevel()
 	md.updateStatus()
-	g.LogStyled("Press SPACE for menu and ? for help. Good luck!", logSpecial)
+	g.LogStyled("按空格键打开菜单，按 ? 查看帮助。祝你好运！", logSpecial)
 	md.mode = modeNormal
 }
 
 func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
+	if md.scrollTextDescription(msg) {
+		return nil
+	}
 	md.menu.main.Update(msg)
 	resetChanges := func() {
 		if len(GameConfig.Mods) == NMods && !ResetMods {
@@ -344,9 +357,9 @@ func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
 		switch {
 		case idx == len(g.Mods):
 			updateDesc := func() {
-				msg := "Disable all mods. You still need to save afterwards."
-				md.desc.Box = &ui.Box{Title: ui.Text("Reset selection")}
-				md.desc.Content = ui.Text(msg).Format(UIWidth/2 - 1 - 2).WithMarkups(Markups)
+				msg := "关闭所有模组。之后仍需保存设置。"
+				md.desc.Box = &ui.Box{Title: ui.Text("重置选择")}
+				md.desc.Content = ui.Text(msg).Format(descriptionPanelWidth() - 3).WithMarkups(Markups)
 			}
 			if act != ui.MenuInvoke {
 				updateDesc()
@@ -357,24 +370,24 @@ func (md *model) updateModSelectionMenu(msg gruid.Msg) gruid.Effect {
 			md.menu.main.SetActiveInvokable(idx)
 			updateDesc()
 		case idx == len(g.Mods)+1:
-			msg := "Save mod selection and return to primary spirit selection menu."
-			md.desc.Box = &ui.Box{Title: ui.Text("Save and continue")}
-			md.desc.Content = ui.Text(msg).Format(UIWidth/2 - 1 - 2).WithMarkups(Markups)
+			msg := "保存模组选项并返回主灵体选择菜单。"
+			md.desc.Box = &ui.Box{Title: ui.Text("保存并继续")}
+			md.desc.Content = ui.Text(msg).Format(descriptionPanelWidth() - 3).WithMarkups(Markups)
 			if act != ui.MenuInvoke {
 				break
 			}
 			if !slices.Equal(GameConfig.Mods, g.Mods) {
 				GameConfig.Mods = slices.Clone(g.Mods)
 				if err := SaveConfig(); err != nil {
-					log.Printf("error saving config: %v", err)
+					log.Printf("保存设置失败：%v", err)
 				}
 			}
 			md.openSpiritSelectionMenu(modeNewGame)
 		case idx > len(g.Mods)+1:
-			title := "Quit menu without saving"
-			content := "Revert any mod changes and return to primary spirit selection menu."
+			title := "退出菜单且不保存"
+			content := "撤销所有模组更改并返回主灵体选择菜单。"
 			md.desc.Box = &ui.Box{Title: ui.Text(title)}
-			md.desc.Content = ui.Text(content).Format(UIWidth/2 - 1 - 2)
+			md.desc.Content = ui.Text(content).Format(descriptionPanelWidth() - 3)
 			if act != ui.MenuInvoke {
 				break
 			}
@@ -401,30 +414,30 @@ func (md *model) updateModDesc(m Mod) {
 	stt := ui.StyledText{}.WithMarkups(Markups)
 	enabled := ""
 	if md.g.Mods[m] {
-		enabled = "@GEnabled.@N\n"
+		enabled = "@G已启用。@N\n"
 	} else {
-		enabled = "@SDisabled.@N\n"
+		enabled = "@S已禁用。@N\n"
 	}
 	l.Box = &ui.Box{Title: ui.Text(m.String())}
-	l.Content = stt.WithText(enabled + m.Desc()).Format(UIWidth/2 - 2)
+	l.Content = stt.WithText(enabled + m.Desc()).Format(descriptionPanelWidth() - 2)
 }
 
 func (md *model) modSelectionMenu() {
 	hstyle := gruid.Style{Fg: ColorCyan}
 	entries := []ui.MenuEntry{}
 	mods := GameMods
-	title := "Mod Selection"
+	title := "模组选单"
 	r := 'a'
 	for i, m := range mods {
 		switch Mod(i) {
 		case FirstExpansion:
 			entries = append(entries, ui.MenuEntry{
-				Text:     ui.Text("Expansions").WithStyle(hstyle),
+				Text:     ui.Text("扩展").WithStyle(hstyle),
 				Disabled: true,
 			})
 		case FirstChallenge:
 			entries = append(entries, ui.MenuEntry{
-				Text:     ui.Text("Challenges").WithStyle(hstyle),
+				Text:     ui.Text("挑战").WithStyle(hstyle),
 				Disabled: true,
 			})
 		}
@@ -447,18 +460,18 @@ func (md *model) modSelectionMenu() {
 		}
 	}
 	entries = append(entries, ui.MenuEntry{
-		Text:     ui.Text("Actions").WithStyle(hstyle),
+		Text:     ui.Text("操作").WithStyle(hstyle),
 		Disabled: true,
 	})
 	entries = append(entries, ui.MenuEntry{
-		Text: ui.Text("r - Reset selection"),
+		Text: ui.Text("r - 重置选择"),
 		Keys: []gruid.Key{gruid.Key('r'), gruid.Key('R')},
 	})
 	entries = append(entries, ui.MenuEntry{
-		Text: ui.Text("s - Save and continue"),
+		Text: ui.Text("s - 保存并继续"),
 		Keys: []gruid.Key{gruid.Key('s'), gruid.Key('S')},
 	})
-	qtext := "q - Quit menu without saving"
+	qtext := "q - 退出菜单且不保存"
 	entries = append(entries, ui.MenuEntry{
 		Text: ui.Text(qtext),
 		Keys: []gruid.Key{gruid.Key('q'), gruid.Key('Q')},

@@ -50,9 +50,9 @@ func (eff EffectPolymorphFungus) Apply(g *Game) bool {
 		mki := mks[i]
 		e := monster(mki)
 		a := e.Role.(*Actor)
-		g.Logf("The %s becomes %s.", ei.Name, One(e.Name))
+		g.Logf("%s变成了%s。", ei.Name, One(e.Name))
 		if ai.DoesAny(MonsNotable) {
-			g.StoryLogf("Polymorphed %s into %s", One(ei.Name), One(e.Name))
+			g.StoryLogf("将%s变成了%s", One(ei.Name), One(e.Name))
 		}
 		// Update name and rune only in entity.
 		ei.Name = e.Name
@@ -79,9 +79,9 @@ func (eff EffectPolymorphFungus) Apply(g *Game) bool {
 
 func (eff EffectPolymorphFungus) Desc(g *Game) string {
 	if g.HasCondComestibles() {
-		return "Eat only if there are exactly two monsters in view. Polymorphs them into a blinking butterfly and a confusing eye."
+		return "仅在视野中恰有两只怪物时才能食用。将它们分别变成闪现蝴蝶和迷惑之眼。"
 	}
-	return fmt.Sprintf("Polymorphs a random monster in view into a blinking butterfly, and a second monster, if any, into a confusing eye.\nIf no monsters are in view, gives @BVampirism@N for %d turns instead, preparing you for a vampiric ambush.", DurationVampFung)
+	return fmt.Sprintf("将视野中的一只随机怪物变成闪现蝴蝶；若还有第二只，则将其变成迷惑之眼。\n若视野中没有怪物，则改为获得 @B吸血@N，持续 %d 回合，为吸血突袭做好准备。", DurationVampFung)
 }
 
 type EffectRunethornRose struct{}
@@ -119,7 +119,7 @@ func (eff EffectRunethornRose) Apply(g *Game) bool {
 					p = gruid.Point{g.rand.IntN(size.X), g.rand.IntN(size.Y)}
 				}
 				i, _ := g.genRunicTrapAt(t, p)
-				g.SenseEntity(i, "sense")
+				g.SenseEntity(i, "感知到")
 				// Trigger the trap if there's already a
 				// monster on top of it.
 				if k, ak := g.ActorAt(p); k >= 0 {
@@ -142,9 +142,9 @@ func (g *Game) validRunePlace(p gruid.Point) bool {
 
 func (eff EffectRunethornRose) Desc(g *Game) string {
 	if !g.HasCondComestibles() {
-		return "Creates 8 runes of same type: up to two at each diagonal on floor tiles, or randomly around the map if there’s no room.\nThe rune type is chosen randomly unless you are standing on a trap, in which case its rune type will be used."
+		return "生成 8 个同类符文：在地面上每个对角方向最多放置两个；若空间不足，则在地图上随机放置。\n符文类型随机决定；若你正站在陷阱上，则使用该陷阱的符文类型。"
 	}
-	return "Eat only if you are standing on a runic trap. Creates 8 runes of its type: up to two at each diagonal on floor tiles, or randomly around the map if there’s no room."
+	return "仅在你站在符文陷阱上时才能食用。生成 8 个同类符文：在地面上每个对角方向最多放置两个；若空间不足，则在地图上随机放置。"
 }
 
 type EffectTunnelingAcorn struct{}
@@ -165,7 +165,7 @@ func (eff EffectTunnelingAcorn) Apply(g *Game) bool {
 		p = p.Add(g.Dir)
 		g.SeeTerrain(p)
 		if i, _ := g.ItemAt(p); i >= 0 {
-			g.SenseEntity(i, "sense")
+			g.SenseEntity(i, "感知到")
 		}
 	}
 	for inMap(p) && !g.Map.Passable(p) {
@@ -188,9 +188,9 @@ func (g *Game) disintegrateWall(at gruid.Point) {
 
 func (eff EffectTunnelingAcorn) Desc(g *Game) string {
 	if !g.HasCondComestibles() {
-		return "Makes you emit a beam that silently disintegrates any walls in front of you, until reaching a non-wall. Reveals terrain on the path."
+		return "发射一道光束，静默摧毁前方遇到的墙壁，直到遇到非墙地形为止，并显露沿途地形。"
 	}
-	return "Eat only if you are next to 3 walls, and facing one of them. Makes you silently disintegrate all walls in front of you, until reaching a non-wall."
+	return "仅在你紧邻三面墙且面朝其中一面时才能食用。静默摧毁前方遇到的所有墙壁，直到遇到非墙地形为止。"
 }
 
 type EffectVanishingSnail struct{}
@@ -230,12 +230,12 @@ func (eff EffectVanishingSnail) Apply(g *Game) bool {
 }
 
 func (eff EffectVanishingSnail) Desc(g *Game) string {
-	cond := "Eat only if at least 4 monsters are hunting you, including any out of view ones. "
+	cond := "仅在至少有四只怪物正在追猎你时才能食用，包括视野外的怪物。"
 	if !g.HasCondComestibles() {
 		cond = ""
 	}
 	return cond + fmt.Sprintf(
-		"Makes all monsters lose track of you and blinks away any that are next to you. Gives @BShadow@N for %d turns.",
+		"使所有怪物失去对你的追踪，并将身旁的怪物闪现带走。获得 @B暗影@N，持续 %d 回合。",
 		DurationShadow)
 }
 
@@ -286,11 +286,11 @@ func (eff EffectWarpingBean) Apply(g *Game) bool {
 }
 
 func (eff EffectWarpingBean) Desc(g *Game) string {
-	cond := "Eat only if you are lignified, dazed, or poisoned. "
+	cond := "仅在你处于木化、眩晕或中毒状态时才能食用。"
 	if !g.HasCondComestibles() {
 		cond = ""
 	}
-	return fmt.Sprintf("%sRemoves all your statuses without the usual after-effects, then warps you away in view with greater chance to distant tiles.%s",
+	return fmt.Sprintf("%s清除你的所有状态，且不会产生通常的后遗效果；随后将你传送到视野内的随机位置，远处格子的概率更高。%s",
 		cond, g.healMsg(HealWarpingBean))
 }
 
@@ -331,11 +331,11 @@ func (eff EffectFortressOyster) Apply(g *Game) bool {
 }
 
 func (eff EffectFortressOyster) Desc(g *Game) string {
-	cond := "Eat only if you are next to at least 3 monsters. "
+	cond := "仅在你至少紧邻三只怪物时才能食用。"
 	if !g.HasCondComestibles() {
 		cond = ""
 	}
-	return cond + "Gives @BBerserk@N, @BLignification@N, and @BVampirism@N for 5 turns. Removes incompatible statuses. Renews duration and temporary HP bonuses if applicable."
+	return cond + "获得 @B狂暴@N、@B木化@N和@B吸血@N，持续 5 回合，并移除不兼容的状态；如适用，还会刷新持续时间和临时生命值加成。"
 }
 
 type EffectSeeingPotato struct{}
@@ -346,7 +346,7 @@ func (eff EffectSeeingPotato) CanApply(g *Game, i ID) bool {
 }
 
 func (eff EffectSeeingPotato) Apply(g *Game) bool {
-	g.eatMsg("seeing potato’s stalk", "")
+	g.eatMsg("看见了马铃薯的茎", "")
 	const maxdist = 2 * MaxFOVRange
 	mp := &MappingPath{passable: func(p gruid.Point) bool { return inMap(p) }}
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, maxdist)
@@ -371,18 +371,18 @@ func (eff EffectSeeingPotato) Apply(g *Game) bool {
 	for i, ei := range g.NPMapEntities() {
 		p := ei.P
 		if paths.DistanceManhattan(pp, p) <= maxdist && g.Map.Terrain.At(p) == Floor {
-			g.SenseEntity(i, "sense")
+			g.SenseEntity(i, "感知到")
 		}
 	}
 	return true
 }
 
 func (eff EffectSeeingPotato) Desc(g *Game) string {
-	cond := "Eat only from the ground and not your inventory. "
+	cond := "只能从地上拾取食用，不能从物品栏中食用。"
 	if !g.HasCondComestibles() {
 		cond = ""
 	}
-	return cond + "Makes you sense nearby floor tiles and any entities on them (2× view range)."
+	return cond + "感知周围地面格及其上的所有实体（范围为视野的 2 倍）。"
 }
 
 type EffectTrickyChestnut struct{}
@@ -408,14 +408,14 @@ func (eff EffectTrickyChestnut) Apply(g *Game) bool {
 		case *Portal:
 			o.Fake = false
 			o.Used = false
-			g.LogStyled("The portal is fixed!", logSpecial)
+			g.LogStyled("传送门修好了！", logSpecial)
 			return true
 		case *Spirit:
 			tot = o
 		}
 	}
 	// Recharge spirits by default.
-	g.LogStyled("Your spirits are recharged!", logSpecial)
+	g.LogStyled("灵体充能已恢复！", logSpecial)
 	if tot != nil { // turn totem to empty if present
 		g.Entity(g.TotemID()).P = InvalidPos
 		et := g.Entity(g.genEmptyTotemAt(pp))
@@ -438,20 +438,20 @@ func (eff EffectTrickyChestnut) Apply(g *Game) bool {
 
 func (eff EffectTrickyChestnut) Desc(g *Game) string {
 	nocond := !g.HasCondComestibles()
-	recharges := "Eat if you are standing on a full totem, to empty the totem, and restore all your spirit charges."
+	recharges := "站在已充能的图腾上时食用，可清空图腾并恢复所有灵体的充能。"
 	if g.Mod(ModNoRecharges) {
-		recharges = "Eat if you are standing on a full totem, to empty the totem, and restore two charges per spirit."
+		recharges = "站在已充能的图腾上时食用，可清空图腾并为每个灵体恢复两点充能。"
 		if nocond {
-			recharges = "If you are standing on a full totem, empties it, and restores two charges per spirit."
+			recharges = "若你站在已充能的图腾上，则清空图腾并为每个灵体恢复两点充能。"
 		}
 	} else if nocond {
-		recharges = "If you are standing on a full totem, empties it, and restores all your spirit charges."
+		recharges = "若你站在已充能的图腾上，则清空图腾并恢复所有灵体的充能。"
 	}
 	if nocond {
-		return fmt.Sprintf("If you are standing on a broken portal, makes it work again.\n%s\nOtherwise, restores one charge per spirit.",
+		return fmt.Sprintf("若你站在故障传送门上，可使其恢复运作。\n%s\n否则，每个灵体恢复一点充能。",
 			recharges)
 	}
-	return "Eat if you are standing on a broken portal, to make it work again.\n" + recharges
+	return "站在故障传送门上时食用，可使其恢复运作。\n" + recharges
 }
 
 // CantEatMsg returns a message suitable for when you try to eat a conditional
@@ -459,17 +459,17 @@ func (eff EffectTrickyChestnut) Desc(g *Game) string {
 func CantEatMsg(ef Effect) string {
 	switch ef.(type) {
 	case EffectVanishingSnail, EffectWarpingBean:
-		return "You can’t grab it!"
+		return "你拿不起来！"
 	case EffectFortressOyster, EffectTunnelingAcorn, EffectTrickyChestnut:
-		return "It won’t open!"
+		return "它打不开！"
 	case EffectRunethornRose:
-		return "You can’t get past its thorns!"
+		return "你无法穿过它的荆棘！"
 	case EffectSeeingPotato:
-		return "It has to be planted in the ground!"
+		return "必须先把它种在地上！"
 	case EffectPolymorphFungus:
-		return "It can only be eaten with exactly two monsters in view!"
+		return "仅当视野中恰有两只怪物时才能食用！"
 	default:
-		panic("unexpected inedible comestible")
+		panic("意外的不可食用食物")
 	}
 }
 

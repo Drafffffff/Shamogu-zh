@@ -164,17 +164,17 @@ func (g *Game) MonsterUpdateTarget(i ID, ai *Actor, at gruid.Point, noise bool) 
 	unhidden := !g.PlayerIsHidden()
 	if at == pp && unhidden && g.InFOV(ei.P) || noise && ai.Is(ChaosMegabat) {
 		if g.InFOV(ei.P) {
-			g.Logf("The %s notices you.", ei.Name)
+			g.Logf("%s注意到了你。", ei.Name)
 		}
 		beh.State = Hunting
 		switch {
 		case ai.Is(BarkingHound):
-			g.Logf("The %s barks.", ei.Name)
+			g.Logf("%s吠叫起来。", ei.Name)
 			g.md.BarkAnimation(ei.P)
 			g.MakeNoise(ei.P, NoiseBark)
 			g.PutStatus(PlayerID, g.PlayerActor(), StatusFear, DurationFearBark)
 			if ai.Has(StatusConfusion) {
-				g.LogfStyled("The confused %s bit its tongue while barking!", logHurtMons, g.Entity(i).Name)
+				g.LogfStyled("混乱的%s吠叫时咬到了自己的舌头！", logHurtMons, g.Entity(i).Name)
 				g.InflictDamage(i, ai, ConfusionDamage, AttackOther)
 			}
 		case ai.Is(WalkingMushroom):
@@ -216,7 +216,7 @@ func (g *Game) releaseSpores(i ID) {
 	if g.PR.BreadthFirstMapAt(g.PP()) > maxdist {
 		return
 	}
-	g.Logf("The %s releases lignifying spores.", ei.Name)
+	g.Logf("%s释放了木化孢子。", ei.Name)
 	g.md.FloodAnimation(nodes, ColorYellow)
 	for j, aj := range g.Actors() {
 		if i == j {

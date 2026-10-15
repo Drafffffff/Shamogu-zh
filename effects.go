@@ -88,16 +88,16 @@ func (g *Game) healMsg(amount int) string {
 	if g.Mod(ModHealingCombat) {
 		return ""
 	}
-	return fmt.Sprintf(" Restores %+d HP.", amount)
+	return fmt.Sprintf(" 恢复 %+d 点生命值。", amount)
 }
 
 // eatMsg returns an eating message with the given optional new hp info.
 func (g *Game) eatMsg(name string, hpstr string) {
-	g.Logf("You eat the %s.", name)
+	g.Logf("你吃下了%s。", name)
 	if hpstr != "" {
-		g.StoryLogf("Ate %s (HP: %s)", One(name), hpstr)
+		g.StoryLogf("吃下%s（生命值：%s）", One(name), hpstr)
 	} else {
-		g.StoryLogf("Ate %s", One(name))
+		g.StoryLogf("吃下%s", One(name))
 	}
 }
 
@@ -142,7 +142,7 @@ func (eff EffectAmbrosiaBerries) Desc(g *Game) string {
 	if g.Mod(ModHealingCombat) {
 		heal = HealAmbrosiaHC
 	}
-	return fmt.Sprintf("Restores %+d HP. Leaves you either @Oconfused@N or @Oafraid@N for %d or %d turns respectively.",
+	return fmt.Sprintf("恢复 %+d 点生命值。随后你会陷入@O混乱@N或@O恐惧@N，分别持续 %d 或 %d 回合。",
 		heal, DurationConfusionAmbrosia, DurationFearAmbrosia)
 }
 
@@ -171,7 +171,7 @@ func (eff EffectBerserkingFlower) Apply(g *Game) bool {
 }
 
 func (eff EffectBerserkingFlower) Desc(_ *Game) string {
-	return fmt.Sprintf("Makes you @BBerserk@N for %d turns. %s",
+	return fmt.Sprintf("使你进入@B狂暴@N状态，持续 %d 回合。%s",
 		DurationBerserk, statusDesc[StatusBerserk])
 }
 
@@ -200,7 +200,7 @@ func (eff EffectLignificationFruit) Apply(g *Game) bool {
 }
 
 func (eff EffectLignificationFruit) Desc(_ *Game) string {
-	return fmt.Sprintf("@BLignification@N for %d turns. %s",
+	return fmt.Sprintf("进入@B木化@N状态，持续 %d 回合。%s",
 		DurationLignification, statusDesc[StatusLignification])
 }
 
@@ -237,7 +237,7 @@ func newHPWithoutBonus(a *Actor, m, hp int) string {
 }
 
 func (eff EffectClarityLeaves) Desc(g *Game) string {
-	return fmt.Sprintf("Gives @BClarity@N for %d turns. %s%s",
+	return fmt.Sprintf("获得@B明晰@N状态，持续 %d 回合。%s%s",
 		DurationClarity, statusDesc[StatusClarity], g.healMsg(HealClarityLeaves))
 }
 
@@ -263,7 +263,7 @@ func (eff EffectFoggySkinOnion) Apply(g *Game) bool {
 }
 
 func (eff EffectFoggySkinOnion) Desc(g *Game) string {
-	return fmt.Sprintf("Gives @BFoggy-Skin@N for %d turns. %s%s",
+	return fmt.Sprintf("获得@B雾肤@N状态，持续 %d 回合。%s%s",
 		DurationFoggySkin, statusDesc[StatusFoggySkin], g.healMsg(HealFoggySkinOnion))
 }
 
@@ -306,7 +306,7 @@ func (eff EffectFirebreathPepper) Apply(g *Game) bool {
 }
 
 func (eff EffectFirebreathPepper) Desc(g *Game) string {
-	return fmt.Sprintf("Makes you breathe a confusing fire beam in the current direction inflicting @OConfusion@N for %d turns and @OFire@N for %d turns. Burns foliage, producing fire clouds lasting 6-12 turns. Makes walls explode.%s",
+	return fmt.Sprintf("向当前方向喷出令人混乱的火焰。使目标陷入@O混乱@N %d 回合并@O着火@N %d 回合。点燃植被，形成持续 6–12 回合的火云，并炸毁墙壁。%s",
 		DurationConfusionPepperBreath, DurationFire, g.healMsg(HealFirebreathPepper))
 }
 
@@ -322,13 +322,13 @@ func (eff EffectTeleportMushroom) Apply(g *Game) bool {
 	j := g.TotemID()
 	g.eatMsg(TeleportMushroom.Name(), "")
 	if !g.TeleportActor(PlayerID, pa, 1) {
-		g.Log("You resist teleport while lignified.")
+		g.Log("木化期间你能抵抗传送。")
 		if !g.Mod(ModHealingCombat) {
 			g.healPlayer(pa, HealTeleportLignified)
 		}
 	}
 	if j >= 0 {
-		g.SenseEntity(j, "sense")
+		g.SenseEntity(j, "感知到")
 	}
 	return true
 }
@@ -344,9 +344,9 @@ func (g *Game) teleportStatuses(i ID, ai *Actor, n int) {
 func (eff EffectTeleportMushroom) Desc(g *Game) string {
 	var healMsg string
 	if !g.Mod(ModHealingCombat) {
-		healMsg = fmt.Sprintf(" Restores %+d HP when lignified instead.", HealTeleportLignified)
+		healMsg = fmt.Sprintf(" 木化时则恢复 %+d 点生命值。", HealTeleportLignified)
 	}
-	return fmt.Sprintf("Teleports you away and makes you sense any totemic spirit. Leaves you either @Odazed@N or @Oimbalanced@N for %d or %d turns respectively.%s",
+	return fmt.Sprintf("将你传送离开，并使你感知所有图腾灵体。随后你会陷入@O眩晕@N或@O失衡@N，分别持续 %d 或 %d 回合。%s",
 		DurationDazeTeleport, DurationImbalanceTeleport, healMsg)
 }
 
@@ -413,9 +413,9 @@ func (eff EffectMoonlightLotus) Apply(g *Game) bool {
 func (eff EffectMoonlightLotus) Desc(g *Game) string {
 	var healmsg string
 	if !g.Mod(ModHealingCombat) {
-		healmsg = fmt.Sprintf("\nIn any case, restores %+d HP.", HealMoonlightLotus)
+		healmsg = fmt.Sprintf("\n无论如何，都会恢复 %+d 点生命值。", HealMoonlightLotus)
 	}
-	return fmt.Sprintf("If you are standing on foliage, gives @BDisorient@N for %d turns and increases visibility around, changing plain walls into translucent ones and foliage into floor.\nOtherwise, gives @BGardener@N for %d turns and changes instead translucent walls into plain ones.%s", DurationGarDis, DurationGarDis, healmsg)
+	return fmt.Sprintf("若你站在植被上，则获得@B迷向@N状态，持续 %d 回合，并提高周围能见度，将普通墙壁变为半透明墙、将植被变为地面。\n否则，获得@B园艺师@N状态，持续 %d 回合，并将半透明墙变回普通墙。%s", DurationGarDis, DurationGarDis, healmsg)
 }
 
 type EffectFocus struct{}
@@ -423,15 +423,15 @@ type EffectFocus struct{}
 func (eff EffectFocus) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	if pa.Has(StatusDaze) {
-		g.Log("Invoking “focus” while dazed would be useless.")
+		g.Log("眩晕时使用“专注”毫无作用。")
 		return false
 	}
 	if pa.Has(StatusFocus) {
-		g.Log("You cannot invoke “focus” when you’re already focusing.")
+		g.Log("你已处于专注状态，无法再次使用“专注”。")
 		return false
 	}
 	if pa.Has(StatusFear) {
-		g.Log("You cannot invoke “focus” while afraid.")
+		g.Log("恐惧时无法使用“专注”。")
 		return false
 	}
 	g.PutStatus(PlayerID, pa, StatusFocus, DurationFocus)
@@ -440,11 +440,11 @@ func (eff EffectFocus) Apply(g *Game) bool {
 }
 
 func (eff EffectFocus) Name() string {
-	return "focus"
+	return "专注"
 }
 
 func (eff EffectFocus) Desc(_ *Game) string {
-	return fmt.Sprintf("@BFocus@N for %d turns. %s @GInstant@N.", DurationFocus, statusDesc[StatusFocus])
+	return fmt.Sprintf("进入@B专注@N状态，持续 %d 回合。%s @G即时生效@N。", DurationFocus, statusDesc[StatusFocus])
 }
 
 type EffectDig struct{}
@@ -452,11 +452,11 @@ type EffectDig struct{}
 func (eff EffectDig) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	if pa.Has(StatusDaze) {
-		g.Log("Invoking “dig” while dazed would be useless.")
+		g.Log("眩晕时使用“掘地”毫无作用。")
 		return false
 	}
 	if pa.Has(StatusDig) {
-		g.Log("You cannot invoke “dig” when you’re already digging.")
+		g.Log("你已处于掘地状态，无法再次使用“掘地”。")
 		return false
 	}
 	g.PutStatus(PlayerID, pa, StatusDig, DurationDig)
@@ -465,11 +465,11 @@ func (eff EffectDig) Apply(g *Game) bool {
 }
 
 func (eff EffectDig) Name() string {
-	return "dig"
+	return "掘地"
 }
 
 func (eff EffectDig) Desc(_ *Game) string {
-	return fmt.Sprintf("@BDig@N for %d turns. %s @GInstant@N.",
+	return fmt.Sprintf("进入@B掘地@N状态，持续 %d 回合。%s @G即时生效@N。",
 		DurationDig, statusDesc[StatusDig])
 }
 
@@ -478,11 +478,11 @@ type EffectJump struct{}
 func (eff EffectJump) Apply(g *Game) bool {
 	pl, pa := g.Player()
 	if !pa.CanMove() {
-		g.Log("You cannot jump while lignified.")
+		g.Log("木化时无法跳跃。")
 		return false
 	}
 	if pa.HP == 1 && pa.Has(StatusPoison) {
-		g.Log("You cannot jump while poisoned and almost dead.")
+		g.Log("中毒且濒死时无法跳跃。")
 		return false
 	}
 	dir, from, to := g.Dir, pl.P, pl.P
@@ -496,10 +496,10 @@ func (eff EffectJump) Apply(g *Game) bool {
 		to = to.Sub(dir)
 	}
 	if to == from {
-		g.Log("There’s no room to jump in that direction.")
+		g.Log("那个方向没有足够空间跳跃。")
 		return false
 	}
-	g.Log("You jump.")
+	g.Log("你跳了起来。")
 	g.MoveActor(PlayerID, pa, to, MovJump)
 	for p := from.Add(dir); p != to; p = p.Add(dir) {
 		if i, ai := g.ActorAt(p); i >= 0 {
@@ -514,7 +514,7 @@ func (eff EffectJump) Apply(g *Game) bool {
 		}
 	}
 	if pa.Has(StatusImbalance) && g.IntN(5) < 2 {
-		g.Log("You fall due to imbalance.")
+		g.Log("你因失衡而跌倒。")
 		duration := DurationDazeFall + paths.DistanceManhattan(from, to)/3
 		g.PutStatus1(PlayerID, pa, StatusDaze, duration)
 	}
@@ -523,11 +523,11 @@ func (eff EffectJump) Apply(g *Game) bool {
 }
 
 func (eff EffectJump) Name() string {
-	return "dazing jump"
+	return "眩晕跳跃"
 }
 
 func (eff EffectJump) Desc(_ *Game) string {
-	return fmt.Sprintf("Jump in the current direction to the furthest free position in view. You will attack any monsters on the path with +1 attack and @Odaze@N them for %d turns.",
+	return fmt.Sprintf("沿当前方向跳至视野内最远的空位。途中会攻击所有怪物，攻击力 +1，并使其@O眩晕@N %d 回合。",
 		DurationDazeJump)
 }
 
@@ -535,7 +535,7 @@ type EffectPushingGale struct{}
 
 func (eff EffectPushingGale) Apply(g *Game) bool {
 	pp := g.PP()
-	g.Log("A strong gale pushes the air away from you.")
+	g.Log("强风将周围的空气推开。")
 	g.MakeNoise(pp, NoiseWind)
 	for _, dir := range Directions {
 		g.pushingGale(pp, dir)
@@ -599,11 +599,11 @@ func (g *Game) blowClouds(p, dir gruid.Point) {
 }
 
 func (eff EffectPushingGale) Name() string {
-	return "pushing gale"
+	return "推风"
 }
 
 func (eff EffectPushingGale) Desc(_ *Game) string {
-	return fmt.Sprintf("Hurt foes in the four cardinal directions for 1 damage when ranged and 1-2 in melee. Pushes foes away and @Ounbalances@N them for %d turns. Dissipates clouds except foliage fires that propagate instead.",
+	return fmt.Sprintf("伤害四个正交方向上的敌人：远程造成 1 点伤害，近战造成 1–2 点。将敌人推开并使其@O失衡@N %d 回合。驱散云雾，但植被火焰会因此蔓延。",
 		DurationImbalanceGale)
 }
 
@@ -612,7 +612,7 @@ type EffectTimeStop struct{}
 func (eff EffectTimeStop) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	if pa.Has(StatusTimeStop) {
-		g.Log("You cannot invoke “stop time” when you’re already freezing time.")
+		g.Log("你已处于止时状态，无法再次使用“止时”。")
 		return false
 	}
 	g.PutStatus(PlayerID, pa, StatusTimeStop, DurationTimeStop)
@@ -621,11 +621,11 @@ func (eff EffectTimeStop) Apply(g *Game) bool {
 }
 
 func (eff EffectTimeStop) Name() string {
-	return "stop time"
+	return "止时"
 }
 
 func (eff EffectTimeStop) Desc(_ *Game) string {
-	return fmt.Sprintf("@BStop Time@N for %d turns. %s @GInstant@N.",
+	return fmt.Sprintf("进入@B止时@N状态，持续 %d 回合。%s @G即时生效@N。",
 		DurationTimeStop, statusDesc[StatusTimeStop])
 }
 
@@ -644,7 +644,7 @@ func (eff EffectTailSlap) Apply(g *Game) bool {
 		actors[i], actors[j] = actors[j], actors[i]
 		ids[i], ids[j] = ids[j], ids[i]
 	})
-	g.Log("You spin around chasing your tail.")
+	g.Log("你转着圈追自己的尾巴。")
 	for k, j := range ids {
 		// Tail-slap works even under fear, as it's not really
 		// directed. NOTE: we should maybe remove one direction under
@@ -657,11 +657,11 @@ func (eff EffectTailSlap) Apply(g *Game) bool {
 }
 
 func (eff EffectTailSlap) Name() string {
-	return "tail slap"
+	return "甩尾"
 }
 
 func (eff EffectTailSlap) Desc(_ *Game) string {
-	return fmt.Sprintf("Perform a tail-slap attack with +1 effective damage on any adjacent foes while turning around, @Ounbalancing@N them for %d turns.",
+	return fmt.Sprintf("转身甩尾攻击相邻敌人，造成的有效伤害 +1，并使其@O失衡@N %d 回合。",
 		DurationImbalanceTailSlap)
 }
 
@@ -670,15 +670,15 @@ type EffectVampirism struct{ Duration int }
 func (eff EffectVampirism) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	if pa.Has(StatusDaze) {
-		g.Log("Invoking “vampirism” while dazed would be useless.")
+		g.Log("眩晕时使用“吸血”毫无作用。")
 		return false
 	}
 	if pa.Has(StatusVampirism) {
-		g.Log("You cannot invoke “vampirism” when you’re already vampiric.")
+		g.Log("你已处于吸血状态，无法再次使用“吸血”。")
 		return false
 	}
 	if pa.Has(StatusFear) {
-		g.Log("You cannot invoke “focus” while afraid.")
+		g.Log("恐惧时无法使用“专注”。")
 		return false
 	}
 	g.PutStatus(PlayerID, pa, StatusVampirism, eff.Duration)
@@ -687,11 +687,11 @@ func (eff EffectVampirism) Apply(g *Game) bool {
 }
 
 func (eff EffectVampirism) Name() string {
-	return "vampirism"
+	return "吸血"
 }
 
 func (eff EffectVampirism) Desc(_ *Game) string {
-	return fmt.Sprintf("@BVampirism@N for %d turns. %s @GInstant@N.", eff.Duration, statusDesc[StatusVampirism])
+	return fmt.Sprintf("进入@B吸血@N状态，持续 %d 回合。%s @G即时生效@N。", eff.Duration, statusDesc[StatusVampirism])
 }
 
 type EffectLightning struct{}
@@ -703,7 +703,7 @@ func (eff EffectLightning) Apply(g *Game) bool {
 	)
 	pa := g.PlayerActor()
 	if pa.HP <= 1 {
-		g.Log("You’re too injured for invoking “lightning”.")
+		g.Log("你伤势过重，无法使用“闪电”。")
 		return false
 	}
 	mp := &MapPath{passable: func(q gruid.Point) bool {
@@ -717,7 +717,7 @@ func (eff EffectLightning) Apply(g *Game) bool {
 	done := false
 	lightning := func() {
 		g.md.LightningAnimation(nodes)
-		g.Logf("You emit a static discharge (-%d HP).", selfDmg)
+		g.Logf("你释放静电（-%d 点生命值）。", selfDmg)
 		g.MakeNoise(g.PP(), NoiseLightning)
 		g.InflictDamage(PlayerID, pa, selfDmg, AttackOther)
 		done = true
@@ -739,17 +739,17 @@ func (eff EffectLightning) Apply(g *Game) bool {
 		lightning()
 	}
 	if !done {
-		g.Log("No suitable targets for lightning.")
+		g.Log("没有合适的闪电目标。")
 	}
 	return done
 }
 
 func (eff EffectLightning) Name() string {
-	return "lightning"
+	return "闪电"
 }
 
 func (eff EffectLightning) Desc(_ *Game) string {
-	return fmt.Sprintf("Inflict 1-3 damage on any chain of monsters adjacent to you. Damage decreases with distance. Affected monsters are @Odazed@N for %d turns. Hurts you too for 1 HP.",
+	return fmt.Sprintf("对所有相邻的一串怪物造成 1–3 点伤害，伤害随距离递减。受影响的怪物会@O眩晕@N %d 回合。你也会受到 1 点伤害。",
 		DurationDazeLightning)
 }
 
@@ -759,7 +759,7 @@ func (eff EffectBark) Apply(g *Game) bool {
 	const maxdist = MaxFOVRange
 	mp := &MapPath{passable: g.Map.Passable}
 	g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, maxdist)
-	g.Log("You bark.")
+	g.Log("你吠叫。")
 	pp := g.PP()
 	g.md.BarkAnimation(pp)
 	g.MakeNoise(pp, NoiseBark)
@@ -773,11 +773,11 @@ func (eff EffectBark) Apply(g *Game) bool {
 }
 
 func (eff EffectBark) Name() string {
-	return "bark"
+	return "吠叫"
 }
 
 func (eff EffectBark) Desc(_ *Game) string {
-	return fmt.Sprintf("Frighten all monsters within %d tiles of distance for %d turns.",
+	return fmt.Sprintf("恐吓距离你 %d 格内的所有怪物，持续 %d 回合。",
 		MaxFOVRange, DurationFearBark)
 }
 
@@ -785,7 +785,7 @@ type EffectNoxiousSmell struct{}
 
 func (eff EffectNoxiousSmell) Apply(g *Game) bool {
 	const maxdist = MaxFOVRange
-	g.Log("You emit a confusing noxious smell.")
+	g.Log("你散发出令人混乱的恶臭。")
 	g.confusingSmell(PlayerID, maxdist, DurationConfusionSkunk)
 	return true
 }
@@ -807,11 +807,11 @@ func (g *Game) confusingSmell(i ID, maxdist, duration int) {
 }
 
 func (eff EffectNoxiousSmell) Name() string {
-	return "noxious smell"
+	return "恶臭"
 }
 
 func (eff EffectNoxiousSmell) Desc(_ *Game) string {
-	return fmt.Sprintf("Confuse monsters within %d tiles of distance for %d turns.",
+	return fmt.Sprintf("使距离你 %d 格内的怪物陷入混乱，持续 %d 回合。",
 		MaxFOVRange, DurationConfusionSkunk)
 }
 
@@ -831,7 +831,7 @@ func (eff EffectLignify) Apply(g *Game) bool {
 			continue
 		}
 		if !done {
-			g.Log("Growing roots lignify your foes.")
+			g.Log("生长的根须使敌人木化。")
 			done = true
 		}
 		g.PutStatus(i, ai, StatusLignification, DurationLignificationRoots)
@@ -841,17 +841,17 @@ func (eff EffectLignify) Apply(g *Game) bool {
 		nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{g.PP()}, MaxFOVRange)
 		g.md.FloodAnimation(nodes, ColorYellow)
 	} else {
-		g.Log("No lignifiable foes in view.")
+		g.Log("视野内没有可木化的敌人。")
 	}
 	return done
 }
 
 func (eff EffectLignify) Name() string {
-	return "lignify"
+	return "木化"
 }
 
 func (eff EffectLignify) Desc(_ *Game) string {
-	return fmt.Sprintf("Lignify monsters in view for %d turns.",
+	return fmt.Sprintf("使视野内的怪物木化 %d 回合。",
 		DurationLignificationRoots)
 }
 
@@ -873,19 +873,19 @@ func (eff EffectPoisonCloud) Apply(g *Game) bool {
 		g.PoisonCloudAt(q)
 	}
 	if done {
-		g.Log("You spit poisonous fumes around.")
+		g.Log("你向周围喷出毒雾。")
 	} else {
-		g.Log("There’s no room to spit poison.")
+		g.Log("没有足够空间喷吐毒雾。")
 	}
 	return done
 }
 
 func (eff EffectPoisonCloud) Name() string {
-	return "poison cloud"
+	return "毒云"
 }
 
 func (eff EffectPoisonCloud) Desc(_ *Game) string {
-	return "Spit poisonous clouds on the sides and in front of you up to two free tiles away, lasting 7-11 turns."
+	return "向前方及两侧最多两格外的空位喷出毒云，持续 7–11 回合。"
 }
 
 type EffectSprint struct{}
@@ -893,15 +893,15 @@ type EffectSprint struct{}
 func (eff EffectSprint) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	if pa.Has(StatusDaze) {
-		g.Log("Invoking “sprint” while dazed would be useless.")
+		g.Log("眩晕时使用“冲刺”毫无作用。")
 		return false
 	}
 	if pa.Has(StatusSprint) {
-		g.Log("You cannot invoke “sprint” while you’re already sprinting.")
+		g.Log("你已处于冲刺状态，无法再次使用“冲刺”。")
 		return false
 	}
 	if !pa.CanMove() {
-		g.Log("You cannot invoke “sprint” while lignified.")
+		g.Log("木化时无法使用“冲刺”。")
 		return false
 	}
 	g.PutStatus(PlayerID, pa, StatusSprint, DurationSprint)
@@ -910,11 +910,11 @@ func (eff EffectSprint) Apply(g *Game) bool {
 }
 
 func (eff EffectSprint) Name() string {
-	return "sprint"
+	return "冲刺"
 }
 
 func (eff EffectSprint) Desc(_ *Game) string {
-	return fmt.Sprintf("@BSprint@N for %d turns. %s @GInstant@N.",
+	return fmt.Sprintf("进入@B冲刺@N状态，持续 %d 回合。%s @G即时生效@N。",
 		DurationSprint, statusDesc[StatusSprint])
 }
 
@@ -923,11 +923,11 @@ type EffectFireRetreat struct{}
 func (eff EffectFireRetreat) Apply(g *Game) bool {
 	pl, pa := g.Player()
 	if !pa.CanMove() {
-		g.Log("You cannot retreat while lignified.")
+		g.Log("木化时无法撤退。")
 		return false
 	}
 	if pa.HP == 1 && pa.Has(StatusPoison) {
-		g.Log("You cannot retreat while poisoned and almost dead.")
+		g.Log("中毒且濒死时无法撤退。")
 		return false
 	}
 	from := pl.P
@@ -946,10 +946,10 @@ func (eff EffectFireRetreat) Apply(g *Game) bool {
 		to = p
 	}
 	if from == to {
-		g.Log("There’s no room to retreat.")
+		g.Log("没有空间撤退。")
 		return false
 	}
-	g.Log("You retreat.")
+	g.Log("你向后撤退。")
 	g.MoveActor(PlayerID, pa, to, MovJump)
 	g.FireCloudAt(from)
 	// We used MovJump for showing the fire cloud before triggering any
@@ -959,11 +959,11 @@ func (eff EffectFireRetreat) Apply(g *Game) bool {
 }
 
 func (eff EffectFireRetreat) Name() string {
-	return "fire retreat"
+	return "烈焰撤退"
 }
 
 func (eff EffectFireRetreat) Desc(_ *Game) string {
-	return "Walk backwards up to two tiles while leaving a fire cloud lasting 6-12 turns."
+	return "向后移动最多两格，并留下持续 6–12 回合的火云。"
 }
 
 type EffectShadows struct{}
@@ -976,11 +976,11 @@ func (eff EffectShadows) Apply(g *Game) bool {
 }
 
 func (eff EffectShadows) Name() string {
-	return "shadows"
+	return "暗影"
 }
 
 func (eff EffectShadows) Desc(_ *Game) string {
-	return fmt.Sprintf("@BShadow@N for %d more turns. %s @GInstant@N.",
+	return fmt.Sprintf("@B暗影@N状态还会持续 %d 回合。%s @G即时生效@N。",
 		DurationShadow, statusDesc[StatusShadow])
 }
 
@@ -989,7 +989,7 @@ type EffectSnack struct{}
 func (eff EffectSnack) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	if pa.Has(StatusLignification) {
-		g.Log("You cannot get a snack while lignified.")
+		g.Log("木化时无法觅食。")
 		return false
 	}
 	pp := g.PP()
@@ -1002,11 +1002,11 @@ func (eff EffectSnack) Apply(g *Game) bool {
 		}
 	}
 	if i < 0 {
-		g.Log("No comestibles remaining in the map.")
+		g.Log("地图上已没有食物。")
 		return false
 	}
-	g.SenseEntity(i, "sense")
-	g.Log("You teleport for a quick snack!")
+	g.SenseEntity(i, "感知到")
+	g.Log("你传送去快速觅食！")
 	to := g.Entity(i).P
 	g.MoveActor(PlayerID, pa, to, MovTeleport)
 	g.UpdateFOV()
@@ -1017,15 +1017,15 @@ func (eff EffectSnack) Apply(g *Game) bool {
 }
 
 func (eff EffectSnack) Name() string {
-	return "snack"
+	return "觅食"
 }
 
 func (eff EffectSnack) Desc(g *Game) string {
-	desc := "You teleport to the nearest comestible, if any, and eat it."
+	desc := "若附近有食物，你会传送到最近的一份并将其吃掉。"
 	if GluttonyRework {
 		return desc
 	}
-	return desc + " It doesn’t trigger @BGluttony@N."
+	return desc + "不会触发@B贪食@N。"
 }
 
 type EffectGarden struct{}
@@ -1033,7 +1033,7 @@ type EffectGarden struct{}
 func (eff EffectGarden) Apply(g *Game) bool {
 	pa := g.PlayerActor()
 	if pa.Has(StatusGardener) {
-		g.Log("You cannot invoke “garden” while you’re already gardening.")
+		g.Log("你已处于园艺师状态，无法再次使用“园艺”。")
 		return false
 	}
 	g.PutStatus(PlayerID, pa, StatusGardener, DurationGarden)
@@ -1042,11 +1042,11 @@ func (eff EffectGarden) Apply(g *Game) bool {
 }
 
 func (eff EffectGarden) Name() string {
-	return "garden"
+	return "园艺"
 }
 
 func (eff EffectGarden) Desc(_ *Game) string {
-	return fmt.Sprintf("@BGardener@N for %d turns. %s @GInstant@N.",
+	return fmt.Sprintf("进入@B园艺师@N状态，持续 %d 回合。%s @G即时生效@N。",
 		DurationGarden, statusDesc[StatusGardener])
 }
 
@@ -1056,7 +1056,7 @@ func (eff EffectStomp) Apply(g *Game) bool {
 	pp := g.PP()
 	mp := &MapPath{passable: inMap}
 	nodes := g.PR.BreadthFirstMap(mp, []gruid.Point{pp}, 2)
-	g.Log("You stomp on the ground.")
+	g.Log("你重踏地面。")
 	g.MakeNoise(pp, NoiseStomp)
 	for _, n := range nodes {
 		g.stompDigAt(n.P)
@@ -1095,11 +1095,11 @@ func (g *Game) stompDigAt(at gruid.Point) {
 }
 
 func (eff EffectStomp) Name() string {
-	return "stomp"
+	return "重踏"
 }
 
 func (eff EffectStomp) Desc(_ *Game) string {
-	return fmt.Sprintf("Destroy walls in a 2-tile radius. Makes you @BBerserk@N for %d turns.",
+	return fmt.Sprintf("摧毁半径两格内的墙壁，并使你进入@B狂暴@N状态 %d 回合。",
 		DurationBerserkStomp)
 }
 
@@ -1108,18 +1108,18 @@ type EffectDeathStare struct{}
 func (eff EffectDeathStare) Apply(g *Game) bool {
 	pl, pa := g.Player()
 	if pa.Has(StatusFear) {
-		g.Log("You cannot invoke “death stare” while afraid.")
+		g.Log("恐惧时无法使用“死亡凝视”。")
 		return false
 	}
 	if j, aj := g.RangedTargetInDir(pl.P, g.Dir); j >= 0 {
 		ej := g.Entity(j)
-		g.Logf("You give a deadly stare at the %s.", ej.Name)
+		g.Logf("你向%s投去致命的凝视。", ej.Name)
 		g.md.RangedBeamAnimation(pl.P, ej.P, ColorViolet)
 		g.InflictDamage(j, aj, aj.HP, AttackOther)
 		g.PutStatus1(PlayerID, pa, StatusFear, DurationFearDeathStare)
 		return true
 	}
-	g.Log("You cannot use “death stare” without a visible foe in front.")
+	g.Log("前方没有可见敌人，无法使用“死亡凝视”。")
 	return false
 }
 
@@ -1135,11 +1135,11 @@ func (g *Game) DeathStareTarget(from, dir gruid.Point) (ID, *Actor) {
 }
 
 func (eff EffectDeathStare) Name() string {
-	return "death stare"
+	return "死亡凝视"
 }
 
 func (eff EffectDeathStare) Desc(_ *Game) string {
-	return fmt.Sprintf("Kill first visible foe in front. Gives you @OFear@N for %d turns as backlash.",
+	return fmt.Sprintf("杀死前方第一个可见敌人。作为反噬，你会陷入@O恐惧@N %d 回合。",
 		DurationFearDeathStare)
 }
 
@@ -1148,27 +1148,27 @@ type EffectLayRune struct{}
 func (eff EffectLayRune) Apply(g *Game) bool {
 	pp := g.PP()
 	if g.Map.Terrain.At(pp) != Floor {
-		g.Log("You cannot lay a rune on a non-floor tile.")
+		g.Log("无法在非地面格上布置符文。")
 		return false
 	}
 	if i, _ := g.ItemAt(pp); i >= 0 {
-		g.Log("You cannot lay a rune on a non-free tile.")
+		g.Log("无法在被占据的格子上布置符文。")
 		return false
 	}
 	r := MagicRune(g.IntN(NRunes))
 	_, e := g.genRunicTrapAt(r, pp)
 	e.Seen = true
-	g.Logf("You lay a %s.", r)
+	g.Logf("你布置了%s。", r)
 	g.MakeNoise(pp, NoiseCackle)
 	return true
 }
 
 func (eff EffectLayRune) Name() string {
-	return "lay rune"
+	return "布置符文"
 }
 
 func (eff EffectLayRune) Desc(_ *Game) string {
-	return "Lay a random runic trap on current floor tile."
+	return "在当前地面格上布置随机符文陷阱。"
 }
 
 type EffectDisorient struct{}
@@ -1181,22 +1181,22 @@ func (eff EffectDisorient) Apply(g *Game) bool {
 }
 
 func (eff EffectDisorient) Name() string {
-	return "disorient"
+	return "迷向"
 }
 
 func (eff EffectDisorient) Desc(_ *Game) string {
-	return fmt.Sprintf("@BDisorient@N for %d turns. %s @GInstant@N.", DurationDisorient, statusDesc[StatusDisorient])
+	return fmt.Sprintf("进入@B迷向@N状态，持续 %d 回合。%s @G即时生效@N。", DurationDisorient, statusDesc[StatusDisorient])
 }
 
 func (g *Game) menhirMsg(name string) {
-	g.Logf("You activate the %s.", name)
+	g.Logf("你激活了%s。", name)
 }
 
 type EffectEarthMenhir struct{}
 
 func (eff EffectEarthMenhir) Apply(g *Game) bool {
 	const maxdist = MaxFOVRange + 4 // "earthquake" distance
-	g.menhirMsg("earth menhir")
+	g.menhirMsg("土之石碑")
 	pp := g.PP()
 	g.MakeNoise(pp, NoiseEarthMenhir)
 	mp := &MappingPath{passable: g.Map.NoWallAt}
@@ -1290,13 +1290,13 @@ func (g *Game) earthMenhirDig(at gruid.Point) {
 }
 
 func (eff EffectEarthMenhir) Desc(_ *Game) string {
-	return "Emits a noisy echoing sound that disintegrates nearby walls and reveals the frontier formed by map walls adjacent to interior ones."
+	return "发出响亮的回声，震碎附近的墙壁，并揭示与内部墙壁相邻的地图边界。"
 }
 
 type EffectWarpingMenhir struct{}
 
 func (eff EffectWarpingMenhir) Apply(g *Game) bool {
-	g.menhirMsg("warping menhir")
+	g.menhirMsg("传送石碑")
 	// Teleport nearby monsters away.
 	mp := &MapPath{passable: g.Map.NoWallAt}
 	pp := g.PP()
@@ -1313,9 +1313,9 @@ func (eff EffectWarpingMenhir) Apply(g *Game) bool {
 	for i, ei := range g.NPMapEntities() {
 		switch ei.Role.(type) {
 		case *Portal:
-			g.SenseEntity(i, "sense")
+			g.SenseEntity(i, "感知到")
 		case *CorruptionOrb:
-			g.SenseEntity(i, "sense")
+			g.SenseEntity(i, "感知到")
 		}
 	}
 	if g.IntN(2+(MapLevels-g.Map.Level)/2) == 0 {
@@ -1332,13 +1332,13 @@ func (eff EffectWarpingMenhir) Apply(g *Game) bool {
 }
 
 func (eff EffectWarpingMenhir) Desc(_ *Game) string {
-	return fmt.Sprintf("Teleports away monsters within %d tiles of distance. Reveals location of any portals. The dungeon might sense you and send a wraith to investigate: the deeper you are, the more likely.", MaxFOVRange)
+	return fmt.Sprintf("将距离你 %d 格内的怪物传送走，并揭示所有传送门的位置。地城可能会察觉到你并派遣幽灵调查；你所在层数越深，发生概率越高。", MaxFOVRange)
 }
 
 type EffectPoisonMenhir struct{}
 
 func (eff EffectPoisonMenhir) Apply(g *Game) bool {
-	g.menhirMsg("poison menhir")
+	g.menhirMsg("毒之石碑")
 	// Spawn poison clouds randomly.
 	mp := &MapPath{passable: g.Map.NoWallAt}
 	pp := g.PP()
@@ -1364,13 +1364,13 @@ func (eff EffectPoisonMenhir) Apply(g *Game) bool {
 }
 
 func (eff EffectPoisonMenhir) Desc(_ *Game) string {
-	return fmt.Sprintf("Makes many poisonous clouds appear within %d tiles of distance. Reveals translucent walls.", MaxFOVRange)
+	return fmt.Sprintf("在距离你 %d 格内生成大量毒云，并揭示半透明墙壁。", MaxFOVRange)
 }
 
 type EffectFireMenhir struct{}
 
 func (eff EffectFireMenhir) Apply(g *Game) bool {
-	g.menhirMsg("fire menhir")
+	g.menhirMsg("火之石碑")
 	// Spawn fire clouds randomly.
 	mp := &MapPath{passable: g.Map.NoWallAt}
 	pp := g.PP()
@@ -1415,5 +1415,5 @@ func (g *Game) revealFoliage() {
 }
 
 func (eff EffectFireMenhir) Desc(_ *Game) string {
-	return fmt.Sprintf("Makes many fire clouds appear within %d tiles of distance, each one lasting 6-12 turns. Reveals foliage partially.", MaxFOVRange)
+	return fmt.Sprintf("在距离你 %d 格内生成大量火云，每团持续 6–12 回合，并部分揭示植被。", MaxFOVRange)
 }

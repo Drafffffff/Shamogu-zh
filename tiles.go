@@ -28,7 +28,7 @@ func (a ActionToggleTiles) Handle(md *model) (gruid.Effect, bool) {
 	GameConfig.Tiles = !GameConfig.Tiles
 	err := SaveConfig()
 	if err != nil {
-		log.Printf("error saving config: %v", err)
+		log.Printf("保存设置失败：%v", err)
 	}
 	clearCache()
 	eff := gruid.Cmd(func() gruid.Msg { return gruid.MsgScreen{} })
@@ -38,16 +38,16 @@ func (a ActionToggleTiles) Handle(md *model) (gruid.Effect, bool) {
 
 func (a ActionToggleTiles) String() string {
 	if GameConfig.Tiles {
-		return "Switch to ASCII graphics"
+		return "切换为 ASCII 图形"
 	}
-	return "Switch to Tiles graphics"
+	return "切换为图块图形"
 }
 
 func (a ActionToggleTiles) Desc(_ *model) string {
 	if GameConfig.Tiles {
-		return "Toggling this option switches to ASCII graphics.\n\n@SCurrent setting: tiles.@N"
+		return "切换此选项即可使用 ASCII 图形。\n\n@S当前设置：图块。@N"
 	}
-	return "Toggling this option switches to Tiles graphics.\n\n@SCurrent setting: ASCII.@N"
+	return "切换此选项即可使用图块图形。\n\n@S当前设置：ASCII。@N"
 }
 
 // ColorToRGBA  maps to colors from selenized palette:
@@ -233,22 +233,30 @@ var LetterNames = map[rune]string{
 	'♫':  "footsteps",
 }
 
-type monochromeTileManager struct{}
+type monochromeTileManager struct{ large bool }
 
 func (tm *monochromeTileManager) TileSize() gruid.Point {
-	return gruid.Point{16, 24}
+	if tm.large {
+		return gruid.Point{80, 90}
+	}
+	return gruid.Point{48, 90}
+}
+
+func (tm *monochromeTileManager) TileSizeForFrame(width, height int) gruid.Point {
+	tm.large = LargeTextPanels && width == TextPanelWidth
+	return tm.TileSize()
 }
 
 func base64pngToRGBA(bs []byte) (*image.RGBA, error) {
 	buf := make([]byte, len(bs))
 	_, err := base64.StdEncoding.Decode(buf, bs)
 	if err != nil {
-		return nil, fmt.Errorf("could not decode base64-encoded png: %v", err)
+		return nil, fmt.Errorf("解码 Base64 PNG 数据失败：%v", err)
 	}
 	br := bytes.NewReader(buf)
 	img, err := png.Decode(br)
 	if err != nil {
-		return nil, fmt.Errorf("could not decode png: %v", err)
+		return nil, fmt.Errorf("解码 PNG 数据失败：%v", err)
 	}
 	rect := img.Bounds()
 	rgbaimg := image.NewRGBA(rect)
@@ -257,6 +265,14 @@ func base64pngToRGBA(bs []byte) (*image.RGBA, error) {
 }
 
 func (tm *monochromeTileManager) GetImage(gc gruid.Cell) image.Image {
+	if gc.Style.Attrs&AttrInMap == 0 {
+		if im := boxGlyph(gc, tm.TileSize()); im != nil {
+			return im
+		}
+	}
+	if gc.Rune > 127 && (gc.Style.Attrs&AttrInMap == 0 || isChineseGlyph(gc.Rune)) {
+		return pixelTextGlyph(gc, tm.large)
+	}
 	var pngImg []byte
 	hastile := false
 	if gc.Style.Attrs&AttrInMap != 0 && GameConfig.Tiles {
@@ -279,7 +295,7 @@ func (tm *monochromeTileManager) GetImage(gc gruid.Cell) image.Image {
 	}
 	rgbaimg, err := base64pngToRGBA(pngImg)
 	if err != nil {
-		log.Printf("Rune %s: %v", string(gc.Rune), err)
+		log.Printf("字符 %s：%v", string(gc.Rune), err)
 		return image.Black
 	}
 	bgc := ColorToRGBA(gc.Style.Bg, false)
@@ -299,5 +315,5 @@ func (tm *monochromeTileManager) GetImage(gc gruid.Cell) image.Image {
 			}
 		}
 	}
-	return rgbaimg
+	return scaleNativePixels(rgbaimg, bgc, tm.large)
 }

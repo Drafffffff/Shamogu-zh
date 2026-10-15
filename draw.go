@@ -61,6 +61,9 @@ func (md *model) Draw() gruid.Grid {
 	if !md.anims.Done() {
 		return md.drawAnimationFrame()
 	}
+	if gd, ok := md.drawTextPanel(); ok {
+		return gd
+	}
 	md.gd.Fill(gruid.Cell{Rune: ' '})
 	switch md.mode {
 	case modeQuitting:
@@ -159,8 +162,8 @@ func (md *model) drawWin(gd gruid.Grid) {
 	textgd := gd.Slice(gruid.NewRange(6, 7, 6+62, 7+5))
 	textgd.Fill(gruid.Cell{Rune: ' '})
 	stt := ui.StyledText{}.WithMarkups(Markups)
-	stt.WithText(`You destroyed the Orb of Corruption! ` +
-		`The dungeon is vanishing and you feel teleported away back to your mountain! `).
+	stt.WithText(`你摧毁了腐化之球！ ` +
+		`地城正在消失，你感到自己被传送回了山中！ `).
 		Format(60).Draw(textgd.Slice(textgd.Range().Shift(1, 1, -1, -1)))
 }
 
@@ -435,7 +438,7 @@ func (md *model) drawTargInfo() {
 		md.desc.Content = stt.WithText(s).Format(MapWidth/2 - 3)
 		if md.desc.Content.Size().Y+y > MapHeight {
 			md.desc.Box = &ui.Box{Title: stt.WithText(title).WithStyle(gruid.Style{Fg: fg}),
-				Footer: ui.NewStyledText("scroll/page down for more…", gruid.Style{Fg: ColorMagenta})}
+				Footer: ui.NewStyledText("滚动/向下翻页查看更多……", gruid.Style{Fg: ColorMagenta})}
 		} else {
 			md.desc.Box = &ui.Box{Title: stt.WithText(title).WithStyle(gruid.Style{Fg: fg})}
 		}
@@ -454,9 +457,9 @@ func (md *model) drawTargInfo() {
 		features = append(features, fmt.Sprintf("@%c%s@N", info.cloud.ColorRune(), clstr))
 	}
 	if !info.sees && !info.unknown {
-		features = append(features, "seen")
+		features = append(features, "已发现")
 	} else if info.unknown {
-		features = append(features, "unexplored")
+		features = append(features, "未探索")
 	}
 	t := features[0]
 	if len(features) > 1 {
@@ -474,28 +477,28 @@ func (md *model) drawTargInfo() {
 		desc += "\n" + info.cloud.Desc()
 	}
 	if noise, ok := g.Map.Noise[md.targ.p]; ok && !g.InFOV(md.targ.p) {
-		msg := "noise"
+		msg := "噪音"
 		switch noise {
 		case NoiseBark:
-			msg = "barking"
+			msg = "吠叫"
 		case NoiseCombat:
-			msg = "smashing"
+			msg = "撞击"
 		case NoiseDig:
-			msg = "rocks falling"
+			msg = "落石"
 		case NoiseExplosion:
-			msg = "an explosion"
+			msg = "爆炸"
 		case NoiseEarthMenhir:
-			msg = "noisy echo" // should not happen (player-only now)
+			msg = "嘈杂回声" // should not happen (player-only now)
 		case NoiseFakePortal:
-			msg = "an eerie sound" // should not happen (player-only now)
+			msg = "诡异声响" // should not happen (player-only now)
 		case NoiseLightning:
-			msg = "a spark" // should not happen (player-only now)
+			msg = "火花" // should not happen (player-only now)
 		case NoiseRoar:
-			msg = "a roar" // should not happen (player-only now)
+			msg = "咆哮" // should not happen (player-only now)
 		case NoiseWind:
-			msg = "a whistle" // should not happen (player-only now)
+			msg = "哨声" // should not happen (player-only now)
 		}
-		formatBox("noise", fmt.Sprintf("You heard %s around there.", msg), ColorCyan)
+		formatBox("噪音", fmt.Sprintf("你听见附近传来%s。", msg), ColorCyan)
 	}
 	formatBox(t, desc, fg)
 	for _, id := range info.entities {
@@ -507,11 +510,11 @@ func (md *model) drawTargInfo() {
 		}
 		e := g.Entity(id)
 		if !info.sees && e.Noise && e.P == md.targ.p && !g.Wizard.Mode.Reveal() {
-			noise := "footsteps"
+			noise := "脚步声"
 			if a, ok := e.Role.(*Actor); ok {
 				noise = monsterNoiseStringStyled(a)
 			}
-			formatBox("monster noise", fmt.Sprintf("You heard %s around there.", noise), ColorForeground)
+			formatBox("怪物发出的声音", fmt.Sprintf("你听见附近传来%s。", noise), ColorForeground)
 			continue
 		}
 		if e.KnownP == InvalidPos && !g.Wizard.Mode.Reveal() {
@@ -528,7 +531,7 @@ func (md *model) drawTargInfo() {
 			case info.sees ||
 				g.PlayerActor().Has(StatusClarity) && SensingRange(g.PP(), e.P) ||
 				g.Wizard.Mode == WizardReveal:
-				fmt.Fprintf(&sb, "HP:%s A:%s D:%s",
+				fmt.Fprintf(&sb, "生命：%s 攻击：%s 防御：%s",
 					r.fmtHP(),
 					fmtAD(r.GetAttack(), r.Attack), fmtAD(r.GetDefense(), r.Defense))
 				for i, turns := range r.Statuses {
@@ -543,21 +546,21 @@ func (md *model) drawTargInfo() {
 				}
 			default:
 				cl = ColorForeground
-				fmt.Fprintf(&sb, "HP:?/%d A:%d D:%d", r.MaxHP, r.Attack, r.Defense)
+				fmt.Fprintf(&sb, "生命：?/%d 攻击：%d 防御：%d", r.MaxHP, r.Attack, r.Defense)
 			}
 			sb.WriteByte('\n')
-			fmt.Fprintf(&sb, "@CTraits:@N %s.", g.TraitDesc(r.Kind, r.Traits))
+			fmt.Fprintf(&sb, "@C特性：@N %s。", g.TraitDesc(r.Kind, r.Traits))
 		case *Spirit:
 			sb.WriteString(r.ExamineDesc(g))
 		case *Menhir:
 			sb.WriteString(r.Desc(g))
 			if r.Used {
-				name += " (inert)"
+				name += "（失效）"
 			}
 		case *RunicTrap:
 			sb.WriteString(r.Desc(g))
 			if r.KnownUsed || r.Used && g.Wizard.Mode.Reveal() {
-				name += " (inert)"
+				name += "（失效）"
 			}
 		case *Comestible:
 			sb.WriteString(r.ExamineDesc(g))
@@ -575,24 +578,21 @@ func (md *model) drawSpiritSelection() {
 	gdslice := md.gd.Slice(gruid.NewRange(0, spiritSelectionMargin, UIWidth, UIHeight))
 	gdslice.Copy(menugd)
 	md.desc.Draw(gdslice.Slice(gdslice.Range().Columns(UIWidth/2, UIWidth)))
-	ui.Textf("Shamanic Mountain Guardian - Shamogu %s", Version).WithStyle(gruid.Style{}.WithFg(ColorMagenta)).
+	ui.Textf("萨满山灵守护者 · Shamogu %s", Version).WithStyle(gruid.Style{}.WithFg(ColorMagenta)).
 		Draw(md.gd.Slice(gruid.NewRange(-25+UIWidth/2, 3, UIWidth, UIHeight)))
 	y := 8 + len(primarySpirits)
 	n := md.g.modCount()
 	var tabtext string
 	if n > 0 {
-		tabtext = fmt.Sprintf(`@G(TAB for mod selection - @V%d@G enabled)@N`, n)
+		tabtext = fmt.Sprintf(`@G（按 TAB 选择模组，已启用 @V%d@G 个）@N`, n)
 	} else {
-		tabtext = `@G(TAB for mod selection)@N`
+		tabtext = `@G（按 TAB 选择模组）@N`
 	}
 	ui.Text(tabtext).WithMarkups(Markups).
 		Draw(md.gd.Slice(gruid.NewRange(0, y, UIWidth/2, y+1)))
 	y = 10 + len(primarySpirits)
-	ui.Text(`All life in your mountain is being corrupted. Beasts are losing their minds and ` +
-		`becoming aggressive. These disturbing events started to happen after a dungeon portal suddenly ` +
-		`appeared at the top of the mountain. As the guardian, you decide to explore ` +
-		`that dungeon in order to find and destroy the source of corruption… ` +
-		`You hope luck will be on your side!`).Format(72).
+	ui.Text(`山中万物正在遭受腐化。野兽逐渐失去理智，变得富有攻击性。这些异变始于一座地城传送门突然 ` +
+		`出现在山顶之后。作为山之守护者，你决定深入地城，找出并摧毁腐化的源头……愿好运与你同在！`).Format(72).
 		Draw(md.gd.Slice(gruid.NewRange(4, y, UIWidth-4, UIHeight)))
 }
 
@@ -603,12 +603,12 @@ func (md *model) drawModSelection() {
 }
 
 func (md *model) drawLoadGameScreen() {
-	ui.Textf("Shamanic Mountain Guardian - Shamogu %s", Version).WithStyle(gruid.Style{}.WithFg(ColorMagenta)).
-		Draw(md.gd.Slice(gruid.NewRange(-25+UIWidth/2, 5, UIWidth, UIHeight)))
-	ui.Text("—Press any key to load saved game—").
-		Draw(md.gd.Slice(gruid.NewRange(-22+UIWidth/2, 18, UIWidth, UIHeight)))
-	gd := md.gd.Slice(gruid.NewRange(-17+UIWidth/2, 7, UIWidth, UIHeight))
-	drawGamePicture(gd)
+	gd := md.gd
+	drawCentered(gd, gameTitle().WithStyle(gruid.Style{Fg: ColorMagenta}), 4)
+	picture := gruid.NewGrid(23, 10)
+	drawGamePicture(picture)
+	gd.Slice(gruid.NewRange((UIWidth-23)/2, 7, (UIWidth-23)/2+23, 17)).Copy(picture)
+	drawCentered(gd, loadPrompt(), 19)
 }
 
 func drawGamePicture(gd gruid.Grid) {
@@ -660,10 +660,28 @@ func (md *model) drawInventory() {
 func (md *model) drawKeySettings() {
 	gd := md.menu.keys.Draw()
 	max := gd.Size()
-	t := ui.Text("(R) reset (Enter) change").WithStyle(gruid.Style{}.WithFg(ColorCyan))
+	t := ui.Text("（R）重置 （Enter）修改").WithStyle(gruid.Style{}.WithFg(ColorCyan))
 	if md.menu.mode == modeKeysChange {
-		t = t.WithText(" Press new key… ")
+		t = t.WithText(" 按下新按键…… ")
 	}
 	t.Draw(gd.Slice(gd.Range().Line(max.Y-1).Shift(2, 0, 0, 0)))
 	md.gd.Copy(gd)
+}
+
+func gameTitle() ui.StyledText { return ui.Textf("萨满山灵守护者 · Shamogu %s", Version) }
+func introText() ui.StyledText {
+	return ui.Text(`山中万物正在遭受腐化。野兽逐渐失去理智，变得富有攻击性。这些异变始于一座地城传送门突然 ` +
+		`出现在山顶之后。作为山之守护者，你决定深入地城，找出并摧毁腐化的源头……愿好运与你同在！`)
+}
+func loadPrompt() ui.StyledText { return ui.Text("—按任意键载入存档—") }
+
+func (md *model) spiritTabHint() ui.StyledText {
+	n := md.g.modCount()
+	var tabtext string
+	if n > 0 {
+		tabtext = fmt.Sprintf(`@G（按 TAB 选择模组，已启用 @V%d@G 个）@N`, n)
+	} else {
+		tabtext = `@G（按 TAB 选择模组）@N`
+	}
+	return ui.Text(tabtext).WithMarkups(Markups)
 }

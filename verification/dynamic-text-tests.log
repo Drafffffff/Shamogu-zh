@@ -1,0 +1,5 @@
+=== RUN   TestDynamicItemDescriptionsAcrossMods
+    zh_render_test.go:265: checked 664 dynamic descriptions
+--- PASS: TestDynamicItemDescriptionsAcrossMods (0.00s)
+PASS
+ok  	codeberg.org/anaseto/shamogu	0.018s

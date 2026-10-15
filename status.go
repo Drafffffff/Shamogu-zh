@@ -34,14 +34,14 @@ func (md *model) updateStatus() {
 	stt := ui.StyledText{}.WithMarkups(Markups)
 
 	// Map level.
-	level := fmt.Sprintf("L:%d ", g.Map.Level)
+	level := fmt.Sprintf("层:%d ", g.Map.Level)
 	if md.g.win {
-		level = "L:@GOut!@N "
+		level = "层：@G通关！@N "
 	}
 	entries = append(entries, ui.MenuEntry{Text: stt.WithText(level), Disabled: true})
 
 	// Turns.
-	entries = append(entries, ui.MenuEntry{Text: stt.WithTextf("T:%d ", g.Turn), Disabled: true})
+	entries = append(entries, ui.MenuEntry{Text: stt.WithTextf("回:%d ", g.Turn), Disabled: true})
 
 	// Menu button.
 	if md.mode == modeMenu && md.menu.mode == modeGameMenu {
@@ -70,17 +70,17 @@ func (md *model) updateStatus() {
 	pa := g.PlayerActor()
 	hps := pa.fmtHP()
 	entries = append(entries, ui.MenuEntry{
-		Text:     stt.WithTextf("HP:%s ", hps),
+		Text:     stt.WithTextf("生:%s ", hps),
 		Disabled: true})
 
 	// attack
 	entries = append(entries, ui.MenuEntry{
-		Text:     stt.WithTextf("A:%s ", fmtAD(pa.GetAttack(), pa.Attack)),
+		Text:     stt.WithTextf("攻:%s ", fmtAD(pa.GetAttack(), pa.Attack)),
 		Disabled: true})
 
 	// defense
 	entries = append(entries, ui.MenuEntry{
-		Text:     stt.WithTextf("D:%s ", fmtAD(pa.GetDefense(), pa.Defense)),
+		Text:     stt.WithTextf("防:%s ", fmtAD(pa.GetDefense(), pa.Defense)),
 		Disabled: true})
 
 	// statuses
@@ -96,7 +96,7 @@ func (md *model) updateStatus() {
 	switch {
 	case pa.IsDead():
 		entries = append(entries, ui.MenuEntry{
-			Text:     stt.WithText("@RDead@N "),
+			Text:     stt.WithText("@R阵亡@N "),
 			Disabled: true})
 	case md.g.win:
 	default:
@@ -130,15 +130,15 @@ func (md *model) updateStatus() {
 		switch {
 		case md.mode == modeCritical:
 			entries = append(entries, ui.MenuEntry{
-				Text:     stt.WithText("@O[Warning]@N "),
+				Text:     stt.WithText("@O[警告]@N "),
 				Disabled: true})
 		case md.mode == modeQuitConfirmation || md.mode == modeWizardConfirmation || md.mode == modeUseConfirmation:
 			entries = append(entries, ui.MenuEntry{
-				Text:     stt.WithText("@C[Confirm]@N "),
+				Text:     stt.WithText("@C[确认]@N "),
 				Disabled: true})
 		case md.targ.kb:
 			entries = append(entries, ui.MenuEntry{
-				Text:     stt.WithText("@C[Examine]@N "),
+				Text:     stt.WithText("@C[查看]@N "),
 				Disabled: true})
 		}
 	}

@@ -102,11 +102,11 @@ func (g *Game) AdjustHPWithMin(i ID, ai *Actor, amount int, m int) {
 	ai.HP = min(maxHP, max(min(m, hp), hp+amount))
 	if i == PlayerID {
 		if ai.HP > hp {
-			g.Logf("You feel better (+%d HP).", ai.HP-hp)
+			g.Logf("你感觉好多了（+%d 点生命值）。", ai.HP-hp)
 		} else if ai.HP < hp {
-			g.Logf("You feel weaker (-%d HP).", hp-ai.HP)
+			g.Logf("你感到虚弱（-%d 点生命值）。", hp-ai.HP)
 		} else if amount >= 0 {
-			g.Log("You feel no change (+0 HP).")
+			g.Log("你感觉没有变化（+0 点生命值）。")
 		}
 	}
 }
@@ -216,112 +216,112 @@ func (g *Game) TraitDesc(ak ActorKind, t Traits) string {
 	desc := []string{}
 
 	// Attack patterns.
-	desc = traitDesc(desc, t, PatternCatch, "ranged catching attack that @Ounbalances@N foes")
-	desc = traitDesc(desc, t, PatternDragging, "@Ounbalancing@N dragging attack")
-	desc = traitDesc(desc, t, PatternFourDirs, "four-directional attack")
-	desc = traitDesc(desc, t, PatternRampage, "rampaging charge")
-	desc = traitDesc(desc, t, PatternRanged, "ranged attack")
-	desc = traitDesc(desc, t, PatternRangedRecoil, "ranged attack with recoil")
-	desc = traitDesc(desc, t, PatternSneaky, "sneaky attack pattern")
-	desc = traitDesc(desc, t, PatternSwap, "ranged space-distorting silent attack")
-	desc = traitDesc(desc, t, PatternSwapDaze, "ranged space-distorting silent attack that may @Odaze@N foes")
+	desc = traitDesc(desc, t, PatternCatch, "可远程抓取敌人并使其@O失衡@N")
+	desc = traitDesc(desc, t, PatternDragging, "拖拽并使敌人@O失衡@N的攻击")
+	desc = traitDesc(desc, t, PatternFourDirs, "四向攻击")
+	desc = traitDesc(desc, t, PatternRampage, "狂暴冲锋")
+	desc = traitDesc(desc, t, PatternRanged, "远程攻击")
+	desc = traitDesc(desc, t, PatternRangedRecoil, "带后退效果的远程攻击")
+	desc = traitDesc(desc, t, PatternSneaky, "潜袭式攻击")
+	desc = traitDesc(desc, t, PatternSwap, "无声扭曲空间的远程攻击")
+	desc = traitDesc(desc, t, PatternSwapDaze, "无声扭曲空间并可能使敌人@O眩晕@N的远程攻击")
 	switch ak {
 	case Player:
 		// Player crocodile gets slow rotation, too.
 		switch {
 		case t.Any(PatternDragging):
-			desc = append(desc, "slow rotation (cannot turn and attack)")
+			desc = append(desc, "转身缓慢（无法边转身边攻击）")
 		case t.Any(PatternFourDirs):
-			desc = append(desc, "attack bonus per extra foe")
+			desc = append(desc, "每多一个敌人，攻击力便提高")
 		case t.Any(PatternSneaky):
-			desc = append(desc, "confusing charge")
+			desc = append(desc, "令人混乱的冲锋")
 		}
 	case DraggingAlligator:
-		desc = append(desc, "confusing bite")
+		desc = append(desc, "令人混乱的撕咬")
 	case ChaosMegabat:
 		if !NoChaos {
-			desc = append(desc, "chaos bite (random effect)")
+			desc = append(desc, "混沌撕咬（效果随机）")
 		}
-		desc = append(desc, "cries upon death")
+		desc = append(desc, "死亡时会发出叫声")
 	}
 
 	// Extra traits.
-	desc = traitDesc(desc, t, BurningHits, "hits may @Oburn@N foes")
-	desc = traitDesc(desc, t, DazingSpines, "spines may @Odaze@N attacking foes in melee")
-	desc = traitDesc(desc, t, Dazzling, "dazzling (redirect attacks just behind you, easily noticed)")
-	desc = traitDesc(desc, t, Elephanty, "rat phobia, difficult rotation when facing a wall, unnoticed in dead-ends, immune to berserk after-effects")
-	desc = traitDesc(desc, t, Gawalt, "wall-jumping movement and attack, weakened hits, menhir sensing and hiding")
+	desc = traitDesc(desc, t, BurningHits, "命中时可能@O点燃@N敌人")
+	desc = traitDesc(desc, t, DazingSpines, "近战攻击者可能被尖刺@O眩晕@N")
+	desc = traitDesc(desc, t, Dazzling, "炫目（将攻击转向你身后的敌人，但容易被发现）")
+	desc = traitDesc(desc, t, Elephanty, "害怕老鼠；面墙时转向困难；在死路中不会被察觉；免疫狂暴后遗症")
+	desc = traitDesc(desc, t, Gawalt, "蹬墙跳移动与攻击；命中伤害降低；可感知并藏匿于石碑处")
 	if g.Mod(ModTotemConditions) {
-		desc = traitDesc(desc, t, Gluttony, "gluttony (needs to eat in pairs, but ignores other requirements)")
+		desc = traitDesc(desc, t, Gluttony, "贪食（必须成对进食，但忽略其他进食条件）")
 	} else {
-		desc = traitDesc(desc, t, Gluttony, "gluttony (needs to eat in pairs)")
+		desc = traitDesc(desc, t, Gluttony, "贪食（必须成对进食）")
 	}
-	desc = traitDesc(desc, t, GoodSmell, "smells food from afar")
-	desc = traitDesc(desc, t, NocturnalFlying, "nocturnal (reduced view range), flies over foliage")
-	desc = traitDesc(desc, t, PushingCharge, "charging pushes and @Ounbalances@N foes")
-	desc = traitDesc(desc, t, RunicChicken, "senses and doesn’t trigger runes, cackles loudly on sighting a portal or totem, confusion vulnerability (longer duration)")
-	desc = traitDesc(desc, t, ScaryRoar, "scary roar on first sight")
-	desc = traitDesc(desc, t, TrailingCloud, "movement leaves dust behind")
-	desc = traitDesc(desc, t, VenomousMelee, "@Ovenomous@N melee attack")
-	desc = traitDesc(desc, t, WoodyLegs, "woody legs (can move while lignified)")
+	desc = traitDesc(desc, t, GoodSmell, "能闻到远处的食物")
+	desc = traitDesc(desc, t, NocturnalFlying, "夜行（视野范围较小），可飞越植被")
+	desc = traitDesc(desc, t, PushingCharge, "冲锋会推开敌人并使其@O失衡@N")
+	desc = traitDesc(desc, t, RunicChicken, "能感知符文但不会触发；看见传送门或图腾时会大声咯咯笑；容易陷入混乱（持续时间更长）")
+	desc = traitDesc(desc, t, ScaryRoar, "初次发现时会发出恐怖咆哮")
+	desc = traitDesc(desc, t, TrailingCloud, "移动时会留下尘土")
+	desc = traitDesc(desc, t, VenomousMelee, "@O带毒@N的近战攻击")
+	desc = traitDesc(desc, t, WoodyLegs, "木质腿（木化时仍可移动）")
 	switch {
 	case t.Any(GoodHearing) && !t.Any(BadHearing):
-		desc = append(desc, "good hearing")
+		desc = append(desc, "听觉敏锐")
 	case !t.Any(GoodHearing) && t.Any(BadHearing):
-		desc = append(desc, "bad hearing")
+		desc = append(desc, "听觉迟钝")
 	}
 
 	// Extra monster-specific traits.
 	switch ak {
 	case BarkingHound:
-		desc = append(desc, "barks on sight and @Ofrightens@N you")
+		desc = append(desc, "发现你时会吠叫并使你@O恐惧@N")
 	case BlinkButterfly:
-		desc = append(desc, "hits makes you blink")
+		desc = append(desc, "命中会使你闪烁传送")
 	case BurningPhoenix:
-		desc = append(desc, "imbalance vulnerability (decreased burning chance)")
+		desc = append(desc, "失衡易伤（被点燃的概率降低）")
 	case ChaosMegabat:
 		// Megabat hunts toward sound when out of view.
-		desc = append(desc, "hunts toward sound")
+		desc = append(desc, "会循声追猎")
 	case EarthDragon:
-		desc = append(desc, "hits may push and @Ounbalance@N foes")
+		desc = append(desc, "命中时可能推开敌人并使其@O失衡@N")
 	case FireLlama:
-		desc = append(desc, "spites @Ofire@N from afar")
+		desc = append(desc, "会从远处喷吐@O火焰@N")
 	case FourHeadedHydra:
-		desc = append(desc, "attacks with all four heads")
+		desc = append(desc, "四个头会同时攻击")
 	case HungryRat:
-		desc = append(desc, "hunts you by smell, becomes berserk if you eat in view")
+		desc = append(desc, "能循着气味追猎你；若在其视野内进食，它会陷入狂暴")
 	case NoisyImp:
-		desc = append(desc, "plays guitar for you, afraid of you")
+		desc = append(desc, "会为你弹吉他，但害怕你")
 	case WalkingMushroom:
-		desc = append(desc, "releases @Blignifying@N spores on sight")
+		desc = append(desc, "发现你时会释放使目标@B木化@N的孢子")
 	case WalkingTree:
-		desc = append(desc, "hits may @Blignify@N you, hits ignore lignification’s defense bonus, woody legs, permanently lignified")
+		desc = append(desc, "命中可能使你@B木化@N；攻击无视木化的防御加成；木质腿；永久木化")
 	case WarpingWraith:
-		desc = append(desc, "hits teleport you away")
+		desc = append(desc, "命中会将你传送走")
 	}
-	desc = traitDesc(desc, t, MonsBerserking, "hits may @Bberserk@N you briefly")
-	desc = traitDesc(desc, t, MonsConfusion, "hits may @Oconfuse@N you")
-	desc = traitDesc(desc, t, MonsDig, "digs walls when hunting")
-	desc = traitDesc(desc, t, MonsExplodingDeath, "explodes on death")
-	desc = traitDesc(desc, t, MonsFear, "hits may @Ofrighten@N you")
-	desc = traitDesc(desc, t, MonsIgnoreDefense, "attack ignores defense")
-	desc = traitDesc(desc, t, MonsScales, "scales (+1 Defense against ranged attacks)")
+	desc = traitDesc(desc, t, MonsBerserking, "命中时可能使你短暂@B狂暴@N")
+	desc = traitDesc(desc, t, MonsConfusion, "命中时可能使你@O混乱@N")
+	desc = traitDesc(desc, t, MonsDig, "追猎时会挖穿墙壁")
+	desc = traitDesc(desc, t, MonsExplodingDeath, "死亡时会爆炸")
+	desc = traitDesc(desc, t, MonsFear, "命中时可能使你@O恐惧@N")
+	desc = traitDesc(desc, t, MonsIgnoreDefense, "攻击无视防御")
+	desc = traitDesc(desc, t, MonsScales, "鳞片（对远程攻击防御 +1）")
 
 	// Vulnerabilities, Resistances, Immunities.
-	desc = traitDesc(desc, t, VulnerabilityFire, "@OFire@N vulnerability (longer duration)")
-	desc = traitDesc(desc, t, ResistanceConfusion, "@OConfusion@N resistance (half duration)")
-	desc = traitDesc(desc, t, ResistanceDaze, "@ODaze@N resistance (can invoke spirits while dazed)")
-	desc = traitDesc(desc, t, ResistanceFear, "@OFear@N resistance (half duration)")
-	desc = traitDesc(desc, t, ResistanceFire, "@OFire@N resistance (delayed burning)")
-	desc = traitDesc(desc, t, ResistanceImbalance, "@OImbalance@N resistance (half duration)")
-	desc = traitDesc(desc, t, ResistancePoison, "@OPoison@N resistance (half duration)")
-	desc = traitDesc(desc, t, ImmunityConfusion, "immune to @OConfusion@N")
-	desc = traitDesc(desc, t, ImmunityDaze, "@ODaze@N immunity")
-	desc = traitDesc(desc, t, ImmunityFear, "@OFear@N immunity")
-	desc = traitDesc(desc, t, ImmunityFire, "@OFire@N immunity")
-	desc = traitDesc(desc, t, ImmunityImbalance, "@OImbalance@N immunity")
-	desc = traitDesc(desc, t, ImmunityLignification, "@BLignification@N immunity")
-	desc = traitDesc(desc, t, ImmunityPoison, "@OPoison@N immunity")
+	desc = traitDesc(desc, t, VulnerabilityFire, "容易受@O火焰@N影响（持续时间更长）")
+	desc = traitDesc(desc, t, ResistanceConfusion, "抵抗@O混乱@N（持续时间减半）")
+	desc = traitDesc(desc, t, ResistanceDaze, "抵抗@O眩晕@N（眩晕时仍可召唤灵体）")
+	desc = traitDesc(desc, t, ResistanceFear, "抵抗@O恐惧@N（持续时间减半）")
+	desc = traitDesc(desc, t, ResistanceFire, "抵抗@O火焰@N（延迟燃烧）")
+	desc = traitDesc(desc, t, ResistanceImbalance, "抵抗@O失衡@N（持续时间减半）")
+	desc = traitDesc(desc, t, ResistancePoison, "抵抗@O中毒@N（持续时间减半）")
+	desc = traitDesc(desc, t, ImmunityConfusion, "免疫@O混乱@N")
+	desc = traitDesc(desc, t, ImmunityDaze, "免疫@O眩晕@N")
+	desc = traitDesc(desc, t, ImmunityFear, "免疫@O恐惧@N")
+	desc = traitDesc(desc, t, ImmunityFire, "免疫@O火焰@N")
+	desc = traitDesc(desc, t, ImmunityImbalance, "免疫@O失衡@N")
+	desc = traitDesc(desc, t, ImmunityLignification, "免疫@B木化@N")
+	desc = traitDesc(desc, t, ImmunityPoison, "免疫@O中毒@N")
 
 	return strings.Join(desc, ", ")
 }
@@ -373,25 +373,25 @@ func (st Status) Bad() bool {
 const NStatuses = StatusVampirism + 1
 
 var statusAbbrevation = []string{
-	StatusBerserk:       "Ber",
-	StatusClarity:       "Cla",
-	StatusConfusion:     "Con",
-	StatusDaze:          "Daz",
-	StatusDig:           "Dig",
-	StatusDisorient:     "Dis",
-	StatusFear:          "Fea",
-	StatusFire:          "Fir",
-	StatusFocus:         "Foc",
-	StatusGardener:      "Gar",
-	StatusGluttony:      "Glu",
-	StatusImbalance:     "Imb",
-	StatusFoggySkin:     "Fog",
-	StatusLignification: "Lig",
-	StatusPoison:        "Poi",
-	StatusShadow:        "Sha",
-	StatusSprint:        "Spr",
-	StatusTimeStop:      "Tim",
-	StatusVampirism:     "Vam",
+	StatusBerserk:       "狂",
+	StatusClarity:       "明",
+	StatusConfusion:     "乱",
+	StatusDaze:          "晕",
+	StatusDig:           "掘",
+	StatusDisorient:     "迷",
+	StatusFear:          "惧",
+	StatusFire:          "火",
+	StatusFocus:         "专",
+	StatusGardener:      "园",
+	StatusGluttony:      "贪",
+	StatusImbalance:     "失",
+	StatusFoggySkin:     "雾",
+	StatusLignification: "木",
+	StatusPoison:        "毒",
+	StatusShadow:        "影",
+	StatusSprint:        "冲",
+	StatusTimeStop:      "停",
+	StatusVampirism:     "吸",
 }
 
 func (st Status) Abbr() string {
@@ -410,25 +410,25 @@ func (g *Game) StatusAbbr(ai *Actor, st Status) string {
 }
 
 var statusName = []string{
-	StatusBerserk:       "Berserk",
-	StatusClarity:       "Clarity",
-	StatusConfusion:     "Confusion",
-	StatusDaze:          "Daze",
-	StatusDig:           "Dig",
-	StatusDisorient:     "Disorient",
-	StatusFear:          "Fear",
-	StatusFire:          "Fire",
-	StatusFocus:         "Focus",
-	StatusFoggySkin:     "Foggy Skin",
-	StatusGardener:      "Gardener",
-	StatusGluttony:      "Gluttony",
-	StatusImbalance:     "Imbalance",
-	StatusLignification: "Lignification",
-	StatusPoison:        "Poison",
-	StatusShadow:        "Shadow",
-	StatusSprint:        "Sprint",
-	StatusTimeStop:      "Time Stop",
-	StatusVampirism:     "Vampirism",
+	StatusBerserk:       "狂暴",
+	StatusClarity:       "明晰",
+	StatusConfusion:     "混乱",
+	StatusDaze:          "眩晕",
+	StatusDig:           "掘",
+	StatusDisorient:     "迷向",
+	StatusFear:          "恐惧",
+	StatusFire:          "着火",
+	StatusFocus:         "专注",
+	StatusFoggySkin:     "雾肤",
+	StatusGardener:      "园艺师",
+	StatusGluttony:      "贪食",
+	StatusImbalance:     "失衡",
+	StatusLignification: "木化",
+	StatusPoison:        "中毒",
+	StatusShadow:        "暗影",
+	StatusSprint:        "冲刺",
+	StatusTimeStop:      "止时",
+	StatusVampirism:     "吸血",
 }
 
 func (st Status) Name() string {
@@ -436,25 +436,25 @@ func (st Status) Name() string {
 }
 
 var statusAdjective = []string{
-	StatusBerserk:       "berserk",
-	StatusClarity:       "clear-minded",
-	StatusConfusion:     "confused",
-	StatusDaze:          "dazed",
-	StatusDig:           "digging",
-	StatusDisorient:     "disorienting",
-	StatusFear:          "afraid",
-	StatusFire:          "on fire",
-	StatusFocus:         "focusing",
-	StatusFoggySkin:     "foggy",
-	StatusGardener:      "gardening",
-	StatusGluttony:      "gluttonous",
-	StatusImbalance:     "imbalanced",
-	StatusLignification: "lignified",
-	StatusPoison:        "poisoned",
-	StatusShadow:        "shadowy",
-	StatusSprint:        "sprinting",
-	StatusTimeStop:      "freezing time",
-	StatusVampirism:     "vampiric",
+	StatusBerserk:       "狂暴",
+	StatusClarity:       "明晰",
+	StatusConfusion:     "混乱",
+	StatusDaze:          "眩晕",
+	StatusDig:           "掘地",
+	StatusDisorient:     "迷向",
+	StatusFear:          "恐惧",
+	StatusFire:          "燃烧",
+	StatusFocus:         "专注",
+	StatusFoggySkin:     "雾肤",
+	StatusGardener:      "园艺",
+	StatusGluttony:      "贪食",
+	StatusImbalance:     "失衡",
+	StatusLignification: "木化",
+	StatusPoison:        "中毒",
+	StatusShadow:        "暗影",
+	StatusSprint:        "冲刺",
+	StatusTimeStop:      "止时",
+	StatusVampirism:     "吸血",
 }
 
 func (st Status) String() string {
@@ -463,29 +463,29 @@ func (st Status) String() string {
 
 var statusDesc = []string{
 	StatusBerserk: fmt.Sprintf(
-		"Gives %+d Attack and +1 effective damage. Provides temporary HP bonus. Protects from @OFear@N. Followed by @OPoison@N on expiration for %d turns.",
+		"攻击力 %+d，造成的有效伤害 +1，并获得临时生命值加成。抵抗@O恐惧@N。效果结束后会@O中毒@N %d 回合。",
 		BerserkAttackBonus, DurationPoisonBerserk),
-	StatusClarity:   "Protects from @OConfusion@N, @ODaze@N, and @BBerserk@N. Makes you sense nearby monsters (2× view range).",
-	StatusConfusion: "Using spirit abilities will hurt you for 1 damage. Doubles duration of new @OImbalance@N, @ODaze@N and @OFear@N effects.",
-	StatusDaze:      "Forbids all actions except waiting or eating until you’re hurt or it expires.",
-	StatusDig:       "Allows walking into walls. Gives +1 effective damage when charging and guarantees pushing hits (even in melee).",
-	StatusDisorient: "Makes any hunting monsters in view move in the opposite direction with respect to your current direction. Monsters may mistakenly attack any monster on the way while doing so. Disoriented monsters do not perform four-directional charges.",
-	StatusFear:      "Forbids attacking and walking toward foes.",
-	StatusFire:      fmt.Sprintf("Remaining in place or moving into a cloud of fire will burn you for %d damage. When first catching @OFire@N, you also get burned once immediately.", FireDamage),
-	StatusFocus:     "Attack frontally with all four heads.",
-	StatusFoggySkin: "Exudes fog on the sides and behind. Protects from @OFire@N and @BLignification@N.",
-	StatusGardener:  "Grows foliage in a 2-tile radius each turn.",
-	StatusGluttony:  fmt.Sprintf("Unless you eat before expiration, you’ll eat a random comestible without taking a turn. If there is no food, you’ll become confused for %d turns.", DurationConfusionGluttony),
-	StatusImbalance: fmt.Sprintf("Halves attack. When also confused, gives %+d Defense.", ConfusedImbalanceDefenseBonus),
+	StatusClarity:   "抵抗@O混乱@N、@O眩晕@N和@B狂暴@N。使你能够感知附近的怪物（范围为视野的 2 倍）。",
+	StatusConfusion: "使用灵体能力会使你受到 1 点伤害。新获得的@O失衡@N、@O眩晕@N和@O恐惧@N效果持续时间加倍。",
+	StatusDaze:      "在受到伤害或效果结束前，除等待或进食外无法行动。",
+	StatusDig:       "允许撞入墙中。冲锋时有效伤害 +1，并保证攻击会推开敌人（近战也有效）。",
+	StatusDisorient: "使视野内所有追猎中的怪物朝与你当前方向相反的方向移动。它们途中可能误伤其他怪物。迷向的怪物不会进行四向冲锋。",
+	StatusFear:      "无法攻击敌人或朝敌人移动。",
+	StatusFire:      fmt.Sprintf("停留原地或走入火云会使你受到 %d 点伤害。首次@O着火@N时还会立即额外受到一次伤害。", FireDamage),
+	StatusFocus:     "用四个头从正面发起攻击。",
+	StatusFoggySkin: "向两侧和身后释放雾气。抵抗@O火焰@N和@B木化@N。",
+	StatusGardener:  "每回合在半径 2 格内生长植被。",
+	StatusGluttony:  fmt.Sprintf("若效果结束前没有进食，你会不消耗回合地吃下一份随机食物。若没有食物，则会陷入混乱 %d 回合。", DurationConfusionGluttony),
+	StatusImbalance: fmt.Sprintf("攻击力减半。若同时处于混乱状态，则防御力 %+d。", ConfusedImbalanceDefenseBonus),
 	StatusLignification: fmt.Sprintf(
-		"Gives %+d Defense. Caps incoming attack damage at 1. Provides temporary HP bonus. Protects from @OPoison@N and @OImbalance@N. Delays burning. Prevents movement. Followed by @OImbalance@N for you and any adjacent actors on expiration for %d turns.",
+		"防御力 %+d，受到的攻击伤害最多为 1，并获得临时生命值加成。抵抗@O中毒@N和@O失衡@N，延缓燃烧，但无法移动。效果结束时，你和相邻生物会@O失衡@N %d 回合。",
 		LignificationDefenseBonus, DurationImbalanceLignification),
-	StatusPoison: fmt.Sprintf("Walking will hurt you for %d damage. Stinky toxins are exuded on expiration, confusing other creatures for %d turns.",
+	StatusPoison: fmt.Sprintf("移动会使你受到 %d 点伤害。效果结束时会散发臭味毒素，使其他生物混乱 %d 回合。",
 		PoisonDamage, DurationConfusionToxins),
-	StatusShadow:   "Harmonic shadows make non-hunting monsters not notice you unless you attack them. You can move instantly through translucent walls. It makes combat silent and hits make hunting monsters lose track of you.",
-	StatusSprint:   "You can move to a visible destination three times as fast on the current direction and twice as fast laterally. You can jump over foes, unbalancing them. Canceled by waiting.",
-	StatusTimeStop: "Time is frozen for everyone but you until expiration. Status effects affecting you will still progress.",
-	StatusVampirism: fmt.Sprintf("Guarantees successful attack that restores HP for the amount of damage you deal. Gives %+d Attack.",
+	StatusShadow:   "和谐暗影会让非追猎状态的怪物无法察觉你，除非你攻击它们。你可以瞬间穿过半透明墙。战斗不会发出声音，命中敌人还会让追猎中的怪物跟丢你。",
+	StatusSprint:   "你可以沿当前方向以三倍速度移动到可见地点，横向则为两倍速度。还可跳过敌人并使其失衡。等待会结束此状态。",
+	StatusTimeStop: "效果结束前，除你之外所有生物的时间都会冻结；影响你的状态仍会继续计时。",
+	StatusVampirism: fmt.Sprintf("攻击必定命中，并按造成的伤害恢复生命值。攻击力 %+d。",
 		VampirismAttackBonus),
 }
 
@@ -501,41 +501,41 @@ func (st Status) Details() string {
 	var details string
 	switch st {
 	case StatusBerserk:
-		details = "HP never falls below 1 after losing bonus HP. Duration and HP bonus may be renewed by eating a berserking flower."
+		details = "失去额外生命值后，生命值不会低于 1。食用狂暴花可刷新持续时间和额外生命值。"
 	case StatusClarity:
-		details = "Player-only effect obtainable by eating clarity leaves. May be removed by eating a berserking flower for half the @BBerserk@N duration."
+		details = "仅玩家可获得，可通过食用明晰叶获得。食用狂暴花可移除此效果，并获得一半持续时间的@B狂暴@N。"
 	case StatusDaze:
-		details = fmt.Sprintf("Players with “daze resistance” can still invoke spirits; status shows as @O%s*@N for them.", StatusDaze.Abbr())
+		details = fmt.Sprintf("拥有眩晕抗性的玩家仍可召唤灵体；对他们而言，该状态显示为 @O%s*@N。", StatusDaze.Abbr())
 	case StatusConfusion:
-		details = "Confused monsters will attack other monsters too when adjacent. Some monsters may even hurt or affect themselves when performing special actions like digging, spitting fire, barking, or pushing."
+		details = "混乱的怪物在与其他怪物相邻时也会攻击它们。有些怪物使用挖掘、喷火、吠叫或推撞等特殊行动时，甚至会伤到自己或受到影响。"
 	case StatusDisorient:
-		details = "Player-only effect obtainable with the Dazzling Zebra spirit or by eating a moonlight lotus."
+		details = "仅玩家可获得，可通过炫目斑马灵体或食用月光莲获得。"
 	case StatusFear:
-		details = "Monsters will flee when facing you. Ambushing charges against unseen foes can still happen. At the end of a turn, a cornered and afraid actor with no possible escape will become berserk. When lignified and afraid, getting hit makes you berserk, too."
+		details = "怪物面对你时会逃跑，但仍可能从视野外发动伏击冲锋。回合结束时，若被困且恐惧的生物无路可逃，就会陷入狂暴。木化且恐惧时受到攻击也会使你狂暴。"
 	case StatusFire:
-		details = "Players with “fire resistance” from the upgraded Fire Salamander don’t take that extra immediate damage."
+		details = "升级火蜥蜴后获得火焰抗性，不会受到额外的即时伤害。"
 	case StatusFocus:
-		details = "Cancels @BSprint@N. Player-only effect obtainable with the Four-Headed Hydra spirit."
+		details = "会结束@B冲刺@N。仅玩家可获得，可通过四头九头蛇灵体获得。"
 	case StatusFoggySkin:
-		details = "Player-only effect obtainable by eating a foggy-skin onion. May be removed by eating a lignification fruit for half the @BLignification@N duration."
+		details = "仅玩家可获得，可通过食用雾肤洋葱获得。食用木化果可移除此效果，并获得一半持续时间的@B木化@N。"
 	case StatusGardener:
-		details = "Player-only effect obtainable with the Gardening Lion spirit or by eating a moonlight lotus."
+		details = "仅玩家可获得，可通过园艺狮灵体或食用月光莲获得。"
 	case StatusGluttony:
-		details = "Player-only effect obtainable with the Gluttonous Bear spirit."
+		details = "仅玩家可获得，可通过贪食熊灵体获得。"
 	case StatusImbalance:
-		details = "Sprinting or jumping while imbalanced may sometimes lead to a @Odazing@N fall."
+		details = "失衡时冲刺或跳跃有时会使你@O眩晕@N倒地。"
 	case StatusLignification:
-		details = fmt.Sprintf("The player’s HP never falls below 3 after losing bonus HP. Monsters’ HP floor is only 1, like for @BBerserk@N. Duration and HP bonus may be renewed by eating a lignification fruit. Cancels @BSprint@N. Actors with “woody legs” aren’t rooted, so they lack delayed burning protection but can move while lignified at the cost of reducing the duration by an extra turn; status shows as @B%s*@N for them, and there is no @OImbalance@N on expiration, because no root withdrawing happens.", StatusLignification.Abbr())
+		details = fmt.Sprintf("失去额外生命值后，玩家生命值不会低于 3；怪物则与@B狂暴@N一样，最低为 1。食用木化果可刷新持续时间和额外生命值。此状态会结束@B冲刺@N。“木质腿”生物不会扎根，因此没有延迟燃烧保护，但木化时仍可移动，代价是额外减少一回合持续时间；其状态标记为@B%s*@N，结束时也不会@O失衡@N，因为没有根须收回。", StatusLignification.Abbr())
 	case StatusPoison:
-		details = "Watch out for confusion if any monsters survive poisoning!"
+		details = "若有怪物在中毒后存活，请小心它们可能陷入混乱！"
 	case StatusShadow:
-		details = "Note that hitting a wandering monster will make it hunt you as usual. Player-only effect obtainable with the Gawalt Monkey spirit or by eating a vanishing snail."
+		details = "注意，攻击游荡中的怪物会使其照常开始追猎你。仅玩家可获得，可通过加瓦尔特猴灵体或食用隐匿蜗牛获得。"
 	case StatusSprint:
-		details = "Disables normal attack. Player-only effect obtainable with the Sprinting Gazelle spirit."
+		details = "无法进行普通攻击。仅玩家可获得，可通过疾驰瞪羚灵体获得。"
 	case StatusTimeStop:
-		details = "Player-only effect obtainable with the Temporal Cat spirit."
+		details = "仅玩家可获得，可通过时序猫灵体获得。"
 	case StatusVampirism:
-		details = "Player-only effect obtainable with the Vampiric Bat spirit or by eating a polymorph fungus."
+		details = "仅玩家可获得，可通过吸血蝙蝠灵体或食用变形菌获得。"
 	}
 	return details
 }
@@ -677,18 +677,18 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 		g.Stats.Statuses[st]++
 		style := logNotable
 		if st.Bad() {
-			g.StoryLogf("Got %s (%s)", st, fmtTurns(turns, n))
+			g.StoryLogf("获得%s（%s）", st, fmtTurns(turns, n))
 			style = logHurtPlayer
 			if !active && GameConfig.WarningsExtra && (st == StatusFire || st == StatusPoison) {
 				g.WarningPrompt()
 			}
 		} else if st == StatusLignification || st == StatusBerserk || st == StatusFoggySkin {
-			g.StoryLogf("Became %s (%s)", st, fmtTurns(turns, n))
+			g.StoryLogf("变为%s（%s）", st, fmtTurns(turns, n))
 		}
-		g.LogfStyled("You’re %s (%s).", style, st, fmtTurns(turns, n))
+		g.LogfStyled("你处于%s状态（%s）。", style, st, fmtTurns(turns, n))
 		g.md.StopAuto()
 	} else if ei := g.Entity(i); g.InFOV(ei.P) {
-		g.Logf("The %s is %s (%s).", ei.Name, st, fmtTurns(turns, n))
+		g.Logf("%s变为%s（%s）。", ei.Name, st, fmtTurns(turns, n))
 	}
 	TotemEvents(g, &EventWithStatus{EvType: EventStatus, EvEntity: g.Entity(i), EvStatus: st})
 	switch st {
@@ -722,7 +722,7 @@ func (g *Game) PutStatusN(i ID, ai *Actor, st Status, turns int, n int) bool {
 
 func fmtTurns(turns int, n int) string {
 	turns -= n
-	return CountNoun("turn", turns)
+	return CountNoun("回合", turns)
 }
 
 // HPBonus returns the amount of HP for berserk or lignification.
@@ -741,16 +741,16 @@ func (g *Game) RemoveStatus(i ID, ai *Actor, st Status) {
 	}
 	ai.Statuses[st] = 0
 	if i == PlayerID {
-		g.LogfStyled("You’re no longer %s.", logStatusEnd, Status(st))
+		g.LogfStyled("你不再处于%s状态。", logStatusEnd, Status(st))
 		g.md.StopAuto()
 	}
 	switch st {
 	case StatusPoison:
 		dist := MaxFOVRange
 		if i == PlayerID {
-			g.Log("You expulse stinky and confusing toxins.")
+			g.Log("你排出带有恶臭、令人混乱的毒素。")
 		} else if ei := g.Entity(i); g.InFOV(ei.P) {
-			g.Logf("The %s expulses stinky and confusing toxins.", ei.Name)
+			g.Logf("%s排出了带有恶臭、令人混乱的毒素。", ei.Name)
 		}
 		g.confusingSmell(i, dist, DurationConfusionToxins)
 	case StatusBerserk:
@@ -880,15 +880,15 @@ func (g *Game) MindStateString(a *Actor) string {
 	}
 	switch beh.State {
 	case Hunting:
-		return "hunting"
+		return "追猎中"
 	default:
 		if g.Mod(ModCorruptedDungeon) {
 			return ""
 		}
 		if len(beh.Guard) > 0 {
-			return "guarding"
+			return "守卫中"
 		}
-		return "wandering"
+		return "游荡中"
 	}
 }
 
@@ -960,11 +960,11 @@ func (g *Game) handleGluttony() {
 				g.UpdateFOV()
 				g.UpdateKnowledge()
 			}
-			g.LogStyled("You cannot hold your appetite any longer!", logStatusEnd)
+			g.LogStyled("你再也无法忍受饥饿了！", logStatusEnd)
 			co.Use(g, id)
 		} else {
 			pa.Statuses[StatusGluttony] = 0
-			g.LogStyled("You search but cannot find anything to eat!", logStatusEnd)
+			g.LogStyled("你四处寻找，却找不到任何食物！", logStatusEnd)
 			g.PutStatus1(PlayerID, pa, StatusConfusion, DurationConfusionGluttony)
 		}
 	default:
@@ -1075,10 +1075,10 @@ func (g *Game) handleCornered(i ID, ai *Actor) {
 	}
 	// The actor is afraid and cornered: become berserk for a short while.
 	if i == PlayerID {
-		g.Log("You feel cornered.")
+		g.Log("你感到无路可退。")
 		g.Stats.Cornered++
 	} else if g.InFOV(from) {
-		g.LogfStyled("The afraid %s feels cornered.", logSpecial, ei.Name)
+		g.LogfStyled("恐惧的%s感到无路可退。", logSpecial, ei.Name)
 	}
 	g.PutStatus1(i, ai, StatusBerserk, DurationBerserkAfraid)
 }
@@ -1103,7 +1103,7 @@ func (g *Game) handleCorneredWithRatPhobia() {
 		}
 	}
 	// You feel cornered: become berserk for a short while.
-	g.Log("You feel cornered.")
+	g.Log("你感到无路可退。")
 	g.Stats.Cornered++
 	g.PutStatus1(PlayerID, pa, StatusBerserk, DurationBerserkAfraid)
 }
@@ -1128,7 +1128,7 @@ func (g *Game) TeleportActor(i ID, ai *Actor, n int) bool {
 				to = nto
 			}
 		}
-		g.LogStyled("A strange energy disturbs your teleportation!", logSpecial)
+		g.LogStyled("一股奇异能量干扰了你的传送！", logSpecial)
 	}
 	g.MoveActor(i, ai, to, MovTeleport)
 	g.teleportStatuses(i, ai, n)

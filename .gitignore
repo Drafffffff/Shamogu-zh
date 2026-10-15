@@ -15,3 +15,6 @@
 *.test
 shamogu
 rewrite.sh
+
+output/
+shamogu-zh
