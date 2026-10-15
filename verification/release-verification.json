@@ -2,8 +2,8 @@
   "release": "1.6.0-zh.1",
   "upstream_tag": "v1.6.0",
   "upstream_commit": "0c1e2d4a4e50ff4cc10cd922b4e82004b9659e5a",
-  "binary_sha256": "e3fe73eadb99314746bb27c9c67a521077c5ee112594556fc59fbc94c05aa64e",
-  "archive_sha256": "c4fa426e46e77df6263c9e675d342572380e6044bbed9edfc06961558b04064d",
+  "binary_sha256": "f43de60782b4993ff753d09d0b129a89b156937a89f1eae7d0b77ce45bff730c",
+  "archive_sha256": "029eb816728cc2e8db4ee39a02444fd4f2bf836ec7fbfb143bd8a16e78735071",
   "target_screen": [
     3840,
     2160
@@ -40,7 +40,8 @@
     "wasm_build": true,
     "linux_amd64_tests_under_emulation": true,
     "steam_installer_temporary_profile": true,
-    "original_175_embedded_images_preserved": true
+    "original_175_embedded_images_preserved": true,
+    "bazzite_native_go_and_sdl": true
   },
   "artwork": {
     "grid": {
@@ -85,15 +86,26 @@
     }
   },
   "installation": {
-    "installed": false,
-    "status": "pending_device_connection",
+    "installed": true,
+    "status": "installed_and_verified",
     "host": "bazzite.local",
     "known_ip": "192.168.50.20",
-    "connection_errors": [
-      "hostname resolution failed",
-      "known IP SSH timed out"
-    ],
-    "physical_display_verified": false,
-    "steam_keyboard_suppression_verified_on_device": false
-  }
+    "physical_display_verified": true,
+    "steam_keyboard_suppression_verified_on_device": true,
+    "installed_binary_sha256": "f43de60782b4993ff753d09d0b129a89b156937a89f1eae7d0b77ce45bff730c",
+    "steam_appid": 3189465904,
+    "steam_restarted": true,
+    "steam_library_play_button_verified": true,
+    "steam_artwork_detail_page_verified": true,
+    "normal_save_and_relaunch_verified": true,
+    "steam_left_running": true
+  },
+  "runtime_checks": [
+    "Centered new-game and saved-game home screens",
+    "48-column main spirit and help menus with continuous borders",
+    "80-column game map and 48-to-80 size transitions",
+    "No automatic keyboard on initial Steam launch or library Play relaunch",
+    "Steam native RunGame launch and visible library Play button launch",
+    "Save and quit followed by saved-game home"
+  ]
 }

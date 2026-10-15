@@ -1,0 +1,16 @@
+{
+  "entry": "Shamogu：萨满山灵守护者",
+  "appid": 3189465904,
+  "steam_game_id": 13698651749420630016,
+  "installed": "/home/bazzite/Games/shamogu-zh",
+  "config": "/home/bazzite/.local/share/Steam/userdata/146975941/config/shortcuts.vdf",
+  "artwork": {
+    "grid": "3189465904.png",
+    "poster": "3189465904p.png",
+    "hero": "3189465904_hero.png",
+    "logo": "3189465904_logo.png",
+    "icon": "3189465904_icon.png"
+  },
+  "existing_shortcuts_preserved": 9,
+  "backup": "/home/bazzite/Games/shamogu-zh/installation-records/20261015-185605-388860"
+}

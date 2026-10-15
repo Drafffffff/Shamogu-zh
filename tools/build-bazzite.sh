@@ -3,6 +3,7 @@ set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 HOST=${SHAMOGU_SSH_HOST:-bazzite}
 REMOTE=Games/shamogu-zh
+ssh "$HOST" 'mkdir -p ~/Games/shamogu-zh/source'
 rsync -az --exclude=.git --exclude=output --exclude=verification "$ROOT/" "$HOST:$REMOTE/source/"
 # Existing Fedora build environment; system image is not changed.
 ssh "$HOST" 'podman start dcss-zh-builder >/dev/null; podman exec dcss-zh-builder mkdir -p /work/shamogu-zh'
